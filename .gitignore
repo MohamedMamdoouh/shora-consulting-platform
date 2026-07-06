@@ -1,0 +1,54 @@
+# Build outputs
+**/bin/
+**/obj/
+**/dist/
+**/out/
+
+# .NET
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.DotSettings.user
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Node / Angular
+**/node_modules/
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# IDE
+.vs/
+.idea/
+*.swp
+*.swo
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Secrets and local config
+**/appsettings.*.local.json
+.env
+.env.*
+!.env.example
+secrets.json
+
+# Test / coverage
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# EF
+*.db
+*.db-shm
+*.db-wal

@@ -1,0 +1,21 @@
+<div class="shell">
+  <header class="shell__header">
+    <a routerLink="/" class="shell__brand">استشارات العلاقات</a>
+    <nav class="shell__nav">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">الرئيسية</a>
+      <a routerLink="/about" routerLinkActive="active">من نحن</a>
+      <a routerLink="/services" routerLinkActive="active">الخدمات</a>
+      <a routerLink="/booking/start" routerLinkActive="active">احجز جلسة</a>
+      <a routerLink="/dashboard" routerLinkActive="active">لوحتي</a>
+      <a routerLink="/auth/login" routerLinkActive="active">تسجيل الدخول</a>
+    </nav>
+  </header>
+
+  <main class="shell__main">
+    <router-outlet />
+  </main>
+
+  <footer class="shell__footer">
+    <p>مساحة دافئة للاستشارة — ليس سريراً طبياً.</p>
+  </footer>
+</div>

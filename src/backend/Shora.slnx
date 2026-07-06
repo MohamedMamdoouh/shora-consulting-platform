@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Shora.Api/Shora.Api.csproj" />
+  <Project Path="Shora.Application/Shora.Application.csproj" />
+  <Project Path="Shora.Domain/Shora.Domain.csproj" />
+  <Project Path="Shora.Infrastructure/Shora.Infrastructure.csproj" />
+  <Project Path="Shora.Tests/Shora.Tests.csproj" />
+</Solution>

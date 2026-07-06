@@ -42,8 +42,6 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
 
         builder.HasIndex(b => b.AvailabilitySlotId)
             .IsUnique()
-            .HasFilter(
-                "[AvailabilitySlotId] IS NOT NULL AND [Status] IN (" +
-                "'PendingPayment', 'PendingApproval', 'Confirmed', 'CancellationRequested', 'Completed')");
+            .HasFilter("[AvailabilitySlotId] IS NOT NULL");
     }
 }

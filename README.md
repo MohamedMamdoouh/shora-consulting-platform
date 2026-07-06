@@ -1,12 +1,14 @@
 # Shora
 
+[![CI](https://github.com/MohamedMamdoouh/shora-consulting-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/MohamedMamdoouh/shora-consulting-platform/actions/workflows/ci.yml)
+
 Arabic-first (RTL) relationship consulting booking platform. Implementation follows numbered specs in `[specs/](specs/)`.
 
 ## Repository layout
 
 ```text
 Shora/
-├── specs/                # Spec-driven documentation (01–08)
+├── specs/                # Spec-driven documentation (01–09)
 ├── src/
 │   ├── backend/          # .NET 10 Clean Architecture API
 │   └── frontend/         # Angular 21 app (package name: shora-web)
@@ -64,9 +66,17 @@ API base URL: `src/environments/environment.ts` → `https://localhost:7183/api`
 
 ## Tests
 
+Same commands as [CI](.github/workflows/ci.yml) — see [spec 09](specs/09-ci-cd-pipeline.md) for the full pipeline design.
+
 ```powershell
 cd src/backend
+dotnet build
 dotnet test
+
+cd ../frontend
+npm ci
+npm run build
+$env:CI = "true"; npm test
 ```
 
 ## Spec implementation roadmap
@@ -80,9 +90,10 @@ dotnet test
 | 05   | Manual payments (Vodafone Cash / InstaPay receipts) | Planned  |
 | 06   | Client dashboard                                    | Planned  |
 | 07   | Admin dashboard                                     | Planned  |
-| 08   | Cross-cutting concerns (jobs, rate limits, ops)     | Planned  |
+| 08   | Cross-cutting concerns (jobs, rate limits, ops)     | Planned      |
+| 09   | CI/CD pipeline (GitHub Actions; Azure CD later)     | **In progress** |
 
-Implement specs **in order** — each builds on the previous.
+Implement feature specs **in order** (01–08) — each builds on the previous. Spec 09 (CI/CD) runs in parallel with feature work.
 
 ## Architecture (backend)
 

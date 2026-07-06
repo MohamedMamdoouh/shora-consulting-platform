@@ -80,6 +80,7 @@ Every alert above must map to an operator runbook with owner + response SLA:
 
 ## 4. Deployment
 
+- **CI/CD workflow design and phased rollout:** see [spec 09](09-ci-cd-pipeline.md) (GitHub Actions CI now; Azure CD later).
 - **Receipt image storage:** an Azure Blob Storage account with a **private** container (`Storage:ReceiptContainer`) must be provisioned; the app writes receipt images there and mints short-lived SAS read URLs for admin viewing (spec 05 §4). No public blob access.
 - **Upload safety controls:** malware scanning service must be provisioned/integrated for uploaded receipts before admin review is allowed.
 - **Database migrations on deploy:** EF Core migrations (spec 01 §5) are applied automatically as part of the deploy/startup so schema stays in sync; seed data (Settings row, admin user, roles) runs once, idempotently.

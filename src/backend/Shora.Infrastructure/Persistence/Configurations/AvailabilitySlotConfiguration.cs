@@ -15,5 +15,9 @@ public class AvailabilitySlotConfiguration : IEntityTypeConfiguration<Availabili
             .WithOne()
             .HasForeignKey<AvailabilitySlot>(s => s.BookingId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasIndex(s => s.BookingId)
+            .IsUnique()
+            .HasFilter("[BookingId] IS NOT NULL");
     }
 }

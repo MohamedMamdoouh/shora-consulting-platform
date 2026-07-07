@@ -1,8 +1,6 @@
 # Shora
 
-[![CI](https://github.com/MohamedMamdoouh/shora-consulting-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/MohamedMamdoouh/shora-consulting-platform/actions/workflows/ci.yml)
-
-Arabic-first (RTL) relationship consulting booking platform. Implementation follows numbered specs in `[specs/](specs/)`.
+Arabic-first (RTL) relationship consulting booking platform. Implementation follows numbered specs in.
 
 ## Repository layout
 
@@ -81,16 +79,16 @@ $env:CI = "true"; npm test
 
 ## Spec implementation roadmap
 
-| Spec | Area                                                | Status   |
-| ---- | --------------------------------------------------- | -------- |
-| 01   | Project scaffold & data model                       | **Done** |
-| 02   | Authentication (JWT, Google, refresh tokens)        | Planned  |
-| 03   | Public pages (Home, About, Services)                | Planned  |
-| 04   | Booking flow                                        | Planned  |
-| 05   | Manual payments (Vodafone Cash / InstaPay receipts) | Planned  |
-| 06   | Client dashboard                                    | Planned  |
-| 07   | Admin dashboard                                     | Planned  |
-| 08   | Cross-cutting concerns (jobs, rate limits, ops)     | Planned      |
+| Spec | Area                                                | Status          |
+| ---- | --------------------------------------------------- | --------------- |
+| 01   | Project scaffold & data model                       | **Done**        |
+| 02   | Authentication (JWT, Google, refresh tokens)        | Planned         |
+| 03   | Public pages (Home, About, Services)                | Planned         |
+| 04   | Booking flow                                        | Planned         |
+| 05   | Manual payments (Vodafone Cash / InstaPay receipts) | Planned         |
+| 06   | Client dashboard                                    | Planned         |
+| 07   | Admin dashboard                                     | Planned         |
+| 08   | Cross-cutting concerns (jobs, rate limits, ops)     | Planned         |
 | 09   | CI/CD pipeline (GitHub Actions; Azure CD later)     | **In progress** |
 
 Implement feature specs **in order** (01–08) — each builds on the previous. Spec 09 (CI/CD) runs in parallel with feature work.

@@ -1,10 +1,14 @@
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { CONSULTATION_TOPICS, HOW_IT_WORKS_STEPS } from '../shared/topic.constants';
+import { BookingCtaComponent } from '../shared/booking-cta.component';
 
 @Component({
   selector: 'app-home-page',
-  imports: [RouterLink],
+  imports: [BookingCtaComponent],
   templateUrl: './home-page.component.html',
-  styleUrl: './home-page.component.scss'
+  styleUrl: './home-page.component.scss',
 })
-export class HomePageComponent {}
+export class HomePageComponent {
+  readonly topics = CONSULTATION_TOPICS;
+  readonly steps = HOW_IT_WORKS_STEPS;
+}

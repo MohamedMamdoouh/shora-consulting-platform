@@ -16,6 +16,11 @@ public static class ErrorCodes
         public const string ValidationFailed = "auth.validation_failed";
     }
 
+    public static class Settings
+    {
+        public const string NotFound = "settings.not_found";
+    }
+
     public static class General
     {
         public const string Validation = "general.validation";

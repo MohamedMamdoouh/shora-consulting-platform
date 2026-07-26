@@ -1,22 +1,26 @@
-import { Component } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { Component, inject } from '@angular/core';
+import { SettingsService } from '../../core/settings/settings.service';
+import { BookingCtaComponent } from '../shared/booking-cta.component';
+import { CONSULTATION_TOPICS } from '../shared/topic.constants';
 
 @Component({
   selector: 'app-services-page',
-  template: `
-    <section class="page">
-      <h1>الخدمات</h1>
-      <p>جلسة واحدة بسعر ثابت — التفاصيل ستُعرض ديناميكياً من واجهة الإعدادات في المواصفة 03.</p>
-    </section>
-  `,
-  styles: `
-    .page {
-      max-width: 40rem;
-      margin: 0 auto;
-      padding: var(--space-xl);
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-    }
-  `
+  imports: [AsyncPipe, BookingCtaComponent],
+  templateUrl: './services-page.component.html',
+  styleUrl: './services-page.component.scss',
 })
-export class ServicesPageComponent {}
+export class ServicesPageComponent {
+  private readonly settingsService = inject(SettingsService);
+
+  readonly topics = CONSULTATION_TOPICS;
+  readonly settings$ = this.settingsService.getPublicSettings();
+
+  formatPrice(amount: number): string {
+    return new Intl.NumberFormat('ar-EG', {
+      style: 'currency',
+      currency: 'EGP',
+      maximumFractionDigits: 0,
+    }).format(amount);
+  }
+}

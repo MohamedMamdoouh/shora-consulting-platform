@@ -3,11 +3,22 @@ export const CACHE_TTL_MS = {
   availability: 30_000,
 } as const;
 
-export const CACHE_KEYS = {
-  settingsPublic: 'settings:public',
-  availabilityPrefix: 'availability:',
-} as const;
+export interface CacheRequest {
+  url: string;
+  ttlMs: number;
+}
 
-export function availabilityCacheKey(from: string, to: string): string {
-  return `${CACHE_KEYS.availabilityPrefix}${from}:${to}`;
+export function settingsPublicRequest(apiBaseUrl: string): CacheRequest {
+  return {
+    url: `${apiBaseUrl}/settings/public`,
+    ttlMs: CACHE_TTL_MS.settingsPublic,
+  };
+}
+
+export function availabilityRequest(apiBaseUrl: string, from: string, to: string): CacheRequest {
+  const params = new URLSearchParams({ from, to });
+  return {
+    url: `${apiBaseUrl}/availability?${params}`,
+    ttlMs: CACHE_TTL_MS.availability,
+  };
 }

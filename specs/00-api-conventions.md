@@ -102,11 +102,22 @@ Register policies via `AddShoraCaching()`; pipeline includes `UseOutputCache()`.
 
 ### Frontend
 
-Use `ApiCacheService` (`src/frontend/src/app/core/api/api-cache.service.ts`) for cacheable GET requests. TTL constants mirror the backend in `cache.config.ts`:
+Use `ApiCacheService` (`src/frontend/src/app/core/api/api-cache.service.ts`) for cacheable GET requests. Cache identity is the request URL (query params normalized), so callers pass `url` + `ttlMs` only — never a separate key.
 
-- `settings:public` — 5 min
-- `availability:{from}:{to}` — 30 sec
+TTL constants and typed request builders live in `cache.config.ts`:
 
-Call `invalidatePrefix('availability:')` when the user enters the booking reserve/confirm step so checkout sees fresh slots after warm browsing.
+- `settingsPublicRequest(apiBaseUrl)` — `GET .../settings/public`, 5 min
+- `availabilityRequest(apiBaseUrl, from, to)` — `GET .../availability?from=&to=`, 30 sec
+
+Example:
+
+```typescript
+const req = settingsPublicRequest(environment.apiBaseUrl);
+return this.cache.getCached<PublicSettings>(req.url, req.ttlMs);
+```
+
+Call `invalidateUrlPrefix(\`${environment.apiBaseUrl}/availability\`)` when the user enters the booking reserve/confirm step so checkout sees fresh slots after warm browsing.
+
+Failed GETs are not cached: the service evicts the entry on HTTP error so the next call retries immediately.
 
 Do **not** route auth calls through `ApiCacheService`. No service worker for MVP.

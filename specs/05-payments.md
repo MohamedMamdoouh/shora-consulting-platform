@@ -4,7 +4,7 @@ Status: **Spec only — not implemented until explicitly requested.**
 
 ## 1. Overview
 
-Per SDD §5.4: single flat session price (default 500 EGP, admin-editable). There is **no online payment gateway**. The client pays **out-of-band** by transferring the session fee to the consultant's **Vodafone Cash** number or **InstaPay** handle, then uploads a **receipt image** as proof. The **admin manually reviews the receipt and approves or declines** it. A booking is only `Confirmed` after the admin approves — never automatically.
+Per SDD #5.4: single flat session price (default 500 EGP, admin-editable). There is **no online payment gateway**. The client pays **out-of-band** by transferring the session fee to the consultant's **Vodafone Cash** number or **InstaPay** handle, then uploads a **receipt image** as proof. The **admin manually reviews the receipt and approves or declines** it. A booking is only `Confirmed` after the admin approves — never automatically.
 
 This replaces the previous automated gateway entirely: there are no webhooks, no HMAC verification, no amount/currency auto-matching, no payment-initiate step, and no automated refund saga. Amount verification is now a **human step** (the admin eyeballs the receipt against the expected `Payment.Amount`).
 
@@ -28,15 +28,15 @@ All state changes are guarded by `Booking.RowVersion` (spec 01), so concurrent a
 
 ## 3. Endpoints
 
-| Endpoint | Auth | Purpose |
-|---|---|---|
-| `GET /api/bookings/{id}/payment-instructions` | Client (owner) | Returns Vodafone Cash number, InstaPay handle, amount, optional instructions, and the upload deadline for a `PendingPayment` booking. |
-| `POST /api/payments/{bookingId}/receipt` | Client (owner) | Multipart: `image` file + `method` (`VodafoneCash`\|`InstaPay`) + optional `senderReference`. Allowed only while the booking is `PendingPayment` and before `ReceiptUploadDeadlineUtc`. Moves the booking to `PendingApproval`. |
-| `GET /api/admin/bookings/{id}/receipts` | Admin | Returns `PaymentReceipt` attempt history + short-lived SAS URLs to view images. |
-| `POST /api/admin/bookings/{id}/receipts/approve` | Admin | Approves the pending receipt → booking `Confirmed`. |
-| `POST /api/admin/bookings/{id}/receipts/decline` | Admin | Body `{ reasonCode, reasonNote? }`. Declines pending receipt → booking back to `PendingPayment` with a new upload window. |
-| `POST /api/admin/payments/{id}/refunds/record` | Admin | Body `{ reference, note }`. Records a manual out-of-band refund on a cancelled booking's payment (§6). |
-| `POST /api/admin/payments/{id}/refunds/revoke` | Admin | Body `{ correctionReason }`. Admin correction path for an accidentally recorded refund; appends audit and reopens refund-due state. |
+| Endpoint                                         | Auth           | Purpose                                                                                                                                                                                                                         |
+| ------------------------------------------------ | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /api/bookings/{id}/payment-instructions`    | Client (owner) | Returns Vodafone Cash number, InstaPay handle, amount, optional instructions, and the upload deadline for a `PendingPayment` booking.                                                                                           |
+| `POST /api/payments/{bookingId}/receipt`         | Client (owner) | Multipart: `image` file + `method` (`VodafoneCash`\|`InstaPay`) + optional `senderReference`. Allowed only while the booking is `PendingPayment` and before `ReceiptUploadDeadlineUtc`. Moves the booking to `PendingApproval`. |
+| `GET /api/admin/bookings/{id}/receipts`          | Admin          | Returns `PaymentReceipt` attempt history + short-lived SAS URLs to view images.                                                                                                                                                 |
+| `POST /api/admin/bookings/{id}/receipts/approve` | Admin          | Approves the pending receipt → booking `Confirmed`.                                                                                                                                                                             |
+| `POST /api/admin/bookings/{id}/receipts/decline` | Admin          | Body `{ reasonCode, reasonNote? }`. Declines pending receipt → booking back to `PendingPayment` with a new upload window.                                                                                                       |
+| `POST /api/admin/payments/{id}/refunds/record`   | Admin          | Body `{ reference, note }`. Records a manual out-of-band refund on a cancelled booking's payment (#6).                                                                                                                          |
+| `POST /api/admin/payments/{id}/refunds/revoke`   | Admin          | Body `{ correctionReason }`. Admin correction path for an accidentally recorded refund; appends audit and reopens refund-due state.                                                                                             |
 
 ## 4. File Upload & Storage (security)
 
@@ -64,7 +64,7 @@ stateDiagram-v2
     AwaitingReceipt --> UnderReview: client uploads receipt
     UnderReview --> Approved: admin approves (booking Confirmed)
     UnderReview --> AwaitingReceipt: admin declines (client re-uploads)
-    Approved --> Refunded: admin records manual refund after cancellation (§6)
+    Approved --> Refunded: admin records manual refund after cancellation (#6)
     AwaitingReceipt --> Void: booking cancelled / upload deadline expired before approval
     UnderReview --> Void: booking cancelled by admin/client before approval
     Approved --> [*]
@@ -76,7 +76,7 @@ stateDiagram-v2
 
 Refunds are **only** triggered by a cancellation and are handled **entirely out-of-band** — the admin sends the money back via Vodafone Cash / InstaPay themselves, then records it in the system. There is no automated refund call, no saga, and no reconciliation job.
 
-- **When a refund is due**: approving a client cancellation request (spec 04 §3) or an admin direct-cancel of a `Confirmed` booking whose `Payment.Status = Approved`. The cancellation itself commits immediately (booking `Cancelled`, slot released per spec 01); the payment stays `Approved` and is flagged as **refund-due** in the admin UI (spec 07).
+- **When a refund is due**: approving a client cancellation request (spec 04 #3) or an admin direct-cancel of a `Confirmed` booking whose `Payment.Status = Approved`. The cancellation itself commits immediately (booking `Cancelled`, slot released per spec 01); the payment stays `Approved` and is flagged as **refund-due** in the admin UI (spec 07).
 - **Recording the refund (integrity hardening):**
   - The admin performs the transfer, then calls `POST /api/admin/payments/{id}/refunds/record` with a **required** `reference` and optional note.
   - Endpoint is idempotent: if already `Refunded`, it returns success with current state and does not duplicate outbox effects.
@@ -92,7 +92,7 @@ Refunds are **only** triggered by a cancellation and are handled **entirely out-
 
 ## 8. Failure & Edge Cases
 
-- **Client never uploads a receipt**: the upload-deadline cleanup job (spec 04 §5, spec 08) cancels the `PendingPayment` booking once `ReceiptUploadDeadlineUtc` passes, **releases the slot** (`IsBooked = false`, `BookingId = null`, `Booking.AvailabilitySlotId = null`, spec 01), sets `Payment.Status = Void`, and emails the client.
+- **Client never uploads a receipt**: the upload-deadline cleanup job (spec 04 #5, spec 08) cancels the `PendingPayment` booking once `ReceiptUploadDeadlineUtc` passes, **releases the slot** (`IsBooked = false`, `BookingId = null`, `Booking.AvailabilitySlotId = null`, spec 01), sets `Payment.Status = Void`, and emails the client.
 - **Uploaded receipt is wrong/unreadable/underpaid**: the admin declines with a reason; the client re-uploads within a fresh window. Repeated declines simply reset the window; if the client stops re-uploading, the deadline cleanup eventually cancels the hold.
 - **Client uploads twice quickly**: only allowed while `PendingPayment`; the first upload moves the booking to `PendingApproval`, so the second loses on the status guard / `RowVersion`.
 - **Admin approves and declines concurrently** (two tabs): `RowVersion` guarantees exactly one wins; the other gets a 409.

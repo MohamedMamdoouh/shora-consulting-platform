@@ -4,9 +4,9 @@ public class AvailabilitySlot
 {
     public Guid Id { get; set; }
 
-    public DateTime StartTime { get; set; }
+    public DateTime StartTimeUtc { get; set; }
 
-    public DateTime EndTime { get; set; }
+    public DateTime EndTimeUtc { get; set; }
 
     public bool IsBooked { get; set; }
 

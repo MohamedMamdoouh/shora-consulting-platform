@@ -1,0 +1,19 @@
+<section class="auth-card">
+  <h1>تأكيد البريد الإلكتروني</h1>
+
+  <div
+    class="auth-banner"
+    [class.auth-banner--success]="status === 'success'"
+    [class.auth-banner--error]="status === 'error'"
+  >
+    @if (status === 'loading') {
+      <p>جاري التحقق...</p>
+    } @else {
+      <p>{{ message }}</p>
+    }
+  </div>
+
+  <div class="auth-links">
+    <a routerLink="/auth/login">العودة لتسجيل الدخول</a>
+  </div>
+</section>

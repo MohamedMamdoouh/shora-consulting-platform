@@ -1,6 +1,6 @@
 # 09 — CI/CD Pipeline
 
-This spec defines how Shora is built, validated, and (later) deployed. It complements spec 08 §4 (hosting topology) with concrete GitHub Actions workflows and a phased rollout plan. Workflow YAML stays thin; this document is the authoritative design.
+This spec defines how Shora is built, validated, and (later) deployed. It complements spec 08 #4 (hosting topology) with concrete GitHub Actions workflows and a phased rollout plan. Workflow YAML stays thin; this document is the authoritative design.
 
 ## 1. Goals
 
@@ -33,7 +33,7 @@ Two **parallel** jobs — no secrets required; read-only `contents` permission.
 | Build      | `dotnet build --no-restore`                            |
 | Test       | `dotnet test --no-build --verbosity normal`            |
 
-- **6 xUnit tests** in `Shora.Tests` (in-memory EF — no SQL Server service in CI).
+- **~20 xUnit tests** in `Shora.Tests` (SQL Server via Testcontainers — Docker required on the runner).
 - **Cache:** NuGet packages via `setup-dotnet` cache.
 
 ### 3.2 Frontend job
@@ -67,7 +67,7 @@ Planned workflow: `.github/workflows/deploy.yml` (separate from CI).
 | **Environments**  | GitHub Environments: `staging`, `production` (production requires manual approval / reviewers)                |
 | **Triggers**      | `workflow_dispatch` for staging; tag `v`\* (semver) for production — not auto-deploy on every merge to `main` |
 | **Build**         | `npm run build` → copy Angular output into API `wwwroot` → `dotnet publish`                                   |
-| **Deploy target** | Azure App Service (Linux, .NET 10, always-on — background jobs run in-process, spec 08 §3)                    |
+| **Deploy target** | Azure App Service (Linux, .NET 10, always-on — background jobs run in-process, spec 08 #3)                    |
 | **Secrets**       | App Service application settings or Azure Key Vault references — never in repo                                |
 
 ### Deploy sequence (planned)
@@ -76,11 +76,11 @@ Planned workflow: `.github/workflows/deploy.yml` (separate from CI).
 2. Build frontend production bundle.
 3. Publish API with static files embedded (same-site model).
 4. Deploy artifact to App Service (e.g. `azure/webapps-deploy` or OIDC federated login).
-5. App startup applies EF migrations and idempotent seed (spec 09 §8) — no separate migration job for MVP.
+5. App startup applies EF migrations and idempotent seed (spec 09 #8) — no separate migration job for MVP.
 
 ## 6. Azure Prerequisites (CD)
 
-Cross-ref [spec 08 §4](08-cross-cutting-concerns.md). Required before Phase 2:
+Cross-ref [spec 08 #4](08-cross-cutting-concerns.md). Required before Phase 2:
 
 | Resource               | Purpose                                                         |
 | ---------------------- | --------------------------------------------------------------- |
@@ -106,26 +106,25 @@ GitHub Actions CD will use **OIDC federated credentials** to Azure (preferred ov
 
 ## 7. Same-Site Deploy Model
 
-MVP requires frontend and API on the **same registrable domain** over HTTPS (spec 02 §deployment constraint, spec 08 §4).
+MVP requires frontend and API on the **same registrable domain** over HTTPS (spec 02 #deployment constraint, spec 08 #4).
 
 - Angular static files served from the API host (e.g. `wwwroot`) or reverse-proxied under the same origin.
 - API routes remain under `/api/**`.
 - **Not** split across unrelated subdomains with cross-site cookies in MVP.
-- CORS configured for the single app origin with `AllowCredentials` (spec 08 §4).
+- CORS configured for the single app origin with `AllowCredentials` (spec 08 #4).
 
 ## 8. Migrations & Startup
 
-EF Core migrations and idempotent seed run on application startup in non-test environments (`[Program.cs](../src/backend/Shora.Api/Program.cs)` — `InitializeDatabaseAsync` skipped when `Environment` is `Testing`).
+EF Core migrations and idempotent seed run on application startup (`[Program.cs](../src/backend/Shora.Api/Program.cs)` — `InitializeDatabaseAsync`).
 
-- **CI:** does not hit a real database; tests use in-memory EF.
-- **CD (MVP):** no separate `dotnet ef database update` step in the pipeline — deploy relies on startup migration (spec 01 §5, spec 08 §4).
+- **CI:** backend tests spin up SQL Server via Testcontainers (Docker on `ubuntu-latest`).
+- **CD (MVP):** no separate `dotnet ef database update` step in the pipeline — deploy relies on startup migration (spec 01 #5, spec 08 #4).
 - **Rollback:** application rollback does not auto-revert schema; forward-only migrations require operational runbook if a bad migration ships (out of MVP automation scope).
 
 ## 9. Out of Scope (MVP Pipeline)
 
 - Docker image build/push and container registry deploy (unless hosting choice changes)
 - Multi-region or blue/green deploy
-- SQL Server integration tests in CI (in-memory unit/integration tests only for now)
 - Automated production deploy on every merge to `main`
 - Full APM / deployment smoke-test suite (add incrementally post-MVP)
 

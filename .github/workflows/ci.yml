@@ -58,6 +58,7 @@ jobs:
         run: dotnet build --no-restore
 
       - name: Test
+        # Backend tests spin up SQL Server via Testcontainers (requires Docker).
         run: dotnet test --no-build --verbosity normal
 
   frontend:

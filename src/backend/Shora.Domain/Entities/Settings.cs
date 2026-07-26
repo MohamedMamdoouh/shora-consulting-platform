@@ -6,11 +6,11 @@ public class Settings
 
     public int Id { get; set; } = SingletonId;
 
-    public decimal SessionPrice { get; set; } = 500m;
+    public decimal SessionPrice { get; set; }
 
-    public int SessionDurationMinutes { get; set; } = 60;
+    public int SessionDurationMinutes { get; set; }
 
-    public int BufferMinutes { get; set; } = 15;
+    public int BufferMinutes { get; set; }
 
     public string ConsultantWhatsAppNumber { get; set; } = string.Empty;
 
@@ -20,9 +20,10 @@ public class Settings
 
     public string? PaymentInstructions { get; set; }
 
-    public int ReceiptUploadWindowMinutes { get; set; } = 60;
+    public int ReceiptUploadWindowMinutes { get; set; }
 
-    public int CancellationRequestAutoDeclineHours { get; set; } = 1;
+    public int CancellationRequestAutoDeclineHours { get; set; }
 
-    public int ReceiptRetentionMonths { get; set; } = 24;
+    public int ReceiptRetentionMonths { get; set; }
+
 }

@@ -4,7 +4,7 @@
 
 ## 1. Architecture: Pragmatic Clean Architecture
 
-The backend follows **Clean Architecture** with four layers, applied pragmatically (see §1.3 for the deliberate simplifications). Dependencies point **inward only** — outer layers depend on inner layers, never the reverse.
+The backend follows **Clean Architecture** with four layers, applied pragmatically (see #1.3 for the deliberate simplifications). Dependencies point **inward only** — outer layers depend on inner layers, never the reverse.
 
 ### 1.1 Dependency Flow
 
@@ -55,13 +55,13 @@ Rationale: this keeps external, swappable concerns (payments, email) behind inte
 
 ### 2.1 Layer Responsibilities & Key Types
 
-- **Domain** — entities and enums from §4 (`ApplicationUser`, `Booking`, `CancellationRequest`, `Payment`, `PaymentReceipt`, `AvailabilitySlot`, `AvailabilityWindow`, `BlockedDate`, `Settings`), plus domain enums and any invariant rules (e.g. a `Booking` cannot be confirmed without an admin-approved payment). No EF attributes required (mapping configured in Infrastructure).
+- **Domain** — entities and enums from #4 (`ApplicationUser`, `Booking`, `CancellationRequest`, `Payment`, `PaymentReceipt`, `AvailabilitySlot`, `AvailabilityWindow`, `BlockedDate`, `Settings`), plus domain enums and any invariant rules (e.g. a `Booking` cannot be confirmed without an admin-approved payment). No EF attributes required (mapping configured in Infrastructure).
 - **Application** — the use-cases and the interfaces they depend on:
   - Use-case services: `BookingService`, `PaymentService` (receipt upload + admin approve/decline + manual refund), `CancellationService` (cancellation requests + decisions), `AvailabilityService`, `SettingsService`, `AuthService` (orchestration around Identity).
   - Abstraction interfaces (implemented by Infrastructure): `IApplicationDbContext`, `IFileStorage` (stores receipt images in a private blob container, issues short-lived read URLs), `IEmailSender`, `IDateTimeProvider` (so time-based logic like the upload deadline and cancellation auto-decline is testable), `ICurrentUser` (resolves the authenticated user id/role).
   - Request/response DTOs and validation (e.g. FluentValidation or DataAnnotations).
 - **Infrastructure** — concrete implementations (spec 01 scope):
-  - `ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>` implementing `IApplicationDbContext`; fluent entity configurations in `Persistence/Configurations/`; initial migration `20260706205915_InitialCreate`.
+  - `ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>` implementing `IApplicationDbContext`; fluent entity configurations in `Data/Configurations/`; initial migration `20260706205915_InitialCreate`.
   - `SystemDateTimeProvider : IDateTimeProvider` — live UTC clock.
   - `NoOpEmailSender : IEmailSender` — stub; real SMTP in spec 02/08.
   - `NotImplementedFileStorage : IFileStorage` — throws until spec 05 (Azure Blob).
@@ -106,7 +106,7 @@ Rationale: this keeps external, swappable concerns (payments, email) behind inte
 
 ## 4. Data Model (detailed)
 
-Builds on the high-level ERD in the SDD (§7). Per the architecture in §1, these are **Domain entities** (plain C# classes, no EF attributes); their table mapping and relationships are configured in the **Infrastructure** layer's EF Core entity configurations, and they are persisted via `ApplicationDbContext` (exposed to the Application layer as `IApplicationDbContext`).
+Builds on the high-level ERD in the SDD (#7). Per the architecture in #1, these are **Domain entities** (plain C# classes, no EF attributes); their table mapping and relationships are configured in the **Infrastructure** layer's EF Core entity configurations, and they are persisted via `ApplicationDbContext` (exposed to the Application layer as `IApplicationDbContext`).
 
 **Timezone convention (cross-cutting):** all `DateTime` fields below are stored in **UTC**. Conversion to the visitor's local browser timezone happens in the Angular UI only. The database and API never deal in local time.
 
@@ -114,7 +114,7 @@ Builds on the high-level ERD in the SDD (§7). Per the architecture in §1, thes
 
 | Field       | Type                     | Notes                                                                                                                                                                        |
 | ----------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| DisplayName | `string`                 | Defaulted from the Google profile name or the email local-part at signup; editable and may be a pseudonym per SDD §5.7                                                       |
+| DisplayName | `string`                 | Defaulted from the Google profile name or the email local-part at signup; editable and may be a pseudonym per SDD #5.7                                                       |
 | Email       | `string`                 | **Required and unique.** Every account has an email (either entered for email/password signup, or provided by Google). Used for login and the password-reset path (spec 02). |
 | Role        | `enum { Client, Admin }` | Enforced via Identity roles, mirrored here for convenience queries                                                                                                           |
 
@@ -122,7 +122,7 @@ Notes:
 
 - **No phone field at the account level.** Phone is not collected at signup and is not verified. A contact phone is captured per-booking only when needed for a voice call (see `Booking.ContactPhone` below).
 - **External logins (Google)** are supported via ASP.NET Core Identity's external-login linking (`AspNetUserLogins`); a Google account is linked to the `ApplicationUser` (see spec 02).
-- **Email verification required before booking** (confirmed): Identity's built-in `EmailConfirmed` flag is used. Email/password signups must verify via an emailed link before they can reserve a slot (spec 02 §7, spec 04); Google accounts are marked confirmed automatically (Google has already verified the address).
+- **Email verification required before booking** (confirmed): Identity's built-in `EmailConfirmed` flag is used. Email/password signups must verify via an emailed link before they can reserve a slot (spec 02 #7, spec 04); Google accounts are marked confirmed automatically (Google has already verified the address).
 
 ### `AvailabilitySlot`
 
@@ -134,20 +134,20 @@ Notes:
 | IsBooked  | `bool`     |                                                                                                 |
 | BookingId | `Guid?`    | FK, nullable until booked. Points to the **currently active holder** of this slot only (if any) |
 
-**Uniqueness & generation concurrency (M1):** a **unique index on** `StartTime` prevents duplicate slots. All slot materialization (on-save regeneration in spec 07 and the nightly top-up job) runs through a **single serialized generation path** guarded by the same DB lease as other background jobs (see §2.1 / spec 08), so on-save and the top-up job can never race to insert the same slot. Generation is idempotent: it upserts missing slots and never touches booked ones.
+**Uniqueness & generation concurrency (M1):** a **unique index on** `StartTime` prevents duplicate slots. All slot materialization (on-save regeneration in spec 07 and the nightly top-up job) runs through a **single serialized generation path** guarded by the same DB lease as other background jobs (see #2.1 / spec 08), so on-save and the top-up job can never race to insert the same slot. Generation is idempotent: it upserts missing slots and never touches booked ones.
 
 **Booking/slot consistency invariant:** `AvailabilitySlot` is the lock; `Booking.AvailabilitySlotId` is set only while the booking **currently holds** the slot. Historical times live in `SlotStartUtc`/`SlotEndUtc` snapshots (not the FK). All changes run in one DB transaction:
 
-- **reserve:** set `Booking.Status = PendingPayment`, `Booking.AvailabilitySlotId = slotId`, snapshot `SlotStartUtc`/`SlotEndUtc`, `AvailabilitySlot.IsBooked = true`, `AvailabilitySlot.BookingId = bookingId` — slot claim is atomic (`UPDATE ... WHERE IsBooked = 0`, spec 04 §5);
+- **reserve:** set `Booking.Status = PendingPayment`, `Booking.AvailabilitySlotId = slotId`, snapshot `SlotStartUtc`/`SlotEndUtc`, `AvailabilitySlot.IsBooked = true`, `AvailabilitySlot.BookingId = bookingId` — slot claim is atomic (`UPDATE ... WHERE IsBooked = 0`, spec 04 #5);
 - **release** (cancel, auto-cancel, completion, or any path that frees the slot): set `AvailabilitySlot.IsBooked = false`, `AvailabilitySlot.BookingId = null`, and **`Booking.AvailabilitySlotId = null`** in the same transaction.
 
 **Concurrency (defense in depth):**
 
-- **Primary:** atomic slot-row update on `IsBooked` (spec 04 §5).
+- **Primary:** atomic slot-row update on `IsBooked` (spec 04 #5).
 - **Secondary:** filtered **unique** index on `Booking(AvailabilitySlotId) WHERE AvailabilitySlotId IS NOT NULL` — at most one booking linked to a slot at a time; cleared on release so a slot can be re-booked after cancel without conflicting with old rows.
 - **Secondary:** filtered **unique** index on `AvailabilitySlot(BookingId) WHERE BookingId IS NOT NULL` — a booking cannot hold two slots.
 
-Generated from admin-defined recurring weekly windows (see spec 07) — the windows themselves are stored separately as `AvailabilityWindow` (recurring rule), and concrete `AvailabilitySlot` rows are materialized from them. The exact packing rule (session + buffer, trailing partial handling) is defined in spec 07 §2.
+Generated from admin-defined recurring weekly windows (see spec 07) — the windows themselves are stored separately as `AvailabilityWindow` (recurring rule), and concrete `AvailabilitySlot` rows are materialized from them. The exact packing rule (session + buffer, trailing partial handling) is defined in spec 07 #2.
 
 ### `AvailabilityWindow` (admin-defined recurring rule — supports spec 07)
 
@@ -185,12 +185,12 @@ Creating a `BlockedDate` is **rejected** if the range overlaps any `Availability
 | SlotEndUtc               | `DateTime`                                                                                         | Snapshot of the slot's end time, copied at reserve time                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | DeliveryMethod           | `enum { VoiceCall, Chat }`                                                                         |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | ContactPhone             | `string?`                                                                                          | Captured at booking time; **required when** `DeliveryMethod = VoiceCall` (so the consultant can call), otherwise null. Never collected at signup; visible only to the **admin and the owning client** (the client dashboard shows it in the "you'll receive a call on…" instructions, spec 06) — never to other clients or public endpoints.                                                                                                                                                                                                                                                                      |
-| Status                   | `enum { PendingPayment, PendingApproval, Confirmed, CancellationRequested, Completed, Cancelled }` | `PendingPayment` = reserved, awaiting the client's receipt upload; `PendingApproval` = receipt uploaded, awaiting admin review; `CancellationRequested` = client has asked to cancel a confirmed booking, awaiting the admin's decision (spec 04 §3). `Completed` is set **automatically** by a background job once `SlotEndUtc` has passed (see spec 07) — there is no manual "mark completed" action. A booking is also set to `Cancelled` **automatically** when its receipt-upload deadline expires while still `PendingPayment` (spec 04 §4) — no booking stays `PendingPayment` after its slot is released. |
+| Status                   | `enum { PendingPayment, PendingApproval, Confirmed, CancellationRequested, Completed, Cancelled }` | `PendingPayment` = reserved, awaiting the client's receipt upload; `PendingApproval` = receipt uploaded, awaiting admin review; `CancellationRequested` = client has asked to cancel a confirmed booking, awaiting the admin's decision (spec 04 #3). `Completed` is set **automatically** by a background job once `SlotEndUtc` has passed (see spec 07) — there is no manual "mark completed" action. A booking is also set to `Cancelled` **automatically** when its receipt-upload deadline expires while still `PendingPayment` (spec 04 #4) — no booking stays `PendingPayment` after its slot is released. |
 | ReceiptUploadDeadlineUtc | `DateTime?`                                                                                        | UTC. Set when the booking enters `PendingPayment` (reserve, or after a declined receipt) to `now + Settings.ReceiptUploadWindowMinutes`. The cleanup job cancels the booking if no receipt is uploaded by this time. Null once a receipt is under review (`PendingApproval`) — no auto-cancel while awaiting the admin.                                                                                                                                                                                                                                                                                           |
 | CreatedAt                | `DateTime`                                                                                         | UTC                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | RowVersion               | `rowversion`                                                                                       | **Optimistic-concurrency token.** Every status transition is a conditional update (`WHERE Status = expectedStatus`, token checked); when two actors race (e.g. client cancellation request vs admin approve vs the auto-decline job), exactly one transition commits and the loser gets a conflict (HTTP 409) — never two audit rows or duplicate emails for one transition.                                                                                                                                                                                                                                      |
 
-**Slot-history rule:** booking history never depends on the slot row surviving. `SlotStartUtc`/`SlotEndUtc` are snapshotted onto the booking at reserve time, so dashboards (specs 06/07) and time guards (spec 04 §4) always work even if the underlying unbooked `AvailabilitySlot` is later removed by regeneration or a `BlockedDate` (the FK is nullable with `SET NULL`). Slots referenced by an **active** booking are never removed (spec 07 §2).
+**Slot-history rule:** booking history never depends on the slot row surviving. `SlotStartUtc`/`SlotEndUtc` are snapshotted onto the booking at reserve time, so dashboards (specs 06/07) and time guards (spec 04 #4) always work even if the underlying unbooked `AvailabilitySlot` is later removed by regeneration or a `BlockedDate` (the FK is nullable with `SET NULL`). Slots referenced by an **active** booking are never removed (spec 07 #2).
 
 ### `BookingStatusAudit` (status-change audit trail — supports H6)
 
@@ -217,7 +217,7 @@ Every booking status transition writes one row **inside the same DB transaction*
 | RequestedAtUtc          | `DateTime`                                           | UTC                                                                                                                                                                                                           |
 | ClientReason            | `string?`                                            | Optional free-text reason supplied by the client                                                                                                                                                              |
 | AutoDeclineAtUtc        | `DateTime`                                           | UTC. Snapshot of `Booking.SlotStartUtc - Settings.CancellationRequestAutoDeclineHours` at request time. The auto-decline job (spec 08) declines the request once `now >= AutoDeclineAtUtc` if still `Pending` |
-| Status                  | `enum { Pending, Approved, Declined, AutoDeclined }` | See the cancellation-request workflow in spec 04 §3                                                                                                                                                           |
+| Status                  | `enum { Pending, Approved, Declined, AutoDeclined }` | See the cancellation-request workflow in spec 04 #3                                                                                                                                                           |
 | ReopenCount             | `int`                                                | Number of times a declined request was reopened by the client (max 1)                                                                                                                                         |
 | ReviewedByAdminId       | `Guid?`                                              | FK to the admin who approved/declined; null while `Pending` or when `AutoDeclined`                                                                                                                            |
 | ReviewedAtUtc           | `DateTime?`                                          | UTC of the admin decision (or the auto-decline)                                                                                                                                                               |
@@ -225,7 +225,7 @@ Every booking status transition writes one row **inside the same DB transaction*
 | DecisionReason          | `string?`                                            | Optional admin note on decline (surfaced to the client, spec 06)                                                                                                                                              |
 | ClientDecisionSeenAtUtc | `DateTime?`                                          | UTC when the client acknowledged the latest decline/auto-decline banner (supports deterministic "one-time note" UX in spec 06)                                                                                |
 
-A `CancellationRequest` is created only for a `Confirmed` booking (spec 04 §3); the booking moves to `CancellationRequested` in the same transaction. Approval cancels the booking (and creates a refund-due, spec 05 §6); decline/auto-decline returns it to `Confirmed`. To reduce accidental admin no-response harm, one reopen is allowed after a decline while still before the deadline (`ReopenCount <= 1`).
+A `CancellationRequest` is created only for a `Confirmed` booking (spec 04 #3); the booking moves to `CancellationRequested` in the same transaction. Approval cancels the booking (and creates a refund-due, spec 05 #6); decline/auto-decline returns it to `Confirmed`. To reduce accidental admin no-response harm, one reopen is allowed after a decline while still before the deadline (`ReopenCount <= 1`).
 
 ### `Payment`
 
@@ -237,7 +237,7 @@ A `CancellationRequest` is created only for a `Confirmed` booking (spec 04 §3);
 | Status                 | `enum { AwaitingReceipt, UnderReview, Approved, Refunded, Void }` | See the payment state machine in spec 05. `AwaitingReceipt` = reserved, no receipt yet; `UnderReview` = a receipt is pending admin review; `Approved` = admin verified the transfer (booking confirmed) **or refund-due reopened after a mistaken refund record was revoked**; `Refunded` = admin recorded a manual out-of-band refund after cancellation; `Void` = booking cancelled/expired before any receipt was approved (no money confirmed). |
 | Amount                 | `decimal(10,2)`                                                   | Session price in **EGP major units**, snapshot at **booking reserve time** so admin price changes never alter an already-started booking                                                                                                                                                                                                                                                                                                            |
 | Currency               | `string`                                                          | ISO code, `"EGP"`                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| RefundedAtUtc          | `DateTime?`                                                       | UTC when the admin recorded the manual refund (`refunds/record`, spec 05 §6)                                                                                                                                                                                                                                                                                                                                                                        |
+| RefundedAtUtc          | `DateTime?`                                                       | UTC when the admin recorded the manual refund (`refunds/record`, spec 05 #6)                                                                                                                                                                                                                                                                                                                                                                        |
 | RefundReference        | `string?`                                                         | Admin-entered reference/note for the out-of-band refund transfer (Vodafone Cash/InstaPay)                                                                                                                                                                                                                                                                                                                                                           |
 | RefundedByAdminId      | `Guid?`                                                           | FK to the admin who recorded the refund                                                                                                                                                                                                                                                                                                                                                                                                             |
 | RefundRevokedAtUtc     | `DateTime?`                                                       | UTC when an incorrectly recorded refund was revoked (`refunds/revoke`)                                                                                                                                                                                                                                                                                                                                                                              |
@@ -297,16 +297,16 @@ These are enforced in domain/application guards and validated in tests:
 | VodafoneCashNumber                  | `string`        | Admin-editable. The Vodafone Cash number the client transfers the session fee to; shown in the payment instructions (spec 04/05).                                                                       |
 | InstaPayHandle                      | `string`        | Admin-editable. The InstaPay address/handle (IPA) the client transfers to; shown in the payment instructions.                                                                                           |
 | PaymentInstructions                 | `string?`       | Optional admin-editable free-text shown alongside the transfer details (e.g. "put your name in the transfer note").                                                                                     |
-| ReceiptUploadWindowMinutes          | `int`           | Default 60. How long a client has to upload a receipt after reserving (or after a declined receipt) before the hold is auto-cancelled (spec 04 §4).                                                     |
-| CancellationRequestAutoDeclineHours | `int`           | Default 1. A client cancellation request is auto-declined at `SlotStartUtc - this` if the admin hasn't acted; a request cannot be submitted once less than this remains (spec 04 §3).                   |
-| ReceiptRetentionMonths              | `int`           | Default 24. How long receipt images are retained before secure purge/anonymization (spec 08 §5).                                                                                                        |
+| ReceiptUploadWindowMinutes          | `int`           | Default 60. How long a client has to upload a receipt after reserving (or after a declined receipt) before the hold is auto-cancelled (spec 04 #4).                                                     |
+| CancellationRequestAutoDeclineHours | `int`           | Default 1. A client cancellation request is auto-declined at `SlotStartUtc - this` if the admin hasn't acted; a request cannot be submitted once less than this remains (spec 04 #3).                   |
+| ReceiptRetentionMonths              | `int`           | Default 24. How long receipt images are retained before secure purge/anonymization (spec 08 #5).                                                                                                        |
 
 **Validation constraints (H4)** — enforced both in the Application layer (FluentValidation) when the admin saves and as CHECK-style guards, so a bad edit can never corrupt scheduling/pricing:
 
 - `SessionPrice` > 0.
 - `SessionPrice` has at most 2 decimal places (EGP minor-unit precision).
 - `SessionDurationMinutes` between 30 and 240.
-- `BufferMinutes` >= 0 (and `SessionDurationMinutes + BufferMinutes` must divide a window sensibly — see spec 07 §2).
+- `BufferMinutes` >= 0 (and `SessionDurationMinutes + BufferMinutes` must divide a window sensibly — see spec 07 #2).
 - `ReceiptUploadWindowMinutes` >= 5.
 - `CancellationRequestAutoDeclineHours` >= 0.
 - `ReceiptRetentionMonths` between 1 and 60.
@@ -334,11 +334,11 @@ These are enforced in domain/application guards and validated in tests:
 | ProcessedAtUtc   | `DateTime?`                                 | UTC when delivered                                                                          |
 | LastError        | `string?`                                   | Last delivery failure detail                                                                |
 
-Any side effect that must be reliable (emails, future integrations) is written as an `OutboxMessage` **in the same DB transaction** as the state transition that triggered it. A background dispatcher job sends and marks processed with retry/backoff. **Dead-letter policy:** after 8 failed attempts (exponential backoff, ~last attempt ≈ 24h after creation) the message is marked `DeadLettered`, an alert fires (spec 08 §2), and it is only retried again by explicit admin/operator action — a permanently broken message can never wedge the dispatcher or retry forever.
+Any side effect that must be reliable (emails, future integrations) is written as an `OutboxMessage` **in the same DB transaction** as the state transition that triggered it. A background dispatcher job sends and marks processed with retry/backoff. **Dead-letter policy:** after 8 failed attempts (exponential backoff, ~last attempt ≈ 24h after creation) the message is marked `DeadLettered`, an alert fires (spec 08 #2), and it is only retried again by explicit admin/operator action — a permanently broken message can never wedge the dispatcher or retry forever.
 
 ## 5. Migrations & Seed Data
 
-- **Initial migration** (`Shora.Infrastructure/Persistence/Migrations/20260706205915_InitialCreate`) creates Identity tables + all domain tables above, including:
+- **Initial migration** (`Shora.Infrastructure/Data/Migrations/20260706205915_InitialCreate`) creates Identity tables + all domain tables above, including:
   - Unique indexes: `AvailabilitySlot.StartTime`, `Payment.BookingId`, `CancellationRequest.BookingId`, `OutboxMessage.IdempotencyKey`, `RefreshToken.TokenHash`
   - Filtered unique index on `Booking(AvailabilitySlotId) WHERE AvailabilitySlotId IS NOT NULL`
   - Filtered unique index on `AvailabilitySlot(BookingId) WHERE BookingId IS NOT NULL`
@@ -348,7 +348,7 @@ Any side effect that must be reliable (emails, future integrations) is written a
   - `BookingStatusAudit`, `CancellationRequest`, `PaymentReceipt`, `RefreshToken`, and `OutboxMessage` tables
   - No payment-gateway columns (`Payment` has no provider/order/transaction fields)
 - **Admin FK delete behavior:** SQL Server cascade-path constraints require `ON DELETE NO ACTION` (not `SET NULL`) on optional admin-user FKs (`Payment.RefundedByAdminId`, `PaymentReceipt.ReviewedByAdminId`, etc.).
-- **Apply migrations:** `dotnet ef database update --project Shora.Infrastructure --startup-project Shora.Api`. On non-test startup, `InitializeDatabaseAsync()` auto-applies pending migrations and runs seed.
+- **Apply migrations:** `dotnet ef database update --project Shora.Infrastructure --startup-project Shora.Api`. On startup, `InitializeDatabaseAsync()` auto-applies pending migrations and runs seed.
 - **Seed data** (idempotent, via `DatabaseSeeder`):
   - `Client` and `Admin` Identity roles
   - Singleton `Settings` row (`Id = 1`): 500 EGP, 60 min duration, 15 min buffer, 60 min receipt-upload window, 1h cancellation-request auto-decline, 24-month receipt retention; payment/contact numbers from `Seed:*` config

@@ -1,3 +1,4 @@
+using Shora.Domain.Constants;
 using Shora.Domain.Enums;
 
 namespace Shora.Domain.Entities;
@@ -16,7 +17,7 @@ public class Payment
 
     public decimal Amount { get; set; }
 
-    public string Currency { get; set; } = "EGP";
+    public string Currency { get; set; } = CurrencyCodes.Egp;
 
     public DateTime? RefundedAtUtc { get; set; }
 

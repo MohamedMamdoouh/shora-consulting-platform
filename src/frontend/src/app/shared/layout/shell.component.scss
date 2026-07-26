@@ -38,6 +38,26 @@
   color: var(--color-primary);
 }
 
+.shell__user {
+  align-self: center;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.shell__banner {
+  max-width: 48rem;
+  margin: 0 auto var(--space-lg);
+  padding: var(--space-md);
+  background: #fff4e5;
+  border: 1px solid #f0d9b5;
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.shell__nav button.secondary {
+  padding: 0.5rem 1rem;
+}
+
 .shell__main {
   flex: 1;
   padding: var(--space-xl);

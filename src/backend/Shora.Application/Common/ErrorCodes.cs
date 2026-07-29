@@ -21,6 +21,30 @@ public static class ErrorCodes
         public const string NotFound = "settings.not_found";
     }
 
+    public static class Availability
+    {
+        public const string InvalidRange = "availability.invalid_range";
+        public const string RangeTooLarge = "availability.range_too_large";
+    }
+
+    public static class Booking
+    {
+        public const string SlotUnavailable = "booking.slot_unavailable";
+        public const string HoldCapExceeded = "booking.hold_cap_exceeded";
+        public const string EmailNotVerified = "booking.email_not_verified";
+        public const string ContactPhoneRequired = "booking.contact_phone_required";
+        public const string ContactPhoneInvalid = "booking.contact_phone_invalid";
+        public const string NotFound = "booking.not_found";
+        public const string Forbidden = "booking.forbidden";
+        public const string InvalidStatus = "booking.invalid_status";
+    }
+
+    public static class Cancellation
+    {
+        public const string TooLate = "cancellation.too_late";
+        public const string ReopenExhausted = "cancellation.reopen_exhausted";
+    }
+
     public static class General
     {
         public const string Validation = "general.validation";

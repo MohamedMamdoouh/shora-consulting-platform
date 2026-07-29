@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Shora.Application.Abstractions;
+using Shora.Application.Bookings;
 using Shora.Application.Email;
 using Shora.Application.Options;
 using Shora.Application.Services;
@@ -36,6 +37,7 @@ public static class DependencyInjection
         services.Configure<SeedOptions>(configuration.GetSection(SeedOptions.SectionName));
         services.Configure<AdminSeedOptions>(configuration.GetSection(AdminSeedOptions.SectionName));
         services.Configure<CacheOptions>(configuration.GetSection(CacheOptions.SectionName));
+        services.Configure<BookingOptions>(configuration.GetSection(BookingOptions.SectionName));
 
         services.AddMemoryCache();
         services.AddSingleton<ICacheService, MemoryCacheService>();
@@ -65,6 +67,8 @@ public static class DependencyInjection
         services.AddScoped<CancellationService>();
         services.AddScoped<PaymentService>();
         services.AddScoped<SettingsService>();
+        services.AddScoped<SlotGenerationService>();
+        services.AddScoped<BookingTransitionHelper>();
 
         return services;
     }

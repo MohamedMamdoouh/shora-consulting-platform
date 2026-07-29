@@ -16,4 +16,22 @@ export const ErrorCodes = {
     Unexpected: 'general.unexpected',
     Forbidden: 'general.forbidden',
   },
+  Availability: {
+    InvalidRange: 'availability.invalid_range',
+    RangeTooLarge: 'availability.range_too_large',
+  },
+  Booking: {
+    SlotUnavailable: 'booking.slot_unavailable',
+    HoldCapExceeded: 'booking.hold_cap_exceeded',
+    EmailNotVerified: 'booking.email_not_verified',
+    ContactPhoneRequired: 'booking.contact_phone_required',
+    ContactPhoneInvalid: 'booking.contact_phone_invalid',
+    NotFound: 'booking.not_found',
+    Forbidden: 'booking.forbidden',
+    InvalidStatus: 'booking.invalid_status',
+  },
+  Cancellation: {
+    TooLate: 'cancellation.too_late',
+    ReopenExhausted: 'cancellation.reopen_exhausted',
+  },
 } as const;

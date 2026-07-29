@@ -1,10 +1,13 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Shora.Domain.Entities;
 
 namespace Shora.Application.Abstractions;
 
 public interface IApplicationDbContext
 {
+    DatabaseFacade Database { get; }
+
     DbSet<ApplicationUser> Users { get; }
 
     DbSet<AvailabilitySlot> AvailabilitySlots { get; }

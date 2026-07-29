@@ -2,9 +2,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Shora.Application.Abstractions;
 using Shora.Application.Options;
+using Shora.Application.Services;
 using Shora.Domain.Entities;
 using Shora.Infrastructure.Data;
+using Shora.Infrastructure.Services;
 
 namespace Shora.Tests.Common;
 
@@ -17,6 +20,10 @@ public static class TestServiceProviderFactory
         services.AddLogging();
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString));
+
+        services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
+        services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
+        services.AddScoped<SlotGenerationService>();
 
         services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
             .AddEntityFrameworkStores<ApplicationDbContext>()

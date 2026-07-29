@@ -134,7 +134,7 @@ Notes:
 | IsBooked  | `bool`     |                                                                                                 |
 | BookingId | `Guid?`    | FK, nullable until booked. Points to the **currently active holder** of this slot only (if any) |
 
-**Uniqueness & generation concurrency (M1):** a **unique index on** `StartTime` prevents duplicate slots. All slot materialization (on-save regeneration in spec 07 and the nightly top-up job) runs through a **single serialized generation path** guarded by the same DB lease as other background jobs (see #2.1 / spec 08), so on-save and the top-up job can never race to insert the same slot. Generation is idempotent: it upserts missing slots and never touches booked ones.
+**Uniqueness & generation concurrency (M1):** a **unique index on** `StartTime` prevents duplicate slots. All slot materialization (on-save regeneration in spec 07 and the nightly top-up job) runs through a **single idempotent generation path** on the one app instance — startup seed, on-save regen, and the top-up job may overlap within the same process, but generation is idempotent and the unique index is the backstop. Generation upserts missing slots and never touches booked ones.
 
 **Booking/slot consistency invariant:** `AvailabilitySlot` is the lock; `Booking.AvailabilitySlotId` is set only while the booking **currently holds** the slot. Historical times live in `SlotStartUtc`/`SlotEndUtc` snapshots (not the FK). All changes run in one DB transaction:
 

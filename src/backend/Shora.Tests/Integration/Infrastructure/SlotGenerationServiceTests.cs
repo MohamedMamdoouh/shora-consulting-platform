@@ -1,26 +1,24 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Shora.Domain.Constants;
-using Shora.Domain.Entities;
+using Shora.Application.Services;
 using Shora.Infrastructure.Data;
 using Shora.Tests.Common;
 
 namespace Shora.Tests.Integration.Infrastructure;
 
 [Collection("SqlServer")]
-public class DatabaseSeederTests
+public class SlotGenerationServiceTests
 {
     private readonly SqlServerFixture _sqlServer;
 
-    public DatabaseSeederTests(SqlServerFixture sqlServer)
+    public SlotGenerationServiceTests(SqlServerFixture sqlServer)
     {
         _sqlServer = sqlServer;
     }
 
     [Fact]
-    public async Task SeedAsync_creates_roles_settings_and_admin_user()
+    public async Task GenerateHorizonAsync_materializes_future_unbooked_slots()
     {
         var connectionString = await _sqlServer.CreateDatabaseAsync();
         var databaseName = new SqlConnectionStringBuilder(connectionString).InitialCatalog!;
@@ -33,23 +31,16 @@ public class DatabaseSeederTests
 
             await using var scope = services.CreateAsyncScope();
             var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var slotGenerationService = scope.ServiceProvider.GetRequiredService<SlotGenerationService>();
 
-            Assert.True(await roleManager.RoleExistsAsync(DatabaseSeeder.ClientRole));
-            Assert.True(await roleManager.RoleExistsAsync(DatabaseSeeder.AdminRole));
+            var initialCount = await context.AvailabilitySlots.CountAsync();
+            Assert.True(initialCount > 0);
 
-            var settings = await context.Settings.SingleAsync();
-            Assert.Equal(Settings.SingletonId, settings.Id);
-            Assert.Equal(SettingsDefaults.SessionPrice, settings.SessionPrice);
-            Assert.Equal(SettingsDefaults.SessionDurationMinutes, settings.SessionDurationMinutes);
+            await slotGenerationService.GenerateHorizonAsync();
 
-            Assert.Equal(5, await context.AvailabilityWindows.CountAsync());
-            Assert.True(await context.AvailabilitySlots.AnyAsync());
-
-            var admin = await userManager.FindByEmailAsync("admin@test.local");
-            Assert.NotNull(admin);
-            Assert.True(await userManager.IsInRoleAsync(admin, DatabaseSeeder.AdminRole));
+            var afterSecondRunCount = await context.AvailabilitySlots.CountAsync();
+            Assert.Equal(initialCount, afterSecondRunCount);
+            Assert.All(await context.AvailabilitySlots.ToListAsync(), slot => Assert.False(slot.IsBooked));
         }
         finally
         {
@@ -58,7 +49,7 @@ public class DatabaseSeederTests
     }
 
     [Fact]
-    public async Task SeedAsync_is_idempotent()
+    public async Task GenerateHorizonAsync_does_not_remove_booked_slots()
     {
         var connectionString = await _sqlServer.CreateDatabaseAsync();
         var databaseName = new SqlConnectionStringBuilder(connectionString).InitialCatalog!;
@@ -68,12 +59,19 @@ public class DatabaseSeederTests
         {
             await TestDatabaseInitializer.MigrateAsync(services);
             await DatabaseSeeder.SeedAsync(services);
-            await DatabaseSeeder.SeedAsync(services);
 
             await using var scope = services.CreateAsyncScope();
             var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var slotGenerationService = scope.ServiceProvider.GetRequiredService<SlotGenerationService>();
 
-            Assert.Single(await context.Settings.ToListAsync());
+            var bookedSlot = await context.AvailabilitySlots.FirstAsync();
+            bookedSlot.IsBooked = true;
+            await context.SaveChangesAsync();
+
+            await slotGenerationService.GenerateHorizonAsync();
+
+            var persistedBookedSlot = await context.AvailabilitySlots.SingleAsync(slot => slot.Id == bookedSlot.Id);
+            Assert.True(persistedBookedSlot.IsBooked);
         }
         finally
         {

@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Shora.Application.Options;
+using Shora.Application.Services;
 using Shora.Domain.Entities;
 using Shora.Domain.Enums;
 
@@ -26,7 +27,11 @@ public static class DatabaseSeeder
 
         await EnsureRolesAsync(roleManager, logger, cancellationToken);
         await EnsureSettingsAsync(context, seedOptions, logger, cancellationToken);
+        await EnsureAvailabilityWindowsAsync(context, logger, cancellationToken);
         await EnsureAdminUserAsync(userManager, adminSeedOptions, logger, cancellationToken);
+
+        var slotGenerationService = scope.ServiceProvider.GetRequiredService<SlotGenerationService>();
+        await slotGenerationService.GenerateHorizonAsync(cancellationToken);
     }
 
     private static async Task EnsureRolesAsync(
@@ -83,6 +88,41 @@ public static class DatabaseSeeder
 
         await context.SaveChangesAsync(cancellationToken);
         logger.LogInformation("Seeded default settings row.");
+    }
+
+    private static async Task EnsureAvailabilityWindowsAsync(
+        ApplicationDbContext context,
+        ILogger logger,
+        CancellationToken cancellationToken)
+    {
+        if (await context.AvailabilityWindows.AnyAsync(cancellationToken))
+        {
+            return;
+        }
+
+        var defaultWindows = new (DayOfWeek Day, TimeSpan Start, TimeSpan End)[]
+        {
+            (DayOfWeek.Sunday, new TimeSpan(16, 0, 0), new TimeSpan(21, 0, 0)),
+            (DayOfWeek.Monday, new TimeSpan(16, 0, 0), new TimeSpan(21, 0, 0)),
+            (DayOfWeek.Tuesday, new TimeSpan(16, 0, 0), new TimeSpan(21, 0, 0)),
+            (DayOfWeek.Wednesday, new TimeSpan(16, 0, 0), new TimeSpan(21, 0, 0)),
+            (DayOfWeek.Thursday, new TimeSpan(16, 0, 0), new TimeSpan(21, 0, 0)),
+        };
+
+        foreach (var (day, start, end) in defaultWindows)
+        {
+            context.AvailabilityWindows.Add(new AvailabilityWindow
+            {
+                Id = Guid.NewGuid(),
+                DayOfWeek = day,
+                StartTime = start,
+                EndTime = end,
+                IsActive = true
+            });
+        }
+
+        await context.SaveChangesAsync(cancellationToken);
+        logger.LogInformation("Seeded default availability windows.");
     }
 
     private static async Task EnsureAdminUserAsync(

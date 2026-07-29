@@ -52,7 +52,7 @@ Every action declares:
 
 ## 8. Caching
 
-MVP uses **in-process memory caching** on a single App Service instance. Application services depend on `ICacheService`; HTTP output cache applies to anonymous public GET endpoints. A future multi-instance deployment can swap in `IDistributedCache` (Redis) without changing service callers.
+MVP uses **in-process memory caching** on the single app instance. Application services depend on `ICacheService`; HTTP output cache applies to anonymous public GET endpoints. This is the **permanent** caching strategy — one server owns all cache state; no `IDistributedCache` / Redis is planned.
 
 ### Cacheable endpoints
 

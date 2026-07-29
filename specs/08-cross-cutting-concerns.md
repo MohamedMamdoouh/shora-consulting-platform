@@ -23,7 +23,7 @@ Uses ASP.NET Core's built-in rate limiting middleware. Limits are per-endpoint a
 
 ### Client-IP resolution & shared-IP fairness (resolved)
 
-- **Trusted proxy config:** the app sits behind the host's reverse proxy/CDN, so the raw socket address is the proxy, not the client. ASP.NET Core **forwarded-headers middleware** is configured with the host's known proxy list so `X-Forwarded-For` is honored **only from trusted proxies** — a client can never spoof its own IP by sending the header directly. Per-IP partitions key on this resolved client IP.
+- **Direct connection:** the app runs on a single server with no load balancer, so per-IP rate-limit partitions key on `HttpContext.Connection.RemoteIpAddress` directly.
 - **CGNAT / shared-IP reality (mobile networks in Egypt):** many legitimate users can share one public IP, so per-IP limits are deliberately **coarse safety nets** (they stop floods, not individuals) and the meaningful per-user fairness comes from the **per-account/per-email partitions** above. If 429s from shared IPs show up in monitoring, raise the per-IP values before touching per-account ones.
 
 ## 2. Logging, Auditing & Monitoring (H6)
@@ -59,13 +59,13 @@ Every alert above must map to an operator runbook with owner + response SLA:
 - `PendingApproval` backlog: validate mail delivery + admin queue health, then force-prioritize review.
 - Cancellation requests near auto-decline: page admin and surface queue in dashboard immediately.
 - `refund-due` ageing: reconcile manual transfer logs and either record (`refunds/record`) or escalate.
-- Job heartbeat missing: verify lease row, app instance health, and last successful run marker.
+- Job heartbeat missing: verify app health and last successful run marker.
 - Outbox dead-letter: inspect `LastError`, fix template/provider issue, requeue via operator action.
 
 ## 3. Background Jobs — Execution Model (M6)
 
-- Each job is a hosted `BackgroundService` in the Api process.
-- **Concurrency safety:** a **DB-based lease/lock** (a row a job must acquire, with an expiry) ensures that if the app ever runs on more than one instance, a given job executes on only one instance at a time. All slot generation (on-save + top-up) shares this lease so it stays single-threaded (spec 01 #4, spec 07 #2).
+- Each job is a hosted `BackgroundService` in the Api process on the **single app instance**.
+- **Concurrency safety:** jobs run in-process on one always-on server; idempotency (re-deriving state from the DB) and `Booking.RowVersion` guards suffice for overlapping callers within the same process.
 - **Idempotency:** every job is safe to run repeatedly — it re-derives state from the DB rather than assuming a prior run's effects, and each transition is guarded by `Booking.RowVersion`.
 - **Reliable side effects:** state-changing transactions write side effects to `OutboxMessage`; dispatcher jobs perform delivery and mark completion, so delivery cannot be lost between DB commit and external send.
 - **External-storage consistency:** blob storage is outside SQL transactions. Receipt processing uses explicit recovery states (`BlobFinalizePending`, `Missing`) and repair jobs rather than assuming distributed atomicity.
@@ -91,7 +91,7 @@ Every alert above must map to an operator runbook with owner + response SLA:
 - **Frontend/API site model (resolved):** MVP deployment is **same-site** (frontend and API under the same registrable domain over HTTPS). This is required by the `SameSite=Strict` refresh cookie strategy in spec 02.
 - **CORS:** the API allows only the Angular app's origin(s) and `AllowCredentials` (required so the refresh-token `httpOnly` cookie flows on `POST /api/auth/refresh`, spec 02). Wildcard origins are not used with credentials.
 - **HTTPS everywhere + secure cookies:** the refresh-token cookie is `Secure`/`httpOnly`/`SameSite=Strict`, which requires HTTPS in all deployed environments.
-- **Hosting decision (resolved):** MVP uses an **always-on web app/container host** (not scale-to-zero serverless) plus managed SQL Server/Azure SQL and Azure Blob Storage. Required capabilities: .NET 10 runtime, scheduled/background processing in-process. No public inbound webhook endpoint is required (payments are verified manually).
+- **Hosting decision (resolved):** MVP uses **exactly one always-on app instance** (not scale-to-zero serverless) plus managed SQL Server/Azure SQL and Azure Blob Storage. No load balancer, no horizontal scaling, and no traffic manager in front of multiple instances. Required capabilities: .NET 10 runtime, scheduled/background processing in-process. No public inbound webhook endpoint is required (payments are verified manually).
 
 ## 5. Data Retention & PII (L4)
 
@@ -106,6 +106,6 @@ MVP stance — minimal and documented, not a full compliance program:
 
 ## 6. Out of Scope (MVP)
 
-- Full APM / distributed tracing platform, WAF configuration specifics, and autoscaling policy.
+- Full APM / distributed tracing platform and WAF configuration specifics.
 - Automated GDPR/data-subject tooling (handled manually).
-- Multi-region / high-availability topology (single instance is sufficient for MVP; the DB-lease model just keeps the door open).
+- Multi-region / high-availability topology, horizontal scaling, and multiple app instances (permanently out of scope).

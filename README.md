@@ -46,6 +46,14 @@ On startup, migrations apply automatically and seed data runs idempotently:
 - Singleton `Settings` row (`Id = 1`, 500 EGP defaults)
 - Admin user when `AdminSeed` credentials are configured
 
+### Deployment topology
+
+Production runs on a **single always-on server** (Azure App Service or equivalent):
+
+- One process hosts the API, in-process background jobs, and in-memory cache
+- No load balancer, no horizontal scaling, and no distributed cache (Redis)
+- Azure SQL and Azure Blob Storage remain the shared external services
+
 ### Health check
 
 `GET /api/v1/health` — returns `{ status, timestampUtc }`

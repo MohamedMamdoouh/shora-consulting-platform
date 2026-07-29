@@ -67,7 +67,7 @@ Planned workflow: `.github/workflows/deploy.yml` (separate from CI).
 | **Environments**  | GitHub Environments: `staging`, `production` (production requires manual approval / reviewers)                |
 | **Triggers**      | `workflow_dispatch` for staging; tag `v`\* (semver) for production — not auto-deploy on every merge to `main` |
 | **Build**         | `npm run build` → copy Angular output into API `wwwroot` → `dotnet publish`                                   |
-| **Deploy target** | Azure App Service (Linux, .NET 10, always-on — background jobs run in-process, spec 08 #3)                    |
+| **Deploy target** | Azure App Service (Linux, .NET 10, always-on, **instance count = 1**, no autoscaling rule — background jobs run in-process, spec 08 #3). No load balancer or traffic manager in front of multiple instances. |
 | **Secrets**       | App Service application settings or Azure Key Vault references — never in repo                                |
 
 ### Deploy sequence (planned)
@@ -84,7 +84,7 @@ Cross-ref [spec 08 #4](08-cross-cutting-concerns.md). Required before Phase 2:
 
 | Resource               | Purpose                                                         |
 | ---------------------- | --------------------------------------------------------------- |
-| **Azure App Service**  | Host .NET 10 API + static Angular (always-on)                   |
+| **Azure App Service**  | Host .NET 10 API + static Angular (always-on, single instance) |
 | **Azure SQL**          | Production database                                             |
 | **Azure Blob Storage** | Private receipt container (`Storage:ReceiptContainer`, spec 05) |
 

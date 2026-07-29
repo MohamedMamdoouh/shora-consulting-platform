@@ -13,4 +13,6 @@ public static class SettingsDefaults
     public const int CancellationRequestAutoDeclineHours = 1;
 
     public const int ReceiptRetentionMonths = 24;
+
+    public const int UnconfirmedHoldCap = 3;
 }

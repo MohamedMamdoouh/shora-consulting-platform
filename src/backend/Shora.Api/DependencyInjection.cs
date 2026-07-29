@@ -1,3 +1,5 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -57,7 +59,7 @@ public static class DependencyInjection
     public static IServiceCollection AddIdentityServices(this IServiceCollection services)
     {
         services
-            .AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+            .AddIdentityCore<ApplicationUser>(options =>
             {
                 options.User.RequireUniqueEmail = true;
                 options.SignIn.RequireConfirmedEmail = false;
@@ -67,6 +69,7 @@ public static class DependencyInjection
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequiredLength = 8;
             })
+            .AddRoles<IdentityRole<Guid>>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
 
@@ -100,6 +103,12 @@ public static class DependencyInjection
             })
             .AddJwtBearer(options =>
             {
+                options.MapInboundClaims = true;
+                options.TokenHandlers.Clear();
+                options.TokenHandlers.Add(new JwtSecurityTokenHandler
+                {
+                    MapInboundClaims = true
+                });
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
@@ -109,7 +118,9 @@ public static class DependencyInjection
                     ValidIssuer = jwtOptions.Issuer,
                     ValidAudience = jwtOptions.Audience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SigningKey)),
-                    ClockSkew = TimeSpan.FromMinutes(1)
+                    ClockSkew = TimeSpan.FromMinutes(1),
+                    NameClaimType = ClaimTypes.NameIdentifier,
+                    RoleClaimType = ClaimTypes.Role
                 };
             });
 

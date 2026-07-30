@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Shora.Contracts.Booking;
 
 public enum DeliveryMethod
@@ -16,6 +18,7 @@ public enum CancellationRequestStatus
 
 public sealed record CreateBookingRequest(
     Guid AvailabilitySlotId,
+    [property: JsonConverter(typeof(JsonStringEnumConverter<DeliveryMethod>))]
     DeliveryMethod DeliveryMethod,
     string? ContactPhone);
 

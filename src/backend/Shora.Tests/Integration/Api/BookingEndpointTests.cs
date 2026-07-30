@@ -71,6 +71,31 @@ public class BookingEndpointTests : IDisposable
     }
 
     [Fact]
+    public async Task Reserve_accepts_frontend_string_delivery_method()
+    {
+        var slotId = await GetOpenSlotIdAsync();
+        var (client, _) = await CreateVerifiedClientAsync("reserve-string-delivery@example.com");
+
+        var response = await client.PostAsJsonAsync("/api/v1/bookings", new
+        {
+            availabilitySlotId = slotId,
+            deliveryMethod = "Chat",
+            contactPhone = (string?)null
+        });
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var body = await response.Content.ReadFromJsonAsync<ReserveBookingResponse>();
+        Assert.NotNull(body);
+
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var booking = await context.Bookings.AsNoTracking().SingleAsync(b => b.Id == body!.BookingId);
+        Assert.Equal(BookingStatus.PendingPayment, booking.Status);
+        Assert.Equal(Domain.Enums.DeliveryMethod.Chat, booking.DeliveryMethod);
+    }
+
+    [Fact]
     public async Task Reserve_returns_conflict_when_slot_already_taken()
     {
         var slotId = await GetOpenSlotIdAsync();

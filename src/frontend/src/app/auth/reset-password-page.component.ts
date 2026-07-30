@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../core/auth/auth.service';
 import { readApiError } from '../core/api/api-error.util';
 import { getAuthFieldError } from '../core/forms/auth-field-error.util';
@@ -35,7 +35,7 @@ export class ResetPasswordPageComponent implements OnInit {
     this.token = this.route.snapshot.queryParamMap.get('token') ?? '';
   }
 
-  submit(): void {
+  async submit(): Promise<void> {
     if (this.isSubmitting) {
       return;
     }
@@ -48,19 +48,16 @@ export class ResetPasswordPageComponent implements OnInit {
     this.errorMessage = '';
     this.isSubmitting = true;
 
-    this.auth
-      .resetPassword(this.email, this.token, this.form.controls.newPassword.value)
-      .pipe(finalize(() => {
-        this.isSubmitting = false;
-      }))
-      .subscribe({
-        next: () => {
-          this.success = true;
-          void this.router.navigate(['/auth/login']);
-        },
-        error: (err) => {
-          this.errorMessage = readApiError(err, 'تعذر إعادة تعيين كلمة المرور. قد يكون الرابط منتهياً.');
-        },
-      });
+    try {
+      await firstValueFrom(
+        this.auth.resetPassword(this.email, this.token, this.form.controls.newPassword.value),
+      );
+      this.success = true;
+      await this.router.navigate(['/auth/login']);
+    } catch (err) {
+      this.errorMessage = readApiError(err, 'تعذر إعادة تعيين كلمة المرور. قد يكون الرابط منتهياً.');
+    } finally {
+      this.isSubmitting = false;
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { ErrorCodes } from '@contracts/error-codes';
 import { AuthService } from '../core/auth/auth.service';
 import { readApiError, readApiErrorCode } from '../core/api/api-error.util';
@@ -21,10 +21,10 @@ export class VerifyEmailPageComponent implements OnInit {
   private isVerifying = false;
 
   ngOnInit(): void {
-    this.verifyFromQueryParams();
+    void this.verifyFromQueryParams();
   }
 
-  private verifyFromQueryParams(): void {
+  private async verifyFromQueryParams(): Promise<void> {
     if (this.isVerifying || this.status !== 'loading') {
       return;
     }
@@ -40,30 +40,23 @@ export class VerifyEmailPageComponent implements OnInit {
 
     this.isVerifying = true;
 
-    this.auth
-      .verifyEmail(email, token)
-      .pipe(
-        finalize(() => {
-          this.isVerifying = false;
-        }),
-      )
-      .subscribe({
-        next: (response) => {
-          const alreadyVerified = response.message.toLowerCase().includes('already');
-          this.completeSuccess(
-            alreadyVerified
-              ? 'حسابك مؤكد بالفعل. سيتم تحويلك لتسجيل الدخول.'
-              : 'تم تأكيد بريدك الإلكتروني بنجاح. سيتم تحويلك لتسجيل الدخول.',
-          );
-        },
-        error: (err) => {
-          this.status = 'error';
-          this.message =
-            readApiErrorCode(err) === ErrorCodes.Auth.VerificationFailed
-              ? 'رابط التحقق منتهي أو غير صالح.'
-              : readApiError(err, 'تعذر تأكيد البريد الإلكتروني. حاول مرة أخرى.');
-        },
-      });
+    try {
+      const response = await firstValueFrom(this.auth.verifyEmail(email, token));
+      const alreadyVerified = response.message.toLowerCase().includes('already');
+      this.completeSuccess(
+        alreadyVerified
+          ? 'حسابك مؤكد بالفعل. سيتم تحويلك لتسجيل الدخول.'
+          : 'تم تأكيد بريدك الإلكتروني بنجاح. سيتم تحويلك لتسجيل الدخول.',
+      );
+    } catch (err) {
+      this.status = 'error';
+      this.message =
+        readApiErrorCode(err) === ErrorCodes.Auth.VerificationFailed
+          ? 'رابط التحقق منتهي أو غير صالح.'
+          : readApiError(err, 'تعذر تأكيد البريد الإلكتروني. حاول مرة أخرى.');
+    } finally {
+      this.isVerifying = false;
+    }
   }
 
   private completeSuccess(message: string): void {

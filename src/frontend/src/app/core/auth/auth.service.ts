@@ -1,8 +1,7 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import {
-  BehaviorSubject,
   Observable,
   finalize,
   firstValueFrom,
@@ -14,14 +13,16 @@ import { AuthResponse, AuthUser } from '@contracts/auth';
 import { MessageResponse } from '@contracts/common';
 import { environment } from '../../../environments/environment';
 
+const USER_EMAIL_STORAGE_KEY = 'shora.auth.email';
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
 
   private accessToken: string | null = null;
-  private readonly currentUserSubject = new BehaviorSubject<AuthUser | null>(null);
-  readonly currentUser$ = this.currentUserSubject.asObservable();
+  private readonly currentUserState = signal<AuthUser | null>(null);
+  readonly currentUser = this.currentUserState.asReadonly();
 
   private refreshInFlight$: Observable<AuthResponse> | null = null;
   private isLoggingOut = false;
@@ -30,7 +31,7 @@ export class AuthService {
   private sessionGeneration = 0;
 
   getCurrentUser(): AuthUser | null {
-    return this.currentUserSubject.value;
+    return this.currentUserState();
   }
 
   getAccessToken(): string | null {
@@ -39,6 +40,10 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     return this.accessToken !== null;
+  }
+
+  getUserEmail(): string | null {
+    return sessionStorage.getItem(USER_EMAIL_STORAGE_KEY);
   }
 
   async initialize(): Promise<void> {
@@ -56,7 +61,7 @@ export class AuthService {
         { email, password, displayName: displayName || null },
         { withCredentials: true },
       )
-      .pipe(tap((response) => this.setSession(response)));
+      .pipe(tap((response) => this.setSession(response, email)));
   }
 
   login(email: string, password: string): Observable<AuthResponse> {
@@ -66,7 +71,7 @@ export class AuthService {
         { email, password },
         { withCredentials: true },
       )
-      .pipe(tap((response) => this.setSession(response)));
+      .pipe(tap((response) => this.setSession(response, email)));
   }
 
   googleSignIn(idToken: string): Observable<AuthResponse> {
@@ -166,12 +171,29 @@ export class AuthService {
     await this.redirectToLogin({ reason: 'sessionExpired' });
   }
 
-  redirectAfterLogin(role: string): Promise<boolean> {
+  redirectAfterLogin(role: string, returnUrl?: string | null): Promise<boolean> {
+    const safeReturnUrl = this.sanitizeReturnUrl(returnUrl);
+    if (safeReturnUrl && role === 'Client') {
+      return this.router.navigateByUrl(safeReturnUrl);
+    }
+
     if (role === 'Admin') {
       return this.router.navigate(['/admin']);
     }
 
     return this.router.navigate(['/dashboard']);
+  }
+
+  sanitizeReturnUrl(returnUrl?: string | null): string | null {
+    if (!returnUrl || !returnUrl.startsWith('/') || returnUrl.startsWith('//')) {
+      return null;
+    }
+
+    if (returnUrl.startsWith('/booking/') || returnUrl === '/dashboard') {
+      return returnUrl;
+    }
+
+    return null;
   }
 
   private async redirectToLogin(options?: { reason?: string }): Promise<boolean> {
@@ -193,24 +215,30 @@ export class AuthService {
     return this.loginRedirectPromise;
   }
 
-  private setSession(response: AuthResponse): void {
+  private setSession(response: AuthResponse, email?: string): void {
     if (this.isLoggingOut) {
       return;
     }
 
     this.sessionExpiredHandled = false;
     this.accessToken = response.accessToken;
-    this.currentUserSubject.next({
+    this.currentUserState.set({
       displayName: response.displayName,
       role: response.role,
       emailConfirmed: response.emailConfirmed,
+      email: email ?? this.getUserEmail() ?? undefined,
     });
+
+    if (email) {
+      sessionStorage.setItem(USER_EMAIL_STORAGE_KEY, email);
+    }
   }
 
   private clearSession(): void {
     this.sessionGeneration++;
     this.accessToken = null;
-    this.currentUserSubject.next(null);
+    this.currentUserState.set(null);
+    sessionStorage.removeItem(USER_EMAIL_STORAGE_KEY);
   }
 }
 

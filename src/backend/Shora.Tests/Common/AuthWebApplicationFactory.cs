@@ -43,7 +43,8 @@ public sealed class AuthWebApplicationFactory : WebApplicationFactory<Program>
                 ["Google:ClientId"] = "test-google-client-id",
                 ["Cache:Enabled"] = "true",
                 ["Cache:SettingsPublicTtlSeconds"] = "300",
-                ["Cache:AvailabilityTtlSeconds"] = "30"
+                ["Cache:AvailabilityTtlSeconds"] = "30",
+                ["BackgroundJobs:Enabled"] = "false"
             });
         });
 

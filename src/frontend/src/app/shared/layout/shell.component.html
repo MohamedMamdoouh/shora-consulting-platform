@@ -2,13 +2,13 @@
   <header class="shell__header">
     <a routerLink="/" class="shell__brand">منصة شورى</a>
     <nav class="shell__nav">
-      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ paths: 'exact' }"
         >الرئيسية</a
       >
       <a routerLink="/about" routerLinkActive="active">من نحن</a>
       <a routerLink="/services" routerLinkActive="active">الخدمات</a>
       <a routerLink="/booking/start" routerLinkActive="active">احجز جلسة</a>
-      @if (currentUser$ | async; as user) {
+      @if (auth.currentUser(); as user) {
         @if (user.role === 'Admin') {
           <a routerLink="/admin" routerLinkActive="active">لوحة الإدارة</a>
         } @else {
@@ -24,7 +24,7 @@
   </header>
 
   <main class="shell__main">
-    @if (currentUser$ | async; as user) {
+    @if (auth.currentUser(); as user) {
       @if (!user.emailConfirmed && user.role === 'Client') {
         <div class="shell__banner">يرجى تأكيد بريدك الإلكتروني قبل حجز جلسة.</div>
       }

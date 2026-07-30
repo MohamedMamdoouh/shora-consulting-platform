@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { ErrorCodes } from '@contracts/error-codes';
 import { AuthService } from '../core/auth/auth.service';
 import { readApiError, readApiErrorCode } from '../core/api/api-error.util';
@@ -16,9 +16,12 @@ import { getAuthFieldError } from '../core/forms/auth-field-error.util';
 export class SignupPageComponent {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
+  private readonly route = inject(ActivatedRoute);
 
   errorMessage = '';
   isSubmitting = false;
+  readonly returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+  readonly authQueryParams = this.returnUrl ? { returnUrl: this.returnUrl } : {};
 
   readonly getFieldError = getAuthFieldError;
 
@@ -28,7 +31,7 @@ export class SignupPageComponent {
     displayName: [''],
   });
 
-  submit(): void {
+  async submit(): Promise<void> {
     if (this.isSubmitting) {
       return;
     }
@@ -42,26 +45,23 @@ export class SignupPageComponent {
     this.errorMessage = '';
     this.isSubmitting = true;
 
-    this.auth
-      .signup(email, password, displayName || undefined)
-      .pipe(finalize(() => {
-        this.isSubmitting = false;
-      }))
-      .subscribe({
-        next: (response) => {
-          this.auth.redirectAfterLogin(response.role);
-        },
-        error: (err) => {
-          if (readApiErrorCode(err) === ErrorCodes.Auth.DuplicateEmail) {
-            this.errorMessage = 'هذا البريد الإلكتروني مسجل بالفعل.';
-            return;
-          }
+    try {
+      const response = await firstValueFrom(
+        this.auth.signup(email, password, displayName || undefined),
+      );
+      await this.auth.redirectAfterLogin(response.role, this.returnUrl);
+    } catch (err) {
+      if (readApiErrorCode(err) === ErrorCodes.Auth.DuplicateEmail) {
+        this.errorMessage = 'هذا البريد الإلكتروني مسجل بالفعل.';
+        return;
+      }
 
-          this.errorMessage = readApiError(
-            err,
-            'تعذر إنشاء الحساب. تحقق من البيانات وحاول مرة أخرى.',
-          );
-        },
-      });
+      this.errorMessage = readApiError(
+        err,
+        'تعذر إنشاء الحساب. تحقق من البيانات وحاول مرة أخرى.',
+      );
+    } finally {
+      this.isSubmitting = false;
+    }
   }
 }

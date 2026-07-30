@@ -8,12 +8,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Shora.Contracts.Auth;
 using Shora.Contracts.Availability;
 using Shora.Contracts.Booking;
+using Shora.Contracts.Payments;
 using Shora.Application.Common;
 using Shora.Domain.Entities;
 using Shora.Domain.Enums;
 using Shora.Infrastructure.Data;
 using Shora.Tests.Common;
 using ContractDeliveryMethod = Shora.Contracts.Booking.DeliveryMethod;
+using ContractCancellationRequestStatus = Shora.Contracts.Booking.CancellationRequestStatus;
 
 namespace Shora.Tests.Integration.Api;
 
@@ -256,6 +258,197 @@ public class BookingEndpointTests : IDisposable
         await AssertProblemCodeAsync(response, "booking.forbidden");
     }
 
+    [Fact]
+    public async Task Payment_instructions_returns_frozen_amount_for_pending_payment()
+    {
+        var (client, bookingId, _) = await ReserveBookingAsync("payment-instructions@example.com");
+
+        await using (var scope = _factory.Services.CreateAsyncScope())
+        {
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var settings = await context.Settings.SingleAsync(s => s.Id == Settings.SingletonId);
+            settings.SessionPrice = 999m;
+            await context.SaveChangesAsync();
+        }
+
+        var response = await client.GetAsync($"/api/v1/bookings/{bookingId}/payment-instructions");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var body = await response.Content.ReadFromJsonAsync<PaymentInstructionsResponse>();
+        Assert.NotNull(body);
+        Assert.Equal(500m, body!.Amount);
+        Assert.Equal("EGP", body.Currency);
+        Assert.Equal("01000000000", body.VodafoneCashNumber);
+        Assert.Equal("consultant@instapay", body.InstaPayHandle);
+        Assert.True(body.ReceiptUploadDeadlineUtc > DateTime.UtcNow);
+
+        await using var verifyScope = _factory.Services.CreateAsyncScope();
+        var verifyContext = verifyScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var payment = await verifyContext.Payments.AsNoTracking().SingleAsync(p => p.BookingId == bookingId);
+        Assert.Equal(body.Amount, payment.Amount);
+    }
+
+    [Fact]
+    public async Task Payment_instructions_rejects_wrong_status()
+    {
+        var (client, bookingId, _) = await ReserveBookingAsync("payment-instructions-status@example.com");
+        await SetBookingStatusAsync(bookingId, BookingStatus.PendingApproval, PaymentStatus.UnderReview);
+
+        var response = await client.GetAsync($"/api/v1/bookings/{bookingId}/payment-instructions");
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        await AssertProblemCodeAsync(response, "booking.invalid_status");
+    }
+
+    [Fact]
+    public async Task Payment_instructions_rejects_non_owner()
+    {
+        var (_, bookingId, _) = await ReserveBookingAsync("payment-instructions-owner@example.com");
+        var (otherClient, _) = await CreateVerifiedClientAsync("payment-instructions-non-owner@example.com");
+
+        var response = await otherClient.GetAsync($"/api/v1/bookings/{bookingId}/payment-instructions");
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        await AssertProblemCodeAsync(response, "booking.forbidden");
+    }
+
+    [Fact]
+    public async Task Cancellation_request_creates_pending_request_for_confirmed_booking()
+    {
+        var (client, bookingId) = await CreateConfirmedBookingAsync("cancellation-happy@example.com");
+
+        var response = await client.PostAsJsonAsync(
+            $"/api/v1/bookings/{bookingId}/cancellation-requests",
+            new CancellationRequestBody("Schedule conflict"));
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var body = await response.Content.ReadFromJsonAsync<CancellationRequestResponse>();
+        Assert.NotNull(body);
+        Assert.NotEqual(Guid.Empty, body!.RequestId);
+        Assert.Equal(ContractCancellationRequestStatus.Pending, body.Status);
+        Assert.Equal(nameof(BookingStatus.CancellationRequested), body.BookingStatus);
+        Assert.True(body.AutoDeclineAtUtc > DateTime.UtcNow);
+
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        var booking = await context.Bookings.AsNoTracking().SingleAsync(b => b.Id == bookingId);
+        Assert.Equal(BookingStatus.CancellationRequested, booking.Status);
+
+        var request = await context.CancellationRequests.AsNoTracking().SingleAsync(r => r.BookingId == bookingId);
+        Assert.Equal(ContractCancellationRequestStatus.Pending, (ContractCancellationRequestStatus)request.Status);
+        Assert.Equal("Schedule conflict", request.ClientReason);
+        Assert.Equal(0, request.ReopenCount);
+
+        var audit = await context.BookingStatusAudits
+            .AsNoTracking()
+            .OrderByDescending(a => a.AtUtc)
+            .FirstAsync(a => a.BookingId == bookingId);
+        Assert.Equal(BookingStatus.Confirmed, audit.FromStatus);
+        Assert.Equal(BookingStatus.CancellationRequested, audit.ToStatus);
+
+        var outbox = await context.OutboxMessages.AsNoTracking().SingleAsync(
+            m => m.AggregateId == bookingId && m.MessageType == OutboxMessageTypes.AdminNewCancellationRequestEmail);
+        Assert.Equal(OutboxMessageStatus.Pending, outbox.Status);
+    }
+
+    [Fact]
+    public async Task Cancellation_request_rejects_when_too_close_to_session()
+    {
+        var (client, bookingId) = await CreateConfirmedBookingAsync("cancellation-too-late@example.com");
+        await SetBookingSlotStartAsync(bookingId, DateTime.UtcNow.AddMinutes(30));
+
+        var response = await client.PostAsJsonAsync(
+            $"/api/v1/bookings/{bookingId}/cancellation-requests",
+            new CancellationRequestBody(null));
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        await AssertProblemCodeAsync(response, "cancellation.too_late");
+
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        Assert.False(await context.CancellationRequests.AnyAsync(r => r.BookingId == bookingId));
+    }
+
+    [Fact]
+    public async Task Cancellation_request_can_reopen_once_after_decline()
+    {
+        var (client, bookingId) = await CreateConfirmedBookingAsync("cancellation-reopen@example.com");
+
+        var firstResponse = await client.PostAsJsonAsync(
+            $"/api/v1/bookings/{bookingId}/cancellation-requests",
+            new CancellationRequestBody("First request"));
+        Assert.Equal(HttpStatusCode.OK, firstResponse.StatusCode);
+
+        await SimulateDeclinedCancellationRequestAsync(bookingId);
+
+        var reopenResponse = await client.PostAsJsonAsync(
+            $"/api/v1/bookings/{bookingId}/cancellation-requests",
+            new CancellationRequestBody("Second request"));
+        Assert.Equal(HttpStatusCode.OK, reopenResponse.StatusCode);
+
+        var body = await reopenResponse.Content.ReadFromJsonAsync<CancellationRequestResponse>();
+        Assert.NotNull(body);
+        Assert.Equal(ContractCancellationRequestStatus.Pending, body!.Status);
+        Assert.Equal(nameof(BookingStatus.CancellationRequested), body.BookingStatus);
+
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var request = await context.CancellationRequests.AsNoTracking().SingleAsync(r => r.BookingId == bookingId);
+        Assert.Equal(1, request.ReopenCount);
+        Assert.Equal("Second request", request.ClientReason);
+        Assert.Equal(BookingStatus.CancellationRequested, (await context.Bookings.AsNoTracking().SingleAsync(b => b.Id == bookingId)).Status);
+    }
+
+    [Fact]
+    public async Task Cancellation_request_rejects_second_reopen()
+    {
+        var (client, bookingId) = await CreateConfirmedBookingAsync("cancellation-reopen-exhausted@example.com");
+
+        var firstResponse = await client.PostAsJsonAsync(
+            $"/api/v1/bookings/{bookingId}/cancellation-requests",
+            new CancellationRequestBody(null));
+        Assert.Equal(HttpStatusCode.OK, firstResponse.StatusCode);
+
+        await SimulateDeclinedCancellationRequestAsync(bookingId);
+
+        var reopenResponse = await client.PostAsJsonAsync(
+            $"/api/v1/bookings/{bookingId}/cancellation-requests",
+            new CancellationRequestBody(null));
+        Assert.Equal(HttpStatusCode.OK, reopenResponse.StatusCode);
+
+        await SimulateDeclinedCancellationRequestAsync(bookingId);
+
+        var secondReopenResponse = await client.PostAsJsonAsync(
+            $"/api/v1/bookings/{bookingId}/cancellation-requests",
+            new CancellationRequestBody(null));
+
+        Assert.Equal(HttpStatusCode.Conflict, secondReopenResponse.StatusCode);
+        await AssertProblemCodeAsync(secondReopenResponse, "cancellation.reopen_exhausted");
+    }
+
+    [Fact]
+    public async Task Cancellation_decision_seen_sets_timestamp_for_declined_request()
+    {
+        var (client, bookingId) = await CreateConfirmedBookingAsync("cancellation-decision-seen@example.com");
+
+        var requestResponse = await client.PostAsJsonAsync(
+            $"/api/v1/bookings/{bookingId}/cancellation-requests",
+            new CancellationRequestBody(null));
+        Assert.Equal(HttpStatusCode.OK, requestResponse.StatusCode);
+
+        await SimulateDeclinedCancellationRequestAsync(bookingId);
+
+        var response = await client.PostAsync($"/api/v1/bookings/{bookingId}/cancellation-requests/decision-seen", null);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var request = await context.CancellationRequests.AsNoTracking().SingleAsync(r => r.BookingId == bookingId);
+        Assert.NotNull(request.ClientDecisionSeenAtUtc);
+    }
+
     public void Dispose()
     {
         _factory.Dispose();
@@ -385,6 +578,42 @@ public class BookingEndpointTests : IDisposable
             booking.Payment.Status = paymentStatus;
             booking.Payment.UpdatedAt = DateTime.UtcNow;
         }
+
+        await context.SaveChangesAsync();
+    }
+
+    private async Task<(HttpClient Client, Guid BookingId)> CreateConfirmedBookingAsync(string email)
+    {
+        var (client, bookingId, _) = await ReserveBookingAsync(email);
+        await SetBookingStatusAsync(bookingId, BookingStatus.Confirmed, PaymentStatus.Approved);
+        return (client, bookingId);
+    }
+
+    private async Task SetBookingSlotStartAsync(Guid bookingId, DateTime slotStartUtc)
+    {
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var booking = await context.Bookings.SingleAsync(b => b.Id == bookingId);
+        booking.SlotStartUtc = slotStartUtc;
+        booking.SlotEndUtc = slotStartUtc.AddHours(1);
+        await context.SaveChangesAsync();
+    }
+
+    private async Task SimulateDeclinedCancellationRequestAsync(Guid bookingId)
+    {
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var booking = await context.Bookings
+            .Include(b => b.CancellationRequest)
+            .SingleAsync(b => b.Id == bookingId);
+
+        Assert.NotNull(booking.CancellationRequest);
+
+        booking.Status = BookingStatus.Confirmed;
+        booking.CancellationRequest!.Status = Domain.Enums.CancellationRequestStatus.Declined;
+        booking.CancellationRequest.ReviewedAtUtc = DateTime.UtcNow;
+        booking.CancellationRequest.DecisionReasonCode = DecisionReasonCode.Policy;
+        booking.CancellationRequest.DecisionReason = "Session stands";
 
         await context.SaveChangesAsync();
     }

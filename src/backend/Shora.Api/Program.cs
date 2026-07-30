@@ -4,7 +4,7 @@ using Shora.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddApiServices();
+builder.Services.AddApiServices(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
 builder.Services.AddShoraCaching(builder.Configuration);
 builder.Services.AddIdentityServices();

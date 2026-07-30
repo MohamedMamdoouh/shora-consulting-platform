@@ -6,7 +6,7 @@
       يناسبك، واحجز موعداً يناسب جدولك.
     </p>
 
-    @if (settings$ | async; as settings) {
+    @if (settings(); as settings) {
       <div class="info-block pricing">
         <h3>السعر والمدة</h3>
         <p>

@@ -1,0 +1,64 @@
+<section class="page">
+  <article class="section">
+    <h1>مراجعة الحجز</h1>
+    <p class="intro">تأكد من تفاصيل جلستك قبل الحجز.</p>
+
+    <dl class="summary-list">
+      <div class="summary-item">
+        <dt>الموعد</dt>
+        <dd>{{ slotSummary }}</dd>
+      </div>
+      <div class="summary-item">
+        <dt>طريقة التواصل</dt>
+        <dd>{{ deliveryLabel }}</dd>
+      </div>
+      @if (flow.deliveryMethod === 'VoiceCall' && flow.contactPhone) {
+        <div class="summary-item">
+          <dt>رقم الهاتف</dt>
+          <dd dir="ltr">{{ flow.contactPhone }}</dd>
+        </div>
+      }
+    </dl>
+
+    @if (!isLoggedIn) {
+      <div class="state-panel">
+        <p>يجب تسجيل الدخول لإتمام الحجز.</p>
+        <a routerLink="/auth/login" [queryParams]="{ returnUrl: '/booking/review' }" class="btn">
+          تسجيل الدخول
+        </a>
+      </div>
+    } @else if (!isVerified) {
+      <div class="state-panel state-panel--warn">
+        <p>يرجى تأكيد بريدك الإلكتروني قبل حجز جلسة.</p>
+        @if (userEmail) {
+          <button type="button" class="btn secondary" [disabled]="isResending" (click)="resendVerification()">
+            {{ isResending ? 'جاري الإرسال…' : 'إعادة إرسال رابط التحقق' }}
+          </button>
+        } @else {
+          <a routerLink="/auth/login" [queryParams]="{ returnUrl: '/booking/review' }" class="btn secondary">
+            سجل الدخول لإرسال رابط التحقق
+          </a>
+        }
+      </div>
+    } @else {
+      @if (infoMessage) {
+        <div class="banner banner--info" role="status">{{ infoMessage }}</div>
+      }
+
+      @if (errorMessage) {
+        <div class="banner banner--error" role="alert">
+          <p>{{ errorMessage }}</p>
+          @if (slotUnavailable) {
+            <a routerLink="/booking/start" class="btn secondary">اختيار موعد آخر</a>
+          }
+        </div>
+      }
+
+      <button type="button" class="btn" [disabled]="isSubmitting" (click)="reserve()">
+        {{ isSubmitting ? 'جاري الحجز…' : 'تأكيد الحجز' }}
+      </button>
+    }
+
+    <a routerLink="/booking/delivery" class="back-link">← تعديل التفاصيل</a>
+  </article>
+</section>

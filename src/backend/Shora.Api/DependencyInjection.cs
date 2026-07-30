@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Shora.Api.BackgroundJobs;
 using Shora.Api.Infrastructure;
 using Shora.Application.Options;
 using Shora.Domain.Entities;
@@ -15,7 +16,9 @@ namespace Shora.Api;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApiServices(this IServiceCollection services)
+    public static IServiceCollection AddApiServices(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
         services.AddHttpContextAccessor();
         services.AddProblemDetails();
@@ -52,6 +55,9 @@ public static class DependencyInjection
             });
 
         services.AddOpenApi();
+
+        services.Configure<BackgroundJobOptions>(configuration.GetSection(BackgroundJobOptions.SectionName));
+        services.AddHostedService<ReceiptUploadDeadlineCleanupJob>();
 
         return services;
     }

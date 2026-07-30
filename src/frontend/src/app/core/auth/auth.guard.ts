@@ -28,12 +28,14 @@ export const adminGuard: CanActivateFn = () => {
   return router.createUrlTree(['/dashboard']);
 };
 
-export const clientGuard: CanActivateFn = () => {
+export const clientGuard: CanActivateFn = (_, state) => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
   if (!auth.isAuthenticated()) {
-    return router.createUrlTree(['/auth/login']);
+    return router.createUrlTree(['/auth/login'], {
+      queryParams: { returnUrl: state.url },
+    });
   }
 
   if (auth.getCurrentUser()?.role === 'Admin') {

@@ -1,0 +1,25 @@
+<section class="page">
+  <article class="section">
+    <h1>طريقة التواصل</h1>
+    <p class="intro">كيف تفضل إجراء الجلسة؟</p>
+
+    <div class="slot-summary">
+      <span class="slot-summary__label">الموعد المختار</span>
+      <strong>{{ slotSummary }}</strong>
+    </div>
+
+    <div class="choice-list">
+      <button type="button" class="choice-card" (click)="selectDeliveryMethod('VoiceCall')">
+        <span class="choice-card__title">مكالمة صوتية</span>
+        <span class="choice-card__detail">سيتصل بك المستشار في الموعد على رقم هاتفك.</span>
+      </button>
+
+      <button type="button" class="choice-card" (click)="selectDeliveryMethod('Chat')">
+        <span class="choice-card__title">محادثة واتساب</span>
+        <span class="choice-card__detail">ستبدأ المحادثة عبر رابط واتساب في الموعد المحدد.</span>
+      </button>
+    </div>
+
+    <a routerLink="/booking/start" class="back-link">← تغيير الموعد</a>
+  </article>
+</section>

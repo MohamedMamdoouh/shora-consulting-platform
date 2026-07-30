@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from '../core/auth/auth.service';
 import { readApiError } from '../core/api/api-error.util';
@@ -40,6 +40,8 @@ export class LoginPageComponent implements OnInit, AfterViewInit {
   errorMessage = '';
   infoMessage = '';
   isSubmitting = false;
+  readonly returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+  readonly authQueryParams = this.returnUrl ? { returnUrl: this.returnUrl } : {};
 
   readonly getFieldError = getAuthFieldError;
 
@@ -58,7 +60,7 @@ export class LoginPageComponent implements OnInit, AfterViewInit {
     this.renderGoogleButton();
   }
 
-  submit(): void {
+  async submit(): Promise<void> {
     if (this.isSubmitting) {
       return;
     }
@@ -72,21 +74,14 @@ export class LoginPageComponent implements OnInit, AfterViewInit {
     this.errorMessage = '';
     this.isSubmitting = true;
 
-    this.auth
-      .login(email, password)
-      .pipe(
-        finalize(() => {
-          this.isSubmitting = false;
-        }),
-      )
-      .subscribe({
-        next: (response) => {
-          this.auth.redirectAfterLogin(response.role);
-        },
-        error: (err) => {
-          this.errorMessage = readApiError(err, 'البريد الإلكتروني أو كلمة المرور غير صحيحة.');
-        },
-      });
+    try {
+      const response = await firstValueFrom(this.auth.login(email, password));
+      await this.auth.redirectAfterLogin(response.role, this.returnUrl);
+    } catch (err) {
+      this.errorMessage = readApiError(err, 'البريد الإلكتروني أو كلمة المرور غير صحيحة.');
+    } finally {
+      this.isSubmitting = false;
+    }
   }
 
   private renderGoogleButton(): void {
@@ -102,12 +97,7 @@ export class LoginPageComponent implements OnInit, AfterViewInit {
     window.google.accounts.id.initialize({
       client_id: environment.googleClientId,
       callback: (response) => {
-        this.auth.googleSignIn(response.credential).subscribe({
-          next: (authResponse) => this.auth.redirectAfterLogin(authResponse.role),
-          error: (err) => {
-            this.errorMessage = readApiError(err, 'تعذر تسجيل الدخول عبر جوجل.');
-          },
-        });
+        void this.handleGoogleSignIn(response.credential);
       },
     });
 
@@ -116,5 +106,14 @@ export class LoginPageComponent implements OnInit, AfterViewInit {
       size: 'large',
       width: 280,
     });
+  }
+
+  private async handleGoogleSignIn(credential: string): Promise<void> {
+    try {
+      const authResponse = await firstValueFrom(this.auth.googleSignIn(credential));
+      await this.auth.redirectAfterLogin(authResponse.role, this.returnUrl);
+    } catch (err) {
+      this.errorMessage = readApiError(err, 'تعذر تسجيل الدخول عبر جوجل.');
+    }
   }
 }

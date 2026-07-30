@@ -1,0 +1,124 @@
+@use '../../public/shared/public-page' as *;
+
+:host {
+  display: block;
+}
+
+.section h1 {
+  margin-top: 0;
+}
+
+.intro {
+  margin-top: 0;
+  color: var(--color-text-muted);
+}
+
+.state-message {
+  color: var(--color-text-muted);
+}
+
+.state-panel {
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.state-panel p {
+  margin: 0;
+}
+
+.state-panel--error {
+  border-color: #e8c4c4;
+  background: #fff5f5;
+  color: #7a2e2e;
+}
+
+.amount-block {
+  display: grid;
+  gap: var(--space-xs);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  text-align: center;
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-primary) 25%, var(--color-border));
+  border-radius: var(--radius-md);
+}
+
+.amount-label {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.amount-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.transfer-list {
+  display: grid;
+  gap: var(--space-md);
+  margin: 0 0 var(--space-lg);
+  padding: var(--space-md);
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.transfer-item {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.transfer-item dt {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.transfer-item dd {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.note-block,
+.countdown-block,
+.next-step {
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.note-block h2,
+.countdown-block h2 {
+  margin: 0 0 var(--space-sm);
+  font-size: 1rem;
+}
+
+.note-block p,
+.next-step p {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.countdown-value {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.countdown-block--expired .countdown-value {
+  color: #7a2e2e;
+}
+
+.next-step a {
+  color: var(--color-primary);
+  font-weight: 600;
+}

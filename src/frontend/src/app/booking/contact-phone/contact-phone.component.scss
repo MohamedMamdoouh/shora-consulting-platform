@@ -1,0 +1,67 @@
+@use '../../public/shared/public-page' as *;
+
+:host {
+  display: block;
+}
+
+.section h1 {
+  margin-top: 0;
+}
+
+.intro {
+  margin-top: 0;
+  color: var(--color-text-muted);
+}
+
+.slot-summary {
+  display: grid;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  margin-bottom: var(--space-lg);
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.slot-summary__label {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.phone-form {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.phone-form label {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.phone-form input {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font: inherit;
+}
+
+.phone-form input:focus {
+  outline: 2px solid color-mix(in srgb, var(--color-primary) 35%, transparent);
+  border-color: var(--color-primary);
+}
+
+.field-error {
+  color: #a33;
+  font-size: 0.875rem;
+}
+
+.back-link {
+  display: inline-block;
+  margin-top: var(--space-lg);
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.back-link:hover {
+  color: var(--color-primary);
+}

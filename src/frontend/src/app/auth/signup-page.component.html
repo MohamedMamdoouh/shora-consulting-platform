@@ -43,6 +43,6 @@
   </form>
 
   <div class="auth-links">
-    <a routerLink="/auth/login">لديك حساب؟ سجل الدخول</a>
+    <a [routerLink]="['/auth/login']" [queryParams]="authQueryParams">لديك حساب؟ سجل الدخول</a>
   </div>
 </section>

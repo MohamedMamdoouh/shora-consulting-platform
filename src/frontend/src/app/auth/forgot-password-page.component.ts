@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../core/auth/auth.service';
 import { getAuthFieldError } from '../core/forms/auth-field-error.util';
 
@@ -24,7 +24,7 @@ export class ForgotPasswordPageComponent {
     email: ['', [Validators.required, Validators.email]],
   });
 
-  submit(): void {
+  async submit(): Promise<void> {
     if (this.isSubmitting) {
       return;
     }
@@ -36,17 +36,11 @@ export class ForgotPasswordPageComponent {
 
     this.isSubmitting = true;
 
-    this.auth
-      .forgotPassword(this.form.controls.email.value)
-      .pipe(
-        finalize(() => {
-          this.isSubmitting = false;
-        }),
-      )
-      .subscribe({
-        next: () => {
-          this.submitted = true;
-        },
-      });
+    try {
+      await firstValueFrom(this.auth.forgotPassword(this.form.controls.email.value));
+      this.submitted = true;
+    } finally {
+      this.isSubmitting = false;
+    }
   }
 }

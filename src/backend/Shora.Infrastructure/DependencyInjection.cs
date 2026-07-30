@@ -38,6 +38,7 @@ public static class DependencyInjection
         services.Configure<AdminSeedOptions>(configuration.GetSection(AdminSeedOptions.SectionName));
         services.Configure<CacheOptions>(configuration.GetSection(CacheOptions.SectionName));
         services.Configure<BookingOptions>(configuration.GetSection(BookingOptions.SectionName));
+        services.Configure<BackgroundJobOptions>(configuration.GetSection(BackgroundJobOptions.SectionName));
 
         services.AddMemoryCache();
         services.AddSingleton<ICacheService, MemoryCacheService>();
@@ -68,6 +69,7 @@ public static class DependencyInjection
         services.AddScoped<PaymentService>();
         services.AddScoped<SettingsService>();
         services.AddScoped<SlotGenerationService>();
+        services.AddScoped<ReceiptUploadDeadlineCleanupService>();
         services.AddScoped<BookingTransitionHelper>();
 
         return services;

@@ -47,7 +47,7 @@
   <div id="google-signin-button"></div>
 
   <div class="auth-links">
-    <a routerLink="/auth/signup">إنشاء حساب جديد</a>
+    <a [routerLink]="['/auth/signup']" [queryParams]="authQueryParams">إنشاء حساب جديد</a>
     <a routerLink="/auth/forgot-password">نسيت كلمة المرور؟</a>
   </div>
 </section>

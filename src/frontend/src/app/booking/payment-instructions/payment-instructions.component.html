@@ -1,0 +1,62 @@
+<section class="page">
+  <article class="section">
+    <h1>تعليمات الدفع</h1>
+
+    @switch (viewModel.status) {
+      @case ('loading') {
+        <p class="state-message" aria-live="polite">جاري تحميل تعليمات الدفع...</p>
+      }
+
+      @case ('error') {
+        <div class="state-panel state-panel--error">
+          <p>{{ viewModel.message }}</p>
+          <button type="button" class="btn" (click)="reload()">إعادة المحاولة</button>
+        </div>
+      }
+
+      @case ('ready') {
+        @if (viewModel.instructions; as instructions) {
+          <p class="intro">
+            تم حجز موعدك. حوّل المبلغ أدناه عبر أحد وسائل الدفع، ثم ارفع إيصال التحويل قبل
+            انتهاء المهلة.
+          </p>
+
+          <div class="amount-block">
+            <span class="amount-label">المبلغ المطلوب</span>
+            <span class="amount-value">{{ formatPrice(instructions.amount, instructions.currency) }}</span>
+          </div>
+
+          <dl class="transfer-list">
+            <div class="transfer-item">
+              <dt>فودافون كاش</dt>
+              <dd dir="ltr">{{ instructions.vodafoneCashNumber }}</dd>
+            </div>
+            <div class="transfer-item">
+              <dt>InstaPay</dt>
+              <dd dir="ltr">{{ instructions.instaPayHandle }}</dd>
+            </div>
+          </dl>
+
+          @if (instructions.paymentInstructions) {
+            <div class="note-block">
+              <h2>ملاحظة</h2>
+              <p>{{ instructions.paymentInstructions }}</p>
+            </div>
+          }
+
+          <div class="countdown-block" [class.countdown-block--expired]="deadlineExpired">
+            <h2>مهلة رفع الإيصال</h2>
+            <p class="countdown-value" aria-live="polite">{{ countdownLabel }}</p>
+          </div>
+
+          <div class="next-step">
+            <p>
+              رفع الإيصال سيتوفر قريباً من
+              <a routerLink="/dashboard">لوحة العميل</a>.
+            </p>
+          </div>
+        }
+      }
+    }
+  </article>
+</section>

@@ -9,12 +9,12 @@ public sealed class SqlServerFixture : IAsyncLifetime
 
     public string AdminConnectionString => _container.GetConnectionString();
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await _container.StartAsync();
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await _container.DisposeAsync();
     }

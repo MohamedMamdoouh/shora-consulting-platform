@@ -51,6 +51,23 @@ public sealed class AuthWebApplicationFactory : WebApplicationFactory<Program>
         builder.ConfigureServices(services =>
         {
             services.AddScoped<IGoogleTokenValidator, FakeGoogleTokenValidator>();
+
+            var fileStorageDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IFileStorage));
+            if (fileStorageDescriptor is not null)
+            {
+                services.Remove(fileStorageDescriptor);
+            }
+
+            services.AddSingleton<IFileStorage, InMemoryFileStorage>();
+
+            var malwareScannerDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IMalwareScanner));
+            if (malwareScannerDescriptor is not null)
+            {
+                services.Remove(malwareScannerDescriptor);
+            }
+
+            services.AddSingleton<TestMalwareScanner>();
+            services.AddSingleton<IMalwareScanner>(sp => sp.GetRequiredService<TestMalwareScanner>());
         });
     }
 

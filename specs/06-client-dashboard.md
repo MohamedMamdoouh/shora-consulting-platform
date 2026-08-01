@@ -1,6 +1,6 @@
 # 06 — Client Dashboard
 
-Status: **Spec only — not implemented until explicitly requested.**
+Status: **Partially implemented.** Payment-instructions page with receipt upload exists (spec 05 thin UI). Full dashboard cards, cancellation UX, and booking history labels remain planned.
 
 ## 1. Purpose
 

@@ -14,6 +14,11 @@ const BOOKING_ERROR_MESSAGES: Record<string, string> = {
   [ErrorCodes.Booking.NotFound]: 'لم يتم العثور على الحجز.',
   [ErrorCodes.Booking.Forbidden]: 'لا يمكنك عرض تعليمات هذا الحجز.',
   [ErrorCodes.Booking.InvalidStatus]: 'تعليمات الدفع غير متاحة لهذا الحجز.',
+  [ErrorCodes.Payment.UploadDeadlinePassed]: 'انتهت مهلة رفع الإيصال.',
+  [ErrorCodes.Payment.InvalidReceiptFile]: 'ملف الإيصال غير صالح. استخدم JPG أو PNG أو WebP أو PDF.',
+  [ErrorCodes.Payment.ReceiptTooLarge]: 'حجم ملف الإيصال أكبر من 5 ميجابايت.',
+  [ErrorCodes.Payment.InvalidMethod]: 'يرجى اختيار طريقة الدفع المستخدمة.',
+  [ErrorCodes.Payment.InvalidStatus]: 'لا يمكن رفع إيصال لهذا الحجز في حالته الحالية.',
 };
 
 export function readBookingErrorMessage(code: string | undefined, fallback: string): string {

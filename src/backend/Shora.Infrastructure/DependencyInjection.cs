@@ -7,6 +7,7 @@ using Shora.Application.Abstractions;
 using Shora.Application.Bookings;
 using Shora.Application.Email;
 using Shora.Application.Options;
+using Shora.Application.Payments;
 using Shora.Application.Services;
 using Shora.Infrastructure.Data;
 using Shora.Infrastructure.Services;
@@ -39,6 +40,20 @@ public static class DependencyInjection
         services.Configure<CacheOptions>(configuration.GetSection(CacheOptions.SectionName));
         services.Configure<BookingOptions>(configuration.GetSection(BookingOptions.SectionName));
         services.Configure<BackgroundJobOptions>(configuration.GetSection(BackgroundJobOptions.SectionName));
+        services.Configure<StorageOptions>(configuration.GetSection(StorageOptions.SectionName));
+        services.Configure<ReceiptUploadOptions>(configuration.GetSection(ReceiptUploadOptions.SectionName));
+
+        var storageOptions = configuration.GetSection(StorageOptions.SectionName).Get<StorageOptions>() ?? new StorageOptions();
+        if (!string.IsNullOrWhiteSpace(storageOptions.ConnectionString))
+        {
+            services.AddSingleton<IFileStorage, AzureBlobFileStorage>();
+        }
+        else
+        {
+            services.AddScoped<IFileStorage, NotImplementedFileStorage>();
+        }
+
+        services.AddSingleton<IMalwareScanner, PassThroughMalwareScanner>();
 
         services.AddMemoryCache();
         services.AddSingleton<ICacheService, MemoryCacheService>();
@@ -50,7 +65,6 @@ public static class DependencyInjection
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<RefreshCookieService>();
         services.AddScoped<IGoogleTokenValidator, GoogleTokenValidator>();
-        services.AddScoped<IFileStorage, NotImplementedFileStorage>();
 
         if (hostEnvironment?.IsDevelopment() == true)
         {
@@ -67,9 +81,15 @@ public static class DependencyInjection
         services.AddScoped<BookingService>();
         services.AddScoped<CancellationService>();
         services.AddScoped<PaymentService>();
+        services.AddScoped<ReceiptUploadService>();
+        services.AddScoped<ReceiptAntiReplayChecker>();
+        services.AddScoped<AdminReceiptReviewService>();
+        services.AddScoped<AdminRefundService>();
         services.AddScoped<SettingsService>();
         services.AddScoped<SlotGenerationService>();
         services.AddScoped<ReceiptUploadDeadlineCleanupService>();
+        services.AddScoped<ReceiptRetentionPurgeService>();
+        services.AddScoped<TempBlobCleanupService>();
         services.AddScoped<BookingTransitionHelper>();
 
         return services;

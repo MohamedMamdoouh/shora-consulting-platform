@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Shora.Application.Abstractions;
 using Shora.Application.Auth;
 using Shora.Application.Common;
@@ -41,9 +41,9 @@ public sealed class AuthService
         var existing = await _userManager.FindByEmailAsync(email);
         if (existing is not null)
         {
-            return Result<AuthResult>.Failure(Error.Conflict(
+            return Error.Conflict(
                 ErrorCodes.Auth.DuplicateEmail,
-                "Email is already registered."));
+                "Email is already registered.");
         }
 
         var displayName = string.IsNullOrWhiteSpace(request.DisplayName)
@@ -63,14 +63,14 @@ public sealed class AuthService
         var createResult = await _userManager.CreateAsync(user, request.Password);
         if (!createResult.Succeeded)
         {
-            return Result<AuthResult>.Failure(MapIdentityErrors(createResult));
+            return MapIdentityErrors(createResult);
         }
 
         await _userManager.AddToRoleAsync(user, AppRoles.Client);
         await _authEmailService.SendVerificationAsync(user, cancellationToken);
 
         var authResult = await IssueTokensAsync(user, ipAddress, userAgent, cancellationToken);
-        return Result<AuthResult>.Success(authResult);
+        return authResult;
     }
 
     public async Task<Result<AuthResult>> LoginAsync(
@@ -82,13 +82,13 @@ public sealed class AuthService
         var user = await _userManager.FindByEmailAsync(request.Email.Trim());
         if (user is null || !await _userManager.CheckPasswordAsync(user, request.Password))
         {
-            return Result<AuthResult>.Failure(Error.Unauthorized(
+            return Error.Unauthorized(
                 ErrorCodes.Auth.InvalidCredentials,
-                "Invalid email or password."));
+                "Invalid email or password.");
         }
 
         var authResult = await IssueTokensAsync(user, ipAddress, userAgent, cancellationToken);
-        return Result<AuthResult>.Success(authResult);
+        return authResult;
     }
 
     public async Task<(RefreshTokenRotationResult Rotation, Result<AuthResult> Auth)> RefreshAsync(
@@ -100,25 +100,25 @@ public sealed class AuthService
         var rotation = await _refreshTokenService.RotateAsync(rawToken, ipAddress, userAgent, cancellationToken);
         if (rotation.Status == RefreshTokenStatus.ReuseDetected)
         {
-            return (rotation, Result<AuthResult>.Failure(Error.Unauthorized(
+            return (rotation, Error.Unauthorized(
                 ErrorCodes.Auth.RefreshTokenReuse,
-                "Session invalidated due to token reuse.")));
+                "Session invalidated due to token reuse."));
         }
 
         if (rotation.Status != RefreshTokenStatus.Success || rotation.UserId is null || rotation.NewToken is null)
         {
-            return (rotation, Result<AuthResult>.Failure(Error.Unauthorized(
+            return (rotation, Error.Unauthorized(
                 ErrorCodes.Auth.RefreshTokenInvalid,
-                "Invalid or expired refresh token.")));
+                "Invalid or expired refresh token."));
         }
 
         var user = await _userManager.FindByIdAsync(rotation.UserId.Value.ToString());
         if (user is null)
         {
             return (new RefreshTokenRotationResult(RefreshTokenStatus.Invalid),
-                Result<AuthResult>.Failure(Error.Unauthorized(
+                Error.Unauthorized(
                     ErrorCodes.Auth.RefreshTokenInvalid,
-                    "Invalid or expired refresh token.")));
+                    "Invalid or expired refresh token."));
         }
 
         var roles = await _userManager.GetRolesAsync(user);
@@ -126,8 +126,7 @@ public sealed class AuthService
         var accessToken = _jwtTokenService.CreateAccessToken(user, role);
         var response = BuildAuthResponse(accessToken, user, role);
 
-        return (rotation, Result<AuthResult>.Success(
-            new AuthResult(response, rotation.NewToken.RawToken, rotation.NewToken.ExpiresAtUtc)));
+        return (rotation, new AuthResult(response, rotation.NewToken.RawToken, rotation.NewToken.ExpiresAtUtc));
     }
 
     public Task<bool> LogoutAsync(string? rawToken, CancellationToken cancellationToken = default)
@@ -147,22 +146,22 @@ public sealed class AuthService
         var user = await _userManager.FindByEmailAsync(request.Email.Trim());
         if (user is null)
         {
-            return Result<bool>.Failure(Error.Validation(
+            return Error.Validation(
                 ErrorCodes.Auth.VerificationFailed,
-                "Invalid verification request."));
+                "Invalid verification request.");
         }
 
         if (user.EmailConfirmed)
         {
-            return Result<bool>.Success(true);
+            return true;
         }
 
         var result = await _userManager.ConfirmEmailAsync(user, request.Token);
         return result.Succeeded
-            ? Result<bool>.Success(false)
-            : Result<bool>.Failure(Error.Validation(
+            ? false
+            : Error.Validation(
                 ErrorCodes.Auth.VerificationFailed,
-                "Invalid or expired verification token."));
+                "Invalid or expired verification token.");
     }
 
     public async Task ResendVerificationAsync(
@@ -210,17 +209,17 @@ public sealed class AuthService
         var user = await _userManager.FindByEmailAsync(request.Email.Trim());
         if (user is null)
         {
-            return Result.Failure(Error.Validation(
+            return Error.Validation(
                 ErrorCodes.Auth.ResetFailed,
-                "Invalid reset request."));
+                "Invalid reset request.");
         }
 
         var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
         if (!result.Succeeded)
         {
-            return Result.Failure(Error.Validation(
+            return Error.Validation(
                 ErrorCodes.Auth.ResetFailed,
-                string.Join(' ', result.Errors.Select(e => e.Description))));
+                string.Join(' ', result.Errors.Select(e => e.Description)));
         }
 
         await _refreshTokenService.RevokeAllForUserAsync(user.Id, cancellationToken);
@@ -236,9 +235,9 @@ public sealed class AuthService
         var payload = await _googleTokenValidator.ValidateAsync(request.IdToken, cancellationToken);
         if (payload is null)
         {
-            return Result<AuthResult>.Failure(Error.Unauthorized(
+            return Error.Unauthorized(
                 ErrorCodes.Auth.GoogleSignInFailed,
-                "Invalid Google token."));
+                "Invalid Google token.");
         }
 
         var user = await _userManager.FindByEmailAsync(payload.Email);
@@ -257,7 +256,7 @@ public sealed class AuthService
             var createResult = await _userManager.CreateAsync(user);
             if (!createResult.Succeeded)
             {
-                return Result<AuthResult>.Failure(MapIdentityErrors(createResult));
+                return MapIdentityErrors(createResult);
             }
 
             await _userManager.AddToRoleAsync(user, AppRoles.Client);
@@ -281,7 +280,7 @@ public sealed class AuthService
         }
 
         var authResult = await IssueTokensAsync(user, ipAddress, userAgent, cancellationToken);
-        return Result<AuthResult>.Success(authResult);
+        return authResult;
     }
 
     public async Task<Result<AuthResponse>> BuildAuthResponseForUserAsync(
@@ -291,7 +290,7 @@ public sealed class AuthService
         var roles = await _userManager.GetRolesAsync(user);
         var role = roles.FirstOrDefault() ?? AppRoles.Client;
         var accessToken = _jwtTokenService.CreateAccessToken(user, role);
-        return Result<AuthResponse>.Success(BuildAuthResponse(accessToken, user, role));
+        return BuildAuthResponse(accessToken, user, role);
     }
 
     public async Task<Result<MeResponse>> BuildMeResponseAsync(
@@ -301,11 +300,11 @@ public sealed class AuthService
         var roles = await _userManager.GetRolesAsync(user);
         var role = roles.FirstOrDefault() ?? AppRoles.Client;
 
-        return Result<MeResponse>.Success(new MeResponse(
+        return new MeResponse(
             user.DisplayName,
             role,
             user.EmailConfirmed,
-            user.Email ?? string.Empty));
+            user.Email ?? string.Empty);
     }
 
     private async Task<AuthResult> IssueTokensAsync(

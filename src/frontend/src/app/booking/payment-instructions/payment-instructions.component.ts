@@ -1,6 +1,7 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { PaymentInstructionsResponse } from '@contracts/payments';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { PaymentInstructionsResponse, PaymentMethod } from '@contracts/payments';
 import { firstValueFrom } from 'rxjs';
 import { readApiError, readApiErrorCode } from '../../core/api/api-error.util';
 import { BookingService } from '../../core/booking/booking.service';
@@ -9,24 +10,32 @@ import { readBookingErrorMessage } from '../booking-error.util';
 type PaymentInstructionsViewModel =
   | { status: 'loading' }
   | { status: 'error'; message: string }
-  | { status: 'ready'; instructions: PaymentInstructionsResponse };
+  | { status: 'ready'; instructions: PaymentInstructionsResponse }
+  | { status: 'submitted' };
 
 @Component({
   selector: 'app-payment-instructions',
-  imports: [RouterLink],
+  imports: [FormsModule],
   templateUrl: './payment-instructions.component.html',
   styleUrl: './payment-instructions.component.scss',
 })
 export class PaymentInstructionsComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly bookingService = inject(BookingService);
 
   viewModel: PaymentInstructionsViewModel = { status: 'loading' };
   countdownLabel = '';
   deadlineExpired = false;
+  uploadMethod: PaymentMethod = 'VodafoneCash';
+  senderReference = '';
+  selectedFile: File | null = null;
+  uploadError = '';
+  uploading = false;
 
   private countdownTimer: ReturnType<typeof setInterval> | null = null;
   private deadlineUtc: string | null = null;
+  private bookingId: string | null = null;
 
   ngOnInit(): void {
     void this.loadInstructions();
@@ -48,6 +57,52 @@ export class PaymentInstructionsComponent implements OnInit, OnDestroy {
     await this.loadInstructions();
   }
 
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.selectedFile = input.files?.[0] ?? null;
+    this.uploadError = '';
+  }
+
+  async submitReceipt(): Promise<void> {
+    if (!this.bookingId || this.uploading || this.deadlineExpired) {
+      return;
+    }
+
+    if (!this.selectedFile) {
+      this.uploadError = 'يرجى اختيار صورة الإيصال.';
+      return;
+    }
+
+    this.uploading = true;
+    this.uploadError = '';
+
+    try {
+      await firstValueFrom(
+        this.bookingService.uploadReceipt(
+          this.bookingId,
+          this.selectedFile,
+          this.uploadMethod,
+          this.senderReference,
+        ),
+      );
+
+      this.viewModel = { status: 'submitted' };
+      this.clearCountdown();
+    } catch (err) {
+      const code = readApiErrorCode(err);
+      this.uploadError = readBookingErrorMessage(
+        code,
+        readApiError(err, 'تعذر رفع الإيصال. حاول مرة أخرى.'),
+      );
+    } finally {
+      this.uploading = false;
+    }
+  }
+
+  goToDashboard(): void {
+    void this.router.navigate(['/dashboard']);
+  }
+
   private async loadInstructions(): Promise<void> {
     const bookingId = this.route.snapshot.paramMap.get('id');
     if (!bookingId) {
@@ -58,6 +113,7 @@ export class PaymentInstructionsComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.bookingId = bookingId;
     this.viewModel = { status: 'loading' };
     this.clearCountdown();
 

@@ -25,6 +25,8 @@
 
     <PackageReference Include="Testcontainers.MsSql" />
 
+    <PackageReference Include="Testcontainers.Azurite" />
+
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
 
     <PackageReference Include="Microsoft.OpenApi" />

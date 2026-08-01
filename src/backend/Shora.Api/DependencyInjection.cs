@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.RateLimiting;
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -57,7 +58,55 @@ public static class DependencyInjection
         services.AddOpenApi();
 
         services.Configure<BackgroundJobOptions>(configuration.GetSection(BackgroundJobOptions.SectionName));
+        services.Configure<ReceiptUploadOptions>(configuration.GetSection(ReceiptUploadOptions.SectionName));
+        services.AddRateLimiting(configuration);
         services.AddHostedService<ReceiptUploadDeadlineCleanupJob>();
+        services.AddHostedService<ReceiptRetentionPurgeJob>();
+        services.AddHostedService<TempBlobCleanupJob>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddRateLimiting(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var receiptUploadOptions = configuration
+            .GetSection(ReceiptUploadOptions.SectionName)
+            .Get<ReceiptUploadOptions>() ?? new ReceiptUploadOptions();
+
+        services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+            options.OnRejected = async (context, cancellationToken) =>
+            {
+                if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+                {
+                    context.HttpContext.Response.Headers.RetryAfter =
+                        ((int)Math.Ceiling(retryAfter.TotalSeconds)).ToString();
+                }
+
+                context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                await context.HttpContext.Response.WriteAsync("Too many requests.", cancellationToken);
+            };
+
+            options.AddPolicy(RateLimitPolicies.ReceiptUpload, httpContext =>
+            {
+                var userId = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var partitionKey = !string.IsNullOrEmpty(userId)
+                    ? $"receipt-upload:user:{userId}"
+                    : $"receipt-upload:ip:{httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown"}";
+
+                return RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey,
+                    _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = receiptUploadOptions.RateLimitPermitLimit,
+                        Window = TimeSpan.FromMinutes(receiptUploadOptions.RateLimitWindowMinutes),
+                        QueueLimit = 0
+                    });
+            });
+        });
 
         return services;
     }

@@ -1,4 +1,4 @@
-using Shora.Application.Abstractions;
+﻿using Shora.Application.Abstractions;
 using Shora.Application.Common;
 using Shora.Application.Common.Results;
 using Shora.Domain.Entities;
@@ -20,10 +20,9 @@ public sealed class BookingTransitionHelper(
     {
         if (expectedFromStatus.HasValue && booking.Status != expectedFromStatus.Value)
         {
-            return Result.Failure(
-                Error.Conflict(
-                    ErrorCodes.Booking.InvalidStatus,
-                    $"Booking status must be {expectedFromStatus.Value} to apply this transition."));
+            return Error.Conflict(
+                ErrorCodes.Booking.InvalidStatus,
+                $"Booking status must be {expectedFromStatus.Value} to apply this transition.");
         }
 
         var fromStatus = expectedFromStatus ?? booking.Status;

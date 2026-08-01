@@ -31,12 +31,10 @@ public class SettingsService(
         var settings = await GetAsync(cancellationToken);
         if (settings is null)
         {
-            return Result<PublicSettingsResponse>.Failure(
-                Error.NotFound(ErrorCodes.Settings.NotFound, "Settings not found."));
+            return Error.NotFound(ErrorCodes.Settings.NotFound, "Settings not found.");
         }
 
-        return Result<PublicSettingsResponse>.Success(
-            new PublicSettingsResponse(settings.SessionPrice, settings.SessionDurationMinutes));
+        return new PublicSettingsResponse(settings.SessionPrice, settings.SessionDurationMinutes);
     }
 
     public Task InvalidateCacheAsync(CancellationToken cancellationToken = default) =>

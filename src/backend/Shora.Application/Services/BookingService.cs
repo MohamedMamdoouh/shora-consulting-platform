@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Shora.Application.Abstractions;
@@ -29,7 +29,7 @@ public sealed class BookingService(
         var deliveryValidation = ValidateDeliveryAndPhone(request);
         if (deliveryValidation.IsFailure)
         {
-            return Result<ReserveBookingResponse>.Failure(deliveryValidation.Error!);
+            return deliveryValidation.Error!;
         }
 
         var normalizedPhone = deliveryValidation.Value;
@@ -40,14 +40,14 @@ public sealed class BookingService(
         if (emailResult.IsFailure)
         {
             await transaction.RollbackAsync(cancellationToken);
-            return Result<ReserveBookingResponse>.Failure(emailResult.Error!);
+            return emailResult.Error!;
         }
 
         var holdCapResult = await EnsureHoldCapAsync(clientId, cancellationToken);
         if (holdCapResult.IsFailure)
         {
             await transaction.RollbackAsync(cancellationToken);
-            return Result<ReserveBookingResponse>.Failure(holdCapResult.Error!);
+            return holdCapResult.Error!;
         }
 
         var settings = await dbContext.Settings
@@ -57,8 +57,7 @@ public sealed class BookingService(
         if (settings is null)
         {
             await transaction.RollbackAsync(cancellationToken);
-            return Result<ReserveBookingResponse>.Failure(
-                Error.NotFound(ErrorCodes.Settings.NotFound, "Settings are not configured."));
+            return Error.NotFound(ErrorCodes.Settings.NotFound, "Settings are not configured.");
         }
 
         var slot = await dbContext.AvailabilitySlots
@@ -72,10 +71,9 @@ public sealed class BookingService(
         if (slot is null || slot.IsBooked)
         {
             await transaction.RollbackAsync(cancellationToken);
-            return Result<ReserveBookingResponse>.Failure(
-                Error.Conflict(
-                    ErrorCodes.Booking.SlotUnavailable,
-                    "The selected slot is no longer available."));
+            return Error.Conflict(
+                ErrorCodes.Booking.SlotUnavailable,
+                "The selected slot is no longer available.");
         }
 
         var now = dateTimeProvider.UtcNow;
@@ -121,7 +119,7 @@ public sealed class BookingService(
         if (auditResult.IsFailure)
         {
             await transaction.RollbackAsync(cancellationToken);
-            return Result<ReserveBookingResponse>.Failure(auditResult.Error!);
+            return auditResult.Error!;
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
@@ -129,7 +127,7 @@ public sealed class BookingService(
 
         await cacheInvalidator.InvalidateAvailabilityAsync(cancellationToken);
 
-        return Result<ReserveBookingResponse>.Success(new ReserveBookingResponse(
+        return new ReserveBookingResponse(
             bookingId,
             new PaymentInstructionsSnapshot(
                 settings.SessionPrice,
@@ -137,7 +135,7 @@ public sealed class BookingService(
                 settings.VodafoneCashNumber,
                 settings.InstaPayHandle,
                 settings.PaymentInstructions,
-                receiptUploadDeadlineUtc)));
+                receiptUploadDeadlineUtc));
     }
 
     public async Task<Result> CancelHoldAsync(
@@ -151,22 +149,19 @@ public sealed class BookingService(
 
         if (booking is null)
         {
-            return Result.Failure(
-                Error.NotFound(ErrorCodes.Booking.NotFound, "Booking was not found."));
+            return Error.NotFound(ErrorCodes.Booking.NotFound, "Booking was not found.");
         }
 
         if (booking.ClientId != clientId)
         {
-            return Result.Failure(
-                Error.Forbidden(ErrorCodes.Booking.Forbidden, "You do not have access to this booking."));
+            return Error.Forbidden(ErrorCodes.Booking.Forbidden, "You do not have access to this booking.");
         }
 
         if (booking.Status is not BookingStatus.PendingPayment and not BookingStatus.PendingApproval)
         {
-            return Result.Failure(
-                Error.Conflict(
-                    ErrorCodes.Booking.InvalidStatus,
-                    "Only unpaid holds can be cancelled."));
+            return Error.Conflict(
+                ErrorCodes.Booking.InvalidStatus,
+                "Only unpaid holds can be cancelled.");
         }
 
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
@@ -245,19 +240,18 @@ public sealed class BookingService(
         {
             if (string.IsNullOrWhiteSpace(request.ContactPhone))
             {
-                return Result<string?>.Failure(
-                    Error.Validation(
-                        ErrorCodes.Booking.ContactPhoneRequired,
-                        "Contact phone is required for voice call delivery."));
+                return Error.Validation(
+                    ErrorCodes.Booking.ContactPhoneRequired,
+                    "Contact phone is required for voice call delivery.");
             }
 
             var phoneResult = PhoneNormalizer.NormalizeToE164(request.ContactPhone);
             if (phoneResult.IsFailure)
             {
-                return Result<string?>.Failure(phoneResult.Error!);
+                return phoneResult.Error!;
             }
 
-            return Result<string?>.Success(phoneResult.Value);
+            return phoneResult.Value;
         }
 
         if (!string.IsNullOrWhiteSpace(request.ContactPhone))
@@ -265,13 +259,13 @@ public sealed class BookingService(
             var phoneResult = PhoneNormalizer.NormalizeToE164(request.ContactPhone);
             if (phoneResult.IsFailure)
             {
-                return Result<string?>.Failure(phoneResult.Error!);
+                return phoneResult.Error!;
             }
 
-            return Result<string?>.Success(phoneResult.Value);
+            return phoneResult.Value;
         }
 
-        return Result<string?>.Success(null);
+        return (string?)null;
     }
 
     private async Task<Result> EnsureEmailVerifiedAsync(Guid clientId, CancellationToken cancellationToken)
@@ -284,10 +278,9 @@ public sealed class BookingService(
 
         if (!emailConfirmed)
         {
-            return Result.Failure(
-                Error.Forbidden(
-                    ErrorCodes.Booking.EmailNotVerified,
-                    "Verify your email before reserving a session."));
+            return Error.Forbidden(
+                ErrorCodes.Booking.EmailNotVerified,
+                "Verify your email before reserving a session.");
         }
 
         return Result.Success();
@@ -309,10 +302,9 @@ public sealed class BookingService(
 
         if (holdCount >= bookingOptions.Value.UnconfirmedHoldCap)
         {
-            return Result.Failure(
-                Error.Conflict(
-                    ErrorCodes.Booking.HoldCapExceeded,
-                    "You already have the maximum number of unpaid holds."));
+            return Error.Conflict(
+                ErrorCodes.Booking.HoldCapExceeded,
+                "You already have the maximum number of unpaid holds.");
         }
 
         return Result.Success();

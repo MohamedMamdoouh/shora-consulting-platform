@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Shora.Application.Abstractions;
 using Shora.Application.Bookings;
@@ -28,14 +28,12 @@ public sealed class CancellationService(
 
         if (booking is null)
         {
-            return Result<CancellationRequestResponse>.Failure(
-                Error.NotFound(ErrorCodes.Booking.NotFound, "Booking was not found."));
+            return Error.NotFound(ErrorCodes.Booking.NotFound, "Booking was not found.");
         }
 
         if (booking.ClientId != clientId)
         {
-            return Result<CancellationRequestResponse>.Failure(
-                Error.Forbidden(ErrorCodes.Booking.Forbidden, "You do not have access to this booking."));
+            return Error.Forbidden(ErrorCodes.Booking.Forbidden, "You do not have access to this booking.");
         }
 
         var settings = await dbContext.Settings
@@ -44,8 +42,7 @@ public sealed class CancellationService(
 
         if (settings is null)
         {
-            return Result<CancellationRequestResponse>.Failure(
-                Error.NotFound(ErrorCodes.Settings.NotFound, "Settings are not configured."));
+            return Error.NotFound(ErrorCodes.Settings.NotFound, "Settings are not configured.");
         }
 
         var now = dateTimeProvider.UtcNow;
@@ -53,10 +50,9 @@ public sealed class CancellationService(
 
         if (now >= autoDeclineAtUtc)
         {
-            return Result<CancellationRequestResponse>.Failure(
-                Error.Conflict(
-                    ErrorCodes.Cancellation.TooLate,
-                    "Too late to request online — contact the consultant on WhatsApp."));
+            return Error.Conflict(
+                ErrorCodes.Cancellation.TooLate,
+                "Too late to request online — contact the consultant on WhatsApp.");
         }
 
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
@@ -69,10 +65,9 @@ public sealed class CancellationService(
             if (booking.Status != BookingStatus.Confirmed)
             {
                 await transaction.RollbackAsync(cancellationToken);
-                return Result<CancellationRequestResponse>.Failure(
-                    Error.Conflict(
-                        ErrorCodes.Booking.InvalidStatus,
-                        "Cancellation requests are only allowed for confirmed bookings."));
+                return Error.Conflict(
+                    ErrorCodes.Booking.InvalidStatus,
+                    "Cancellation requests are only allowed for confirmed bookings.");
             }
 
             request = new CancellationRequest
@@ -101,7 +96,7 @@ public sealed class CancellationService(
             if (transitionResult.IsFailure)
             {
                 await transaction.RollbackAsync(cancellationToken);
-                return Result<CancellationRequestResponse>.Failure(transitionResult.Error!);
+                return transitionResult.Error!;
             }
         }
         else
@@ -112,46 +107,41 @@ public sealed class CancellationService(
                 && request.Status == Domain.Enums.CancellationRequestStatus.Pending)
             {
                 await transaction.RollbackAsync(cancellationToken);
-                return Result<CancellationRequestResponse>.Failure(
-                    Error.Conflict(
-                        ErrorCodes.Booking.InvalidStatus,
-                        "A cancellation request is already pending."));
+                return Error.Conflict(
+                    ErrorCodes.Booking.InvalidStatus,
+                    "A cancellation request is already pending.");
             }
 
             if (request.Status == Domain.Enums.CancellationRequestStatus.AutoDeclined)
             {
                 await transaction.RollbackAsync(cancellationToken);
-                return Result<CancellationRequestResponse>.Failure(
-                    Error.Conflict(
-                        ErrorCodes.Cancellation.ReopenExhausted,
-                        "Further online cancellation requests are not allowed for this booking."));
+                return Error.Conflict(
+                    ErrorCodes.Cancellation.ReopenExhausted,
+                    "Further online cancellation requests are not allowed for this booking.");
             }
 
             if (request.Status != Domain.Enums.CancellationRequestStatus.Declined)
             {
                 await transaction.RollbackAsync(cancellationToken);
-                return Result<CancellationRequestResponse>.Failure(
-                    Error.Conflict(
-                        ErrorCodes.Booking.InvalidStatus,
-                        "Cancellation requests are only allowed for confirmed bookings."));
+                return Error.Conflict(
+                    ErrorCodes.Booking.InvalidStatus,
+                    "Cancellation requests are only allowed for confirmed bookings.");
             }
 
             if (request.ReopenCount >= 1)
             {
                 await transaction.RollbackAsync(cancellationToken);
-                return Result<CancellationRequestResponse>.Failure(
-                    Error.Conflict(
-                        ErrorCodes.Cancellation.ReopenExhausted,
-                        "You have already used your one allowed reopen for this booking."));
+                return Error.Conflict(
+                    ErrorCodes.Cancellation.ReopenExhausted,
+                    "You have already used your one allowed reopen for this booking.");
             }
 
             if (booking.Status != BookingStatus.Confirmed)
             {
                 await transaction.RollbackAsync(cancellationToken);
-                return Result<CancellationRequestResponse>.Failure(
-                    Error.Conflict(
-                        ErrorCodes.Booking.InvalidStatus,
-                        "Cancellation requests are only allowed for confirmed bookings."));
+                return Error.Conflict(
+                    ErrorCodes.Booking.InvalidStatus,
+                    "Cancellation requests are only allowed for confirmed bookings.");
             }
 
             request.Status = Domain.Enums.CancellationRequestStatus.Pending;
@@ -177,7 +167,7 @@ public sealed class CancellationService(
             if (transitionResult.IsFailure)
             {
                 await transaction.RollbackAsync(cancellationToken);
-                return Result<CancellationRequestResponse>.Failure(transitionResult.Error!);
+                return transitionResult.Error!;
             }
         }
 
@@ -186,11 +176,11 @@ public sealed class CancellationService(
         await dbContext.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
 
-        return Result<CancellationRequestResponse>.Success(new CancellationRequestResponse(
+        return new CancellationRequestResponse(
             request.Id,
             MapStatus(request.Status),
             request.AutoDeclineAtUtc,
-            booking.Status.ToString()));
+            booking.Status.ToString());
     }
 
     public async Task<Result> MarkDecisionSeenAsync(
@@ -204,29 +194,25 @@ public sealed class CancellationService(
 
         if (booking is null)
         {
-            return Result.Failure(
-                Error.NotFound(ErrorCodes.Booking.NotFound, "Booking was not found."));
+            return Error.NotFound(ErrorCodes.Booking.NotFound, "Booking was not found.");
         }
 
         if (booking.ClientId != clientId)
         {
-            return Result.Failure(
-                Error.Forbidden(ErrorCodes.Booking.Forbidden, "You do not have access to this booking."));
+            return Error.Forbidden(ErrorCodes.Booking.Forbidden, "You do not have access to this booking.");
         }
 
         if (booking.CancellationRequest is not { } request)
         {
-            return Result.Failure(
-                Error.NotFound(ErrorCodes.Booking.NotFound, "No cancellation request exists for this booking."));
+            return Error.NotFound(ErrorCodes.Booking.NotFound, "No cancellation request exists for this booking.");
         }
 
         if (request.Status is not Domain.Enums.CancellationRequestStatus.Declined
             and not Domain.Enums.CancellationRequestStatus.AutoDeclined)
         {
-            return Result.Failure(
-                Error.Conflict(
-                    ErrorCodes.Booking.InvalidStatus,
-                    "Only declined cancellation decisions can be acknowledged."));
+            return Error.Conflict(
+                ErrorCodes.Booking.InvalidStatus,
+                "Only declined cancellation decisions can be acknowledged.");
         }
 
         request.ClientDecisionSeenAtUtc = dateTimeProvider.UtcNow;

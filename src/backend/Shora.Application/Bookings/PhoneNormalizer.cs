@@ -13,10 +13,9 @@ public static class PhoneNormalizer
     {
         if (string.IsNullOrWhiteSpace(phone))
         {
-            return Result<string>.Failure(
-                Error.Validation(
-                    ErrorCodes.Booking.ContactPhoneInvalid,
-                    "Contact phone number is invalid."));
+            return Error.Validation(
+                ErrorCodes.Booking.ContactPhoneInvalid,
+                "Contact phone number is invalid.");
         }
 
         try
@@ -24,20 +23,18 @@ public static class PhoneNormalizer
             var parsed = PhoneUtil.Parse(phone.Trim(), defaultRegion);
             if (!PhoneUtil.IsValidNumber(parsed))
             {
-                return Result<string>.Failure(
-                    Error.Validation(
-                        ErrorCodes.Booking.ContactPhoneInvalid,
-                        "Contact phone number is invalid."));
+                return Error.Validation(
+                    ErrorCodes.Booking.ContactPhoneInvalid,
+                    "Contact phone number is invalid.");
             }
 
-            return Result<string>.Success(PhoneUtil.Format(parsed, PhoneNumberFormat.E164));
+            return PhoneUtil.Format(parsed, PhoneNumberFormat.E164);
         }
         catch (NumberParseException)
         {
-            return Result<string>.Failure(
-                Error.Validation(
-                    ErrorCodes.Booking.ContactPhoneInvalid,
-                    "Contact phone number is invalid."));
+            return Error.Validation(
+                ErrorCodes.Booking.ContactPhoneInvalid,
+                "Contact phone number is invalid.");
         }
     }
 }

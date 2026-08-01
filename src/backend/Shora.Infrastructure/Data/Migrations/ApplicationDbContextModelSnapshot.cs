@@ -17,7 +17,7 @@ namespace Shora.Infrastructure.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.9")
+                .HasAnnotation("ProductVersion", "10.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -632,6 +632,9 @@ namespace Shora.Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
+
+                    b.Property<int>("ReviewWarnings")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("ReviewedAtUtc")
                         .HasColumnType("datetime2");

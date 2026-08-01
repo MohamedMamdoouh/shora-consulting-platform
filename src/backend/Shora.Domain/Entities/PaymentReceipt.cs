@@ -39,4 +39,6 @@ public class PaymentReceipt
     public DeclineReasonCode? DeclineReasonCode { get; set; }
 
     public string? DeclineReason { get; set; }
+
+    public ReceiptReviewWarning ReviewWarnings { get; set; }
 }

@@ -1,6 +1,6 @@
 ﻿# 04 — Booking Flow
 
-Status: **Spec only — not implemented until explicitly requested.**
+Status: **Partially implemented (backend).** Reserve, unpaid hold cancel, payment instructions, client cancellation-request API, and receipt-upload deadline cleanup are in place. Admin cancel/approve/decline cancellation requests and auto-decline job remain (spec 07 / spec 08).
 
 ## 1. Flow Overview (per SDD #8, flow 1)
 

@@ -23,7 +23,7 @@ public class AvailabilityService(
         var rangeResult = AvailabilityRangeValidator.Normalize(fromUtc, toUtc, dateTimeProvider.UtcNow);
         if (rangeResult.IsFailure)
         {
-            return Result<AvailabilityResponse>.Failure(rangeResult.Error!);
+            return rangeResult.Error!;
         }
 
         var (effectiveFromUtc, effectiveToUtc) = rangeResult.Value;
@@ -34,7 +34,7 @@ public class AvailabilityService(
             cacheOptions.Value.AvailabilityTtl,
             cancellationToken);
 
-        return Result<AvailabilityResponse>.Success(response ?? new AvailabilityResponse([]));
+        return response ?? new AvailabilityResponse([]);
     }
 
     private async Task<AvailabilityResponse> LoadOpenSlotsAsync(

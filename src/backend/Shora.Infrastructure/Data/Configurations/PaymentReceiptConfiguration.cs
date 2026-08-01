@@ -48,6 +48,9 @@ public class PaymentReceiptConfiguration : IEntityTypeConfiguration<PaymentRecei
         builder.Property(r => r.DeclineReason)
             .HasMaxLength(1000);
 
+        builder.Property(r => r.ReviewWarnings)
+            .HasConversion<int>();
+
         builder.HasOne(r => r.Payment)
             .WithMany(p => p.Receipts)
             .HasForeignKey(r => r.PaymentId)

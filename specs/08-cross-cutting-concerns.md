@@ -1,8 +1,16 @@
 # 08 — Cross-Cutting Concerns (Ops, Security, Deployment)
 
-Status: **Spec only — not implemented until explicitly requested.**
+Status: **Partially implemented.** See “Already landed” below; outbox dispatcher, full rate-limit matrix, blob reconciliation (spec 05h), and ops monitoring remain.
 
-This spec consolidates operational and cross-cutting requirements referenced by specs 01–07 so they live in one place: rate limiting, logging/auditing/monitoring, the background-job execution model, deployment, and data retention. Nothing here changes feature behavior; it hardens how the system runs in production.
+This spec consolidates operational and cross-cutting requirements referenced by specs 01–07 so they live in one place: rate limiting, logging/auditing/monitoring, the background-job execution model, deployment, and data retention.
+
+### Already landed (partial)
+
+- **Rate limiting:** `POST /api/v1/payments/{bookingId}/receipt` — 5/min/account (spec 05e)
+- **Background jobs:** receipt-upload-deadline cleanup, receipt retention purge, temp blob cleanup (orphan `temp/` prefix)
+- **Outbox writes:** payment/booking transitions enqueue messages; **dispatcher job not yet implemented** (emails stay `Pending` until spec 08)
+
+---
 
 ## 1. Rate Limiting (H2)
 
@@ -15,7 +23,7 @@ Uses ASP.NET Core's built-in rate limiting middleware. Limits are per-endpoint a
 | `POST /api/auth/refresh`                                                                     | ~10 / minute / IP              | Blunts brute-force of stolen refresh cookies                                                         |
 | `GET /api/availability`                                                                      | ~30 / minute / IP              | Public, cacheable; also bounded by date-range validation (spec 04 #2)                                |
 | `POST /api/bookings`                                                                         | ~10 / minute / account         | Backstops the 3-concurrent-hold cap (spec 04)                                                        |
-| `POST /api/payments/{bookingId}/receipt`                                                     | ~5 / minute / account          | Bounds receipt-upload abuse; combined with the 5 MB size cap and content-type allowlist (spec 05 #4) |
+| `POST /api/payments/{bookingId}/receipt`                                                     | ~5 / minute / account          | **Done** (spec 05e). Bounds receipt-upload abuse; combined with the 5 MB size cap and content-type allowlist (spec 05 #4) |
 | `POST /api/bookings/{id}/cancellation-requests`                                              | ~5 / minute / account          | Light limit; single reopen policy still blocks spam (spec 04 #3.1)                                   |
 
 - Throttled responses return `429 Too Many Requests` with a `Retry-After` header.
@@ -70,16 +78,17 @@ Every alert above must map to an operator runbook with owner + response SLA:
 - **Reliable side effects:** state-changing transactions write side effects to `OutboxMessage`; dispatcher jobs perform delivery and mark completion, so delivery cannot be lost between DB commit and external send.
 - **External-storage consistency:** blob storage is outside SQL transactions. Receipt processing uses explicit recovery states (`BlobFinalizePending`, `Missing`) and repair jobs rather than assuming distributed atomicity.
 
-| Job                               | Interval | Purpose                                                                                                                                     | Cross-ref                  |
-| --------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- |
-| Receipt-upload-deadline cleanup   | ~1 min   | Cancel `PendingPayment` holds past `ReceiptUploadDeadlineUtc`, free the slot, set `Payment.Status = Void` (never touches `PendingApproval`) | spec 04 #5, spec 05 #8     |
-| Cancellation-request auto-decline | ~1 min   | Set `Pending` cancellation requests to `AutoDeclined` and return the booking to `Confirmed` at `AutoDeclineAtUtc`                           | spec 04 #3.1, spec 07 #4.1 |
-| Receipt blob reconciliation       | ~15 min  | Repair `BlobFinalizePending` records and clean orphan temp blobs after partial upload failures                                              | spec 05 #2, spec 05 #8     |
-| Auto-complete                     | ~5 min   | `Confirmed` → `Completed` once slot end passed                                                                                              | spec 06, spec 07           |
-| Availability top-up               | nightly  | Keep ~4 weeks of future slots materialized, skipping `BlockedDate`s                                                                         | spec 07 #2                 |
-| Receipt retention purge           | daily    | Remove/scrub receipt blobs and PII metadata older than `Settings.ReceiptRetentionMonths` where not legally held                             | spec 01 #4, #5             |
-| Refresh-token purge               | daily    | Delete expired `RefreshToken` rows                                                                                                          | spec 02 #11                |
-| Outbox dispatcher                 | ~1 min   | Deliver pending outbox messages (emails) with retry/backoff; dead-letters after 8 attempts (spec 01 #4) and alerts (#2)                     | spec 01, spec 05, spec 07  |
+| Job                               | Interval | Purpose                                                                                                                                     | Cross-ref                  | Status |
+| --------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- | ------ |
+| Receipt-upload-deadline cleanup   | ~1 min   | Cancel `PendingPayment` holds past `ReceiptUploadDeadlineUtc`, free the slot, set `Payment.Status = Void` (never touches `PendingApproval`) | spec 04 #5, spec 05 #8     | **Done** |
+| Cancellation-request auto-decline | ~1 min   | Set `Pending` cancellation requests to `AutoDeclined` and return the booking to `Confirmed` at `AutoDeclineAtUtc`                           | spec 04 #3.1, spec 07 #4.1 | Planned |
+| Receipt blob reconciliation       | ~15 min  | Repair `BlobFinalizePending` records and clean orphan temp blobs after partial upload failures (**spec 05h — deferred here from spec 05**)   | spec 05 #2, spec 05 #8     | Planned |
+| Auto-complete                     | ~5 min   | `Confirmed` → `Completed` once slot end passed                                                                                              | spec 06, spec 07           | Planned |
+| Availability top-up               | nightly  | Keep ~4 weeks of future slots materialized, skipping `BlockedDate`s                                                                         | spec 07 #2                 | Planned |
+| Receipt retention purge           | daily    | Remove/scrub receipt blobs and PII metadata older than `Settings.ReceiptRetentionMonths` where not legally held                             | spec 01 #4, #5             | **Done** |
+| Temp blob cleanup (orphan `temp/`) | daily   | Delete aged orphan temp blobs under `temp/` prefix (partial overlap with reconciliation job)                                                | spec 05                    | **Done** |
+| Refresh-token purge               | daily    | Delete expired `RefreshToken` rows                                                                                                          | spec 02 #11                | Planned |
+| Outbox dispatcher                 | ~1 min   | Deliver pending outbox messages (emails) with retry/backoff; dead-letters after 8 attempts (spec 01 #4) and alerts (#2)                     | spec 01, spec 05, spec 07  | Planned |
 
 ## 4. Deployment
 

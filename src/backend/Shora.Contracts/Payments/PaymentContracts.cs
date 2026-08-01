@@ -7,3 +7,9 @@ public sealed record PaymentInstructionsResponse(
     string InstaPayHandle,
     string? PaymentInstructions,
     DateTime ReceiptUploadDeadlineUtc);
+
+public sealed record UploadReceiptResponse(
+    Guid ReceiptId,
+    Guid BookingId,
+    string BookingStatus,
+    IReadOnlyList<string> ReviewWarnings);

@@ -1,6 +1,6 @@
 # 07 — Admin / Consultant Dashboard
 
-Status: **Spec only — not implemented until explicitly requested.**
+Status: **Backend APIs partially complete.** Payment receipt review, approve/decline, and manual refund record/revoke endpoints are implemented (spec 05); this spec covers the **admin UI** that consumes them. Settings edit, bookings table, cancellation decisions, and earnings view remain planned.
 
 ## 1. Purpose
 

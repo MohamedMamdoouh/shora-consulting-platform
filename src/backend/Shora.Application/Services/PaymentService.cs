@@ -22,30 +22,26 @@ public sealed class PaymentService(IApplicationDbContext dbContext)
 
         if (booking is null)
         {
-            return Result<PaymentInstructionsResponse>.Failure(
-                Error.NotFound(ErrorCodes.Booking.NotFound, "Booking was not found."));
+            return Error.NotFound(ErrorCodes.Booking.NotFound, "Booking was not found.");
         }
 
         if (booking.ClientId != clientId)
         {
-            return Result<PaymentInstructionsResponse>.Failure(
-                Error.Forbidden(ErrorCodes.Booking.Forbidden, "You do not have access to this booking."));
+            return Error.Forbidden(ErrorCodes.Booking.Forbidden, "You do not have access to this booking.");
         }
 
         if (booking.Status != BookingStatus.PendingPayment)
         {
-            return Result<PaymentInstructionsResponse>.Failure(
-                Error.Conflict(
-                    ErrorCodes.Booking.InvalidStatus,
-                    "Payment instructions are only available for bookings awaiting receipt upload."));
+            return Error.Conflict(
+                ErrorCodes.Booking.InvalidStatus,
+                "Payment instructions are only available for bookings awaiting receipt upload.");
         }
 
         if (booking.Payment is null || booking.ReceiptUploadDeadlineUtc is not { } deadline)
         {
-            return Result<PaymentInstructionsResponse>.Failure(
-                Error.Conflict(
-                    ErrorCodes.Booking.InvalidStatus,
-                    "Payment instructions are only available while the upload window is open."));
+            return Error.Conflict(
+                ErrorCodes.Booking.InvalidStatus,
+                "Payment instructions are only available while the upload window is open.");
         }
 
         var settings = await dbContext.Settings
@@ -54,16 +50,15 @@ public sealed class PaymentService(IApplicationDbContext dbContext)
 
         if (settings is null)
         {
-            return Result<PaymentInstructionsResponse>.Failure(
-                Error.NotFound(ErrorCodes.Settings.NotFound, "Settings are not configured."));
+            return Error.NotFound(ErrorCodes.Settings.NotFound, "Settings are not configured.");
         }
 
-        return Result<PaymentInstructionsResponse>.Success(new PaymentInstructionsResponse(
+        return new PaymentInstructionsResponse(
             booking.Payment.Amount,
             booking.Payment.Currency,
             settings.VodafoneCashNumber,
             settings.InstaPayHandle,
             settings.PaymentInstructions,
-            deadline));
+            deadline);
     }
 }

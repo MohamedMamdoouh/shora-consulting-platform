@@ -86,7 +86,7 @@ Cross-ref [spec 08 #4](08-cross-cutting-concerns.md). Required before Phase 2:
 | ---------------------- | --------------------------------------------------------------- |
 | **Azure App Service**  | Host .NET 10 API + static Angular (always-on, single instance) |
 | **Azure SQL**          | Production database                                             |
-| **Azure Blob Storage** | Private receipt container (`Storage:ReceiptContainer`, spec 05) |
+| **Azure Blob Storage** | Private receipt container (`Storage:ReceiptContainer`, spec 05) — **implemented**; provision account for deploy |
 
 ### Application settings / secrets (production)
 

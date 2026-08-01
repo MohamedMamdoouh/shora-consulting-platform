@@ -45,6 +45,23 @@ public static class ErrorCodes
         public const string ReopenExhausted = "cancellation.reopen_exhausted";
     }
 
+    public static class Payment
+    {
+        public const string NotFound = "payment.not_found";
+        public const string Forbidden = "payment.forbidden";
+        public const string InvalidStatus = "payment.invalid_status";
+        public const string UploadDeadlinePassed = "payment.upload_deadline_passed";
+        public const string InvalidReceiptFile = "payment.invalid_receipt_file";
+        public const string ReceiptTooLarge = "payment.receipt_too_large";
+        public const string InvalidMethod = "payment.invalid_method";
+        public const string NoPendingReceipt = "payment.no_pending_receipt";
+        public const string InvalidDeclineReason = "payment.invalid_decline_reason";
+        public const string RefundNotDue = "payment.refund_not_due";
+        public const string NotRefunded = "payment.not_refunded";
+        public const string InvalidRefundReference = "payment.invalid_refund_reference";
+        public const string InvalidRefundRevocationReason = "payment.invalid_refund_revocation_reason";
+    }
+
     public static class General
     {
         public const string Validation = "general.validation";

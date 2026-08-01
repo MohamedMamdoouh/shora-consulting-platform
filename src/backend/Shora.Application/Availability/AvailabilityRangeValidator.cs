@@ -17,22 +17,20 @@ public static class AvailabilityRangeValidator
 
         if (fromUtc >= toUtc)
         {
-            return Result<(DateTime, DateTime)>.Failure(
-                Error.Validation(
-                    ErrorCodes.Availability.InvalidRange,
-                    "The availability range is invalid: 'from' must be earlier than 'to'."));
+            return Error.Validation(
+                ErrorCodes.Availability.InvalidRange,
+                "The availability range is invalid: 'from' must be earlier than 'to'.");
         }
 
         if (toUtc - fromUtc > MaxRange)
         {
-            return Result<(DateTime, DateTime)>.Failure(
-                Error.Validation(
-                    ErrorCodes.Availability.RangeTooLarge,
-                    $"The availability range must not exceed {SlotGenerationConstants.HorizonWeeks} weeks."));
+            return Error.Validation(
+                ErrorCodes.Availability.RangeTooLarge,
+                $"The availability range must not exceed {SlotGenerationConstants.HorizonWeeks} weeks.");
         }
 
         var effectiveFromUtc = fromUtc < utcNow ? utcNow : fromUtc;
-        return Result<(DateTime, DateTime)>.Success((effectiveFromUtc, toUtc));
+        return (effectiveFromUtc, toUtc);
     }
 
     private static DateTime NormalizeToUtc(DateTime value) =>

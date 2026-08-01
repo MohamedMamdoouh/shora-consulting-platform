@@ -64,7 +64,9 @@ Rationale: this keeps external, swappable concerns (payments, email) behind inte
   - `ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>` implementing `IApplicationDbContext`; fluent entity configurations in `Data/Configurations/`; initial migration `20260706205915_InitialCreate`.
   - `SystemDateTimeProvider : IDateTimeProvider` — live UTC clock.
   - `NoOpEmailSender : IEmailSender` — stub; real SMTP in spec 02/08.
-  - `NotImplementedFileStorage : IFileStorage` — throws until spec 05 (Azure Blob).
+  - `NotImplementedFileStorage : IFileStorage` — used when `Storage:ConnectionString` is unset; configure storage or use Azurite in dev (see README).
+  - `AzureBlobFileStorage : IFileStorage` — production/dev implementation (spec 05a).
+  - `PassThroughMalwareScanner : IMalwareScanner` — dev stub; replace in staging/prod (spec 05f).
   - `HttpContextCurrentUser : ICurrentUser` — minimal; full auth wiring in spec 02.
   - `DatabaseSeeder` — idempotent seed for roles, singleton `Settings`, and admin user from config.
   - **Deferred to later specs:** `BlobFileStorage`, real `EmailSender`, and all background jobs (receipt-deadline cleanup, cancellation auto-decline, auto-complete, slot top-up, refresh-token purge, outbox dispatcher — see spec 08).
@@ -368,4 +370,6 @@ Any side effect that must be reliable (emails, future integrations) is written a
 
 **Namespaces:** all C# code uses the `Shora.`\* root namespace (`Shora.Domain`, `Shora.Application`, `Shora.Infrastructure`, `Shora.Api`).
 
-**Deferred to later specs:** JWT auth, Google login, refresh-token flows (02); public pages API (03); booking/availability (04); receipt upload & blob storage (05); dashboards (06–07); background jobs, outbox dispatcher, rate limiting (08).
+**Deferred to later specs:** public pages API (03); admin booking/cancellation UI and decisions (07); client dashboard UX (06); outbox dispatcher, full rate-limit matrix, blob reconciliation job (05h → 08).
+
+**Done elsewhere:** auth (02); core booking reserve/cancel-hold API (04 partial); manual payment verification backend (05a–05g); receipt upload rate limit (05e, partial 08).

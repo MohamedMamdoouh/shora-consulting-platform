@@ -23,6 +23,7 @@ app.UseCors(CorsOptions.PolicyName);
 app.UseOutputCache();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 app.MapControllers();
 
 await app.Services.InitializeDatabaseAsync();

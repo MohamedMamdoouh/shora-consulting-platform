@@ -1,6 +1,25 @@
 ﻿# 05 — Manual Payment Verification (Vodafone Cash / InstaPay)
 
-Status: **Spec only — not implemented until explicitly requested.**
+Status: **Backend API complete (sub-phases 05a–05g).** Polished client/admin UI remains in specs 06–07. **Blob reconciliation job (05h) is deferred to [spec 08](08-cross-cutting-concerns.md)** — uploads already mark `BlobFinalizePending` on post-commit finalize failure; repair is an ops job, not a payment-loop blocker.
+
+### Implementation status (backend)
+
+| Sub-phase | Scope | Status |
+| --------- | ----- | ------ |
+| 05a | Azure `IFileStorage`, Azurite dev setup, integration tests | **Done** |
+| 05b | `POST /api/v1/payments/{bookingId}/receipt`, validation, state transitions | **Done** |
+| 05c | `GET /api/v1/admin/bookings/{id}/receipts` + on-demand SAS URLs | **Done** |
+| 05d | Admin approve/decline receipts, `RowVersion` guards, outbox emails | **Done** |
+| 05e | SHA-256 duplicate-hash warnings, receipt upload rate limit (5/min/account) | **Done** |
+| 05f | `IMalwareScanner` stub; admin SAS URLs only when scan `Clean` | **Done** |
+| 05g | `POST …/refunds/record` and `…/refunds/revoke` (idempotent record) | **Done** |
+| 05h | Blob reconciliation job (`BlobFinalizePending`, orphan temps) | **Deferred → spec 08** |
+
+**Implemented endpoints:** `GET /api/v1/bookings/{id}/payment-instructions`, `POST /api/v1/payments/{bookingId}/receipt`, `GET /api/v1/admin/bookings/{id}/receipts`, `POST /api/v1/admin/bookings/{id}/receipts/approve`, `POST /api/v1/admin/bookings/{id}/receipts/decline`, `POST /api/v1/admin/payments/{id}/refunds/record`, `POST /api/v1/admin/payments/{id}/refunds/revoke`.
+
+**Thin client UI:** payment-instructions page includes receipt upload (spec 06 will expand dashboard UX).
+
+---
 
 ## 1. Overview
 
@@ -18,7 +37,7 @@ This replaces the previous automated gateway entirely: there are no webhooks, no
      1. Upload to a temporary blob key.
      2. Open DB transaction; create `PaymentReceipt` (`ReviewStatus = Pending`), set `Payment.Method`, `Payment.Status = UnderReview`, `Booking.Status = PendingApproval`, clear `ReceiptUploadDeadlineUtc`, enqueue admin-review outbox message.
      3. Commit DB; move/rename blob to final key (or mark final in metadata).
-     4. If any post-commit blob step fails, mark the receipt row `BlobFinalizePending` and let the storage-recovery job (spec 08) reconcile.
+     4. If any post-commit blob step fails, mark the receipt row `BlobFinalizePending` and let the **receipt blob reconciliation job ([spec 08](08-cross-cutting-concerns.md) §3)** reconcile.
    - This prevents silent divergence between blob and DB state.
 5. **Admin reviews (`GET /api/admin/bookings/{id}/receipts`)**: returns the attempt history plus **short-lived SAS read URLs** for the private blob images.
 6. **Approve (`POST /api/admin/bookings/{id}/receipts/approve`)**: in one DB transaction set the latest `PaymentReceipt.ReviewStatus = Approved`, `Payment.Status = Approved`, `Booking.Status = Confirmed` (writing a `BookingStatusAudit` row), and enqueue the client confirmation + admin new-booking emails to the outbox.

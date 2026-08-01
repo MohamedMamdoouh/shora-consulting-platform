@@ -69,6 +69,58 @@ public class ReceiptAntiReplayCheckerTests
         Assert.Equal(ReceiptReviewWarning.None, warnings);
     }
 
+    [Fact]
+    public async Task DetectWarningsAsync_ignores_duplicate_hash_from_same_booking()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var context = CreateContext();
+        var checker = new ReceiptAntiReplayChecker(context);
+
+        var bookingId = Guid.NewGuid();
+        var paymentId = Guid.NewGuid();
+        const string sharedHash = "abc123";
+
+        context.Bookings.Add(new Booking
+        {
+            Id = bookingId,
+            ClientId = Guid.NewGuid(),
+            Status = BookingStatus.PendingPayment,
+            RowVersion = []
+        });
+        context.Payments.Add(new Payment
+        {
+            Id = paymentId,
+            BookingId = bookingId,
+            Status = PaymentStatus.AwaitingReceipt,
+            Amount = 500m,
+            Method = PaymentMethod.VodafoneCash,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        });
+        context.PaymentReceipts.Add(new PaymentReceipt
+        {
+            Id = Guid.NewGuid(),
+            PaymentId = paymentId,
+            ContentHashSha256 = sharedHash,
+            BlobPath = "receipts/test",
+            OriginalFileName = "a.jpg",
+            ContentType = "image/jpeg",
+            SizeBytes = 1,
+            UploadedAtUtc = DateTime.UtcNow,
+            BlobState = BlobState.Finalized,
+            MalwareScanStatus = MalwareScanStatus.Pending,
+            ReviewStatus = ReceiptReviewStatus.Declined
+        });
+        await context.SaveChangesAsync(cancellationToken);
+
+        var warnings = await checker.DetectWarningsAsync(
+            sharedHash,
+            bookingId,
+            cancellationToken);
+
+        Assert.Equal(ReceiptReviewWarning.None, warnings);
+    }
+
     private static ApplicationDbContext CreateContext()
     {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()

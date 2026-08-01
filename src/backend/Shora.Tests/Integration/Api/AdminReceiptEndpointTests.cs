@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Shora.Application.Abstractions;
 using Shora.Application.Common;
 using Shora.Contracts.Auth;
 using Shora.Contracts.Booking;
@@ -118,6 +119,36 @@ public class AdminReceiptEndpointTests : IDisposable
     }
 
     [Fact]
+    public async Task Get_receipts_omits_read_url_when_finalized_blob_is_missing()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var (client, bookingId, _) = await ReserveBookingAsync("admin-receipts-missing-blob@example.com", cancellationToken);
+        await UploadReceiptAsync(client, bookingId, cancellationToken);
+
+        await using (var scope = _factory.Services.CreateAsyncScope())
+        {
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var fileStorage = scope.ServiceProvider.GetRequiredService<IFileStorage>();
+            var payment = await context.Payments.SingleAsync(p => p.BookingId == bookingId, cancellationToken);
+            var receipt = await context.PaymentReceipts.SingleAsync(r => r.PaymentId == payment.Id, cancellationToken);
+            await fileStorage.DeleteAsync(receipt.BlobPath, cancellationToken);
+        }
+
+        var adminClient = await CreateAdminClientAsync(cancellationToken);
+        var response = await adminClient.GetAsync(
+            $"/api/v1/admin/bookings/{bookingId}/receipts",
+            cancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var body = await response.Content.ReadFromJsonAsync<AdminBookingReceiptsResponse>(cancellationToken);
+        Assert.NotNull(body);
+        Assert.Single(body!.Receipts);
+        Assert.Null(body.Receipts[0].ImageReadUrl);
+        Assert.Null(body.Receipts[0].ImageReadUrlExpiresAtUtc);
+    }
+
+    [Fact]
     public async Task Get_receipts_rejects_non_admin()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
@@ -185,6 +216,41 @@ public class AdminReceiptEndpointTests : IDisposable
     }
 
     [Fact]
+    public async Task Approve_receipt_rejects_receipt_that_is_not_reviewable()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var (client, bookingId, _) = await ReserveBookingAsync("admin-approve-unreviewable@example.com", cancellationToken);
+        await UploadReceiptAsync(client, bookingId, cancellationToken);
+
+        await using (var scope = _factory.Services.CreateAsyncScope())
+        {
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var payment = await context.Payments.SingleAsync(p => p.BookingId == bookingId, cancellationToken);
+            var receipt = await context.PaymentReceipts.SingleAsync(r => r.PaymentId == payment.Id, cancellationToken);
+            receipt.BlobState = BlobState.BlobFinalizePending;
+            receipt.MalwareScanStatus = MalwareScanStatus.Pending;
+            await context.SaveChangesAsync(cancellationToken);
+        }
+
+        var adminClient = await CreateAdminClientAsync(cancellationToken);
+        var response = await adminClient.PostAsync(
+            $"/api/v1/admin/bookings/{bookingId}/receipts/approve",
+            null,
+            cancellationToken);
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        await AssertProblemCodeAsync(response, "payment.receipt_not_reviewable", cancellationToken);
+
+        await using var verifyScope = _factory.Services.CreateAsyncScope();
+        var verifyContext = verifyScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var booking = await verifyContext.Bookings.AsNoTracking().SingleAsync(b => b.Id == bookingId, cancellationToken);
+        var verifyPayment = await verifyContext.Payments.AsNoTracking().SingleAsync(p => p.BookingId == bookingId, cancellationToken);
+
+        Assert.Equal(BookingStatus.PendingApproval, booking.Status);
+        Assert.Equal(PaymentStatus.UnderReview, verifyPayment.Status);
+    }
+
+    [Fact]
     public async Task Decline_receipt_reopens_upload_window_and_enqueues_email()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
@@ -194,7 +260,7 @@ public class AdminReceiptEndpointTests : IDisposable
         var adminClient = await CreateAdminClientAsync(cancellationToken);
         var response = await adminClient.PostAsJsonAsync(
             $"/api/v1/admin/bookings/{bookingId}/receipts/decline",
-            new DeclineReceiptRequest(ContractDeclineReasonCode.UnreadableImage, "Image is blurry"),
+            new { reasonCode = "UnreadableImage", reasonNote = "Image is blurry" },
             cancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

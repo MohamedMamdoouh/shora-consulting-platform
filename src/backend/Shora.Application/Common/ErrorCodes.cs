@@ -25,6 +25,9 @@ public static class ErrorCodes
     {
         public const string InvalidRange = "availability.invalid_range";
         public const string RangeTooLarge = "availability.range_too_large";
+        public const string WindowNotFound = "availability.window_not_found";
+        public const string BlockedDateNotFound = "availability.blocked_date_not_found";
+        public const string BlockedRangeConflictsWithBookings = "availability.blocked_range_conflicts_with_bookings";
     }
 
     public static class Booking
@@ -43,6 +46,7 @@ public static class ErrorCodes
     {
         public const string TooLate = "cancellation.too_late";
         public const string ReopenExhausted = "cancellation.reopen_exhausted";
+        public const string InvalidDecisionReason = "cancellation.invalid_decision_reason";
     }
 
     public static class Payment

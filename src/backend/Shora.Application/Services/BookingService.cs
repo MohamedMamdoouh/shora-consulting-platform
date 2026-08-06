@@ -10,6 +10,7 @@ using Shora.Contracts.Booking;
 using Shora.Domain.Constants;
 using Shora.Domain.Entities;
 using Shora.Domain.Enums;
+using ContractCancellationRequestStatus = Shora.Contracts.Booking.CancellationRequestStatus;
 using ContractDeliveryMethod = Shora.Contracts.Booking.DeliveryMethod;
 
 namespace Shora.Application.Services;
@@ -19,7 +20,9 @@ public sealed class BookingService(
     IDateTimeProvider dateTimeProvider,
     BookingTransitionHelper transitionHelper,
     ICacheInvalidator cacheInvalidator,
-    IOptions<BookingOptions> bookingOptions)
+    IFileStorage fileStorage,
+    IOptions<BookingOptions> bookingOptions,
+    IOptions<StorageOptions> storageOptions)
 {
     public async Task<Result<ReserveBookingResponse>> ReserveAsync(
         Guid clientId,
@@ -233,6 +236,272 @@ public sealed class BookingService(
             Status = OutboxMessageStatus.Pending
         });
     }
+
+    public async Task<Result<MyBookingsResponse>> ListMineAsync(
+        Guid clientId,
+        MyBookingsQuery query,
+        CancellationToken cancellationToken = default)
+    {
+        var validation = ValidateMyBookingsQuery(query);
+        if (validation.IsFailure)
+        {
+            return validation.Error!;
+        }
+
+        var now = dateTimeProvider.UtcNow;
+        var bookingsQuery = dbContext.Bookings
+            .AsNoTracking()
+            .Where(booking => booking.ClientId == clientId);
+
+        bookingsQuery = ApplyMyBookingsStatusFilter(bookingsQuery, query.Status, now);
+
+        var totalCount = await bookingsQuery.CountAsync(cancellationToken);
+        var orderedQuery = ApplyMyBookingsOrdering(bookingsQuery, query.Status)
+            .Include(booking => booking.CancellationRequest)
+            .Include(booking => booking.Payment!)
+            .ThenInclude(payment => payment.Receipts);
+
+        var page = query.Page;
+        var pageSize = query.PageSize;
+        List<Booking> bookings;
+
+        if (query.Status is MyBookingsStatusFilter.Upcoming or MyBookingsStatusFilter.Pending)
+        {
+            bookings = await orderedQuery.ToListAsync(cancellationToken);
+            page = MyBookingsQueryLimits.DefaultPage;
+            pageSize = totalCount;
+        }
+        else
+        {
+            bookings = await orderedQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+        }
+
+        var settings = await dbContext.Settings
+            .AsNoTracking()
+            .SingleOrDefaultAsync(s => s.Id == Settings.SingletonId, cancellationToken);
+
+        var cancelledBookingIds = bookings
+            .Where(booking => booking.Status == BookingStatus.Cancelled)
+            .Select(booking => booking.Id)
+            .ToList();
+        var cancelAudits = await LoadLatestCancelAuditsAsync(cancelledBookingIds, cancellationToken);
+
+        var items = new List<MyBookingListItem>(bookings.Count);
+        foreach (var booking in bookings)
+        {
+            cancelAudits.TryGetValue(booking.Id, out var cancelAudit);
+            items.Add(await MapToMyBookingListItemAsync(
+                booking,
+                settings,
+                cancelAudit,
+                now,
+                cancellationToken));
+        }
+
+        return new MyBookingsResponse(items, page, pageSize, totalCount);
+    }
+
+    private async Task<IReadOnlyDictionary<Guid, BookingStatusAudit>> LoadLatestCancelAuditsAsync(
+        IReadOnlyCollection<Guid> bookingIds,
+        CancellationToken cancellationToken)
+    {
+        if (bookingIds.Count == 0)
+        {
+            return new Dictionary<Guid, BookingStatusAudit>();
+        }
+
+        var audits = await dbContext.BookingStatusAudits
+            .AsNoTracking()
+            .Where(audit => bookingIds.Contains(audit.BookingId) && audit.ToStatus == BookingStatus.Cancelled)
+            .OrderByDescending(audit => audit.AtUtc)
+            .ToListAsync(cancellationToken);
+
+        return audits
+            .GroupBy(audit => audit.BookingId)
+            .ToDictionary(group => group.Key, group => group.First());
+    }
+
+    private async Task<MyBookingListItem> MapToMyBookingListItemAsync(
+        Booking booking,
+        Settings? settings,
+        BookingStatusAudit? cancelAudit,
+        DateTime nowUtc,
+        CancellationToken cancellationToken) =>
+        new(
+            booking.Id,
+            booking.SlotStartUtc,
+            booking.SlotEndUtc,
+            MapDeliveryMethodToContract(booking.DeliveryMethod),
+            booking.ContactPhone,
+            booking.Status.ToString(),
+            MyBookingLabelMapper.MapCancellationReasonLabel(cancelAudit),
+            MyBookingLabelMapper.MapRefundLabel(booking.Status, booking.Payment),
+            MapCancellationRequestMetadata(booking.CancellationRequest),
+            MapPaymentSummary(booking, settings),
+            await GetReceiptThumbnailUrlAsync(booking, cancellationToken),
+            MapConsultantWhatsAppNumber(booking, settings, nowUtc));
+
+    private static MyBookingCancellationRequestMetadata? MapCancellationRequestMetadata(
+        CancellationRequest? request)
+    {
+        if (request is null)
+        {
+            return null;
+        }
+
+        return new MyBookingCancellationRequestMetadata(
+            MapCancellationRequestStatus(request.Status),
+            request.ReopenCount,
+            request.ClientDecisionSeenAtUtc,
+            request.DecisionReason,
+            request.AutoDeclineAtUtc);
+    }
+
+    private static MyBookingPaymentSummary? MapPaymentSummary(Booking booking, Settings? settings)
+    {
+        if (settings is null
+            || booking.Payment is null
+            || booking.Status is not (BookingStatus.PendingPayment or BookingStatus.PendingApproval))
+        {
+            return null;
+        }
+
+        return new MyBookingPaymentSummary(
+            booking.Payment.Amount,
+            booking.Payment.Currency,
+            settings.VodafoneCashNumber,
+            settings.InstaPayHandle,
+            settings.PaymentInstructions,
+            booking.Status == BookingStatus.PendingPayment ? booking.ReceiptUploadDeadlineUtc : null,
+            booking.Status == BookingStatus.PendingPayment
+                ? GetLatestReceiptDeclineReason(booking.Payment)
+                : null);
+    }
+
+    private static string? GetLatestReceiptDeclineReason(Payment payment)
+    {
+        var latestDeclinedReceipt = payment.Receipts
+            .Where(receipt => receipt.ReviewStatus == ReceiptReviewStatus.Declined)
+            .OrderByDescending(receipt => receipt.ReviewedAtUtc ?? receipt.UploadedAtUtc)
+            .ThenByDescending(receipt => receipt.Id)
+            .FirstOrDefault();
+
+        if (latestDeclinedReceipt is null)
+        {
+            return null;
+        }
+
+        return !string.IsNullOrWhiteSpace(latestDeclinedReceipt.DeclineReason)
+            ? latestDeclinedReceipt.DeclineReason
+            : latestDeclinedReceipt.DeclineReasonCode?.ToString();
+    }
+
+    private async Task<string?> GetReceiptThumbnailUrlAsync(
+        Booking booking,
+        CancellationToken cancellationToken)
+    {
+        if (booking.Status != BookingStatus.PendingApproval || booking.Payment is null)
+        {
+            return null;
+        }
+
+        var receipt = booking.Payment.Receipts
+            .OrderByDescending(receipt => receipt.UploadedAtUtc)
+            .ThenByDescending(receipt => receipt.Id)
+            .FirstOrDefault();
+
+        if (receipt is null || !CanMintReceiptReadUrl(receipt))
+        {
+            return null;
+        }
+
+        var validity = TimeSpan.FromMinutes(storageOptions.Value.ReceiptReadUrlMinutes);
+        return await fileStorage.GetReadUrlAsync(receipt.BlobPath, validity, cancellationToken);
+    }
+
+    private static string? MapConsultantWhatsAppNumber(
+        Booking booking,
+        Settings? settings,
+        DateTime nowUtc)
+    {
+        if (settings is null
+            || booking.SlotStartUtc <= nowUtc
+            || booking.Status is not (BookingStatus.Confirmed or BookingStatus.CancellationRequested))
+        {
+            return null;
+        }
+
+        return string.IsNullOrWhiteSpace(settings.ConsultantWhatsAppNumber)
+            ? null
+            : settings.ConsultantWhatsAppNumber;
+    }
+
+    private static bool CanMintReceiptReadUrl(PaymentReceipt receipt) =>
+        receipt.BlobState == BlobState.Finalized
+        && receipt.MalwareScanStatus == MalwareScanStatus.Clean;
+
+    private static ContractCancellationRequestStatus MapCancellationRequestStatus(
+        Domain.Enums.CancellationRequestStatus status) =>
+        (ContractCancellationRequestStatus)(int)status;
+
+    private static Result ValidateMyBookingsQuery(MyBookingsQuery query)
+    {
+        if (query.Page < MyBookingsQueryLimits.DefaultPage)
+        {
+            return Error.Validation(
+                ErrorCodes.General.Validation,
+                "Page must be at least 1.");
+        }
+
+        if (query.PageSize is < 1 or > MyBookingsQueryLimits.MaxPageSize)
+        {
+            return Error.Validation(
+                ErrorCodes.General.Validation,
+                $"Page size must be between 1 and {MyBookingsQueryLimits.MaxPageSize}.");
+        }
+
+        return Result.Success();
+    }
+
+    private static IQueryable<Booking> ApplyMyBookingsStatusFilter(
+        IQueryable<Booking> query,
+        MyBookingsStatusFilter? statusFilter,
+        DateTime nowUtc) =>
+        statusFilter switch
+        {
+            MyBookingsStatusFilter.Upcoming => query.Where(booking =>
+                (booking.Status == BookingStatus.Confirmed
+                 || booking.Status == BookingStatus.CancellationRequested)
+                && booking.SlotStartUtc > nowUtc),
+            MyBookingsStatusFilter.Pending => query.Where(booking =>
+                booking.Status == BookingStatus.PendingPayment
+                || booking.Status == BookingStatus.PendingApproval),
+            MyBookingsStatusFilter.Past => query.Where(booking =>
+                booking.Status == BookingStatus.Completed
+                || booking.Status == BookingStatus.Cancelled),
+            _ => query
+        };
+
+    private static IOrderedQueryable<Booking> ApplyMyBookingsOrdering(
+        IQueryable<Booking> query,
+        MyBookingsStatusFilter? statusFilter) =>
+        statusFilter switch
+        {
+            MyBookingsStatusFilter.Upcoming => query.OrderBy(booking => booking.SlotStartUtc),
+            MyBookingsStatusFilter.Pending => query.OrderBy(booking => booking.SlotStartUtc),
+            _ => query.OrderByDescending(booking => booking.SlotStartUtc)
+        };
+
+    private static ContractDeliveryMethod MapDeliveryMethodToContract(Domain.Enums.DeliveryMethod deliveryMethod) =>
+        deliveryMethod switch
+        {
+            Domain.Enums.DeliveryMethod.VoiceCall => ContractDeliveryMethod.VoiceCall,
+            Domain.Enums.DeliveryMethod.Chat => ContractDeliveryMethod.Chat,
+            _ => throw new ArgumentOutOfRangeException(nameof(deliveryMethod), deliveryMethod, "Unknown delivery method.")
+        };
 
     private static Result<string?> ValidateDeliveryAndPhone(CreateBookingRequest request)
     {

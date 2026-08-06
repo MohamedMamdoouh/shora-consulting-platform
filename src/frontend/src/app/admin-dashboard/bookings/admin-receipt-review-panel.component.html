@@ -1,0 +1,212 @@
+<div class="receipt-panel-backdrop" (click)="close()">
+  <section
+    class="receipt-panel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="receipt-panel-title"
+    (click)="$event.stopPropagation()"
+  >
+    <header class="receipt-panel__header">
+      <div>
+        <h3 id="receipt-panel-title">مراجعة إيصال الدفع</h3>
+        <p class="receipt-panel__subtitle">{{ clientDisplayName }}</p>
+      </div>
+      <button type="button" class="receipt-panel__close" (click)="close()" aria-label="إغلاق">
+        ×
+      </button>
+    </header>
+
+    @switch (panelState.status) {
+      @case ('loading') {
+        <p class="receipt-panel__state" aria-live="polite">جاري تحميل الإيصالات...</p>
+      }
+
+      @case ('error') {
+        <div class="receipt-panel__message receipt-panel__message--error">
+          <p>{{ panelState.message }}</p>
+          <button type="button" class="btn btn--secondary" (click)="loadReceipts()">
+            إعادة المحاولة
+          </button>
+        </div>
+      }
+
+      @case ('ready') {
+        <div class="receipt-panel__summary">
+          <dl>
+            <div>
+              <dt>المبلغ</dt>
+              <dd>{{ formatMoney(panelState.data.amount, panelState.data.currency) }}</dd>
+            </div>
+            <div>
+              <dt>طريقة الدفع</dt>
+              <dd>{{ formatPaymentMethod(panelState.data.method) }}</dd>
+            </div>
+            <div>
+              <dt>حالة الدفع</dt>
+              <dd>{{ formatPaymentStatus(panelState.data.paymentStatus) }}</dd>
+            </div>
+          </dl>
+        </div>
+
+        @if (panelState.pendingReceipt; as pendingReceipt) {
+          <article class="receipt-panel__current">
+            <h4>الإيصال الحالي (محاولة {{ pendingReceipt.attemptNumber }})</h4>
+
+            <dl class="receipt-panel__meta">
+              <div>
+                <dt>تاريخ الرفع</dt>
+                <dd>{{ formatReceiptUploadedAt(pendingReceipt.uploadedAtUtc) }}</dd>
+              </div>
+              @if (pendingReceipt.senderReference) {
+                <div>
+                  <dt>مرجع المرسل</dt>
+                  <dd>{{ pendingReceipt.senderReference }}</dd>
+                </div>
+              }
+              <div>
+                <dt>فحص الأمان</dt>
+                <dd>{{ formatMalwareScanStatus(pendingReceipt.malwareScanStatus) }}</dd>
+              </div>
+            </dl>
+
+            @if (pendingReceipt.reviewWarnings.length > 0) {
+              <ul class="receipt-panel__warnings">
+                @for (warning of pendingReceipt.reviewWarnings; track warning) {
+                  <li>{{ formatReviewWarning(warning) }}</li>
+                }
+              </ul>
+            }
+
+            @if (pendingReceipt.imageReadUrl) {
+              <figure class="receipt-panel__image-wrap">
+                <img
+                  [src]="pendingReceipt.imageReadUrl"
+                  [alt]="'إيصال الدفع — ' + pendingReceipt.originalFileName"
+                  class="receipt-panel__image"
+                />
+                @if (pendingReceipt.imageReadUrlExpiresAtUtc) {
+                  <figcaption>
+                    الرابط صالح حتى
+                    {{ formatReceiptUploadedAt(pendingReceipt.imageReadUrlExpiresAtUtc) }}
+                  </figcaption>
+                }
+              </figure>
+            } @else {
+              <p class="receipt-panel__state">
+                @if (
+                  pendingReceipt.malwareScanStatus === 'Blocked' ||
+                  pendingReceipt.malwareScanStatus === 'Suspicious'
+                ) {
+                  لا يمكن عرض الصورة — نتيجة فحص الأمان:
+                  {{ formatMalwareScanStatus(pendingReceipt.malwareScanStatus) }}.
+                } @else if (pendingReceipt.blobState !== 'Finalized') {
+                  الصورة غير جاهزة بعد — انتظر اكتمال المعالجة ثم أعد فتح هذه النافذة.
+                } @else {
+                  تعذّر إنشاء رابط عرض للصورة.
+                }
+              </p>
+            }
+
+            @if (actionError) {
+              <p class="receipt-panel__message receipt-panel__message--error" role="alert">
+                {{ actionError }}
+              </p>
+            }
+
+            @if (!showDeclineForm) {
+              <div class="receipt-panel__actions">
+                <button
+                  type="button"
+                  class="btn"
+                  [disabled]="isApproving || isDeclining"
+                  (click)="approveReceipt()"
+                >
+                  {{ isApproving ? 'جاري القبول...' : 'قبول الإيصال' }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn--danger"
+                  [disabled]="isApproving || isDeclining"
+                  (click)="openDeclineForm()"
+                >
+                  رفض الإيصال
+                </button>
+              </div>
+            } @else {
+              <form
+                class="receipt-panel__decline-form"
+                [formGroup]="declineForm"
+                (ngSubmit)="submitDecline()"
+              >
+                <h4>رفض الإيصال</h4>
+
+                <label>
+                  سبب الرفض
+                  <select formControlName="reasonCode">
+                    @for (option of declineReasonOptions; track option.value) {
+                      <option [value]="option.value">{{ option.label }}</option>
+                    }
+                  </select>
+                </label>
+
+                <label>
+                  ملاحظة للعميل (اختياري)
+                  <textarea
+                    formControlName="reasonNote"
+                    rows="3"
+                    placeholder="تفاصيل إضافية تُرسل للعميل"
+                  ></textarea>
+                </label>
+
+                <div class="receipt-panel__actions">
+                  <button
+                    type="submit"
+                    class="btn btn--danger"
+                    [disabled]="isApproving || isDeclining"
+                  >
+                    {{ isDeclining ? 'جاري الرفض...' : 'تأكيد الرفض' }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn--secondary"
+                    [disabled]="isApproving || isDeclining"
+                    (click)="cancelDeclineForm()"
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              </form>
+            }
+          </article>
+        }
+
+        @if (panelState.data.receipts.length > 0) {
+          <section class="receipt-panel__history">
+            <h4>سجل المحاولات</h4>
+            <ul>
+              @for (receipt of panelState.data.receipts; track receipt.receiptId) {
+                <li>
+                  <span class="receipt-panel__history-title">
+                    محاولة {{ receipt.attemptNumber }} —
+                    {{ formatReceiptReviewStatus(receipt.reviewStatus) }}
+                  </span>
+                  <span class="receipt-panel__history-meta">
+                    {{ formatReceiptUploadedAt(receipt.uploadedAtUtc) }}
+                    @if (receipt.declineReasonCode; as reasonCode) {
+                      · {{ formatReceiptDeclineReasonCode(reasonCode) }}
+                      @if (receipt.declineReason) {
+                        ({{ receipt.declineReason }})
+                      }
+                    }
+                  </span>
+                </li>
+              }
+            </ul>
+          </section>
+        } @else {
+          <p class="receipt-panel__state">لا توجد إيصالات لهذا الحجز.</p>
+        }
+      }
+    }
+  </section>
+</div>

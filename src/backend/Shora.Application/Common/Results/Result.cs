@@ -11,7 +11,11 @@ public enum ErrorKind
     Failure = 500
 }
 
-public sealed record Error(string Code, string Message, ErrorKind Kind = ErrorKind.Validation)
+public sealed record Error(
+    string Code,
+    string Message,
+    ErrorKind Kind = ErrorKind.Validation,
+    IReadOnlyDictionary<string, object?>? Extensions = null)
 {
     public static Error Validation(string code, string message) => new(code, message, ErrorKind.Validation);
 
@@ -23,7 +27,11 @@ public sealed record Error(string Code, string Message, ErrorKind Kind = ErrorKi
 
     public static Error PayloadTooLarge(string code, string message) => new(code, message, ErrorKind.PayloadTooLarge);
 
-    public static Error Conflict(string code, string message) => new(code, message, ErrorKind.Conflict);
+    public static Error Conflict(
+        string code,
+        string message,
+        IReadOnlyDictionary<string, object?>? extensions = null) =>
+        new(code, message, ErrorKind.Conflict, extensions);
 
     public static Error Failure(string code, string message) => new(code, message, ErrorKind.Failure);
 

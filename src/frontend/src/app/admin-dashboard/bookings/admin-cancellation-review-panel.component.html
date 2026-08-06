@@ -1,0 +1,101 @@
+<div class="cancellation-panel-backdrop" (click)="close()">
+  <section
+    class="cancellation-panel"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="cancellation-panel-title"
+    (click)="$event.stopPropagation()"
+  >
+    <header class="cancellation-panel__header">
+      <div>
+        <h3 id="cancellation-panel-title">مراجعة طلب الإلغاء</h3>
+        <p class="cancellation-panel__subtitle">{{ item.clientDisplayName }}</p>
+      </div>
+      <button type="button" class="cancellation-panel__close" (click)="close()" aria-label="إغلاق">
+        ×
+      </button>
+    </header>
+
+    @if (item.cancellationRequest; as request) {
+      <dl class="cancellation-panel__meta">
+        <div>
+          <dt>تاريخ الطلب</dt>
+          <dd>{{ formatRequestedAt(request.requestedAtUtc) }}</dd>
+        </div>
+        <div>
+          <dt>الموعد النهائي للقرار</dt>
+          <dd class="cancellation-panel__countdown" aria-live="polite">{{ countdownLabel }}</dd>
+        </div>
+      </dl>
+
+      <div class="cancellation-panel__reason">
+        <h4>سبب العميل</h4>
+        <p>{{ request.clientReason?.trim() || 'لم يُذكر سبب.' }}</p>
+      </div>
+
+      @if (item.paymentStatus === 'Approved') {
+        <p class="cancellation-panel__hint">
+          الدفع مقبول — الموافقة على الإلغاء ستضع علامة «استرداد مستحق».
+        </p>
+      }
+
+      @if (actionError) {
+        <p class="cancellation-panel__message cancellation-panel__message--error" role="alert">
+          {{ actionError }}
+        </p>
+      }
+
+      @if (!showDeclineForm) {
+        <div class="cancellation-panel__actions">
+          <button type="button" class="btn" [disabled]="isApproving || isDeclining" (click)="approveRequest()">
+            {{ isApproving ? 'جاري الموافقة...' : 'الموافقة على الإلغاء' }}
+          </button>
+          <button
+            type="button"
+            class="btn btn--danger"
+            [disabled]="isApproving || isDeclining"
+            (click)="openDeclineForm()"
+          >
+            رفض الطلب
+          </button>
+        </div>
+      } @else {
+        <form
+          class="cancellation-panel__decline-form"
+          [formGroup]="declineForm"
+          (ngSubmit)="submitDecline()"
+        >
+          <h4>رفض طلب الإلغاء</h4>
+
+          <label>
+            سبب الرفض
+            <select formControlName="reasonCode">
+              @for (option of declineReasonOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </label>
+
+          <label>
+            ملاحظة للعميل (اختياري)
+            <textarea formControlName="reasonNote" rows="3" placeholder="تفاصيل تُرسل للعميل"></textarea>
+          </label>
+
+          <div class="cancellation-panel__actions">
+            <button type="submit" class="btn btn--danger" [disabled]="isApproving || isDeclining">
+              {{ isDeclining ? 'جاري الرفض...' : 'تأكيد الرفض' }}
+            </button>
+            <button
+              type="button"
+              class="btn btn--secondary"
+              [disabled]="isApproving || isDeclining"
+              (click)="cancelDeclineForm()"
+            >
+              إلغاء
+            </button>
+          </div>
+        </form>
+      }
+    }
+  </section>
+</div>

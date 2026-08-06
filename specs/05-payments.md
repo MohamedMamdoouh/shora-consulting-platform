@@ -1,6 +1,6 @@
 ﻿# 05 — Manual Payment Verification (Vodafone Cash / InstaPay)
 
-Status: **Backend API complete (sub-phases 05a–05g).** Polished client/admin UI remains in specs 06–07. **Blob reconciliation job (05h) is deferred to [spec 08](08-cross-cutting-concerns.md)** — uploads already mark `BlobFinalizePending` on post-commit finalize failure; repair is an ops job, not a payment-loop blocker.
+Status: **Done (backend 05a–05g; client UI in spec 06; admin UI in spec 07).** **Blob reconciliation job (05h) is deferred to [spec 08](08-cross-cutting-concerns.md)** — uploads already mark `BlobFinalizePending` on post-commit finalize failure; repair is an ops job, not a payment-loop blocker.
 
 ### Implementation status (backend)
 
@@ -17,7 +17,9 @@ Status: **Backend API complete (sub-phases 05a–05g).** Polished client/admin U
 
 **Implemented endpoints:** `GET /api/v1/bookings/{id}/payment-instructions`, `POST /api/v1/payments/{bookingId}/receipt`, `GET /api/v1/admin/bookings/{id}/receipts`, `POST /api/v1/admin/bookings/{id}/receipts/approve`, `POST /api/v1/admin/bookings/{id}/receipts/decline`, `POST /api/v1/admin/payments/{id}/refunds/record`, `POST /api/v1/admin/payments/{id}/refunds/revoke`.
 
-**Thin client UI:** payment-instructions page includes receipt upload (spec 06 will expand dashboard UX).
+**Client UI (spec 06):** `PaymentInstructionsPanelComponent` powers receipt upload on `/booking/payment/:id` and on the dashboard `PendingPayment` card (`paymentSummary` from `GET /bookings/mine` avoids a second instructions fetch).
+
+**Admin UI (spec 07):** receipt review modal on `/admin/bookings`, manual refund record/revoke, earnings summary on `/admin/earnings`.
 
 ---
 

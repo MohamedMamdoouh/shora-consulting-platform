@@ -1,6 +1,6 @@
 # 01 — Project Scaffold & Data Model
 
-**Status: Implemented** (2026-07-06). Backend scaffold, data model, initial migration, seed, Angular RTL shell, and smoke tests are in place. Business logic for auth, booking, payments, and dashboards is deferred to specs 02–08.
+**Status: Implemented** (2026-07-06). Backend scaffold, data model, initial migration, seed, Angular RTL shell, and smoke tests are in place. Feature specs 02–07 build on this foundation.
 
 ## 1. Architecture: Pragmatic Clean Architecture
 
@@ -86,21 +86,19 @@ Rationale: this keeps external, swappable concerns (payments, email) behind inte
 ## 3. Frontend Scaffold
 
 - **Angular version**: 21 (standalone components, no feature NgModules). App lives in `src/frontend/` (npm package name `shora-web`).
-- **Structure** (implemented):
+- **Structure** (implemented; evolves with specs 02–07):
   ```
   src/app/
-  ├── core/auth/       # auth.service, auth.guard, auth.interceptor — placeholders (spec 02)
-  ├── shared/
-  │   ├── layout/      # ShellComponent (RTL nav + router-outlet)
-  │   └── components/  # PlaceholderPageComponent for lazy route stubs
-  ├── public/
-  │   ├── home/        # Minimal Arabic home page
-  │   ├── about/       # Placeholder
-  │   └── services/    # Placeholder
-  ├── booking/         # Lazy route stub → spec 04
-  ├── client-dashboard/# Lazy route stub → spec 06
-  ├── admin-dashboard/ # Lazy route stub → spec 07
-  └── auth/            # Lazy route stub → spec 02
+  ├── core/
+  │   ├── auth/          # auth.service, guards, interceptor (spec 02)
+  │   ├── booking/       # booking.service (spec 04/06)
+  │   └── api/           # Problem Details helpers
+  ├── shared/layout/     # ShellComponent (RTL nav + router-outlet)
+  ├── public/            # Home, About, Services (spec 03 — placeholder copy)
+  ├── booking/           # Slot picker, delivery, review, payment instructions (spec 04)
+  ├── client-dashboard/  # Full client dashboard (spec 06 — done)
+  ├── admin-dashboard/   # Lazy route stub → spec 07
+  └── auth/              # Login, signup, verify, reset (spec 02)
   ```
 - **Localization/RTL**: `<html lang="ar" dir="rtl">` in `index.html`; Arabic-friendly font stack in global `styles.scss`; no i18n library (Arabic-only site).
 - **Styling**: CSS custom properties in `styles.scss` (warm palette: `--color-primary`, `--color-background`, spacing, radius). Component-level SCSS elsewhere.
@@ -370,6 +368,6 @@ Any side effect that must be reliable (emails, future integrations) is written a
 
 **Namespaces:** all C# code uses the `Shora.`\* root namespace (`Shora.Domain`, `Shora.Application`, `Shora.Infrastructure`, `Shora.Api`).
 
-**Deferred to later specs:** public pages API (03); admin booking/cancellation UI and decisions (07); client dashboard UX (06); outbox dispatcher, full rate-limit matrix, blob reconciliation job (05h → 08).
+**Deferred to later specs:** public pages real content and polish (03); outbox dispatcher, cancellation auto-decline, auto-complete, availability top-up, full rate-limit matrix, blob reconciliation job (05h → 08); Azure CD (09).
 
-**Done elsewhere:** auth (02); core booking reserve/cancel-hold API (04 partial); manual payment verification backend (05a–05g); receipt upload rate limit (05e, partial 08).
+**Done elsewhere:** auth (02); client dashboard (06); admin dashboard UI + APIs (07); core booking reserve/cancel-hold/list-mine/cancellation-request API (04); client booking flow UI (04); manual payment verification backend (05a–05g); receipt upload rate limit (05e, partial 08); receipt retention + temp blob cleanup jobs (08 partial).

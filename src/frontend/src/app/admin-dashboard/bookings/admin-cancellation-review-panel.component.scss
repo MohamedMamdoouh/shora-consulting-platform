@@ -1,0 +1,171 @@
+:host {
+  display: contents;
+}
+
+.cancellation-panel-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: var(--space-lg);
+  background: rgb(0 0 0 / 45%);
+}
+
+.cancellation-panel {
+  display: grid;
+  gap: var(--space-lg);
+  width: min(100%, 36rem);
+  max-height: min(90vh, 40rem);
+  overflow: auto;
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: 0 1rem 2rem rgb(0 0 0 / 12%);
+}
+
+.cancellation-panel__header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.cancellation-panel__header h3,
+.cancellation-panel__reason h4,
+.cancellation-panel__decline-form h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.cancellation-panel__subtitle {
+  margin: var(--space-xs) 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.cancellation-panel__close {
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.cancellation-panel__meta {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .cancellation-panel__meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.cancellation-panel__meta dt {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
+.cancellation-panel__meta dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.cancellation-panel__countdown {
+  color: #7a5a00;
+}
+
+.cancellation-panel__reason {
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-background);
+}
+
+.cancellation-panel__reason p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.cancellation-panel__hint {
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  background: #fff8e6;
+  color: #7a5a00;
+  font-size: 0.875rem;
+}
+
+.cancellation-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.cancellation-panel__decline-form {
+  display: grid;
+  gap: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.cancellation-panel__decline-form label {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.cancellation-panel__decline-form select,
+.cancellation-panel__decline-form textarea {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-background);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.cancellation-panel__message {
+  margin: 0;
+}
+
+.cancellation-panel__message--error {
+  padding: var(--space-md);
+  border-radius: var(--radius-sm);
+  background: #fff5f5;
+  color: #7a2e2e;
+}
+
+.btn {
+  padding: var(--space-sm) var(--space-lg);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+}
+
+.btn--secondary {
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.btn--danger {
+  border-color: #c0392b;
+  background: #c0392b;
+}
+
+.btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

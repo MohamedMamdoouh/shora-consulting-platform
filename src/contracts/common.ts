@@ -15,4 +15,5 @@ export interface ProblemDetails {
   instance?: string;
   code?: string;
   errors?: Record<string, string[]>;
+  conflictingBookingIds?: string[];
 }

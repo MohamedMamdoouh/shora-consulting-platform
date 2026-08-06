@@ -19,6 +19,9 @@ export const ErrorCodes = {
   Availability: {
     InvalidRange: 'availability.invalid_range',
     RangeTooLarge: 'availability.range_too_large',
+    WindowNotFound: 'availability.window_not_found',
+    BlockedDateNotFound: 'availability.blocked_date_not_found',
+    BlockedRangeConflictsWithBookings: 'availability.blocked_range_conflicts_with_bookings',
   },
   Booking: {
     SlotUnavailable: 'booking.slot_unavailable',
@@ -33,6 +36,7 @@ export const ErrorCodes = {
   Cancellation: {
     TooLate: 'cancellation.too_late',
     ReopenExhausted: 'cancellation.reopen_exhausted',
+    InvalidDecisionReason: 'cancellation.invalid_decision_reason',
   },
   Payment: {
     NotFound: 'payment.not_found',

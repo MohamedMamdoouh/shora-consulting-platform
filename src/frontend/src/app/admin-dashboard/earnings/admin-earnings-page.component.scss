@@ -1,0 +1,130 @@
+:host {
+  display: block;
+}
+
+.admin-earnings {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.admin-earnings__header h2 {
+  margin: 0 0 var(--space-sm);
+  font-size: 1.125rem;
+}
+
+.admin-earnings__note,
+.admin-earnings__state,
+.admin-earnings__meta {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+}
+
+.admin-earnings__filters {
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+@media (min-width: 768px) {
+  .admin-earnings__filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: end;
+  }
+
+  .admin-earnings__filter-actions {
+    grid-column: 1 / -1;
+  }
+}
+
+.admin-earnings__filters label {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.admin-earnings__filters input[type='date'] {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-background);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.admin-earnings__filter-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.admin-earnings__panel {
+  padding: var(--space-lg);
+  border-radius: var(--radius-md);
+}
+
+.admin-earnings__panel--error {
+  border: 1px solid #e8c4c4;
+  background: #fff5f5;
+  color: #7a2e2e;
+}
+
+.admin-earnings__summary {
+  display: grid;
+  gap: var(--space-md);
+}
+
+@media (min-width: 768px) {
+  .admin-earnings__summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.admin-earnings__card {
+  display: grid;
+  gap: var(--space-sm);
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.admin-earnings__card h3 {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.admin-earnings__amount {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.admin-earnings__card--primary {
+  border-color: #b8d4e8;
+  background: #f5faff;
+}
+
+.admin-earnings__card--highlight {
+  border-color: #b8dfc0;
+  background: #f0faf2;
+}
+
+.admin-earnings__card--warning {
+  border-color: #e8d4a8;
+  background: #fffaf0;
+}
+
+.admin-earnings__card--warning .admin-earnings__amount {
+  font-size: 1.5rem;
+}
+
+.admin-earnings__meta a {
+  color: inherit;
+}

@@ -22,6 +22,15 @@ public static class ApiProblemDetailsMapper
         };
 
         problem.Extensions.TryAdd("code", error.Code);
+
+        if (error.Extensions is not null)
+        {
+            foreach (var (key, value) in error.Extensions)
+            {
+                problem.Extensions.TryAdd(key, value);
+            }
+        }
+
         return problem;
     }
 

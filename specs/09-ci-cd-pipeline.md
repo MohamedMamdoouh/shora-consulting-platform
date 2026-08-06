@@ -1,5 +1,7 @@
 # 09 — CI/CD Pipeline
 
+Status: **Phase 1 CI implemented** (`.github/workflows/ci.yml` — backend + frontend build/test on push/PR to `main`). **Phase 2 CD** (Azure App Service deploy) is planned, not yet implemented.
+
 This spec defines how Shora is built, validated, and (later) deployed. It complements spec 08 #4 (hosting topology) with concrete GitHub Actions workflows and a phased rollout plan. Workflow YAML stays thin; this document is the authoritative design.
 
 ## 1. Goals
@@ -58,7 +60,7 @@ Two **parallel** jobs — no secrets required; read-only `contents` permission.
 
 ## 5. Phase 2 — CD (future)
 
-**Not implemented until Azure resources exist and MVP features (specs 02–07) are deployable.**
+**Not implemented until Azure resources exist.** Core MVP features (specs 02–07) are implemented in code; CD awaits Azure provisioning and secrets setup.
 
 Planned workflow: `.github/workflows/deploy.yml` (separate from CI).
 

@@ -34,85 +34,13 @@
             المهلة.
           </p>
 
-          <div class="amount-block">
-            <span class="amount-label">المبلغ المطلوب</span>
-            <span class="amount-value">{{
-              formatPrice(instructions.amount, instructions.currency)
-            }}</span>
-          </div>
-
-          <dl class="transfer-list">
-            <div class="transfer-item">
-              <dt>فودافون كاش</dt>
-              <dd dir="ltr">{{ instructions.vodafoneCashNumber }}</dd>
-            </div>
-            <div class="transfer-item">
-              <dt>InstaPay</dt>
-              <dd dir="ltr">{{ instructions.instaPayHandle }}</dd>
-            </div>
-          </dl>
-
-          @if (instructions.paymentInstructions) {
-            <div class="note-block">
-              <h2>ملاحظة</h2>
-              <p>{{ instructions.paymentInstructions }}</p>
-            </div>
+          @if (bookingId) {
+            <app-payment-instructions-panel
+              [bookingId]="bookingId"
+              [instructions]="instructions"
+              (receiptSubmitted)="onReceiptSubmitted()"
+            />
           }
-
-          <div class="countdown-block" [class.countdown-block--expired]="deadlineExpired">
-            <h2>مهلة رفع الإيصال</h2>
-            <p class="countdown-value" aria-live="polite">{{ countdownLabel }}</p>
-          </div>
-
-          <form class="upload-form" (submit)="$event.preventDefault(); submitReceipt()">
-            <h2>رفع الإيصال</h2>
-
-            <label class="field">
-              <span>طريقة الدفع المستخدمة</span>
-              <select
-                [(ngModel)]="uploadMethod"
-                name="method"
-                [disabled]="uploading || deadlineExpired"
-              >
-                <option value="VodafoneCash">فودافون كاش</option>
-                <option value="InstaPay">إنستا باي</option>
-              </select>
-            </label>
-
-            <label class="field">
-              <span>مرجع المرسل (اختياري)</span>
-              <input
-                type="text"
-                [(ngModel)]="senderReference"
-                name="senderReference"
-                maxlength="200"
-                placeholder="رقم العملية أو رقم المحفظة"
-                [disabled]="uploading || deadlineExpired"
-              />
-            </label>
-
-            <label class="field">
-              <span>صورة الإيصال</span>
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/webp,application/pdf"
-                (change)="onFileSelected($event)"
-                [disabled]="uploading || deadlineExpired"
-              />
-            </label>
-
-            @if (uploadError) {
-              <p class="upload-error" aria-live="polite">{{ uploadError }}</p>
-            }
-
-            <button
-              type="submit"
-              class="btn btn--primary"
-              [disabled]="uploading || deadlineExpired"
-            >
-              {{ uploading ? 'جاري الرفع...' : 'رفع الإيصال' }}
-            </button>
-          </form>
         }
       }
     }

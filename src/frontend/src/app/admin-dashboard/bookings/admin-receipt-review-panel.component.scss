@@ -1,0 +1,224 @@
+:host {
+  display: contents;
+}
+
+.receipt-panel-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: var(--space-lg);
+  background: rgb(0 0 0 / 45%);
+}
+
+.receipt-panel {
+  display: grid;
+  gap: var(--space-lg);
+  width: min(100%, 42rem);
+  max-height: min(90vh, 48rem);
+  overflow: auto;
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: 0 1rem 2rem rgb(0 0 0 / 12%);
+}
+
+.receipt-panel__header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.receipt-panel__header h3,
+.receipt-panel__current h4,
+.receipt-panel__history h4,
+.receipt-panel__decline-form h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.receipt-panel__subtitle {
+  margin: var(--space-xs) 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.receipt-panel__close {
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.receipt-panel__state {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.receipt-panel__summary dl,
+.receipt-panel__meta {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .receipt-panel__summary dl {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .receipt-panel__meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.receipt-panel__summary dt,
+.receipt-panel__meta dt {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
+.receipt-panel__summary dd,
+.receipt-panel__meta dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.receipt-panel__current,
+.receipt-panel__history,
+.receipt-panel__decline-form {
+  display: grid;
+  gap: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.receipt-panel__warnings {
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  background: #fff8e6;
+  color: #7a5a00;
+  list-style: none;
+}
+
+.receipt-panel__warnings li + li {
+  margin-top: var(--space-xs);
+}
+
+.receipt-panel__image-wrap {
+  margin: 0;
+}
+
+.receipt-panel__image {
+  display: block;
+  width: 100%;
+  max-height: 20rem;
+  object-fit: contain;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-background);
+}
+
+.receipt-panel__image-wrap figcaption {
+  margin-top: var(--space-xs);
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
+.receipt-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.receipt-panel__decline-form label {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.receipt-panel__decline-form select,
+.receipt-panel__decline-form textarea {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-background);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.receipt-panel__history ul {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.receipt-panel__history li {
+  display: grid;
+  gap: 0.125rem;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-background);
+}
+
+.receipt-panel__history-title {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.receipt-panel__history-meta {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
+.receipt-panel__message {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.receipt-panel__message p {
+  margin: 0;
+}
+
+.receipt-panel__message--error {
+  padding: var(--space-md);
+  border-radius: var(--radius-sm);
+  background: #fff5f5;
+  color: #7a2e2e;
+}
+
+.btn {
+  padding: var(--space-sm) var(--space-lg);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+}
+
+.btn--secondary {
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.btn--danger {
+  border-color: #c0392b;
+  background: #c0392b;
+}
+
+.btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

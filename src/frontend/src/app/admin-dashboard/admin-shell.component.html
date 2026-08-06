@@ -1,0 +1,19 @@
+<section class="page admin-shell">
+  <header class="admin-shell__header">
+    <div class="admin-shell__intro">
+      <h1>لوحة الإدارة</h1>
+      <p class="admin-shell__subtitle">إدارة الحجوزات، المواعيد، الإعدادات، والأرباح.</p>
+    </div>
+
+    <nav class="admin-shell__nav" aria-label="أقسام لوحة الإدارة">
+      <a routerLink="/admin/settings" routerLinkActive="active">الإعدادات</a>
+      <a routerLink="/admin/availability" routerLinkActive="active">المواعيد</a>
+      <a routerLink="/admin/bookings" routerLinkActive="active">الحجوزات</a>
+      <a routerLink="/admin/earnings" routerLinkActive="active">الأرباح</a>
+    </nav>
+  </header>
+
+  <div class="admin-shell__content">
+    <router-outlet />
+  </div>
+</section>

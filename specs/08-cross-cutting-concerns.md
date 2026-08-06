@@ -1,6 +1,6 @@
 # 08 — Cross-Cutting Concerns (Ops, Security, Deployment)
 
-Status: **Partially implemented.** See “Already landed” below; outbox dispatcher, full rate-limit matrix, blob reconciliation (spec 05h), and ops monitoring remain.
+Status: **Partially implemented.** Core product flows (auth, booking, payments, client dashboard, admin dashboard) are complete. See “Already landed” below; outbox dispatcher, cancellation auto-decline, auto-complete, availability top-up, full rate-limit matrix, blob reconciliation (spec 05h), refresh-token purge, and ops monitoring remain.
 
 This spec consolidates operational and cross-cutting requirements referenced by specs 01–07 so they live in one place: rate limiting, logging/auditing/monitoring, the background-job execution model, deployment, and data retention.
 
@@ -8,6 +8,7 @@ This spec consolidates operational and cross-cutting requirements referenced by 
 
 - **Rate limiting:** `POST /api/v1/payments/{bookingId}/receipt` — 5/min/account (spec 05e)
 - **Background jobs:** receipt-upload-deadline cleanup, receipt retention purge, temp blob cleanup (orphan `temp/` prefix)
+- **Admin slot generation:** on-save horizon regeneration when availability windows or blocked dates change (spec 07 — not the nightly top-up job)
 - **Outbox writes:** payment/booking transitions enqueue messages; **dispatcher job not yet implemented** (emails stay `Pending` until spec 08)
 
 ---

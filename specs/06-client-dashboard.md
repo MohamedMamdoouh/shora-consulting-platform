@@ -1,6 +1,40 @@
 # 06 — Client Dashboard
 
-Status: **Partially implemented.** Payment-instructions page with receipt upload exists (spec 05 thin UI). Full dashboard cards, cancellation UX, and booking history labels remain planned.
+Status: **Implemented** (sub-phases 06a–06j, 2026-08).
+
+The client dashboard at `/dashboard` is fully wired to `GET /api/bookings/mine` and the booking/payment/cancellation client APIs described in specs 04–05. Arabic (RTL) UI; slot times render in the visitor's local browser timezone.
+
+### Implementation status
+
+| Sub-phase | Scope | Status |
+| --------- | ----- | ------ |
+| 06a | Shared TS + C# contracts for `GET /bookings/mine` | **Done** |
+| 06b | `BookingService.ListMineAsync` — owner scoping, status filters, past pagination | **Done** |
+| 06c | L2 cancellation/refund labels, payment summary, receipt SAS thumbnail, consultant WhatsApp | **Done** |
+| 06d | HTTP endpoint + integration tests | **Done** |
+| 06e | Dashboard shell — three sections, parallel load, empty state | **Done** |
+| 06f | Past section — local times, status/reason/refund labels, load-more pagination | **Done** |
+| 06g | `PendingPayment` card — shared payment panel, countdown, upload, cancel hold | **Done** |
+| 06h | `PendingApproval` card — under-review message, receipt thumbnail, cancel hold | **Done** |
+| 06i | Upcoming cards — voice-call copy, pre-filled `wa.me` chat link, local timezone | **Done** |
+| 06j | Cancellation UX — request, pending banner, declined banner, decision-seen, reopen, WhatsApp fallback | **Done** |
+
+**Backend:** `BookingsController` (`GET /mine`, `POST /{id}/cancel`, cancellation-request endpoints), `BookingService.ListMineAsync`, `MyBookingLabelMapper`, unit + integration tests.
+
+**Frontend (`src/frontend/src/app/client-dashboard/`):**
+
+- `client-dashboard.component.*` — section loading/error/empty states; orchestrates three parallel `GET /bookings/mine?status=…` calls (past paginated via load-more).
+- `pending-payment-card.*` + `booking/shared/payment-instructions-panel.*` — payment instructions, countdown, receipt upload (also reused by `/booking/payment/:id`).
+- `pending-approval-card.*` — review message, receipt thumbnail (`receiptThumbnailUrl`), cancel hold.
+- `upcoming-booking-card.*` + `upcoming-booking.util.ts` + `upcoming-cancellation.util.ts` — delivery instructions and full cancellation state machine.
+- `client-dashboard-labels.util.ts` — Arabic labels for past cancelled bookings (reason + refund).
+- `client-dashboard-slot.util.ts` — shared local slot formatting.
+
+**API client:** `BookingService` — `getMyBookings`, `getPaymentInstructions`, `uploadReceipt`, `cancelHold`, `requestCancellation`, `markCancellationDecisionSeen`.
+
+**Note:** When a booking has never had a cancellation request, the UI derives the online-request deadline as `SlotStartUtc − 1h` (server default). After a request exists, `cancellationRequest.autoDeclineAtUtc` from the API is authoritative.
+
+---
 
 ## 1. Purpose
 
@@ -8,7 +42,7 @@ A simple view for logged-in clients to see their booking history and upcoming se
 
 ## 2. Page: `/dashboard`
 
-- **Upcoming section**: bookings with status `Confirmed` and a future slot time. Times are converted from UTC to the visitor's local browser timezone (per spec 01 #4).
+- **Upcoming section**: bookings with status `Confirmed` or `CancellationRequested` and a future slot time. Times are converted from UTC to the visitor's local browser timezone (per spec 01 #4).
   - Shows: date/time, delivery method, and delivery instructions:
     - Voice Call: "You'll receive a call at 4:00 PM on [contactPhone]."
     - Chat: a tappable pre-filled `wa.me` link (per spec 04, confirmed mechanic) to start the WhatsApp chat at the scheduled time.
@@ -19,17 +53,17 @@ A simple view for logged-in clients to see their booking history and upcoming se
     - The one-time behavior is server-driven: the banner remains until `POST /api/bookings/{id}/cancellation-requests/decision-seen` is called, which sets `CancellationRequest.ClientDecisionSeenAtUtc`.
     - Re-request rule: if the decline was admin-driven and the user has not used their single reopen yet, the request button is shown again; otherwise it is hidden and the client is directed to WhatsApp.
 - **Pending payment / awaiting review**:
-  - `PendingPayment` booking (within its upload window, spec 04 #4): show the **payment instructions** (Vodafone Cash number, InstaPay handle, exact amount, optional note from `GET /api/bookings/{id}/payment-instructions`), a countdown to the upload deadline, and an **Upload receipt** control (`POST /api/payments/{bookingId}/receipt`, spec 05). If a previous attempt was declined, show the **decline reason** and allow a fresh upload. A **Cancel hold** button (`POST /api/bookings/{id}/cancel`) is available any time — it releases the slot and frees a unit of the 3-hold cap immediately.
+  - `PendingPayment` booking (within its upload window, spec 04 #4): show the **payment instructions** (Vodafone Cash number, InstaPay handle, exact amount, optional note — from `paymentSummary` on `GET /bookings/mine`, same fields as `GET /api/bookings/{id}/payment-instructions`), a countdown to the upload deadline, and an **Upload receipt** control (`POST /api/payments/{bookingId}/receipt`, spec 05). If a previous attempt was declined, show the **decline reason** and allow a fresh upload. A **Cancel hold** button (`POST /api/bookings/{id}/cancel`) is available any time — it releases the slot and frees a unit of the 3-hold cap immediately.
   - `PendingApproval` booking (receipt uploaded): show "Payment under review — we'll email you once the consultant approves it," with a thumbnail of the submitted receipt. **Cancel hold** remains available.
-- **Past section**: bookings with status `Completed` or `Cancelled`, most recent first. Shows date/time and final status. Note: `Completed` appears **automatically** once the session end time has passed (spec 07) — no action needed from the client or admin.
+- **Past section**: bookings with status `Completed` or `Cancelled`, most recent first. Shows date/time and final status. Note: `Completed` appears **automatically** once the session end time has passed (spec 08 job — not yet implemented) — no action needed from the client or admin once the job lands.
   - **Cancelled bookings show a reason label** derived from the latest `BookingStatusAudit` row (spec 01): e.g. "Cancelled by you", "Cancelled by the consultant", or "Receipt not uploaded in time". (A _declined_ cancellation request does not appear here — that booking stays `Confirmed`.) If the cancelled booking had an approved payment, the label also notes "Refunded" once `Payment.Status = Refunded`, or "Refund being processed" while it is still refund-due (spec 05 #6).
 
 ## 3. Endpoint
 
 `GET /api/bookings/mine` (Client, auth required) — returns the current user's bookings, each with the **snapshotted** slot time (`Booking.SlotStartUtc`/`SlotEndUtc`, spec 01 — never a live slot join, so history survives slot removal), delivery method, status, and (for cancelled ones) the cancellation reason label (L2). The Upcoming/Pending sections are naturally small, but the Past section grows unboundedly, so the endpoint is **paginated (M5)**:
 
-- Query params: `?status=` (optional filter: `upcoming` = `Confirmed`/`CancellationRequested`; `pending` = `PendingPayment`/`PendingApproval`; `past` = `Completed`/`Cancelled`), `?page=` (1-based, default 1), `?pageSize=` (default 20, max 100).
-- Response envelope: `{ items: [...], page, pageSize, totalCount }`, ordered most-recent-first for past bookings. Each item includes cancellation-request metadata (`status`, `reopenCount`, `clientDecisionSeenAtUtc`) so the UI can render pending/declined/reopen states deterministically.
+- Query params: `?status=` (optional filter: `Upcoming` = `Confirmed`/`CancellationRequested`; `Pending` = `PendingPayment`/`PendingApproval`; `Past` = `Completed`/`Cancelled`), `?page=` (1-based, default 1), `?pageSize=` (default 20, max 100).
+- Response envelope: `{ items: [...], page, pageSize, totalCount }`, ordered most-recent-first for past bookings. Each item includes cancellation-request metadata (`status`, `reopenCount`, `clientDecisionSeenAtUtc`, `declineReason`, `autoDeclineAtUtc`) so the UI can render pending/declined/reopen states deterministically.
 - The frontend requests upcoming/pending unpaginated (small) and pages through the past list.
 
 ## 4. Empty State

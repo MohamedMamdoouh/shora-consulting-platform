@@ -1,6 +1,6 @@
 # 03 — Public Pages (Home, About, Services)
 
-Status: **Spec only — not implemented until explicitly requested.**
+Status: **Partially implemented** — RTL pages exist at `/`, `/about`, and `/services` with placeholder Arabic copy and working CTAs into `/booking/start`. Real consultant bio, topic descriptions, and final marketing copy are still TBD.
 
 ## 1. Goals
 

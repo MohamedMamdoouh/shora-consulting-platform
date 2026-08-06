@@ -1,0 +1,223 @@
+<section class="admin-settings">
+  @switch (pageState.status) {
+    @case ('loading') {
+      <p class="admin-settings__state" aria-live="polite">جاري تحميل الإعدادات...</p>
+    }
+
+    @case ('error') {
+      <div class="admin-settings__panel admin-settings__panel--error">
+        <p>{{ pageState.message }}</p>
+        <button type="button" class="btn" (click)="loadSettings()">إعادة المحاولة</button>
+      </div>
+    }
+
+    @case ('ready') {
+      <header class="admin-settings__header">
+        <h2>إعدادات الجلسة والدفع</h2>
+        <p class="admin-settings__note">
+          التغييرات هنا تؤثر على الحجوزات والمواعيد الجديدة فقط — الحجوزات الحالية تحتفظ بسعرها وموعدها
+          المحفوظ.
+        </p>
+      </header>
+
+      @if (successMessage) {
+        <p class="admin-settings__banner admin-settings__banner--success" role="status">
+          {{ successMessage }}
+        </p>
+      }
+
+      @if (errorMessage) {
+        <p class="admin-settings__banner admin-settings__banner--error" role="alert">
+          {{ errorMessage }}
+        </p>
+      }
+
+      <form class="admin-settings__form" [formGroup]="form" (ngSubmit)="submit()">
+        <fieldset class="admin-settings__section">
+          <legend>الجلسة</legend>
+
+          <label>
+            سعر الجلسة (جنيه)
+            <input
+              type="number"
+              formControlName="sessionPrice"
+              min="0.01"
+              step="0.01"
+              inputmode="decimal"
+              [attr.aria-invalid]="form.controls.sessionPrice.touched && form.controls.sessionPrice.invalid"
+            />
+            @if (getFieldError(form.controls.sessionPrice, 'sessionPrice'); as fieldError) {
+              <span class="admin-settings__field-error" role="alert">{{ fieldError }}</span>
+            }
+          </label>
+
+          <label>
+            مدة الجلسة (دقيقة)
+            <input
+              type="number"
+              formControlName="sessionDurationMinutes"
+              min="30"
+              max="240"
+              step="1"
+              inputmode="numeric"
+              [attr.aria-invalid]="
+                form.controls.sessionDurationMinutes.touched && form.controls.sessionDurationMinutes.invalid
+              "
+            />
+            @if (getFieldError(form.controls.sessionDurationMinutes, 'sessionDurationMinutes'); as fieldError) {
+              <span class="admin-settings__field-error" role="alert">{{ fieldError }}</span>
+            }
+          </label>
+
+          <label>
+            وقت الفاصل بين الجلسات (دقيقة)
+            <input
+              type="number"
+              formControlName="bufferMinutes"
+              min="0"
+              step="1"
+              inputmode="numeric"
+              [attr.aria-invalid]="form.controls.bufferMinutes.touched && form.controls.bufferMinutes.invalid"
+            />
+            @if (getFieldError(form.controls.bufferMinutes, 'bufferMinutes'); as fieldError) {
+              <span class="admin-settings__field-error" role="alert">{{ fieldError }}</span>
+            }
+          </label>
+        </fieldset>
+
+        <fieldset class="admin-settings__section">
+          <legend>بيانات الدفع اليدوي</legend>
+
+          <label>
+            رقم Vodafone Cash
+            <input
+              type="tel"
+              formControlName="vodafoneCashNumber"
+              autocomplete="tel"
+              dir="ltr"
+              placeholder="01012345678"
+              [attr.aria-invalid]="
+                form.controls.vodafoneCashNumber.touched && form.controls.vodafoneCashNumber.invalid
+              "
+            />
+            @if (getFieldError(form.controls.vodafoneCashNumber, 'vodafoneCashNumber'); as fieldError) {
+              <span class="admin-settings__field-error" role="alert">{{ fieldError }}</span>
+            }
+          </label>
+
+          <label>
+            InstaPay
+            <input
+              type="text"
+              formControlName="instaPayHandle"
+              dir="ltr"
+              placeholder="consultant@instapay"
+              [attr.aria-invalid]="form.controls.instaPayHandle.touched && form.controls.instaPayHandle.invalid"
+            />
+            @if (getFieldError(form.controls.instaPayHandle, 'instaPayHandle'); as fieldError) {
+              <span class="admin-settings__field-error" role="alert">{{ fieldError }}</span>
+            }
+          </label>
+
+          <label>
+            ملاحظة الدفع (اختياري)
+            <textarea
+              formControlName="paymentInstructions"
+              rows="3"
+              [attr.aria-invalid]="
+                form.controls.paymentInstructions.touched && form.controls.paymentInstructions.invalid
+              "
+            ></textarea>
+            @if (getFieldError(form.controls.paymentInstructions, 'paymentInstructions'); as fieldError) {
+              <span class="admin-settings__field-error" role="alert">{{ fieldError }}</span>
+            }
+          </label>
+        </fieldset>
+
+        <fieldset class="admin-settings__section">
+          <legend>سياسات الحجز</legend>
+
+          <label>
+            مهلة رفع الإيصال (دقيقة)
+            <input
+              type="number"
+              formControlName="receiptUploadWindowMinutes"
+              min="5"
+              step="1"
+              inputmode="numeric"
+              [attr.aria-invalid]="
+                form.controls.receiptUploadWindowMinutes.touched &&
+                form.controls.receiptUploadWindowMinutes.invalid
+              "
+            />
+            @if (
+              getFieldError(form.controls.receiptUploadWindowMinutes, 'receiptUploadWindowMinutes');
+              as fieldError
+            ) {
+              <span class="admin-settings__field-error" role="alert">{{ fieldError }}</span>
+            }
+          </label>
+
+          <label>
+            مهلة رفض طلب الإلغاء التلقائي (ساعة قبل الجلسة)
+            <input
+              type="number"
+              formControlName="cancellationRequestAutoDeclineHours"
+              min="0"
+              step="1"
+              inputmode="numeric"
+              [attr.aria-invalid]="
+                form.controls.cancellationRequestAutoDeclineHours.touched &&
+                form.controls.cancellationRequestAutoDeclineHours.invalid
+              "
+            />
+            @if (
+              getFieldError(
+                form.controls.cancellationRequestAutoDeclineHours,
+                'cancellationRequestAutoDeclineHours'
+              );
+              as fieldError
+            ) {
+              <span class="admin-settings__field-error" role="alert">{{ fieldError }}</span>
+            }
+          </label>
+        </fieldset>
+
+        <fieldset class="admin-settings__section">
+          <legend>التواصل</legend>
+
+          <label>
+            رقم واتساب المستشار (E.164)
+            <input
+              type="tel"
+              formControlName="consultantWhatsAppNumber"
+              autocomplete="tel"
+              dir="ltr"
+              placeholder="+201012345678"
+              [attr.aria-invalid]="
+                form.controls.consultantWhatsAppNumber.touched &&
+                form.controls.consultantWhatsAppNumber.invalid
+              "
+            />
+            @if (
+              getFieldError(form.controls.consultantWhatsAppNumber, 'consultantWhatsAppNumber');
+              as fieldError
+            ) {
+              <span class="admin-settings__field-error" role="alert">{{ fieldError }}</span>
+            }
+          </label>
+        </fieldset>
+
+        <p class="admin-settings__meta">
+          مدة الاحتفاظ بالإيصالات (للقراءة فقط): {{ pageState.receiptRetentionMonths }} شهر
+        </p>
+
+        <div class="admin-settings__actions">
+          <button type="submit" class="btn" [disabled]="form.invalid || isSubmitting">
+            {{ isSubmitting ? 'جاري الحفظ...' : 'حفظ الإعدادات' }}
+          </button>
+        </div>
+      </form>
+    }
+  }
+</section>

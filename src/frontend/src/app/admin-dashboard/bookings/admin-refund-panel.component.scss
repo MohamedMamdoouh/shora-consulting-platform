@@ -1,0 +1,131 @@
+:host {
+  display: contents;
+}
+
+.refund-panel-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: var(--space-lg);
+  background: rgb(0 0 0 / 45%);
+}
+
+.refund-panel {
+  display: grid;
+  gap: var(--space-lg);
+  width: min(100%, 34rem);
+  max-height: min(90vh, 40rem);
+  overflow: auto;
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: 0 1rem 2rem rgb(0 0 0 / 12%);
+}
+
+.refund-panel__header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.refund-panel__header h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.refund-panel__subtitle {
+  margin: var(--space-xs) 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.refund-panel__close {
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.refund-panel__hint {
+  margin: 0;
+  padding: var(--space-md);
+  border-radius: var(--radius-sm);
+  background: #f0faf2;
+  color: #1f5a2d;
+  font-size: 0.875rem;
+}
+
+.refund-panel__hint--warning {
+  background: #fff8e6;
+  color: #7a5a00;
+}
+
+.refund-panel__form {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.refund-panel__form label {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.refund-panel__form input,
+.refund-panel__form textarea {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-background);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.refund-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.refund-panel__message {
+  margin: 0;
+}
+
+.refund-panel__message--error {
+  padding: var(--space-md);
+  border-radius: var(--radius-sm);
+  background: #fff5f5;
+  color: #7a2e2e;
+}
+
+.btn {
+  padding: var(--space-sm) var(--space-lg);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+}
+
+.btn--secondary {
+  border-color: var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.btn--danger {
+  border-color: #c0392b;
+  background: #c0392b;
+}
+
+.btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

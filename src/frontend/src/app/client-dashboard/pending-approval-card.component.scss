@@ -1,0 +1,103 @@
+.pending-approval-card {
+  padding: var(--space-md);
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.pending-approval-card__header {
+  margin-bottom: var(--space-md);
+}
+
+.pending-approval-card__main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.pending-approval-card__time {
+  font-weight: 600;
+}
+
+.pending-approval-card__status {
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, #9a7b2e 12%, var(--color-surface));
+  color: #9a7b2e;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.pending-approval-card__message {
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+  background: color-mix(in srgb, #9a7b2e 6%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, #9a7b2e 25%, var(--color-border));
+  border-radius: var(--radius-md);
+}
+
+.pending-approval-card__message p {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.pending-approval-card__receipt {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0 0 var(--space-md);
+}
+
+.pending-approval-card__receipt figcaption {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.pending-approval-card__receipt a {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.pending-approval-card__receipt img {
+  display: block;
+  max-width: min(100%, 16rem);
+  max-height: 16rem;
+  object-fit: contain;
+  background: var(--color-surface);
+}
+
+.pending-approval-card__footer {
+  display: grid;
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.pending-approval-card__error {
+  margin: 0;
+  color: #7a2e2e;
+}
+
+.btn {
+  justify-self: start;
+  padding: var(--space-sm) var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.btn--secondary {
+  background: var(--color-surface);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

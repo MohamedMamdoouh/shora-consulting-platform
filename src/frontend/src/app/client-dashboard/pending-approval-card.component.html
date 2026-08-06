@@ -1,0 +1,38 @@
+<article class="pending-approval-card">
+  <header class="pending-approval-card__header">
+    <div class="pending-approval-card__main">
+      <span class="pending-approval-card__time">{{ slotLabel }}</span>
+      <span class="pending-approval-card__status">قيد مراجعة الدفع</span>
+    </div>
+  </header>
+
+  <div class="pending-approval-card__message" role="status">
+    <p>
+      استلمنا إيصال الدفع وهو قيد المراجعة. سنرسل لك بريداً إلكترونياً بعد موافقة المستشار.
+    </p>
+  </div>
+
+  @if (item.receiptThumbnailUrl; as thumbnailUrl) {
+    <figure class="pending-approval-card__receipt">
+      <figcaption>الإيصال المرفوع</figcaption>
+      <a [href]="thumbnailUrl" target="_blank" rel="noopener noreferrer">
+        <img [src]="thumbnailUrl" alt="صورة إيصال الدفع المرفوع" loading="lazy" />
+      </a>
+    </figure>
+  }
+
+  <footer class="pending-approval-card__footer">
+    @if (cancelError) {
+      <p class="pending-approval-card__error" aria-live="polite">{{ cancelError }}</p>
+    }
+
+    <button
+      type="button"
+      class="btn btn--secondary"
+      [disabled]="cancelling"
+      (click)="cancelHold()"
+    >
+      {{ cancelling ? 'جاري الإلغاء...' : 'إلغاء الحجز' }}
+    </button>
+  </footer>
+</article>

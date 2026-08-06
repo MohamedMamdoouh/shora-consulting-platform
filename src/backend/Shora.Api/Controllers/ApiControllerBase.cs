@@ -34,4 +34,10 @@ public abstract class ApiControllerBase : ControllerBase
         var problem = ApiProblemDetailsMapper.FromError(error, HttpContext);
         return new ObjectResult(problem) { StatusCode = error.StatusCode };
     }
+
+    protected IActionResult FromValidationErrors(IDictionary<string, string[]> errors)
+    {
+        var problem = ApiProblemDetailsMapper.FromValidationErrors(errors, HttpContext);
+        return new ObjectResult(problem) { StatusCode = StatusCodes.Status400BadRequest };
+    }
 }

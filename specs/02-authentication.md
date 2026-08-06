@@ -1,5 +1,7 @@
 # 02 — Authentication (Client + Admin)
 
+Status: **Implemented** — JWT access tokens, HTTP-only refresh cookies, email verification, Google sign-in, password reset, and Admin role gating for `/admin/*` endpoints.
+
 ## 1. Approach
 
 - **ASP.NET Core Identity** manages users, roles, password hashing, external-login linking, and email confirmation.

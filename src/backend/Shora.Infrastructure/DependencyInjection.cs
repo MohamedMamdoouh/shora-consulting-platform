@@ -85,6 +85,11 @@ public static class DependencyInjection
         services.AddScoped<ReceiptAntiReplayChecker>();
         services.AddScoped<AdminReceiptReviewService>();
         services.AddScoped<AdminRefundService>();
+        services.AddScoped<AdminAvailabilityService>();
+        services.AddScoped<AdminBookingListService>();
+        services.AddScoped<AdminEarningsService>();
+        services.AddScoped<AdminBookingCancellationService>();
+        services.AddScoped<AdminBlockedDateService>();
         services.AddScoped<SettingsService>();
         services.AddScoped<SlotGenerationService>();
         services.AddScoped<ReceiptUploadDeadlineCleanupService>();

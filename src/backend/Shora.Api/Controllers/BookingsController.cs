@@ -40,6 +40,33 @@ public sealed class BookingsController(
         return FromResult(result);
     }
 
+    [HttpGet("mine")]
+    [EndpointName("Bookings.ListMine")]
+    [EndpointSummary("List the authenticated client's bookings")]
+    [ProducesResponseType(typeof(MyBookingsResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> ListMine(
+        [FromQuery] MyBookingsStatusFilter? status,
+        [FromQuery] int page = MyBookingsQueryLimits.DefaultPage,
+        [FromQuery] int pageSize = MyBookingsQueryLimits.DefaultPageSize,
+        CancellationToken cancellationToken = default)
+    {
+        if (currentUser.UserId is not { } clientId)
+        {
+            return ToProblem(Error.Unauthorized(
+                ErrorCodes.Auth.UserNotFound,
+                "User is not authenticated."));
+        }
+
+        var result = await bookingService.ListMineAsync(
+            clientId,
+            new MyBookingsQuery(status, page, pageSize),
+            cancellationToken);
+        return FromResult(result);
+    }
+
     [HttpPost("{id:guid}/cancel")]
     [EndpointName("Bookings.CancelHold")]
     [EndpointSummary("Cancel an unpaid booking hold and release the slot")]

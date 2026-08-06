@@ -1,49 +1,58 @@
-# ShoraWeb
+# Shora Web (Angular 21)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.9.
+Arabic-first (RTL) frontend for the Shora booking platform. API contracts live in `src/contracts/`; HTTP calls use `@contracts/*` types aligned with `Shora.Contracts`.
 
 ## Development server
 
-To start a local development server, run:
-
 ```bash
-ng serve
+npm install
+npm start
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Open `http://localhost:4200/`. The dev server proxies `/api` to the backend (`proxy.conf.json`) so auth cookies work on same-origin `localhost:4200`.
+
+## Implemented features (by spec)
+
+| Area | Route(s) | Spec |
+| ---- | -------- | ---- |
+| Auth | `/auth/*` | 02 |
+| Public pages | `/`, `/about`, `/services` | 03 (placeholder copy) |
+| Booking flow | `/booking/start` → delivery → phone → review → `/booking/payment/:id` | 04 |
+| Client dashboard | `/dashboard` | 06 |
+| Admin dashboard | `/admin/settings`, `/admin/availability`, `/admin/bookings`, `/admin/earnings` | 07 |
+
+### Booking flow (spec 04)
+
+- Slot picker, delivery method, contact phone (voice call), review & reserve
+- Post-reserve payment instructions with shared `PaymentInstructionsPanelComponent`
+
+### Client dashboard (spec 06)
+
+- Three sections: upcoming, pending (payment / approval), past (paginated load-more)
+- Shared payment panel for upload + countdown
+- Upcoming cards: voice-call instructions, WhatsApp chat link, cancellation request UX
+- Arabic labels for past cancelled bookings (reason + refund)
+
+### Admin dashboard (spec 07)
+
+- **Settings** — consultant pricing, session duration, payment numbers
+- **Availability** — recurring windows + blocked date ranges
+- **Bookings** — filters, pagination, receipt review, cancellation queue, direct cancel, refund record/revoke
+- **Earnings** — gross / refunded / net summary with date filters
+
+Admin HTTP services live under `src/app/core/admin/`.
+
+## Build & test
+
+```bash
+npm run build
+npm test
+```
 
 ## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
 
 ```bash
 ng generate component component-name
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+See [Angular CLI documentation](https://angular.dev/tools/cli) for more commands.

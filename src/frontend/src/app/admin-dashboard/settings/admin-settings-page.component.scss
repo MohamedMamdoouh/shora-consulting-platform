@@ -1,0 +1,128 @@
+:host {
+  display: block;
+}
+
+.admin-settings {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.admin-settings__header h2 {
+  margin: 0 0 var(--space-sm);
+  font-size: 1.125rem;
+}
+
+.admin-settings__note,
+.admin-settings__meta,
+.admin-settings__state {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.admin-settings__banner {
+  margin: 0;
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+}
+
+.admin-settings__banner--success {
+  background: color-mix(in srgb, #3d7a4a 12%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, #3d7a4a 30%, var(--color-border));
+  color: #3d7a4a;
+}
+
+.admin-settings__banner--error {
+  background: #fff5f5;
+  border: 1px solid #e8c4c4;
+  color: #7a2e2e;
+}
+
+.admin-settings__panel {
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.admin-settings__panel--error {
+  border-color: #e8c4c4;
+  background: #fff5f5;
+  color: #7a2e2e;
+}
+
+.admin-settings__panel p {
+  margin: 0;
+}
+
+.admin-settings__form {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.admin-settings__section {
+  margin: 0;
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+
+.admin-settings__section legend {
+  padding: 0 var(--space-xs);
+  font-weight: 700;
+}
+
+.admin-settings__section label {
+  display: grid;
+  gap: var(--space-xs);
+  margin-top: var(--space-md);
+}
+
+.admin-settings__section label:first-of-type {
+  margin-top: 0;
+}
+
+.admin-settings__section input,
+.admin-settings__section textarea {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-background);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.admin-settings__field-error {
+  color: #7a2e2e;
+  font-size: 0.875rem;
+}
+
+.admin-settings__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.btn {
+  padding: var(--space-sm) var(--space-lg);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+}
+
+.btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .admin-settings__section {
+    padding: var(--space-md);
+  }
+}

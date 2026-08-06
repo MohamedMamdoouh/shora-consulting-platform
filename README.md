@@ -79,7 +79,17 @@ npm install
 npm start
 ```
 
-Default: `http://localhost:4200` (RTL Arabic shell with lazy-loaded route stubs)
+Default: `http://localhost:4200` (RTL Arabic app with lazy-loaded routes)
+
+Implemented routes:
+
+| Area | Routes | Spec |
+| ---- | ------ | ---- |
+| Public | `/`, `/about`, `/services` | 03 (placeholder copy) |
+| Auth | `/auth/*` | 02 |
+| Booking | `/booking/*` | 04 |
+| Client dashboard | `/dashboard` | 06 |
+| Admin | `/admin/*` | 07 |
 
 API base URL: `src/environments/environment.ts` → `/api/v1` (proxied to the backend in dev — see below)
 
@@ -114,13 +124,13 @@ $env:CI = "true"; npm test
 | 00   | API conventions (Result, Problem Details, contracts) | **Done**        |
 | 01   | Project scaffold & data model                        | **Done**        |
 | 02   | Authentication (JWT, Google, refresh tokens)         | **Done**        |
-| 03   | Public pages (Home, About, Services)                 | Planned         |
-| 04   | Booking flow                                         | **In progress** |
-| 05   | Manual payments (Vodafone Cash / InstaPay receipts)  | **Done** (API; UI in 06–07) |
-| 06   | Client dashboard                                     | **In progress** (payment-instructions + upload; full dashboard planned) |
-| 07   | Admin dashboard                                      | **In progress** (payment/refund APIs done; admin UI planned) |
+| 03   | Public pages (Home, About, Services)                 | **Partial** (RTL pages + placeholder copy; real content TBD) |
+| 04   | Booking flow                                         | **Mostly done** (full client UI + APIs; auto-decline/auto-complete jobs in 08) |
+| 05   | Manual payments (Vodafone Cash / InstaPay receipts)  | **Done** (backend + client upload UX in 06 + admin review/refund UI in 07) |
+| 06   | Client dashboard                                     | **Done** (06a–06j) |
+| 07   | Admin dashboard                                      | **Done** (07a–07n) |
 | 08   | Cross-cutting concerns (jobs, rate limits, ops)      | **In progress** |
-| 09   | CI/CD pipeline (GitHub Actions; Azure CD later)      | **In progress** |
+| 09   | CI/CD pipeline (GitHub Actions; Azure CD later)      | **CI done** (CD planned) |
 
 Implement feature specs **in order** (01–08) — each builds on the previous. Spec 09 (CI/CD) runs in parallel with feature work.
 
@@ -150,12 +160,39 @@ Backend API for manual payment verification is **complete** (sub-phases 05a–05
 
 **Deferred to spec 08:** blob reconciliation job for `BlobFinalizePending` rows (05h). Uploads already mark the state; repair is ops polish.
 
-Polished payment UX lives in specs 06 (client) and 07 (admin).
+**Client payment UX (spec 06):** `/dashboard` pending cards and `/booking/payment/:id` share `PaymentInstructionsPanelComponent` (instructions, countdown, receipt upload, cancel hold).
+
+**Admin payment UX (spec 07):** receipt review modal, refund record/revoke, and earnings summary on `/admin/bookings` and `/admin/earnings`.
+
+## Spec 06 — client dashboard (complete)
+
+Sub-phases 06a–06j:
+
+- `GET /api/v1/bookings/mine` with status filters, past pagination, and enriched list items (payment summary, receipt thumbnail SAS, cancellation metadata, consultant WhatsApp)
+- `/dashboard` — upcoming (delivery + cancellation UX), pending payment/approval cards, past history with Arabic reason/refund labels and load-more
+- Shared payment panel reused by standalone payment-instructions page
+
+See [spec 06](specs/06-client-dashboard.md) for full detail.
+
+## Spec 07 — admin dashboard (complete)
+
+Sub-phases 07a–07n:
+
+- `/admin/settings` — session price, duration, payment numbers, validation
+- `/admin/availability` — recurring windows + blocked dates
+- `/admin/bookings` — paginated table, receipt review, cancellation queue, direct cancel, refund record/revoke
+- `/admin/earnings` — gross / refunded / net revenue and refund-due counts (date filter on session slot)
+
+See [spec 07](specs/07-admin-dashboard.md) for full detail.
 
 ## Deferred / remaining
 
-- Outbox email dispatcher (spec 08)
+- Outbox email dispatcher (spec 08) — messages enqueue but are not dispatched yet
 - Full rate-limit matrix for auth/booking endpoints (spec 08)
 - Blob reconciliation job (spec 05h → 08)
-- Feature pages and dashboards (specs 03, 06–07)
-- Admin cancellation decisions and direct cancel (spec 07)
+- Cancellation-request auto-decline job (spec 08)
+- Auto-complete confirmed bookings job (spec 08)
+- Availability horizon top-up job (spec 08)
+- Refresh-token purge job (spec 08)
+- Public pages real content and polish (spec 03)
+- Azure CD deploy workflow (spec 09 Phase 2)

@@ -1,0 +1,107 @@
+<article class="upcoming-booking-card">
+  <header class="upcoming-booking-card__header">
+    <div class="upcoming-booking-card__main">
+      <span class="upcoming-booking-card__time">{{ slotLabel }}</span>
+      <span
+        class="upcoming-booking-card__status"
+        [class.upcoming-booking-card__status--cancellation-requested]="statusModifier === 'cancellation-requested'"
+      >
+        {{ statusLabel }}
+      </span>
+    </div>
+    <p class="upcoming-booking-card__delivery">
+      طريقة الجلسة: {{ formatDeliveryMethodLabel(item.deliveryMethod) }}
+    </p>
+  </header>
+
+  @if (item.deliveryMethod === 'VoiceCall') {
+    @if (voiceCallInstruction; as instruction) {
+      <p class="upcoming-booking-card__instruction">{{ instruction }}</p>
+    } @else {
+      <p class="upcoming-booking-card__instruction upcoming-booking-card__instruction--muted">
+        لم يُسجَّل رقم للمكالمة. تواصل مع المستشار إذا احتجت مساعدة.
+      </p>
+    }
+  } @else if (whatsAppChatUrl; as chatUrl) {
+    <div class="upcoming-booking-card__instruction">
+      <p>اضغط على الرابط في موعد الجلسة لبدء المحادثة مع المستشار على واتساب.</p>
+      <a [href]="chatUrl" target="_blank" rel="noopener noreferrer" class="upcoming-booking-card__chat-link">
+        فتح محادثة واتساب
+      </a>
+    </div>
+  } @else {
+    <p class="upcoming-booking-card__instruction upcoming-booking-card__instruction--muted">
+      تعذّر تحميل رابط واتساب. تواصل مع المستشار إذا احتجت مساعدة.
+    </p>
+  }
+
+  @if (showPendingCancellation) {
+    <div class="upcoming-booking-card__cancellation upcoming-booking-card__cancellation--pending" role="status">
+      <p>طلب الإلغاء قيد المراجعة — بانتظار قرار المستشار.</p>
+    </div>
+  }
+
+  @if (showDeclinedBanner) {
+    <div class="upcoming-booking-card__cancellation upcoming-booking-card__cancellation--declined" role="status">
+      <p>
+        رُفض طلب الإلغاء — الجلسة ما زالت قائمة.
+        @if (declinedReason) {
+          السبب: {{ declinedReason }}
+        }
+      </p>
+      <button
+        type="button"
+        class="btn btn--secondary"
+        [disabled]="acknowledgingDecision"
+        (click)="acknowledgeDecision()"
+      >
+        {{ acknowledgingDecision ? 'جاري التسجيل...' : 'حسناً' }}
+      </button>
+    </div>
+  }
+
+  @if (showRequestCancellation) {
+    <div class="upcoming-booking-card__cancellation">
+      <label class="field">
+        <span>سبب الإلغاء (اختياري)</span>
+        <textarea
+          [(ngModel)]="cancellationReason"
+          name="cancellationReason"
+          rows="2"
+          maxlength="500"
+          placeholder="مثال: تعارض في الموعد"
+          [disabled]="requestingCancellation"
+        ></textarea>
+      </label>
+
+      @if (cancellationActionError) {
+        <p class="upcoming-booking-card__error" aria-live="polite">{{ cancellationActionError }}</p>
+      }
+
+      <button
+        type="button"
+        class="btn btn--danger"
+        [disabled]="requestingCancellation"
+        (click)="submitCancellationRequest()"
+      >
+        {{ requestingCancellation ? 'جاري الإرسال...' : 'طلب إلغاء الجلسة' }}
+      </button>
+    </div>
+  }
+
+  @if (showWhatsAppFallback) {
+    <div class="upcoming-booking-card__cancellation upcoming-booking-card__cancellation--whatsapp">
+      <p>
+        لإلغاء الحجز قرب موعد الجلسة، تواصل مع المستشار على واتساب
+        @if (item.consultantWhatsAppNumber; as whatsAppNumber) {
+          : <span dir="ltr">{{ whatsAppNumber }}</span>
+        }.
+      </p>
+      @if (consultantWhatsAppContactUrl; as contactUrl) {
+        <a [href]="contactUrl" target="_blank" rel="noopener noreferrer" class="upcoming-booking-card__chat-link">
+          مراسلة المستشار على واتساب
+        </a>
+      }
+    </div>
+  }
+</article>

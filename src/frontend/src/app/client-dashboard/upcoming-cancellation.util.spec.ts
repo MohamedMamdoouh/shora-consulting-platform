@@ -136,6 +136,7 @@ describe('upcoming cancellation utilities', () => {
           cancellationRequest: {
             status: 'Declined',
             reopenCount: 1,
+            clientDecisionSeenAtUtc: '2026-08-06T09:30:00.000Z',
             autoDeclineAtUtc: '2026-08-06T11:00:00.000Z',
           },
         }),

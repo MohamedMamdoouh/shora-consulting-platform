@@ -124,6 +124,14 @@ public sealed class AdminBookingCancellationService(
                 "No pending cancellation request was found for this booking.");
         }
 
+        if (now >= booking.SlotStartUtc)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            return Error.Conflict(
+                ErrorCodes.Booking.InvalidStatus,
+                "The booking can no longer be cancelled because the session has started.");
+        }
+
         request.Status = Domain.Enums.CancellationRequestStatus.Approved;
         request.ReviewedByAdminId = adminId;
         request.ReviewedAtUtc = now;

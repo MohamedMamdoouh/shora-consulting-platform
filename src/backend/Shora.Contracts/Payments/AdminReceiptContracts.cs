@@ -1,5 +1,8 @@
+using System.Text.Json.Serialization;
+
 namespace Shora.Contracts.Payments;
 
+[JsonConverter(typeof(JsonStringEnumConverter<ReceiptDeclineReasonCode>))]
 public enum ReceiptDeclineReasonCode
 {
     UnreadableImage = 0,

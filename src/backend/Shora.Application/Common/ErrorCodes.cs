@@ -59,6 +59,8 @@ public static class ErrorCodes
         public const string ReceiptTooLarge = "payment.receipt_too_large";
         public const string InvalidMethod = "payment.invalid_method";
         public const string NoPendingReceipt = "payment.no_pending_receipt";
+        public const string ReceiptFinalizeFailed = "payment.receipt_finalize_failed";
+        public const string ReceiptNotReviewable = "payment.receipt_not_reviewable";
         public const string InvalidDeclineReason = "payment.invalid_decline_reason";
         public const string RefundNotDue = "payment.refund_not_due";
         public const string NotRefunded = "payment.not_refunded";

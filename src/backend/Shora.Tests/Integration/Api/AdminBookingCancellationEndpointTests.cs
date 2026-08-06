@@ -156,6 +156,45 @@ public class AdminBookingCancellationEndpointTests : IDisposable
     }
 
     [Fact]
+    public async Task Approve_cancellation_request_rejects_after_session_start()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var (client, bookingId, slotId) = await CreateConfirmedBookingAsync("admin-approve-cancel-too-late@example.com", cancellationToken);
+
+        var requestResponse = await client.PostAsJsonAsync(
+            $"/api/v1/bookings/{bookingId}/cancellation-requests",
+            new CancellationRequestBody("Need to reschedule"),
+            cancellationToken);
+        Assert.Equal(HttpStatusCode.OK, requestResponse.StatusCode);
+
+        await SetBookingSlotStartAsync(bookingId, DateTime.UtcNow.AddMinutes(-5), cancellationToken);
+
+        var adminClient = await CreateAdminClientAsync(cancellationToken);
+        var response = await adminClient.PostAsync(
+            $"/api/v1/admin/bookings/{bookingId}/cancellation-requests/approve",
+            null,
+            cancellationToken);
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        await AssertProblemCodeAsync(response, ErrorCodes.Booking.InvalidStatus, cancellationToken);
+
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        var booking = await context.Bookings.AsNoTracking().SingleAsync(b => b.Id == bookingId, cancellationToken);
+        Assert.Equal(BookingStatus.CancellationRequested, booking.Status);
+        Assert.Equal(slotId, booking.AvailabilitySlotId);
+
+        var request = await context.CancellationRequests.AsNoTracking().SingleAsync(r => r.BookingId == bookingId, cancellationToken);
+        Assert.Equal(Domain.Enums.CancellationRequestStatus.Pending, request.Status);
+        Assert.Null(request.ReviewedAtUtc);
+
+        var slot = await context.AvailabilitySlots.AsNoTracking().SingleAsync(s => s.Id == slotId, cancellationToken);
+        Assert.True(slot.IsBooked);
+        Assert.Equal(bookingId, slot.BookingId);
+    }
+
+    [Fact]
     public async Task Decline_cancellation_request_returns_booking_to_confirmed_and_enqueues_email()
     {
         var cancellationToken = TestContext.Current.CancellationToken;

@@ -10,6 +10,8 @@ public interface IFileStorage
 
     Task DeleteAsync(string blobPath, CancellationToken cancellationToken = default);
 
+    Task<bool> ExistsAsync(string blobPath, CancellationToken cancellationToken = default);
+
     Task<int> DeleteBlobsWithPrefixOlderThanAsync(
         string prefix,
         TimeSpan maxAge,

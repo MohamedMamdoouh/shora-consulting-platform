@@ -91,6 +91,8 @@ public sealed class AdminReceiptReviewService(
         Guid bookingId,
         CancellationToken cancellationToken = default)
     {
+        using var _ = PaymentLogScope.Begin(logger, bookingId);
+
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
         var loadResult = await LoadPendingReviewContextAsync(bookingId, cancellationToken);
@@ -139,6 +141,13 @@ public sealed class AdminReceiptReviewService(
                 "The booking was updated by another action. Please refresh and try again.");
         }
 
+        logger.LogInformation(
+            "Receipt approved for booking {BookingId} payment {PaymentId} receipt {ReceiptId} by admin {AdminId}",
+            booking.Id,
+            payment.Id,
+            receipt.Id,
+            adminId);
+
         return new AdminReceiptDecisionResponse(
             booking.Id,
             nameof(BookingStatus.Confirmed),
@@ -162,6 +171,8 @@ public sealed class AdminReceiptReviewService(
         }
 
         var domainReasonCode = MapDeclineReasonCode(request.ReasonCode);
+
+        using var _ = PaymentLogScope.Begin(logger, bookingId);
 
         await using var transaction = await dbContext.Database.BeginTransactionAsync(cancellationToken);
 
@@ -225,6 +236,13 @@ public sealed class AdminReceiptReviewService(
                 ErrorCodes.Payment.InvalidStatus,
                 "The booking was updated by another action. Please refresh and try again.");
         }
+
+        logger.LogInformation(
+            "Receipt declined for booking {BookingId} payment {PaymentId} receipt {ReceiptId} by admin {AdminId}",
+            booking.Id,
+            payment.Id,
+            receipt.Id,
+            adminId);
 
         return new AdminReceiptDecisionResponse(
             booking.Id,

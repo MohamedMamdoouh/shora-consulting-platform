@@ -7,10 +7,12 @@ Arabic-first (RTL) relationship consulting booking platform. Implementation foll
 ```text
 Shora/
 ├── specs/                # Spec-driven documentation (00–09)
+├── docs/                 # Operator runbooks (ops alerts)
 ├── src/
 │   ├── contracts/        # TypeScript API contracts
 │   ├── backend/          # .NET 10 Clean Architecture API
 │   └── frontend/         # Angular 21 app
+├── .github/workflows/    # CI (Phase 1); CD planned (spec 09)
 ├── .gitignore
 └── README.md
 ```
@@ -45,7 +47,9 @@ Default dev URLs: `https://localhost:7183` / `http://localhost:5107`
   ```
 
   Production: set `Storage:ConnectionString` and `Storage:ReceiptContainer` via `dotnet user-secrets` or environment variables (private Azure Blob container; never commit credentials).
+
 - Production secrets: use `dotnet user-secrets` or environment variables — never commit real credentials
+- Production email: configure `Email:Host`, `Email:Port`, `Email:Username`, `Email:Password`, `Email:FromAddress` (spec 08.4); when unset in non-dev environments, emails are no-ops
 
 On startup, migrations apply automatically and seed data runs idempotently:
 
@@ -83,13 +87,13 @@ Default: `http://localhost:4200` (RTL Arabic app with lazy-loaded routes)
 
 Implemented routes:
 
-| Area | Routes | Spec |
-| ---- | ------ | ---- |
-| Public | `/`, `/about`, `/services` | 03 (placeholder copy) |
-| Auth | `/auth/*` | 02 |
-| Booking | `/booking/*` | 04 |
-| Client dashboard | `/dashboard` | 06 |
-| Admin | `/admin/*` | 07 |
+| Area             | Routes                     | Spec                  |
+| ---------------- | -------------------------- | --------------------- |
+| Public           | `/`, `/about`, `/services` | 03 (placeholder copy) |
+| Auth             | `/auth/*`                  | 02                    |
+| Booking          | `/booking/*`               | 04                    |
+| Client dashboard | `/dashboard`               | 06                    |
+| Admin            | `/admin/*`                 | 07                    |
 
 API base URL: `src/environments/environment.ts` → `/api/v1` (proxied to the backend in dev — see below)
 
@@ -109,7 +113,7 @@ Same commands as [CI](.github/workflows/ci.yml) — see [spec 09](specs/09-ci-cd
 ```powershell
 cd src/backend
 dotnet build
-dotnet test
+dotnet test   # ~240 xUnit tests; requires Docker (Testcontainers)
 
 cd ../frontend
 npm ci
@@ -119,33 +123,34 @@ $env:CI = "true"; npm test
 
 ## Spec implementation roadmap
 
-| Spec | Area                                                 | Status          |
-| ---- | ---------------------------------------------------- | --------------- |
-| 00   | API conventions (Result, Problem Details, contracts) | **Done**        |
-| 01   | Project scaffold & data model                        | **Done**        |
-| 02   | Authentication (JWT, Google, refresh tokens)         | **Done**        |
+| Spec | Area                                                 | Status                                                       |
+| ---- | ---------------------------------------------------- | ------------------------------------------------------------ |
+| 00   | API conventions (Result, Problem Details, contracts) | **Done**                                                     |
+| 01   | Project scaffold & data model                        | **Done**                                                     |
+| 02   | Authentication (JWT, Google, refresh tokens)         | **Done**                                                     |
 | 03   | Public pages (Home, About, Services)                 | **Partial** (RTL pages + placeholder copy; real content TBD) |
-| 04   | Booking flow                                         | **Mostly done** (full client UI + APIs; auto-decline/auto-complete jobs in 08) |
-| 05   | Manual payments (Vodafone Cash / InstaPay receipts)  | **Done** (backend + client upload UX in 06 + admin review/refund UI in 07) |
-| 06   | Client dashboard                                     | **Done** (06a–06j) |
-| 07   | Admin dashboard                                      | **Done** (07a–07n) |
-| 08   | Cross-cutting concerns (jobs, rate limits, ops)      | **In progress** |
-| 09   | CI/CD pipeline (GitHub Actions; Azure CD later)      | **CI done** (CD planned) |
+| 04   | Booking flow                                         | **Done**                                                     |
+| 05   | Manual payments (Vodafone Cash / InstaPay receipts)  | **Done**                                                     |
+| 06   | Client dashboard                                     | **Done** (06a–06j)                                           |
+| 07   | Admin dashboard                                      | **Done** (07a–07o; ops alerts UI optional)                   |
+| 08   | Cross-cutting concerns (jobs, rate limits, ops)      | **Done** (08.1–08.9)                                         |
+| 09   | CI/CD pipeline (GitHub Actions; Azure CD later)      | **CI done** (CD planned)                                     |
 
-Implement feature specs **in order** (01–08) — each builds on the previous. Spec 09 (CI/CD) runs in parallel with feature work.
+Implement specs **01–08** in order for new features — the MVP backend and dashboards are **complete** except public-page content (03) and optional ops alerts UI. Spec 09 (CI/CD) Phase 1 is done; **Phase 2 Azure CD** is the main remaining infra item.
 
 ## Architecture (backend)
 
 ```text
 Api → Application → Domain
 Infrastructure → Application + Domain
+Contracts (shared DTOs, referenced by Api + frontend TS mirrors)
 ```
 
 - **Domain:** entities, enums, invariants (no EF/ASP.NET dependencies)
-- **Application:** use-case services, `Result` pattern, `IApplicationDbContext`, abstraction interfaces
-- **Infrastructure:** EF Core, Identity stores, seed, Azure Blob file storage (`IFileStorage`), pass-through malware scanner stub, dev logging email
-- **Contracts:** shared request/response DTOs (C# records)
-- **Api:** controllers, Problem Details, global exception handler, API versioning, DI wiring
+- **Application:** use-case services, `Result` pattern, `IApplicationDbContext`, background-job services, outbox email renderer, ops monitoring
+- **Infrastructure:** EF Core, Identity stores, seed, Azure Blob file storage (`IFileStorage`), SMTP email (`SmtpEmailSender`), pass-through malware scanner stub
+- **Contracts:** shared request/response DTOs (C# records in `Shora.Contracts`; TypeScript mirrors in `src/contracts/`)
+- **Api:** controllers, Problem Details, global exception handler, API versioning (`/api/v1/...`), rate limiting, correlation ID middleware, in-process background jobs
 
 ## Spec 05 — payment backend (complete)
 
@@ -156,9 +161,9 @@ Backend API for manual payment verification is **complete** (sub-phases 05a–05
 - Admin receipt review (SAS URLs gated on `Clean` malware scan)
 - Admin approve/decline with outbox emails
 - Manual refund record/revoke (`/api/v1/admin/payments/{id}/refunds/*`)
-- Receipt upload rate limit: 5/min/account
+- Receipt upload rate limit: 5/min/account (part of full rate-limit matrix in spec 08)
 
-**Deferred to spec 08:** blob reconciliation job for `BlobFinalizePending` rows (05h). Uploads already mark the state; repair is ops polish.
+**Blob reconciliation (05h, spec 08.6):** `ReceiptBlobReconciliationService` repairs `BlobFinalizePending`/`Missing` rows and deletes orphan `temp/` blobs.
 
 **Client payment UX (spec 06):** `/dashboard` pending cards and `/booking/payment/:id` share `PaymentInstructionsPanelComponent` (instructions, countdown, receipt upload, cancel hold).
 
@@ -185,14 +190,23 @@ Sub-phases 07a–07n:
 
 See [spec 07](specs/07-admin-dashboard.md) for full detail.
 
-## Deferred / remaining
+## Spec 08 — cross-cutting concerns (complete)
 
-- Outbox email dispatcher (spec 08) — messages enqueue but are not dispatched yet
-- Full rate-limit matrix for auth/booking endpoints (spec 08)
-- Blob reconciliation job (spec 05h → 08)
-- Cancellation-request auto-decline job (spec 08)
-- Auto-complete confirmed bookings job (spec 08)
-- Availability horizon top-up job (spec 08)
-- Refresh-token purge job (spec 08)
+Sub-phases 08.1–08.9:
+
+- **Observability:** correlation ID middleware, payment log scopes, `JobRunHistory` + job heartbeats
+- **Email:** HTML transaction templates, outbox dispatcher (8-attempt retry, dead-letter), production SMTP (`MailKit`)
+- **Background jobs:** receipt-deadline cleanup, outbox dispatcher, cancellation auto-decline, booking auto-complete, blob reconciliation, refresh-token purge, temp blob cleanup, receipt retention purge, availability top-up, ops monitoring
+- **Rate limiting:** auth, availability, booking reserve, receipt upload, cancellation request (configurable via `RateLimiting` + `ReceiptUpload`)
+- **Ops monitoring:** `OpsMonitoringService` + `GET /api/v1/admin/ops/alerts`; runbooks in [`docs/ops-runbooks.md`](docs/ops-runbooks.md)
+
+Disable background jobs in tests via `BackgroundJobs:Enabled = false`.
+
+See [spec 08](specs/08-cross-cutting-concerns.md) for intervals, thresholds, and deployment notes.
+
+## Remaining / out of scope (MVP)
+
 - Public pages real content and polish (spec 03)
 - Azure CD deploy workflow (spec 09 Phase 2)
+- Full APM / WAF (spec 08 out of scope)
+- Admin ops alerts UI on frontend (API exists; dashboard wiring optional)

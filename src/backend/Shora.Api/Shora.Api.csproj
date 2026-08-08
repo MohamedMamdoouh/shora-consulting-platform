@@ -18,4 +18,8 @@
     <ProjectReference Include="..\Shora.Infrastructure\Shora.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Shora.Tests" />
+  </ItemGroup>
+
 </Project>

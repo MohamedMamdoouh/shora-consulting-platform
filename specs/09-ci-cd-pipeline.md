@@ -17,13 +17,22 @@ This spec defines how Shora is built, validated, and (later) deployed. It comple
 - **Triggers (Phase 1 CI):**
   - `push` to `main`
   - `pull_request` targeting `main`
-- **Path filters:** backend job runs only when `src/backend/`** or the CI workflow changes; frontend job runs only when `src/frontend/**` or the CI workflow changes. Reduces runner minutes on monorepo edits.
+- **Path filters:** backend job runs when `src/backend/**` or `.github/workflows/**` changes; frontend job when `src/frontend/**` or workflows change (via `dorny/paths-filter@v3` in the `changes` job). Reduces runner minutes on monorepo edits outside those trees.
 
 ## 3. Phase 1 — CI
 
 Workflow file: `[.github/workflows/ci.yml](../.github/workflows/ci.yml)`
 
-Two **parallel** jobs — no secrets required; read-only `contents` permission.
+Three jobs — a **change-detection** gate plus two **parallel** build/test jobs. No secrets required; read-only `contents` permission.
+
+### 3.0 Change detection job
+
+| Step        | Action / detail                                                                 |
+| ----------- | ------------------------------------------------------------------------------- |
+| Checkout    | `actions/checkout@v4`                                                           |
+| Path filter | `dorny/paths-filter@v3` — outputs `backend`, `frontend`, `workflows` booleans |
+
+Backend and frontend jobs run only when their paths (or `.github/workflows/**`) change. Docs/specs-only edits skip the affected job(s).
 
 ### 3.1 Backend job
 
@@ -35,7 +44,7 @@ Two **parallel** jobs — no secrets required; read-only `contents` permission.
 | Build      | `dotnet build --no-restore`                            |
 | Test       | `dotnet test --no-build --verbosity normal`            |
 
-- **~20 xUnit tests** in `Shora.Tests` (SQL Server via Testcontainers — Docker required on the runner).
+- **~240 xUnit tests** in `Shora.Tests` (59 test classes; SQL Server via Testcontainers — Docker required on the runner).
 - **Cache:** NuGet packages via `setup-dotnet` cache.
 
 ### 3.2 Frontend job
@@ -64,13 +73,13 @@ Two **parallel** jobs — no secrets required; read-only `contents` permission.
 
 Planned workflow: `.github/workflows/deploy.yml` (separate from CI).
 
-| Concern           | Design                                                                                                        |
-| ----------------- | ------------------------------------------------------------------------------------------------------------- |
-| **Environments**  | GitHub Environments: `staging`, `production` (production requires manual approval / reviewers)                |
-| **Triggers**      | `workflow_dispatch` for staging; tag `v`\* (semver) for production — not auto-deploy on every merge to `main` |
-| **Build**         | `npm run build` → copy Angular output into API `wwwroot` → `dotnet publish`                                   |
+| Concern           | Design                                                                                                                                                                                                       |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Environments**  | GitHub Environments: `staging`, `production` (production requires manual approval / reviewers)                                                                                                               |
+| **Triggers**      | `workflow_dispatch` for staging; tag `v`\* (semver) for production — not auto-deploy on every merge to `main`                                                                                                |
+| **Build**         | `npm run build` → copy Angular output into API `wwwroot` → `dotnet publish`                                                                                                                                  |
 | **Deploy target** | Azure App Service (Linux, .NET 10, always-on, **instance count = 1**, no autoscaling rule — background jobs run in-process, spec 08 #3). No load balancer or traffic manager in front of multiple instances. |
-| **Secrets**       | App Service application settings or Azure Key Vault references — never in repo                                |
+| **Secrets**       | App Service application settings or Azure Key Vault references — never in repo                                                                                                                               |
 
 ### Deploy sequence (planned)
 
@@ -84,10 +93,10 @@ Planned workflow: `.github/workflows/deploy.yml` (separate from CI).
 
 Cross-ref [spec 08 #4](08-cross-cutting-concerns.md). Required before Phase 2:
 
-| Resource               | Purpose                                                         |
-| ---------------------- | --------------------------------------------------------------- |
-| **Azure App Service**  | Host .NET 10 API + static Angular (always-on, single instance) |
-| **Azure SQL**          | Production database                                             |
+| Resource               | Purpose                                                                                                         |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------- |
+| **Azure App Service**  | Host .NET 10 API + static Angular (always-on, single instance)                                                  |
+| **Azure SQL**          | Production database                                                                                             |
 | **Azure Blob Storage** | Private receipt container (`Storage:ReceiptContainer`, spec 05) — **implemented**; provision account for deploy |
 
 ### Application settings / secrets (production)

@@ -1,19 +1,16 @@
-using System.Collections.Concurrent;
 using System.Net;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using Microsoft.Extensions.Options;
 using Shora.Application.Options;
 
 namespace Shora.Application.Email;
 
-public sealed partial class EmailTemplateService(IOptions<EmailBrandOptions> brandOptions) : IEmailTemplateService
+public sealed class EmailTemplateService(IOptions<EmailBrandOptions> brandOptions) : IEmailTemplateService
 {
     private const string ResourcePrefix = "Shora.Application.Email.Templates.";
     private const string LayoutTemplate = "_layout.html";
 
     private static readonly Assembly TemplateAssembly = typeof(EmailTemplateService).Assembly;
-    private static readonly ConcurrentDictionary<string, string> TemplateCache = new(StringComparer.Ordinal);
 
     private readonly EmailBrandOptions _brand = brandOptions.Value;
 
@@ -24,11 +21,14 @@ public sealed partial class EmailTemplateService(IOptions<EmailBrandOptions> bra
         return ReplaceTokens(LoadTemplate(LayoutTemplate), tokens);
     }
 
+    internal static string RenderFragment(string templatePath, IReadOnlyDictionary<string, string> tokens) =>
+        ReplaceTokens(LoadTemplate(templatePath), tokens);
+
     private Dictionary<string, string> BuildTokens(EmailTemplateRequest request)
     {
         var brandName = HtmlEncode(_brand.BrandName);
 
-        return new Dictionary<string, string>(StringComparer.Ordinal)
+        var tokens = new Dictionary<string, string>(StringComparer.Ordinal)
         {
             ["RecipientName"] = HtmlEncode(request.RecipientName),
             ["BrandName"] = brandName,
@@ -40,37 +40,37 @@ public sealed partial class EmailTemplateService(IOptions<EmailBrandOptions> bra
             ["BrandHeader"] = $"""<p style="margin:0;font-size:20px;font-weight:700;color:#b85c38;">{brandName}</p>""",
             ["Year"] = DateTime.UtcNow.Year.ToString()
         };
+
+        if (request.AdditionalTokens is not null)
+        {
+            foreach (var (key, value) in request.AdditionalTokens)
+            {
+                tokens[key] = value;
+            }
+        }
+
+        return tokens;
     }
 
     private static string LoadTemplate(string templatePath)
     {
-        var resourceKey = templatePath.Replace('/', '.').Replace('\\', '.');
-        return TemplateCache.GetOrAdd(resourceKey, static key =>
-        {
-            var resourceName = ResourcePrefix + key;
-            using var stream = TemplateAssembly.GetManifestResourceStream(resourceName)
-                ?? throw new InvalidOperationException($"Email template '{key}' was not found.");
+        var resourceName = ResourcePrefix + templatePath.Replace('/', '.').Replace('\\', '.');
+        using var stream = TemplateAssembly.GetManifestResourceStream(resourceName)
+            ?? throw new InvalidOperationException($"Email template '{templatePath}' was not found.");
 
-            using var reader = new StreamReader(stream);
-            return reader.ReadToEnd();
-        });
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd();
     }
 
-    private static string ReplaceTokens(string template, IReadOnlyDictionary<string, string> tokens) =>
-        PlaceholderPattern().Replace(template, match =>
+    private static string ReplaceTokens(string template, IReadOnlyDictionary<string, string> tokens)
+    {
+        foreach (var (key, value) in tokens)
         {
-            var name = match.Groups[1].Value;
-            if (!tokens.TryGetValue(name, out var value))
-            {
-                throw new InvalidOperationException(
-                    $"Email template placeholder '{{{{{name}}}}}' has no replacement value.");
-            }
+            template = template.Replace($"{{{{{key}}}}}", value, StringComparison.Ordinal);
+        }
 
-            return value;
-        });
+        return template;
+    }
 
     private static string HtmlEncode(string value) => WebUtility.HtmlEncode(value);
-
-    [GeneratedRegex(@"\{\{([A-Za-z][A-Za-z0-9_]*)\}\}")]
-    private static partial Regex PlaceholderPattern();
 }

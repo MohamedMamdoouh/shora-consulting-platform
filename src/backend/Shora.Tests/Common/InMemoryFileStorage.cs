@@ -44,6 +44,9 @@ public sealed class InMemoryFileStorage : IFileStorage
         return Task.CompletedTask;
     }
 
+    public Task<bool> ExistsAsync(string blobPath, CancellationToken cancellationToken = default) =>
+        Task.FromResult(_blobs.ContainsKey(blobPath));
+
     public Task<int> DeleteBlobsWithPrefixOlderThanAsync(
         string prefix,
         TimeSpan maxAge,

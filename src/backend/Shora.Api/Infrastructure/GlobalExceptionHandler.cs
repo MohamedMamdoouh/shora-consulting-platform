@@ -20,9 +20,12 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
         Exception exception,
         CancellationToken cancellationToken)
     {
-        _logger.LogError(exception, "Unhandled exception for {Method} {Path}",
+        _logger.LogError(
+            exception,
+            "Unhandled exception for {Method} {Path} (CorrelationId: {CorrelationId})",
             httpContext.Request.Method,
-            httpContext.Request.Path);
+            httpContext.Request.Path,
+            httpContext.GetCorrelationId() ?? "unknown");
 
         var problem = new ProblemDetails
         {

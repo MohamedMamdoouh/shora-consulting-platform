@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Shora.Application.Abstractions;
 using Shora.Application.Bookings;
@@ -22,7 +23,8 @@ public sealed class ReceiptUploadService(
     IDateTimeProvider dateTimeProvider,
     BookingTransitionHelper transitionHelper,
     ReceiptAntiReplayChecker antiReplayChecker,
-    IOptions<ReceiptUploadOptions> receiptUploadOptions)
+    IOptions<ReceiptUploadOptions> receiptUploadOptions,
+    ILogger<ReceiptUploadService> logger)
 {
     public async Task<Result<UploadReceiptResponse>> UploadAsync(
         Guid clientId,
@@ -35,6 +37,7 @@ public sealed class ReceiptUploadService(
         string? senderReference,
         CancellationToken cancellationToken = default)
     {
+        using var _ = PaymentLogScope.Begin(logger, bookingId);
         ArgumentNullException.ThrowIfNull(content);
 
         var maxSizeBytes = receiptUploadOptions.Value.MaxSizeBytes;
@@ -202,6 +205,12 @@ public sealed class ReceiptUploadService(
                 receipt.BlobState = BlobState.BlobFinalizePending;
                 await dbContext.SaveChangesAsync(cancellationToken);
             }
+
+            logger.LogInformation(
+                "Receipt uploaded for booking {BookingId} payment {PaymentId} receipt {ReceiptId}",
+                booking.Id,
+                payment.Id,
+                receipt.Id);
 
             return new UploadReceiptResponse(
                 receipt.Id,

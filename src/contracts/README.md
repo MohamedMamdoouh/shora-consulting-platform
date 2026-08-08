@@ -20,4 +20,6 @@ This keeps the frontend and backend aligned without code generation for MVP.
 
 **Availability (spec 07):** `availability.ts` includes admin window CRUD types (`AvailabilityWindow`, `CreateAvailabilityWindowRequest`, `UpdateAvailabilityWindowRequest`) and blocked-date types.
 
+**Ops (spec 08):** `GET /api/v1/admin/ops/alerts` is implemented (`AdminOpsAlertDto`, `AdminOpsAlertsResponse` in `Shora.Contracts.Ops`). TypeScript mirror not yet added — add `ops.ts` under `src/contracts/` when the admin UI consumes alerts.
+
 `ProblemDetails` in `common.ts` documents the RFC 7807 error JSON shape (ASP.NET framework type, not a C# Contracts record). `error-codes.ts` mirrors `Shora.Application.Common.ErrorCodes`.

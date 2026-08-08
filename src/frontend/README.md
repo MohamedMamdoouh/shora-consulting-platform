@@ -40,6 +40,8 @@ Open `http://localhost:4200/`. The dev server proxies `/api` to the backend (`pr
 - **Bookings** — filters, pagination, receipt review, cancellation queue, direct cancel, refund record/revoke
 - **Earnings** — gross / refunded / net summary with date filters
 
+**Not yet wired:** `GET /api/v1/admin/ops/alerts` (spec 08) — backend API exists; no admin UI page yet.
+
 Admin HTTP services live under `src/app/core/admin/`.
 
 ## Build & test

@@ -1,4 +1,5 @@
 using Shora.Api;
+using Shora.Api.Middleware;
 using Shora.Application.Options;
 using Shora.Infrastructure;
 
@@ -17,13 +18,15 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseCors(CorsOptions.PolicyName);
-app.UseOutputCache();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseAuthRateLimitEmail();
 app.UseRateLimiter();
+app.UseOutputCache();
 app.MapControllers();
 
 await app.Services.InitializeDatabaseAsync();

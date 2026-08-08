@@ -1,6 +1,6 @@
 # 02 — Authentication (Client + Admin)
 
-Status: **Implemented** — JWT access tokens, HTTP-only refresh cookies, email verification, Google sign-in, password reset, and Admin role gating for `/admin/*` endpoints.
+Status: **Implemented** — JWT access tokens, HTTP-only refresh cookies, email verification, Google sign-in, password reset, Admin role gating for `/admin/*` endpoints, and auth rate limits (spec 08).
 
 ## 1. Approach
 

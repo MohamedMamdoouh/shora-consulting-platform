@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using Shora.Api.Infrastructure;
 using Shora.Application.Abstractions;
 using Shora.Application.Common;
 using Shora.Application.Common.Results;
@@ -18,6 +20,7 @@ public sealed class BookingsController(
     ICurrentUser currentUser) : ApiControllerBase
 {
     [HttpPost]
+    [EnableRateLimiting(RateLimitPolicies.BookingReserve)]
     [EndpointName("Bookings.Reserve")]
     [EndpointSummary("Reserve an availability slot and create a pending-payment booking")]
     [ProducesResponseType(typeof(ReserveBookingResponse), StatusCodes.Status200OK)]
@@ -25,6 +28,7 @@ public sealed class BookingsController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> Reserve(
         CreateBookingRequest request,
         CancellationToken cancellationToken)
@@ -110,6 +114,7 @@ public sealed class BookingsController(
     }
 
     [HttpPost("{id:guid}/cancellation-requests")]
+    [EnableRateLimiting(RateLimitPolicies.CancellationRequest)]
     [EndpointName("Bookings.RequestCancellation")]
     [EndpointSummary("Request cancellation of a confirmed booking")]
     [ProducesResponseType(typeof(CancellationRequestResponse), StatusCodes.Status200OK)]
@@ -117,6 +122,7 @@ public sealed class BookingsController(
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> RequestCancellation(
         Guid id,
         CancellationRequestBody body,

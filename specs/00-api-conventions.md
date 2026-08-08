@@ -58,8 +58,8 @@ MVP uses **in-process memory caching** on the single app instance. Application s
 
 | Endpoint | App cache key | Output cache policy | Default TTL |
 |---|---|---|---|
-| `GET /api/settings/public` | `settings:public` | `PublicSettings` | 5 min |
-| `GET /api/availability?from=&to=` | `availability:{from}:{to}` | `PublicAvailability` | 30 sec |
+| `GET /api/v1/settings/public` | `settings:public` | `PublicSettings` | 5 min |
+| `GET /api/v1/availability?from=&to=` | `availability:{from}:{to}` | `PublicAvailability` | 30 sec |
 
 **Never cache:** auth endpoints, user-specific lists (`/bookings/mine`), admin paginated queries, payment/receipt flows, or external token validation.
 
@@ -87,7 +87,7 @@ Constants live in `Shora.Application.Common` (`CacheKeys`, `CachePolicies`, `Cac
 | Booking hold/create/cancel, slot freed | `InvalidateAvailabilityAsync()` |
 | Admin blocks date / changes availability windows | `InvalidateAvailabilityAsync()` |
 
-Hook invalidation into mutation paths when those features are implemented. `SettingsService.InvalidateCacheAsync()` is the placeholder for admin settings save.
+Hook invalidation into mutation paths on admin settings save, booking reserve/cancel/hold release, and admin availability/blocked-date changes. `SettingsService`, booking services, and admin availability services call `ICacheInvalidator` after successful commits.
 
 ### Controller usage
 

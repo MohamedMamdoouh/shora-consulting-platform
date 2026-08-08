@@ -1,6 +1,6 @@
 ﻿# 05 — Manual Payment Verification (Vodafone Cash / InstaPay)
 
-Status: **Done (backend 05a–05g; client UI in spec 06; admin UI in spec 07).** **Blob reconciliation job (05h) is deferred to [spec 08](08-cross-cutting-concerns.md)** — uploads already mark `BlobFinalizePending` on post-commit finalize failure; repair is an ops job, not a payment-loop blocker.
+Status: **Done (backend 05a–05h; client UI in spec 06; admin UI in spec 07).** Blob reconciliation (05h) is implemented in [spec 08](08-cross-cutting-concerns.md) as `ReceiptBlobReconciliationService`.
 
 ### Implementation status (backend)
 
@@ -13,7 +13,7 @@ Status: **Done (backend 05a–05g; client UI in spec 06; admin UI in spec 07).**
 | 05e | SHA-256 duplicate-hash warnings, receipt upload rate limit (5/min/account) | **Done** |
 | 05f | `IMalwareScanner` stub; admin SAS URLs only when scan `Clean` | **Done** |
 | 05g | `POST …/refunds/record` and `…/refunds/revoke` (idempotent record) | **Done** |
-| 05h | Blob reconciliation job (`BlobFinalizePending`, orphan temps) | **Deferred → spec 08** |
+| 05h | Blob reconciliation job (`BlobFinalizePending`, orphan temps) | **Done** (spec 08.6) |
 
 **Implemented endpoints:** `GET /api/v1/bookings/{id}/payment-instructions`, `POST /api/v1/payments/{bookingId}/receipt`, `GET /api/v1/admin/bookings/{id}/receipts`, `POST /api/v1/admin/bookings/{id}/receipts/approve`, `POST /api/v1/admin/bookings/{id}/receipts/decline`, `POST /api/v1/admin/payments/{id}/refunds/record`, `POST /api/v1/admin/payments/{id}/refunds/revoke`.
 

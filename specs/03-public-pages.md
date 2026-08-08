@@ -32,7 +32,7 @@ Sections (Arabic, RTL, placeholder copy until real content is provided):
 
 ## 5. Shared Public API
 
-**Endpoint**: `GET /api/settings/public` (no auth) — returns `{ sessionPrice, sessionDurationMinutes }` so the Home/Services pages and booking flow always reflect the current admin-configured price/duration without redeploying the frontend.
+**Endpoint**: `GET /api/v1/settings/public` (no auth) — returns `{ sessionPrice, sessionDurationMinutes }` so the Home/Services pages and booking flow always reflect the current admin-configured price/duration without redeploying the frontend.
 
 ## 6. Non-Functional Notes (from SDD #6)
 

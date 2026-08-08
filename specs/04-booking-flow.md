@@ -1,6 +1,6 @@
 ﻿# 04 — Booking Flow
 
-Status: **Mostly implemented.** Client booking flow UI (slot → delivery → phone → review → payment), reserve/cancel-hold/cancellation-request APIs, receipt-upload deadline cleanup, and client dashboard are complete (specs 04/06). Admin cancel and cancellation approve/decline are complete (spec 07). **Remaining:** cancellation-request auto-decline and auto-complete background jobs (spec 08).
+Status: **Done.** Client booking flow UI, reserve/cancel-hold/cancellation-request APIs, receipt-upload deadline cleanup, lifecycle background jobs (auto-decline, auto-complete), and client dashboard are complete (specs 04/06/08). Admin cancel and cancellation approve/decline are complete (spec 07).
 
 ## 1. Flow Overview (per SDD #8, flow 1)
 

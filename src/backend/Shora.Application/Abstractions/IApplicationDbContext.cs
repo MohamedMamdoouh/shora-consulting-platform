@@ -32,5 +32,7 @@ public interface IApplicationDbContext
 
     DbSet<RefreshToken> RefreshTokens { get; }
 
+    DbSet<JobRunHistory> JobRunHistories { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

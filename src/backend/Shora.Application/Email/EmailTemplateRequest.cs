@@ -7,4 +7,5 @@ public sealed record EmailTemplateRequest(
     string ActionUrl,
     string ActionLabel,
     string RecipientName,
-    string FooterNote);
+    string FooterNote,
+    IReadOnlyDictionary<string, string>? AdditionalTokens = null);

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Shora.Application.Abstractions;
 using Shora.Application.Common;
 using Shora.Application.Common.Results;
@@ -11,7 +12,8 @@ namespace Shora.Application.Services;
 
 public sealed class AdminRefundService(
     IApplicationDbContext dbContext,
-    IDateTimeProvider dateTimeProvider)
+    IDateTimeProvider dateTimeProvider,
+    ILogger<AdminRefundService> logger)
 {
     public async Task<Result<PaymentRefundResponse>> RecordRefundAsync(
         Guid adminId,
@@ -53,6 +55,8 @@ public sealed class AdminRefundService(
             return Error.NotFound(ErrorCodes.Booking.NotFound, "Booking was not found.");
         }
 
+        using var _ = PaymentLogScope.Begin(logger, booking.Id, payment.Id);
+
         if (payment.Status == PaymentStatus.Refunded)
         {
             await transaction.RollbackAsync(cancellationToken);
@@ -79,6 +83,12 @@ public sealed class AdminRefundService(
 
         await dbContext.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
+
+        logger.LogInformation(
+            "Refund recorded for booking {BookingId} payment {PaymentId} by admin {AdminId}",
+            booking.Id,
+            payment.Id,
+            adminId);
 
         return MapResponse(payment);
     }
@@ -113,6 +123,18 @@ public sealed class AdminRefundService(
             return Error.NotFound(ErrorCodes.Payment.NotFound, "Payment was not found.");
         }
 
+        var booking = await dbContext.Bookings
+            .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.Id == payment.BookingId, cancellationToken);
+
+        if (booking is null)
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            return Error.NotFound(ErrorCodes.Booking.NotFound, "Booking was not found.");
+        }
+
+        using var _ = PaymentLogScope.Begin(logger, booking.Id, payment.Id);
+
         if (payment.Status != PaymentStatus.Refunded)
         {
             await transaction.RollbackAsync(cancellationToken);
@@ -137,6 +159,12 @@ public sealed class AdminRefundService(
 
         await dbContext.SaveChangesAsync(cancellationToken);
         await transaction.CommitAsync(cancellationToken);
+
+        logger.LogInformation(
+            "Refund revoked for booking {BookingId} payment {PaymentId} by admin {AdminId}",
+            booking.Id,
+            payment.Id,
+            adminId);
 
         return MapResponse(payment);
     }

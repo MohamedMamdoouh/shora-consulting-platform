@@ -1,6 +1,6 @@
 # 01 — Project Scaffold & Data Model
 
-**Status: Implemented** (2026-07-06). Backend scaffold, data model, initial migration, seed, Angular RTL shell, and smoke tests are in place. Feature specs 02–07 build on this foundation.
+**Status: Implemented** (foundation 2026-07-06; extended through 2026-08). Backend scaffold, data model, migrations, seed, Angular RTL shell, and the full MVP stack (specs 02–08) are in place on this foundation. Remaining MVP gaps: public-page real content (03) and Azure CD (09 Phase 2).
 
 ## 1. Architecture: Pragmatic Clean Architecture
 
@@ -26,17 +26,21 @@ flowchart LR
 
 ```
 Shora/
-├── specs/                          # Spec-driven documentation (01–08)
+├── specs/                          # Spec-driven documentation (00–09)
+├── docs/                           # Operator runbooks (ops alerts, spec 08)
 ├── src/
+│   ├── contracts/                  # TypeScript mirrors of Shora.Contracts
 │   ├── frontend/                   # Angular 21 (standalone, RTL Arabic shell)
 │   │
 │   └── backend/                    # .NET 10 solution
 │       ├── Shora.slnx
 │       ├── Shora.Domain/           # Entities, enums, domain rules. No external dependencies.
-│       ├── Shora.Application/      # Use-case service stubs, abstraction interfaces, DTOs (later specs)
-│       ├── Shora.Infrastructure/   # EF Core DbContext + migrations, seed, stub email/file providers
-│       ├── Shora.Api/              # ASP.NET Core Web API: controllers, DI wiring, Identity registration
-│       └── Shora.Tests/            # xUnit smoke tests
+│       ├── Shora.Application/      # Use-case services, abstraction interfaces, options, email templates
+│       ├── Shora.Contracts/        # Shared request/response records (no dependencies)
+│       ├── Shora.Infrastructure/   # EF Core DbContext + migrations, seed, Azure Blob, SMTP email
+│       ├── Shora.Api/              # ASP.NET Core Web API: controllers, jobs, rate limiting, middleware
+│       └── Shora.Tests/            # xUnit integration + unit tests (~240 methods)
+├── .github/workflows/              # CI (spec 09 Phase 1)
 ├── .gitignore
 └── README.md
 ```
@@ -60,17 +64,16 @@ Rationale: this keeps external, swappable concerns (payments, email) behind inte
   - Use-case services: `BookingService`, `PaymentService` (receipt upload + admin approve/decline + manual refund), `CancellationService` (cancellation requests + decisions), `AvailabilityService`, `SettingsService`, `AuthService` (orchestration around Identity).
   - Abstraction interfaces (implemented by Infrastructure): `IApplicationDbContext`, `IFileStorage` (stores receipt images in a private blob container, issues short-lived read URLs), `IEmailSender`, `IDateTimeProvider` (so time-based logic like the upload deadline and cancellation auto-decline is testable), `ICurrentUser` (resolves the authenticated user id/role).
   - Request/response DTOs and validation (e.g. FluentValidation or DataAnnotations).
-- **Infrastructure** — concrete implementations (spec 01 scope):
-  - `ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>` implementing `IApplicationDbContext`; fluent entity configurations in `Data/Configurations/`; initial migration `20260706205915_InitialCreate`.
+- **Infrastructure** — concrete implementations:
+  - `ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>` implementing `IApplicationDbContext`; fluent entity configurations in `Data/Configurations/`; migrations through `20260806084352_AddJobRunHistory` (see #5).
   - `SystemDateTimeProvider : IDateTimeProvider` — live UTC clock.
-  - `NoOpEmailSender : IEmailSender` — stub; real SMTP in spec 02/08.
-  - `NotImplementedFileStorage : IFileStorage` — used when `Storage:ConnectionString` is unset; configure storage or use Azurite in dev (see README).
-  - `AzureBlobFileStorage : IFileStorage` — production/dev implementation (spec 05a).
+  - `SmtpEmailSender : IEmailSender` — production SMTP via MailKit (spec 08.4); dev falls back to logging when `Email:Host` is unset.
+  - `AzureBlobFileStorage : IFileStorage` — receipt blob storage (spec 05a); `NotImplementedFileStorage` when `Storage:ConnectionString` is unset.
   - `PassThroughMalwareScanner : IMalwareScanner` — dev stub; replace in staging/prod (spec 05f).
-  - `HttpContextCurrentUser : ICurrentUser` — minimal; full auth wiring in spec 02.
+  - `HttpContextCurrentUser : ICurrentUser` — resolves authenticated user id/role (spec 02).
   - `DatabaseSeeder` — idempotent seed for roles, singleton `Settings`, and admin user from config.
-  - **Deferred to later specs:** `BlobFileStorage`, real `EmailSender`, and all background jobs (receipt-deadline cleanup, cancellation auto-decline, auto-complete, slot top-up, refresh-token purge, outbox dispatcher — see spec 08).
-- **Api** — ASP.NET Core Web API, Controllers (not minimal APIs). OpenAPI enabled in Development (`/openapi/v1.json`). Identity registered here; JWT auth stubbed (spec 02). `GET /api/health` validates the scaffold. Controllers for booking, payments, etc. are added in specs 04–07.
+- **Contracts** — `Shora.Contracts` records for all public API DTOs; mirrored manually in `src/contracts/` (spec 00).
+- **Api** — ASP.NET Core Web API (controllers, not minimal APIs). OpenAPI in Development (`/openapi/v1.json`). JWT + refresh cookies (spec 02), rate limiting + correlation ID middleware (spec 08), in-process background jobs (spec 08). `GET /api/v1/health` returns `{ status, timestampUtc }`. Feature controllers cover auth, availability, bookings, payments, admin settings/availability/bookings/earnings/ops (specs 02–08).
 
 ### 2.2 Configuration
 
@@ -82,6 +85,10 @@ Rationale: this keeps external, swappable concerns (payments, email) behind inte
   - `Email:*` — provider/SMTP settings for `EmailSender` (password reset + all client/admin notifications). Email is the only notification channel; no SMS.
   - `AdminSeed:Email`, `AdminSeed:Password` — seeded admin user (dev via `appsettings.Development.json`; production via secrets)
   - `Seed:ConsultantWhatsAppNumber`, `Seed:VodafoneCashNumber`, `Seed:InstaPayHandle`, `Seed:PaymentInstructions` — defaults for the singleton `Settings` row on first run
+  - `BackgroundJobs:*` — enable/disable in-process jobs and per-job intervals (spec 08; set `Enabled = false` in tests)
+  - `RateLimiting:*`, `ReceiptUpload:RateLimitPerMinute` — auth, availability, booking, receipt, cancellation limits (spec 08)
+  - `OpsMonitoring:*` — alert thresholds for pending approval, refund-due ageing, job heartbeats, outbox dead-letters (spec 08)
+  - `Cache:*` — in-process cache TTLs for public settings and availability (spec 00)
 
 ## 3. Frontend Scaffold
 
@@ -97,12 +104,12 @@ Rationale: this keeps external, swappable concerns (payments, email) behind inte
   ├── public/            # Home, About, Services (spec 03 — placeholder copy)
   ├── booking/           # Slot picker, delivery, review, payment instructions (spec 04)
   ├── client-dashboard/  # Full client dashboard (spec 06 — done)
-  ├── admin-dashboard/   # Lazy route stub → spec 07
+  ├── admin-dashboard/   # Admin shell + settings, availability, bookings, earnings (spec 07 — done)
   └── auth/              # Login, signup, verify, reset (spec 02)
   ```
 - **Localization/RTL**: `<html lang="ar" dir="rtl">` in `index.html`; Arabic-friendly font stack in global `styles.scss`; no i18n library (Arabic-only site).
 - **Styling**: CSS custom properties in `styles.scss` (warm palette: `--color-primary`, `--color-background`, spacing, radius). Component-level SCSS elsewhere.
-- **Routing**: lazy-loaded feature routes via `app.routes.ts`; API base URL in `src/environments/environment.ts` → `https://localhost:7183/api`.
+- **Routing**: lazy-loaded feature routes via `app.routes.ts`; API base URL in `src/environments/environment.ts` → `/api/v1` (dev proxy to backend — see README).
 
 ## 4. Data Model (detailed)
 
@@ -336,9 +343,26 @@ These are enforced in domain/application guards and validated in tests:
 
 Any side effect that must be reliable (emails, future integrations) is written as an `OutboxMessage` **in the same DB transaction** as the state transition that triggered it. A background dispatcher job sends and marks processed with retry/backoff. **Dead-letter policy:** after 8 failed attempts (exponential backoff, ~last attempt ≈ 24h after creation) the message is marked `DeadLettered`, an alert fires (spec 08 #2), and it is only retried again by explicit admin/operator action — a permanently broken message can never wedge the dispatcher or retry forever.
 
+### `JobRunHistory` (background-job heartbeats — spec 08)
+
+| Field             | Type        | Notes                                                                 |
+| ----------------- | ----------- | --------------------------------------------------------------------- |
+| JobName           | `string`    | PK — matches `BackgroundJobNames` constants                           |
+| LastSuccessAtUtc  | `DateTime?` | UTC of the last successful run                                        |
+| LastFailureAtUtc  | `DateTime?` | UTC of the last failed run                                            |
+| LastError         | `string?`   | Last failure detail (truncated in logs; full text stored for ops)     |
+
+Updated by `JobHeartbeatService` after each background job run. `OpsMonitoringService` alerts when heartbeats go stale or `LastFailureAtUtc > LastSuccessAtUtc`. Added in migration `20260806084352_AddJobRunHistory`.
+
 ## 5. Migrations & Seed Data
 
-- **Initial migration** (`Shora.Infrastructure/Data/Migrations/20260706205915_InitialCreate`) creates Identity tables + all domain tables above, including:
+- **Migrations** (applied automatically on startup via `InitializeDatabaseAsync`):
+  - `20260706205915_InitialCreate` — Identity + all domain tables, indexes, `Settings` singleton constraint
+  - `20260706221230_FixSettingsSingletonId`, `20260706231838_SimplifyBookingSlotUniqueIndex`
+  - `20260709132945_SyncPendingModelChanges`, `20260712142357_RenameIdentityTables`
+  - `20260801004727_AddPaymentReceiptReviewWarnings`
+  - `20260806084352_AddJobRunHistory` — ops heartbeat table (spec 08)
+- **Initial schema highlights:**
   - Unique indexes: `AvailabilitySlot.StartTime`, `Payment.BookingId`, `CancellationRequest.BookingId`, `OutboxMessage.IdempotencyKey`, `RefreshToken.TokenHash`
   - Filtered unique index on `Booking(AvailabilitySlotId) WHERE AvailabilitySlotId IS NOT NULL`
   - Filtered unique index on `AvailabilitySlot(BookingId) WHERE BookingId IS NOT NULL`
@@ -346,6 +370,7 @@ Any side effect that must be reliable (emails, future integrations) is written a
   - `CHECK (Id = 1)` constraint on `Settings`
   - `Booking.RowVersion` concurrency token
   - `BookingStatusAudit`, `CancellationRequest`, `PaymentReceipt`, `RefreshToken`, and `OutboxMessage` tables
+  - `JobRunHistory` table (added in `AddJobRunHistory`)
   - No payment-gateway columns (`Payment` has no provider/order/transaction fields)
 - **Admin FK delete behavior:** SQL Server cascade-path constraints require `ON DELETE NO ACTION` (not `SET NULL`) on optional admin-user FKs (`Payment.RefundedByAdminId`, `PaymentReceipt.ReviewedByAdminId`, etc.).
 - **Apply migrations:** `dotnet ef database update --project Shora.Infrastructure --startup-project Shora.Api`. On startup, `InitializeDatabaseAsync()` auto-applies pending migrations and runs seed.
@@ -359,15 +384,15 @@ Any side effect that must be reliable (emails, future integrations) is written a
 | Check                 | Command / endpoint                                           |
 | --------------------- | ------------------------------------------------------------ |
 | Backend build         | `dotnet build` in `src/backend`                              |
-| Tests (6 smoke tests) | `dotnet test` — model, seed, filtered index, health endpoint |
+| Tests                 | `dotnet test` — ~240 xUnit methods across integration + unit (Docker required for Testcontainers SQL Server) |
 | Database              | `dotnet ef database update` or API startup auto-migrate      |
-| Health                | `GET /api/health` → `{ status: "healthy", timestampUtc }`    |
+| Health                | `GET /api/v1/health` → `{ status: "healthy", timestampUtc }` |
 | OpenAPI (dev)         | `/openapi/v1.json`                                           |
 | Frontend build        | `npm run build` in `src/frontend`                            |
 | Frontend dev          | `npm start` → RTL Arabic shell at `http://localhost:4200`    |
 
 **Namespaces:** all C# code uses the `Shora.`\* root namespace (`Shora.Domain`, `Shora.Application`, `Shora.Infrastructure`, `Shora.Api`).
 
-**Deferred to later specs:** public pages real content and polish (03); outbox dispatcher, cancellation auto-decline, auto-complete, availability top-up, full rate-limit matrix, blob reconciliation job (05h → 08); Azure CD (09).
+**Deferred:** public pages real content and polish (03); Azure CD (09 Phase 2); admin ops alerts UI (API done — spec 08).
 
-**Done elsewhere:** auth (02); client dashboard (06); admin dashboard UI + APIs (07); core booking reserve/cancel-hold/list-mine/cancellation-request API (04); client booking flow UI (04); manual payment verification backend (05a–05g); receipt upload rate limit (05e, partial 08); receipt retention + temp blob cleanup jobs (08 partial).
+**Done on this foundation:** auth (02); booking flow + lifecycle jobs (04, 08); manual payments (05); client dashboard (06); admin dashboard (07); cross-cutting — outbox dispatcher, all background jobs, rate limits, ops monitoring (08); CI pipeline (09 Phase 1).

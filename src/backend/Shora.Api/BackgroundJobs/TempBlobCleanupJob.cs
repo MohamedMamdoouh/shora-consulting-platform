@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using Shora.Application.Common;
 using Shora.Application.Options;
 using Shora.Application.Services;
 
@@ -19,31 +20,16 @@ public sealed class TempBlobCleanupJob(
 
         var interval = TimeSpan.FromSeconds(options.Value.TempBlobCleanupIntervalSeconds);
 
-        while (!stoppingToken.IsCancellationRequested)
-        {
-            try
+        await BackgroundJobHost.RunPeriodicAsync(
+            scopeFactory,
+            logger,
+            BackgroundJobNames.TempBlobCleanup,
+            interval,
+            async (provider, cancellationToken) =>
             {
-                await using var scope = scopeFactory.CreateAsyncScope();
-                var cleanupService = scope.ServiceProvider.GetRequiredService<TempBlobCleanupService>();
-                await cleanupService.RunAsync(stoppingToken);
-            }
-            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-            {
-                break;
-            }
-            catch (Exception exception)
-            {
-                logger.LogError(exception, "Temp blob cleanup job failed.");
-            }
-
-            try
-            {
-                await Task.Delay(interval, stoppingToken);
-            }
-            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-            {
-                break;
-            }
-        }
+                var cleanupService = provider.GetRequiredService<TempBlobCleanupService>();
+                await cleanupService.RunAsync(cancellationToken);
+            },
+            stoppingToken);
     }
 }

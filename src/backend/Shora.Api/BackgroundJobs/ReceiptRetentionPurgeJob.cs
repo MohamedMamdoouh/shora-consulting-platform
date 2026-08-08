@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using Shora.Application.Common;
 using Shora.Application.Options;
 using Shora.Application.Services;
 
@@ -19,31 +20,16 @@ public sealed class ReceiptRetentionPurgeJob(
 
         var interval = TimeSpan.FromSeconds(options.Value.ReceiptRetentionPurgeIntervalSeconds);
 
-        while (!stoppingToken.IsCancellationRequested)
-        {
-            try
+        await BackgroundJobHost.RunPeriodicAsync(
+            scopeFactory,
+            logger,
+            BackgroundJobNames.ReceiptRetentionPurge,
+            interval,
+            async (provider, cancellationToken) =>
             {
-                await using var scope = scopeFactory.CreateAsyncScope();
-                var purgeService = scope.ServiceProvider.GetRequiredService<ReceiptRetentionPurgeService>();
-                await purgeService.RunAsync(stoppingToken);
-            }
-            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-            {
-                break;
-            }
-            catch (Exception exception)
-            {
-                logger.LogError(exception, "Receipt retention purge job failed.");
-            }
-
-            try
-            {
-                await Task.Delay(interval, stoppingToken);
-            }
-            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
-            {
-                break;
-            }
-        }
+                var purgeService = provider.GetRequiredService<ReceiptRetentionPurgeService>();
+                await purgeService.RunAsync(cancellationToken);
+            },
+            stoppingToken);
     }
 }

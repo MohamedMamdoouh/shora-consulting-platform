@@ -16,6 +16,9 @@ public sealed class NotImplementedFileStorage : IFileStorage
     public Task DeleteAsync(string blobPath, CancellationToken cancellationToken = default)
         => throw new NotImplementedException("Configure Storage:ConnectionString to enable Azure Blob receipt storage.");
 
+    public Task<bool> ExistsAsync(string blobPath, CancellationToken cancellationToken = default)
+        => throw new NotImplementedException("Configure Storage:ConnectionString to enable Azure Blob receipt storage.");
+
     public Task<int> DeleteBlobsWithPrefixOlderThanAsync(
         string prefix,
         TimeSpan maxAge,

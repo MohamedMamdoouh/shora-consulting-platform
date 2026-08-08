@@ -58,11 +58,20 @@ public static class DependencyInjection
         services.AddOpenApi();
 
         services.Configure<BackgroundJobOptions>(configuration.GetSection(BackgroundJobOptions.SectionName));
+        services.Configure<RateLimitOptions>(configuration.GetSection(RateLimitOptions.SectionName));
+        services.Configure<OpsMonitoringOptions>(configuration.GetSection(OpsMonitoringOptions.SectionName));
         services.Configure<ReceiptUploadOptions>(configuration.GetSection(ReceiptUploadOptions.SectionName));
         services.AddRateLimiting(configuration);
         services.AddHostedService<ReceiptUploadDeadlineCleanupJob>();
         services.AddHostedService<ReceiptRetentionPurgeJob>();
         services.AddHostedService<TempBlobCleanupJob>();
+        services.AddHostedService<OutboxDispatcherJob>();
+        services.AddHostedService<CancellationRequestAutoDeclineJob>();
+        services.AddHostedService<BookingAutoCompleteJob>();
+        services.AddHostedService<RefreshTokenPurgeJob>();
+        services.AddHostedService<ReceiptBlobReconciliationJob>();
+        services.AddHostedService<AvailabilityTopUpJob>();
+        services.AddHostedService<OpsMonitoringJob>();
 
         return services;
     }
@@ -71,9 +80,15 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        var rateLimitOptions = configuration
+            .GetSection(RateLimitOptions.SectionName)
+            .Get<RateLimitOptions>() ?? new RateLimitOptions();
+
         var receiptUploadOptions = configuration
             .GetSection(ReceiptUploadOptions.SectionName)
             .Get<ReceiptUploadOptions>() ?? new ReceiptUploadOptions();
+
+        services.AddSingleton<RateLimiterCache>();
 
         services.AddRateLimiter(options =>
         {
@@ -90,21 +105,81 @@ public static class DependencyInjection
                 await context.HttpContext.Response.WriteAsync("Too many requests.", cancellationToken);
             };
 
+            options.AddPolicy(RateLimitPolicies.AuthCredential, httpContext =>
+            {
+                var cache = httpContext.RequestServices.GetRequiredService<RateLimiterCache>();
+                return RateLimitPartitionFactory.FixedWindowByIpAndEmail(
+                    httpContext,
+                    "auth-credential",
+                    rateLimitOptions.AuthCredentialPermitLimit,
+                    TimeSpan.FromMinutes(rateLimitOptions.AuthCredentialWindowMinutes),
+                    cache);
+            });
+
+            options.AddPolicy(RateLimitPolicies.AuthRecovery, httpContext =>
+            {
+                var cache = httpContext.RequestServices.GetRequiredService<RateLimiterCache>();
+                return RateLimitPartitionFactory.FixedWindowByIpAndEmail(
+                    httpContext,
+                    "auth-recovery",
+                    rateLimitOptions.AuthRecoveryPermitLimit,
+                    TimeSpan.FromMinutes(rateLimitOptions.AuthRecoveryWindowMinutes),
+                    cache);
+            });
+
+            options.AddPolicy(RateLimitPolicies.AuthRefresh, httpContext =>
+            {
+                var cache = httpContext.RequestServices.GetRequiredService<RateLimiterCache>();
+                return RateLimitPartitionFactory.FixedWindowByIp(
+                    httpContext,
+                    "auth-refresh",
+                    rateLimitOptions.AuthRefreshPermitLimit,
+                    TimeSpan.FromMinutes(rateLimitOptions.AuthRefreshWindowMinutes),
+                    cache);
+            });
+
+            options.AddPolicy(RateLimitPolicies.PublicAvailability, httpContext =>
+            {
+                var cache = httpContext.RequestServices.GetRequiredService<RateLimiterCache>();
+                return RateLimitPartitionFactory.FixedWindowByIp(
+                    httpContext,
+                    "availability",
+                    rateLimitOptions.PublicAvailabilityPermitLimit,
+                    TimeSpan.FromMinutes(rateLimitOptions.PublicAvailabilityWindowMinutes),
+                    cache);
+            });
+
+            options.AddPolicy(RateLimitPolicies.BookingReserve, httpContext =>
+            {
+                var cache = httpContext.RequestServices.GetRequiredService<RateLimiterCache>();
+                return RateLimitPartitionFactory.FixedWindowByUserOrIp(
+                    httpContext,
+                    "booking-reserve",
+                    rateLimitOptions.BookingReservePermitLimit,
+                    TimeSpan.FromMinutes(rateLimitOptions.BookingReserveWindowMinutes),
+                    cache);
+            });
+
+            options.AddPolicy(RateLimitPolicies.CancellationRequest, httpContext =>
+            {
+                var cache = httpContext.RequestServices.GetRequiredService<RateLimiterCache>();
+                return RateLimitPartitionFactory.FixedWindowByUserOrIp(
+                    httpContext,
+                    "cancellation-request",
+                    rateLimitOptions.CancellationRequestPermitLimit,
+                    TimeSpan.FromMinutes(rateLimitOptions.CancellationRequestWindowMinutes),
+                    cache);
+            });
+
             options.AddPolicy(RateLimitPolicies.ReceiptUpload, httpContext =>
             {
-                var userId = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var partitionKey = !string.IsNullOrEmpty(userId)
-                    ? $"receipt-upload:user:{userId}"
-                    : $"receipt-upload:ip:{httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown"}";
-
-                return RateLimitPartition.GetFixedWindowLimiter(
-                    partitionKey,
-                    _ => new FixedWindowRateLimiterOptions
-                    {
-                        PermitLimit = receiptUploadOptions.RateLimitPermitLimit,
-                        Window = TimeSpan.FromMinutes(receiptUploadOptions.RateLimitWindowMinutes),
-                        QueueLimit = 0
-                    });
+                var cache = httpContext.RequestServices.GetRequiredService<RateLimiterCache>();
+                return RateLimitPartitionFactory.FixedWindowByUserOrIp(
+                    httpContext,
+                    "receipt-upload",
+                    receiptUploadOptions.RateLimitPermitLimit,
+                    TimeSpan.FromMinutes(receiptUploadOptions.RateLimitWindowMinutes),
+                    cache);
             });
         });
 

@@ -1,121 +1,135 @@
 # 08 — Cross-Cutting Concerns (Ops, Security, Deployment)
 
-Status: **Partially implemented.** Core product flows (auth, booking, payments, client dashboard, admin dashboard) are complete. See “Already landed” below; outbox dispatcher, cancellation auto-decline, auto-complete, availability top-up, full rate-limit matrix, blob reconciliation (spec 05h), refresh-token purge, and ops monitoring remain.
+Status: **Done** (sub-phases 08.1–08.9). Observability, outbox email delivery, all background jobs, full rate-limit matrix, and ops monitoring with runbooks are implemented.
 
-This spec consolidates operational and cross-cutting requirements referenced by specs 01–07 so they live in one place: rate limiting, logging/auditing/monitoring, the background-job execution model, deployment, and data retention.
+This spec consolidates operational and cross-cutting requirements referenced by specs 01–07: rate limiting, logging/auditing/monitoring, the background-job execution model, deployment, and data retention.
 
-### Already landed (partial)
+### Implementation summary
 
-- **Rate limiting:** `POST /api/v1/payments/{bookingId}/receipt` — 5/min/account (spec 05e)
-- **Background jobs:** receipt-upload-deadline cleanup, receipt retention purge, temp blob cleanup (orphan `temp/` prefix)
-- **Admin slot generation:** on-save horizon regeneration when availability windows or blocked dates change (spec 07 — not the nightly top-up job)
-- **Outbox writes:** payment/booking transitions enqueue messages; **dispatcher job not yet implemented** (emails stay `Pending` until spec 08)
+| Sub-phase | Scope                                                                                   | Status   |
+| --------- | --------------------------------------------------------------------------------------- | -------- |
+| 08.1      | Correlation ID, `JobRunHistory`, job heartbeat, `BackgroundJobHost`, payment log scopes | **Done** |
+| 08.2      | Transaction HTML email templates + `IOutboxEmailRenderer`                               | **Done** |
+| 08.3      | Outbox dispatcher (retry/backoff, dead-letter after 8 attempts)                         | **Done** |
+| 08.4      | Production SMTP sender (`SmtpEmailSender` / MailKit)                                    | **Done** |
+| 08.5      | Cancellation auto-decline + booking auto-complete jobs                                  | **Done** |
+| 08.6      | Refresh-token purge + receipt blob reconciliation (05h)                                 | **Done** |
+| 08.7      | Availability horizon top-up (nightly)                                                   | **Done** |
+| 08.8      | Full rate-limit matrix (auth, availability, booking, receipt, cancellation)             | **Done** |
+| 08.9      | Ops monitoring job, admin alerts API, runbooks                                          | **Done** |
 
 ---
 
 ## 1. Rate Limiting (H2)
 
-Uses ASP.NET Core's built-in rate limiting middleware. Limits are per-endpoint and combine a **per-IP** partition and, where an account is identifiable, a **per-account/email** partition. Values below are starting points (tunable via configuration).
+Uses ASP.NET Core's built-in rate limiting middleware. Limits are per-endpoint and combine a **per-IP** partition and, where an account is identifiable, a **per-account/email** partition. Values are tunable via `RateLimiting` and `ReceiptUpload` configuration.
 
-| Endpoint(s)                                                                                  | Limit (starting point)         | Notes                                                                                                |
-| -------------------------------------------------------------------------------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------- |
-| `POST /api/auth/login`, `/signup`, `/google`                                                 | ~5 / minute / IP + per-email   | Temporary lockout / backoff after repeated failures                                                  |
-| `POST /api/auth/forgot-password`, `/reset-password`, `/verify-email`, `/resend-verification` | ~3–5 / minute / IP + per-email | Still returns generic responses (no account-existence leak)                                          |
-| `POST /api/auth/refresh`                                                                     | ~10 / minute / IP              | Blunts brute-force of stolen refresh cookies                                                         |
-| `GET /api/availability`                                                                      | ~30 / minute / IP              | Public, cacheable; also bounded by date-range validation (spec 04 #2)                                |
-| `POST /api/bookings`                                                                         | ~10 / minute / account         | Backstops the 3-concurrent-hold cap (spec 04)                                                        |
-| `POST /api/payments/{bookingId}/receipt`                                                     | ~5 / minute / account          | **Done** (spec 05e). Bounds receipt-upload abuse; combined with the 5 MB size cap and content-type allowlist (spec 05 #4) |
-| `POST /api/bookings/{id}/cancellation-requests`                                              | ~5 / minute / account          | Light limit; single reopen policy still blocks spam (spec 04 #3.1)                                   |
+| Endpoint(s)                                                                                  | Limit (starting point)       | Status   |
+| -------------------------------------------------------------------------------------------- | ---------------------------- | -------- |
+| `POST /api/auth/login`, `/signup`, `/google`                                                 | ~5 / minute / IP + per-email | **Done** |
+| `POST /api/auth/forgot-password`, `/reset-password`, `/verify-email`, `/resend-verification` | ~5 / minute / IP + per-email | **Done** |
+| `POST /api/auth/refresh`                                                                     | ~10 / minute / IP            | **Done** |
+| `GET /api/availability`                                                                      | ~30 / minute / IP            | **Done** |
+| `POST /api/bookings`                                                                         | ~10 / minute / account       | **Done** |
+| `POST /api/payments/{bookingId}/receipt`                                                     | ~5 / minute / account        | **Done** |
+| `POST /api/bookings/{id}/cancellation-requests`                                              | ~5 / minute / account        | **Done** |
 
 - Throttled responses return `429 Too Many Requests` with a `Retry-After` header.
-- Admin endpoints sit behind auth + the single admin account, so they need only light limiting.
+- Auth email bodies are parsed by `AuthRateLimitEmailMiddleware` for per-email partitions; Google sign-in is IP-only when no email is present in the body.
+- Rate limiting runs **before** output cache so cached availability responses still count toward limits.
+- Admin endpoints sit behind auth + the single admin account; light limiting only (not matrix-listed).
 
 ### Client-IP resolution & shared-IP fairness (resolved)
 
 - **Direct connection:** the app runs on a single server with no load balancer, so per-IP rate-limit partitions key on `HttpContext.Connection.RemoteIpAddress` directly.
-- **CGNAT / shared-IP reality (mobile networks in Egypt):** many legitimate users can share one public IP, so per-IP limits are deliberately **coarse safety nets** (they stop floods, not individuals) and the meaningful per-user fairness comes from the **per-account/per-email partitions** above. If 429s from shared IPs show up in monitoring, raise the per-IP values before touching per-account ones.
+- **CGNAT / shared-IP reality (mobile networks in Egypt):** per-IP limits are deliberately **coarse safety nets**; meaningful per-user fairness comes from **per-account/per-email partitions**. If 429s from shared IPs show up in monitoring, raise per-IP values before touching per-account ones.
 
 ## 2. Logging, Auditing & Monitoring (H6)
 
 ### Structured logging
 
-- Structured (JSON) logs with a **correlation id** per request; payment flows additionally carry the `bookingId`/`paymentId` so a whole transaction can be traced across the upload → review → refund lifecycle.
-- **Never log** secrets, JWTs, refresh tokens, or storage connection strings/SAS tokens. Client PII (email/phone) is logged only where necessary and avoided in favor of ids. Receipt images are never logged; only the fact that a SAS URL was minted (with actor + booking id) is recorded.
+- Structured logs with a **correlation id** per request; payment flows additionally carry `bookingId`/`paymentId`.
+- **Never log** secrets, JWTs, refresh tokens, or storage connection strings/SAS tokens. Receipt images are never logged.
 
 ### Audit trail
 
-- `BookingStatusAudit` (spec 01) records every booking transition (actor, from/to, reason, UTC time) inside the same DB transaction as the change — the authoritative history behind spec 06 labels and spec 07 monitoring, including cancellation-request decisions.
-- Payment lifecycle changes are captured via `Payment` fields (`Status`, `UpdatedAt`, refund fields) and `PaymentReceipt`/`CancellationRequest` review fields, plus logs.
+- `BookingStatusAudit` (spec 01) records every booking transition inside the same DB transaction as the change.
+- Payment lifecycle changes are captured via `Payment` fields, `PaymentReceipt`/`CancellationRequest` review fields, and logs.
 
 ### Monitoring & alerts
 
-- **Receipts awaiting review:** alert when a booking sits in `PendingApproval` beyond a threshold (a client is waiting on the admin).
-- **Cancellation requests:** alert when a `Pending` cancellation request is approaching its `AutoDeclineAtUtc` so the admin decides deliberately.
-- **Refunds due:** alert when a cancelled booking's payment stays `Approved` (refund owed) beyond a threshold.
-- **Background jobs:** alert on job exceptions or a job not completing within its expected window.
-- **Concrete thresholds (resolved):**
-  - `PendingApproval > 6 h` = warning; `> 24 h` = critical.
-  - Cancellation request within `< 30 min` of `AutoDeclineAtUtc` = warning.
-  - `refund-due > 24 h` = warning; `> 72 h` = critical.
-  - Job heartbeat missing for >2 expected intervals = warning; >4 intervals = critical.
-  - Outbox: any message reaching `DeadLettered` (spec 01 #4) = warning (it names the message type + aggregate id so the admin can act); `>= 5` dead-lettered in 1 hour = critical (systemic delivery failure, e.g. email provider outage).
-- MVP delivery can be as simple as error-level logs shipped to the hosting provider's log sink plus email alerts to the admin; a full APM is out of scope.
+**`OpsMonitoringService`** evaluates alert conditions every ~5 minutes (`OpsMonitoringJob`) and logs warnings/criticals. **`GET /api/v1/admin/ops/alerts`** (`AdminOpsController`) returns active alerts for the admin dashboard. Runbook IDs match [`docs/ops-runbooks.md`](../docs/ops-runbooks.md).
 
-### Alert runbooks (resolved)
+| Condition                                   | Threshold                               |
+| ------------------------------------------- | --------------------------------------- |
+| `PendingApproval` backlog                   | > 6 h warning · > 24 h critical         |
+| Cancellation request near auto-decline      | < 30 min to `AutoDeclineAtUtc`          |
+| Refund due (cancelled + `Payment.Approved`) | > 24 h warning · > 72 h critical        |
+| Job heartbeat stale                         | > 2× interval warning · > 4× critical   |
+| Job failure                                 | `LastFailureAtUtc` > `LastSuccessAtUtc` |
+| Outbox dead-letter                          | any `DeadLettered` message = warning    |
+| Outbox dead-letter burst                    | ≥ 5 in 1 hour = critical                |
 
-Every alert above must map to an operator runbook with owner + response SLA:
+MVP delivery: structured logs to the hosting provider's log sink. Full APM is out of scope.
 
-- `PendingApproval` backlog: validate mail delivery + admin queue health, then force-prioritize review.
-- Cancellation requests near auto-decline: page admin and surface queue in dashboard immediately.
-- `refund-due` ageing: reconcile manual transfer logs and either record (`refunds/record`) or escalate.
-- Job heartbeat missing: verify app health and last successful run marker.
-- Outbox dead-letter: inspect `LastError`, fix template/provider issue, requeue via operator action.
+### Alert runbooks
+
+Operator runbooks with owner + response SLA: [`docs/ops-runbooks.md`](../docs/ops-runbooks.md).
 
 ## 3. Background Jobs — Execution Model (M6)
 
 - Each job is a hosted `BackgroundService` in the Api process on the **single app instance**.
-- **Concurrency safety:** jobs run in-process on one always-on server; idempotency (re-deriving state from the DB) and `Booking.RowVersion` guards suffice for overlapping callers within the same process.
-- **Idempotency:** every job is safe to run repeatedly — it re-derives state from the DB rather than assuming a prior run's effects, and each transition is guarded by `Booking.RowVersion`.
-- **Reliable side effects:** state-changing transactions write side effects to `OutboxMessage`; dispatcher jobs perform delivery and mark completion, so delivery cannot be lost between DB commit and external send.
-- **External-storage consistency:** blob storage is outside SQL transactions. Receipt processing uses explicit recovery states (`BlobFinalizePending`, `Missing`) and repair jobs rather than assuming distributed atomicity.
+- **Idempotency:** every job re-derives state from the DB; transitions guarded by `Booking.RowVersion`.
+- **Heartbeats:** `JobHeartbeatService` records success/failure in `JobRunHistory`; ops monitoring alerts on stale heartbeats.
+- **Side effects:** state-changing transactions write `OutboxMessage`; the dispatcher delivers emails with retry/backoff.
 
-| Job                               | Interval | Purpose                                                                                                                                     | Cross-ref                  | Status |
-| --------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------- | ------ |
-| Receipt-upload-deadline cleanup   | ~1 min   | Cancel `PendingPayment` holds past `ReceiptUploadDeadlineUtc`, free the slot, set `Payment.Status = Void` (never touches `PendingApproval`) | spec 04 #5, spec 05 #8     | **Done** |
-| Cancellation-request auto-decline | ~1 min   | Set `Pending` cancellation requests to `AutoDeclined` and return the booking to `Confirmed` at `AutoDeclineAtUtc`                           | spec 04 #3.1, spec 07 #4.1 | Planned |
-| Receipt blob reconciliation       | ~15 min  | Repair `BlobFinalizePending` records and clean orphan temp blobs after partial upload failures (**spec 05h — deferred here from spec 05**)   | spec 05 #2, spec 05 #8     | Planned |
-| Auto-complete                     | ~5 min   | `Confirmed` → `Completed` once slot end passed                                                                                              | spec 06, spec 07           | Planned |
-| Availability top-up               | nightly  | Keep ~4 weeks of future slots materialized, skipping `BlockedDate`s                                                                         | spec 07 #2                 | Planned |
-| Receipt retention purge           | daily    | Remove/scrub receipt blobs and PII metadata older than `Settings.ReceiptRetentionMonths` where not legally held                             | spec 01 #4, #5             | **Done** |
-| Temp blob cleanup (orphan `temp/`) | daily   | Delete aged orphan temp blobs under `temp/` prefix (partial overlap with reconciliation job)                                                | spec 05                    | **Done** |
-| Refresh-token purge               | daily    | Delete expired `RefreshToken` rows                                                                                                          | spec 02 #11                | Planned |
-| Outbox dispatcher                 | ~1 min   | Deliver pending outbox messages (emails) with retry/backoff; dead-letters after 8 attempts (spec 01 #4) and alerts (#2)                     | spec 01, spec 05, spec 07  | Planned |
+| Job                                | Interval | Purpose                                                                         | Status   |
+| ---------------------------------- | -------- | ------------------------------------------------------------------------------- | -------- |
+| Receipt-upload-deadline cleanup    | ~1 min   | Cancel `PendingPayment` holds past deadline, free slot, `Payment.Status = Void` | **Done** |
+| Outbox dispatcher                  | ~1 min   | Deliver pending outbox emails; dead-letter after 8 attempts                     | **Done** |
+| Cancellation-request auto-decline  | ~1 min   | `Pending` → `AutoDeclined`, booking → `Confirmed` at `AutoDeclineAtUtc`         | **Done** |
+| Booking auto-complete              | ~5 min   | `Confirmed` → `Completed` once `SlotEndUtc` passed                              | **Done** |
+| Receipt blob reconciliation        | ~15 min  | Repair `BlobFinalizePending` / `Missing`; delete orphan `temp/` blobs > 1 h     | **Done** |
+| Ops monitoring                     | ~5 min   | Evaluate operational alerts and log warnings/criticals                          | **Done** |
+| Receipt retention purge            | daily    | Purge receipt blobs older than `Settings.ReceiptRetentionMonths`                | **Done** |
+| Temp blob cleanup (orphan `temp/`) | daily    | Delete aged orphan temp blobs (24 h default)                                    | **Done** |
+| Refresh-token purge                | daily    | Delete expired `RefreshToken` rows                                              | **Done** |
+| Availability top-up                | nightly  | Keep ~4 weeks of future slots materialized, skipping `BlockedDate`s             | **Done** |
+
+Disable all jobs in dev/test via `BackgroundJobs:Enabled = false`.
+
+### Configuration keys
+
+Tunable via `appsettings.json` (see `BackgroundJobOptions`, `OpsMonitoringOptions`, `RateLimitOptions`, `EmailOptions`):
+
+| Section | Purpose |
+| --- | --- |
+| `BackgroundJobs:Enabled` | Master switch (false in integration tests) |
+| `BackgroundJobs:*IntervalSeconds` | Per-job schedule (defaults match table above) |
+| `OpsMonitoring:*` | Alert thresholds (pending approval hours, refund-due hours, heartbeat multipliers, dead-letter burst count/window) |
+| `RateLimiting:*` | Per-endpoint IP/email/account limits |
+| `ReceiptUpload:RateLimitPerMinute` | Receipt upload cap (default 5/min/account) |
+| `Email:*` | SMTP host, port, credentials, from address (spec 08.4) |
 
 ## 4. Deployment
 
-- **CI/CD workflow design and phased rollout:** see [spec 09](09-ci-cd-pipeline.md) (GitHub Actions CI now; Azure CD later).
-- **Receipt image storage:** an Azure Blob Storage account with a **private** container (`Storage:ReceiptContainer`) must be provisioned; the app writes receipt images there and mints short-lived SAS read URLs for admin viewing (spec 05 #4). No public blob access.
-- **Upload safety controls:** malware scanning service must be provisioned/integrated for uploaded receipts before admin review is allowed.
-- **Database migrations on deploy:** EF Core migrations (spec 01 #5) are applied automatically as part of the deploy/startup so schema stays in sync; seed data (Settings row, admin user, roles) runs once, idempotently.
-- **Secrets:** all secrets (`ConnectionStrings`, `Jwt:SigningKey`, `Storage:ConnectionString`, `Google:*`, `Email:*`) come from environment variables / the host's secret store — never committed. Local dev uses `dotnet user-secrets` (spec 01 #2.2).
-- **Frontend/API site model (resolved):** MVP deployment is **same-site** (frontend and API under the same registrable domain over HTTPS). This is required by the `SameSite=Strict` refresh cookie strategy in spec 02.
-- **CORS:** the API allows only the Angular app's origin(s) and `AllowCredentials` (required so the refresh-token `httpOnly` cookie flows on `POST /api/auth/refresh`, spec 02). Wildcard origins are not used with credentials.
-- **HTTPS everywhere + secure cookies:** the refresh-token cookie is `Secure`/`httpOnly`/`SameSite=Strict`, which requires HTTPS in all deployed environments.
-- **Hosting decision (resolved):** MVP uses **exactly one always-on app instance** (not scale-to-zero serverless) plus managed SQL Server/Azure SQL and Azure Blob Storage. No load balancer, no horizontal scaling, and no traffic manager in front of multiple instances. Required capabilities: .NET 10 runtime, scheduled/background processing in-process. No public inbound webhook endpoint is required (payments are verified manually).
+- **CI/CD:** see [spec 09](09-ci-cd-pipeline.md) (GitHub Actions CI done; Azure CD planned).
+- **Receipt storage:** private Azure Blob container (`Storage:ReceiptContainer`); short-lived SAS read URLs for admin.
+- **Email:** configure `Email:*` for production SMTP; dev uses log sender unless SMTP is configured.
+- **Migrations + seed:** applied on startup, idempotent.
+- **Secrets:** environment variables / user-secrets — never committed.
+- **Same-site deployment:** frontend + API under one registrable domain (required for `SameSite=Strict` refresh cookies).
+- **Single always-on instance:** no horizontal scaling in MVP.
 
 ## 5. Data Retention & PII (L4)
 
-MVP stance — minimal and documented, not a full compliance program:
-
-- **Data collected:** account email + display name (may be a pseudonym, SDD #5.7), per-booking contact phone (Voice Call only), booking/payment records, and **uploaded receipt images** (which may show the client's name / wallet number). No card data is ever collected or stored (there is no card gateway).
-- **Retention:** booking, payment, and audit records are retained indefinitely for MVP (needed for earnings history and dispute/refund traceability). Receipt images are retained per `Settings.ReceiptRetentionMonths` (default 24), then securely purged/scrubbed by the retention job unless a legal/dispute hold exists. Refresh tokens are purged after expiry (#3).
-- **Receipt access:** receipt images are visible only to the admin, only via short-lived SAS URLs (spec 05 #4); they are never exposed on a public URL or to other clients.
-- **Access:** client data is only ever visible to that client and the single admin (spec 06 #5). No third-party analytics/PII sharing in MVP.
-- **Deletion:** account/data-deletion requests are handled manually by the admin for MVP; a self-serve "delete my account" flow is out of scope.
-- **Transport security:** all traffic over HTTPS; secrets and PII never logged in plaintext (#2).
+- Booking, payment, and audit records retained indefinitely for MVP.
+- Receipt images retained per `Settings.ReceiptRetentionMonths` (default 24), then purged by the retention job.
+- Refresh tokens purged after expiry by the daily purge job.
+- Account deletion handled manually by admin for MVP.
 
 ## 6. Out of Scope (MVP)
 
 - Full APM / distributed tracing platform and WAF configuration specifics.
-- Automated GDPR/data-subject tooling (handled manually).
-- Multi-region / high-availability topology, horizontal scaling, and multiple app instances (permanently out of scope).
+- Automated GDPR/data-subject tooling.
+- Multi-region / high-availability topology.

@@ -2,7 +2,7 @@
 
 Status: **Implemented** (sub-phases 06a–06j, 2026-08).
 
-The client dashboard at `/dashboard` is fully wired to `GET /api/bookings/mine` and the booking/payment/cancellation client APIs described in specs 04–05. Arabic (RTL) UI; slot times render in the visitor's local browser timezone.
+The client dashboard at `/dashboard` is fully wired to `GET /api/v1/bookings/mine` and the booking/payment/cancellation client APIs described in specs 04–05. Arabic (RTL) UI; slot times render in the visitor's local browser timezone.
 
 ### Implementation status
 
@@ -55,7 +55,7 @@ A simple view for logged-in clients to see their booking history and upcoming se
 - **Pending payment / awaiting review**:
   - `PendingPayment` booking (within its upload window, spec 04 #4): show the **payment instructions** (Vodafone Cash number, InstaPay handle, exact amount, optional note — from `paymentSummary` on `GET /bookings/mine`, same fields as `GET /api/bookings/{id}/payment-instructions`), a countdown to the upload deadline, and an **Upload receipt** control (`POST /api/payments/{bookingId}/receipt`, spec 05). If a previous attempt was declined, show the **decline reason** and allow a fresh upload. A **Cancel hold** button (`POST /api/bookings/{id}/cancel`) is available any time — it releases the slot and frees a unit of the 3-hold cap immediately.
   - `PendingApproval` booking (receipt uploaded): show "Payment under review — we'll email you once the consultant approves it," with a thumbnail of the submitted receipt. **Cancel hold** remains available.
-- **Past section**: bookings with status `Completed` or `Cancelled`, most recent first. Shows date/time and final status. Note: `Completed` appears **automatically** once the session end time has passed (spec 08 job — not yet implemented) — no action needed from the client or admin once the job lands.
+- **Past section**: bookings with status `Completed` or `Cancelled`, most recent first. Shows date/time and final status. `Completed` appears **automatically** once the session end time has passed (`BookingAutoCompleteService`, spec 08) — no client or admin action required.
   - **Cancelled bookings show a reason label** derived from the latest `BookingStatusAudit` row (spec 01): e.g. "Cancelled by you", "Cancelled by the consultant", or "Receipt not uploaded in time". (A _declined_ cancellation request does not appear here — that booking stays `Confirmed`.) If the cancelled booking had an approved payment, the label also notes "Refunded" once `Payment.Status = Refunded`, or "Refund being processed" while it is still refund-due (spec 05 #6).
 
 ## 3. Endpoint

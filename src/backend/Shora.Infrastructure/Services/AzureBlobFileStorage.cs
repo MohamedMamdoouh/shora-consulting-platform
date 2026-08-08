@@ -135,6 +135,15 @@ public sealed class AzureBlobFileStorage : IFileStorage
         await blobClient.DeleteIfExistsAsync(DeleteSnapshotsOption.IncludeSnapshots, cancellationToken: cancellationToken);
     }
 
+    public async Task<bool> ExistsAsync(string blobPath, CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(blobPath);
+
+        var container = await GetContainerClientAsync(cancellationToken);
+        var blobClient = container.GetBlobClient(blobPath);
+        return await blobClient.ExistsAsync(cancellationToken);
+    }
+
     public async Task<int> DeleteBlobsWithPrefixOlderThanAsync(
         string prefix,
         TimeSpan maxAge,

@@ -459,6 +459,27 @@ namespace Shora.Infrastructure.Data.Migrations
                     b.ToTable("CancellationRequests");
                 });
 
+            modelBuilder.Entity("Shora.Domain.Entities.JobRunHistory", b =>
+                {
+                    b.Property<string>("JobName")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("LastError")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<DateTime?>("LastFailureAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("LastSuccessAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("JobName");
+
+                    b.ToTable("JobRunHistories");
+                });
+
             modelBuilder.Entity("Shora.Domain.Entities.OutboxMessage", b =>
                 {
                     b.Property<Guid>("Id")

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Shora.Application.Abstractions;
 using Shora.Application.Bookings;
 using Shora.Application.Email;
+using Shora.Application.Email.Outbox;
 using Shora.Application.Options;
 using Shora.Application.Payments;
 using Shora.Application.Services;
@@ -33,6 +34,7 @@ public static class DependencyInjection
         services.Configure<RefreshCookieOptions>(configuration.GetSection(RefreshCookieOptions.SectionName));
         services.Configure<FrontendOptions>(configuration.GetSection(FrontendOptions.SectionName));
         services.Configure<EmailBrandOptions>(configuration.GetSection(EmailBrandOptions.SectionName));
+        services.Configure<EmailOptions>(configuration.GetSection(EmailOptions.SectionName));
         services.Configure<CorsOptions>(configuration.GetSection(CorsOptions.SectionName));
         services.Configure<GoogleOptions>(configuration.GetSection(GoogleOptions.SectionName));
         services.Configure<SeedOptions>(configuration.GetSection(SeedOptions.SectionName));
@@ -66,9 +68,16 @@ public static class DependencyInjection
         services.AddScoped<RefreshCookieService>();
         services.AddScoped<IGoogleTokenValidator, GoogleTokenValidator>();
 
+        var emailOptions = configuration.GetSection(EmailOptions.SectionName).Get<EmailOptions>()
+            ?? new EmailOptions();
+
         if (hostEnvironment?.IsDevelopment() == true)
         {
             services.AddScoped<IEmailSender, DevLoggingEmailSender>();
+        }
+        else if (emailOptions.IsConfigured)
+        {
+            services.AddScoped<IEmailSender, SmtpEmailSender>();
         }
         else
         {
@@ -93,8 +102,19 @@ public static class DependencyInjection
         services.AddScoped<SettingsService>();
         services.AddScoped<SlotGenerationService>();
         services.AddScoped<ReceiptUploadDeadlineCleanupService>();
+        services.AddScoped<CancellationRequestAutoDeclineService>();
+        services.AddScoped<BookingAutoCompleteService>();
+        services.AddScoped<RefreshTokenPurgeService>();
+        services.AddScoped<ReceiptBlobReconciliationService>();
+        services.AddScoped<AvailabilityTopUpService>();
+        services.AddScoped<OpsMonitoringService>();
+        services.AddScoped<AdminOpsMonitoringService>();
         services.AddScoped<ReceiptRetentionPurgeService>();
         services.AddScoped<TempBlobCleanupService>();
+        services.AddScoped<JobHeartbeatService>();
+        services.AddScoped<OutboxDispatcherService>();
+        services.AddScoped<IOutboxEmailRenderer, OutboxEmailRenderer>();
+        services.AddSingleton<TransactionEmailLinks>();
         services.AddScoped<BookingTransitionHelper>();
 
         return services;

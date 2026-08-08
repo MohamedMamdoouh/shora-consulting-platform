@@ -1,6 +1,6 @@
 # 07 — Admin / Consultant Dashboard
 
-Status: **Done** (sub-phases 07a–07n). Payment receipt review, approve/decline, and manual refund record/revoke endpoints are implemented (spec 05). Admin shell and routing landed in 07a; all admin pages are phased below.
+Status: **Done** (sub-phases 07a–07o). Payment receipt review, approve/decline, manual refund record/revoke, and ops alerts API are implemented (specs 05, 08). Admin shell and routing landed in 07a; all admin pages are phased below.
 
 ### Implementation status
 
@@ -17,9 +17,10 @@ Status: **Done** (sub-phases 07a–07n). Payment receipt review, approve/decline
 | 07i       | Admin bookings table UI                                | **Done** |
 | 07j       | Receipt review UI                                      | **Done** |
 | 07k       | Admin cancel + cancellation decision API               | **Done** |
-| 07l       | Cancellation queue + direct cancel UI                    | **Done** |
+| 07l       | Cancellation queue + direct cancel UI                  | **Done** |
 | 07m       | Refund due UI                                          | **Done** |
 | 07n       | Earnings API + UI                                      | **Done** |
+| 07o       | Ops alerts API (`GET /admin/ops/alerts`)               | **Done** (UI optional) |
 
 **Frontend (`src/frontend/src/app/admin-dashboard/`):**
 
@@ -128,6 +129,12 @@ Status: **Done** (sub-phases 07a–07n). Payment receipt review, approve/decline
 - `earnings/admin-earnings-labels.util.ts` — Arabic amount/count formatting.
 - `core/admin/admin-earnings.service.ts` — `GET /admin/earnings`.
 
+**Backend (07o):**
+
+- `AdminOpsController` — `GET /api/v1/admin/ops/alerts` (Admin role).
+- `AdminOpsMonitoringService` — maps `OpsMonitoringService.EvaluateAlertsAsync` to `AdminOpsAlertsResponse`.
+- Contracts: `AdminOpsContracts.cs` (`AdminOpsAlertDto`, `AdminOpsAlertsResponse`); TypeScript mirror deferred until admin UI consumes alerts.
+
 ## 1. Purpose
 
 The single consultant's control panel: manage availability, edit the session price/duration, view and manage bookings, and see a basic earnings overview. Accessible only to the seeded `Admin` account (per spec 02).
@@ -167,7 +174,7 @@ The single consultant's control panel: manage availability, edit the session pri
   - `GET /api/admin/bookings/{id}/receipts` returns the `PaymentReceipt` attempt history with short-lived SAS image URLs (spec 05 #4).
   - `POST /api/admin/bookings/{id}/receipts/approve` → booking `Confirmed`, confirmation emails enqueued.
   - `POST /api/admin/bookings/{id}/receipts/decline` (body `{ reasonCode, reasonNote? }`) → booking back to `PendingPayment` with a fresh upload window; a "please re-upload" email carries the typed reason + optional note.
-- Bookings **auto-complete**: a background job (spec 08, not yet implemented) transitions `Confirmed` bookings to `Completed` once the booking's snapshotted `SlotEndUtc` passes (spec 01 #4). The client past section (spec 06) displays `Completed` rows once this job runs. There is no manual "mark completed" action.
+- Bookings **auto-complete**: `BookingAutoCompleteService` (spec 08, ~every 5 min) transitions `Confirmed` bookings to `Completed` once `SlotEndUtc` passes. The client past section (spec 06) displays `Completed` rows after this job runs. There is no manual "mark completed" action.
 - **Direct cancel** action: `POST /api/admin/bookings/{id}/cancel` — allowed **any time before the session start**, from `Confirmed`, `CancellationRequested`, or an unpaid hold. Sets `Booking.Status = Cancelled` (writing a `BookingStatusAudit` row), frees the `AvailabilitySlot`. If the payment is `Approved`, this creates a **refund-due** (see below); otherwise the payment is set `Void`. A booking that has already started/completed cannot be cancelled (`now < StartUtc` guard, spec 04 #4).
 - **Cancellation-request decisions:** for `CancellationRequested` bookings the admin approves or declines the client's request (see #4.1). Approval is equivalent to a direct cancel (refund-due if paid); decline returns the booking to `Confirmed`.
 - **Manual refunds (`refunds/record`):** because refunds are out-of-band (spec 05 #6), a cancelled booking whose payment is still `Approved` shows a **"refund due"** indicator. The admin sends the money back via Vodafone Cash/InstaPay, then records it with `POST /api/admin/payments/{id}/refunds/record` (body `{ reference, note }`), which sets `Payment.Status = Refunded` and enqueues the client refund email. If recorded by mistake, `POST /api/admin/payments/{id}/refunds/revoke` appends correction audit and reopens refund-due.
@@ -207,10 +214,9 @@ The single consultant's control panel: manage availability, edit the session pri
 
 - **Status-change audit trail:** every booking transition is recorded in `BookingStatusAudit` (spec 01) with actor (Client/Admin/System), reason, and UTC timestamp. This backs the cancelled-reason labels (spec 06) and gives the admin an authoritative history, including cancellation-request decisions.
 - **Payment/refund logging:** every payment action (receipt upload, admin approve/decline, manual `refunds/record`/`refunds/revoke`) is logged with a correlation id tied to the booking/payment (details in spec 08). Receipt image access (SAS URL minting) is logged too.
-- **Alerts:** operational alerts for (a) bookings sitting in `PendingApproval` beyond a threshold (client waiting on review), (b) cancellation requests approaching their `AutoDeclineAtUtc` (so the admin decides deliberately rather than letting them lapse), (c) cancelled bookings with a `refund-due` older than a threshold, and (d) background-job failures. Delivered to the admin (email/log sink per spec 08).
-- **Alert thresholds (resolved):** `PendingApproval > 6 h` = warning, `> 24 h` = critical; cancellation request within `< 30 min` of `AutoDeclineAtUtc` = warning; `refund-due > 24 h` = warning, `> 72 h` = critical.
+- **Alerts:** `OpsMonitoringService` (spec 08) evaluates operational alerts every ~5 min and logs warnings/criticals. `GET /api/v1/admin/ops/alerts` exposes active alerts for the admin dashboard (implemented; frontend UI optional). Thresholds: `PendingApproval > 6 h` warning / `> 24 h` critical; cancellation request within `< 30 min` of auto-decline; refund-due > 24 h warning / > 72 h critical; job heartbeat stale; outbox dead-letters. Runbooks: [`docs/ops-runbooks.md`](../docs/ops-runbooks.md).
 - **Background-job intervals (M6):** the receipt-upload-deadline cleanup job runs ~**every 1 minute**, the cancellation-request auto-decline job ~**every 1 minute**, the auto-complete job ~**every 5 minutes**, and the availability top-up job **nightly**. All jobs run as in-process `BackgroundService` workers on the single app instance (spec 08).
 
 ## 8. Open Items for This Area
 
-- None.
+- **Ops alerts UI (optional):** `GET /api/v1/admin/ops/alerts` and `AdminOpsController` are implemented (spec 08.9); wiring an admin page or banner is deferred — operators can use logs + runbooks until then.

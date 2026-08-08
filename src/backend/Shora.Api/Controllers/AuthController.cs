@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Shora.Api.Filters;
+using Shora.Api.Infrastructure;
 using Shora.Application.Auth;
 using Shora.Application.Common;
 using Shora.Application.Common.Results;
@@ -31,11 +33,14 @@ public sealed class AuthController : ApiControllerBase
     }
 
     [HttpPost("signup")]
+    [EnableRateLimiting(RateLimitPolicies.AuthCredential)]
+    [ExtractAuthEmailForRateLimit]
     [EndpointName("Auth.SignUp")]
     [EndpointSummary("Register a new client account")]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> SignUp(SignUpRequest request, CancellationToken cancellationToken)
     {
         var result = await _authService.SignUpAsync(
@@ -54,10 +59,13 @@ public sealed class AuthController : ApiControllerBase
     }
 
     [HttpPost("login")]
+    [EnableRateLimiting(RateLimitPolicies.AuthCredential)]
+    [ExtractAuthEmailForRateLimit]
     [EndpointName("Auth.Login")]
     [EndpointSummary("Sign in with email and password")]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> Login(LoginRequest request, CancellationToken cancellationToken)
     {
         var result = await _authService.LoginAsync(
@@ -76,11 +84,13 @@ public sealed class AuthController : ApiControllerBase
     }
 
     [HttpPost("refresh")]
+    [EnableRateLimiting(RateLimitPolicies.AuthRefresh)]
     [EndpointName("Auth.Refresh")]
     [EndpointSummary("Rotate refresh token and issue a new access token")]
     [ValidateAuthCookieOrigin]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> Refresh(CancellationToken cancellationToken)
     {
         var rawToken = _refreshCookieService.GetRefreshTokenFromRequest(Request);
@@ -125,10 +135,13 @@ public sealed class AuthController : ApiControllerBase
     }
 
     [HttpPost("verify-email")]
+    [EnableRateLimiting(RateLimitPolicies.AuthRecovery)]
+    [ExtractAuthEmailForRateLimit]
     [EndpointName("Auth.VerifyEmail")]
     [EndpointSummary("Confirm email address with verification token")]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> VerifyEmail(VerifyEmailRequest request, CancellationToken cancellationToken)
     {
         var result = await _authService.VerifyEmailAsync(request, cancellationToken);
@@ -143,9 +156,12 @@ public sealed class AuthController : ApiControllerBase
     }
 
     [HttpPost("resend-verification")]
+    [EnableRateLimiting(RateLimitPolicies.AuthRecovery)]
+    [ExtractAuthEmailForRateLimit]
     [EndpointName("Auth.ResendVerification")]
     [EndpointSummary("Resend email verification link")]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> ResendVerification(ResendVerificationRequest request, CancellationToken cancellationToken)
     {
         await _authService.ResendVerificationAsync(request, cancellationToken);
@@ -153,9 +169,12 @@ public sealed class AuthController : ApiControllerBase
     }
 
     [HttpPost("forgot-password")]
+    [EnableRateLimiting(RateLimitPolicies.AuthRecovery)]
+    [ExtractAuthEmailForRateLimit]
     [EndpointName("Auth.ForgotPassword")]
     [EndpointSummary("Request a password reset link")]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request, CancellationToken cancellationToken)
     {
         await _authService.ForgotPasswordAsync(request, cancellationToken);
@@ -163,10 +182,13 @@ public sealed class AuthController : ApiControllerBase
     }
 
     [HttpPost("reset-password")]
+    [EnableRateLimiting(RateLimitPolicies.AuthRecovery)]
+    [ExtractAuthEmailForRateLimit]
     [EndpointName("Auth.ResetPassword")]
     [EndpointSummary("Reset password using email token")]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> ResetPassword(ResetPasswordRequest request, CancellationToken cancellationToken)
     {
         var result = await _authService.ResetPasswordAsync(request, cancellationToken);
@@ -179,10 +201,12 @@ public sealed class AuthController : ApiControllerBase
     }
 
     [HttpPost("google")]
+    [EnableRateLimiting(RateLimitPolicies.AuthCredential)]
     [EndpointName("Auth.GoogleSignIn")]
     [EndpointSummary("Sign in or register with Google ID token")]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> Google(GoogleSignInRequest request, CancellationToken cancellationToken)
     {
         var result = await _authService.GoogleSignInAsync(

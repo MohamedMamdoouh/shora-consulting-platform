@@ -1,17 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import {
-  Observable,
-  finalize,
-  firstValueFrom,
-  shareReplay,
-  tap,
-  throwError,
-} from 'rxjs';
+import { Observable, finalize, firstValueFrom, shareReplay, tap, throwError } from 'rxjs';
 import { AuthResponse, AuthUser } from '@contracts/auth';
 import { MessageResponse } from '@contracts/common';
 import { environment } from '../../../environments/environment';
+import { resolvePostLoginRedirect, sanitizeAuthReturnUrl } from './auth-redirect.util';
 
 const USER_EMAIL_STORAGE_KEY = 'shora.auth.email';
 
@@ -172,28 +166,14 @@ export class AuthService {
   }
 
   redirectAfterLogin(role: string, returnUrl?: string | null): Promise<boolean> {
-    const safeReturnUrl = this.sanitizeReturnUrl(returnUrl);
-    if (safeReturnUrl && role === 'Client') {
-      return this.router.navigateByUrl(safeReturnUrl);
-    }
-
-    if (role === 'Admin') {
-      return this.router.navigate(['/admin']);
-    }
-
-    return this.router.navigate(['/dashboard']);
+    const redirect = resolvePostLoginRedirect(role, returnUrl);
+    return redirect.kind === 'url'
+      ? this.router.navigateByUrl(redirect.url)
+      : this.router.navigate(redirect.commands);
   }
 
   sanitizeReturnUrl(returnUrl?: string | null): string | null {
-    if (!returnUrl || !returnUrl.startsWith('/') || returnUrl.startsWith('//')) {
-      return null;
-    }
-
-    if (returnUrl.startsWith('/booking/') || returnUrl === '/dashboard') {
-      return returnUrl;
-    }
-
-    return null;
+    return sanitizeAuthReturnUrl(returnUrl);
   }
 
   private async redirectToLogin(options?: { reason?: string }): Promise<boolean> {

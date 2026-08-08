@@ -63,14 +63,25 @@ public sealed class AdminReceiptReviewService(
 
             if (CanMintReadUrl(receipt))
             {
-                readUrl = await fileStorage.GetReadUrlAsync(receipt.BlobPath, readUrlValidity, cancellationToken);
-                readUrlExpiresAtUtc = mintedAtUtc.Add(readUrlValidity);
+                try
+                {
+                    readUrl = await fileStorage.GetReadUrlAsync(receipt.BlobPath, readUrlValidity, cancellationToken);
+                    readUrlExpiresAtUtc = mintedAtUtc.Add(readUrlValidity);
 
-                logger.LogInformation(
-                    "Receipt read URL minted for booking {BookingId} receipt {ReceiptId} by admin {AdminId}",
-                    bookingId,
-                    receipt.Id,
-                    adminId);
+                    logger.LogInformation(
+                        "Receipt read URL minted for booking {BookingId} receipt {ReceiptId} by admin {AdminId}",
+                        bookingId,
+                        receipt.Id,
+                        adminId);
+                }
+                catch (Exception exception)
+                {
+                    logger.LogWarning(
+                        exception,
+                        "Receipt read URL could not be minted for booking {BookingId} receipt {ReceiptId}",
+                        bookingId,
+                        receipt.Id);
+                }
             }
 
             items.Add(MapReceipt(receipt, index + 1, readUrl, readUrlExpiresAtUtc));
@@ -104,6 +115,14 @@ public sealed class AdminReceiptReviewService(
 
         var (booking, payment, receipt) = loadResult.Value!;
         var now = dateTimeProvider.UtcNow;
+
+        if (!CanMintReadUrl(receipt))
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            return Error.Conflict(
+                ErrorCodes.Payment.ReceiptNotReviewable,
+                "Receipt approval requires a finalized clean receipt.");
+        }
 
         receipt.ReviewStatus = ReceiptReviewStatus.Approved;
         receipt.ReviewedByAdminId = adminId;

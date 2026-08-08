@@ -7,6 +7,8 @@ public sealed class InMemoryFileStorage : IFileStorage
 {
     private readonly ConcurrentDictionary<string, StoredBlob> _blobs = new(StringComparer.Ordinal);
 
+    public bool FailNextFinalize { get; set; }
+
     public Task<string> UploadTempAsync(Stream content, string contentType, CancellationToken cancellationToken = default)
     {
         _ = contentType;
@@ -17,6 +19,12 @@ public sealed class InMemoryFileStorage : IFileStorage
 
     public Task FinalizeAsync(string tempPath, string finalPath, CancellationToken cancellationToken = default)
     {
+        if (FailNextFinalize)
+        {
+            FailNextFinalize = false;
+            throw new IOException("Simulated finalize failure.");
+        }
+
         if (!_blobs.TryRemove(tempPath, out var storedBlob))
         {
             throw new FileNotFoundException($"Temporary blob '{tempPath}' was not found.");

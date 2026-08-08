@@ -88,6 +88,46 @@ public class PaymentEndpointTests : IDisposable
     }
 
     [Fact]
+    public async Task Upload_receipt_rolls_back_when_blob_finalize_fails()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var (client, bookingId, _) = await ReserveBookingAsync("receipt-finalize-fails@example.com", cancellationToken);
+
+        await using (var scope = _factory.Services.CreateAsyncScope())
+        {
+            var fileStorage = (InMemoryFileStorage)scope.ServiceProvider.GetRequiredService<IFileStorage>();
+            fileStorage.FailNextFinalize = true;
+        }
+
+        using var content = CreateReceiptUploadContent(
+            ReceiptTestFiles.MinimalJpeg,
+            "image/jpeg",
+            "receipt.jpg",
+            ContractPaymentMethod.VodafoneCash,
+            null);
+
+        var response = await client.PostAsync($"/api/v1/payments/{bookingId}/receipt", content, cancellationToken);
+
+        Assert.Equal(HttpStatusCode.InternalServerError, response.StatusCode);
+        await AssertProblemCodeAsync(response, "payment.receipt_finalize_failed", cancellationToken);
+
+        await using var verifyScope = _factory.Services.CreateAsyncScope();
+        var context = verifyScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        var booking = await context.Bookings.AsNoTracking().SingleAsync(b => b.Id == bookingId, cancellationToken);
+        Assert.Equal(BookingStatus.PendingPayment, booking.Status);
+        Assert.NotNull(booking.ReceiptUploadDeadlineUtc);
+
+        var payment = await context.Payments.AsNoTracking().SingleAsync(p => p.BookingId == bookingId, cancellationToken);
+        Assert.Equal(PaymentStatus.AwaitingReceipt, payment.Status);
+
+        var receiptCount = await context.PaymentReceipts
+            .AsNoTracking()
+            .CountAsync(r => r.PaymentId == payment.Id, cancellationToken);
+        Assert.Equal(0, receiptCount);
+    }
+
+    [Fact]
     public async Task Upload_receipt_rejects_second_upload_while_pending_approval()
     {
         var cancellationToken = TestContext.Current.CancellationToken;

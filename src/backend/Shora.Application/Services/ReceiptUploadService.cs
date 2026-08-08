@@ -67,6 +67,7 @@ public sealed class ReceiptUploadService(
         var domainMethod = MapPaymentMethod(method);
 
         string? tempPath = null;
+        string? finalizedPath = null;
 
         try
         {
@@ -180,8 +181,26 @@ public sealed class ReceiptUploadService(
 
             try
             {
+                await fileStorage.FinalizeAsync(tempPath, finalBlobPath, cancellationToken);
+                tempPath = null;
+                finalizedPath = finalBlobPath;
+
+                receipt.BlobState = BlobState.Finalized;
+                receipt.MalwareScanStatus = await ScanReceiptAsync(fileBytes, normalizedContentType, cancellationToken);
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync(cancellationToken);
+                return Error.Failure(
+                    ErrorCodes.Payment.ReceiptFinalizeFailed,
+                    "Receipt upload could not be finalized. Please try again.");
+            }
+
+            try
+            {
                 await dbContext.SaveChangesAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
+                finalizedPath = null;
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -189,21 +208,6 @@ public sealed class ReceiptUploadService(
                 return Error.Conflict(
                     ErrorCodes.Payment.InvalidStatus,
                     "The booking was updated by another action. Please refresh and try again.");
-            }
-
-            try
-            {
-                await fileStorage.FinalizeAsync(tempPath, finalBlobPath, cancellationToken);
-                tempPath = null;
-
-                receipt.BlobState = BlobState.Finalized;
-                receipt.MalwareScanStatus = await ScanReceiptAsync(fileBytes, normalizedContentType, cancellationToken);
-                await dbContext.SaveChangesAsync(cancellationToken);
-            }
-            catch (Exception)
-            {
-                receipt.BlobState = BlobState.BlobFinalizePending;
-                await dbContext.SaveChangesAsync(cancellationToken);
             }
 
             logger.LogInformation(
@@ -220,6 +224,18 @@ public sealed class ReceiptUploadService(
         }
         finally
         {
+            if (finalizedPath is not null)
+            {
+                try
+                {
+                    await fileStorage.DeleteAsync(finalizedPath, cancellationToken);
+                }
+                catch (Exception)
+                {
+                    // Best-effort cleanup if the database commit failed after finalizing the blob.
+                }
+            }
+
             if (tempPath is not null)
             {
                 try

@@ -1,4 +1,7 @@
+using System.Buffers.Binary;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.RateLimiting;
 using Shora.Api.Middleware;
 
@@ -6,6 +9,8 @@ namespace Shora.Api.Infrastructure;
 
 internal static class RateLimitPartitionFactory
 {
+    internal const int EmailPartitionBucketCount = 4096;
+
     public static RateLimitPartition<string> FixedWindowByIp(
         HttpContext httpContext,
         string policyPrefix,
@@ -27,19 +32,22 @@ internal static class RateLimitPartitionFactory
     {
         var ip = GetClientIp(httpContext);
         var email = AuthRateLimitEmailMiddleware.TryGetAuthEmail(httpContext);
-        var partitionKey = string.IsNullOrWhiteSpace(email)
+        int? emailBucket = string.IsNullOrWhiteSpace(email)
+            ? null
+            : GetEmailBucket(email);
+        var partitionKey = emailBucket is null
             ? $"{policyPrefix}:ip:{ip}"
-            : $"{policyPrefix}:{ip}:{email}";
+            : $"{policyPrefix}:ip:{ip}:email-bucket:{emailBucket.Value}";
 
         return RateLimitPartition.Get(partitionKey, _ =>
         {
             var ipLimiter = cache.GetFixedWindow($"{policyPrefix}:ip:{ip}", permitLimit, window);
-            if (string.IsNullOrWhiteSpace(email))
+            if (emailBucket is null)
             {
                 return ipLimiter;
             }
 
-            var emailLimiter = cache.GetFixedWindow($"{policyPrefix}:email:{email}", permitLimit, window);
+            var emailLimiter = cache.GetFixedWindow($"{policyPrefix}:email-bucket:{emailBucket.Value}", permitLimit, window);
             return new DualWindowRateLimiter(ipLimiter, emailLimiter);
         });
     }
@@ -70,4 +78,10 @@ internal static class RateLimitPartitionFactory
 
     private static string GetClientIp(HttpContext httpContext) =>
         httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+    private static int GetEmailBucket(string email)
+    {
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(email));
+        return (int)(BinaryPrimitives.ReadUInt32BigEndian(hash) % EmailPartitionBucketCount);
+    }
 }

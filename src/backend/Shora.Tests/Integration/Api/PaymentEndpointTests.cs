@@ -128,6 +128,40 @@ public class PaymentEndpointTests : IDisposable
     }
 
     [Fact]
+    public async Task Upload_receipt_rejects_file_over_receipt_size_limit_without_changing_booking()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var (client, bookingId, _) = await ReserveBookingAsync("receipt-upload-too-large@example.com", cancellationToken);
+
+        using var content = CreateReceiptUploadContent(
+            CreateJpegBytes((5 * 1024 * 1024) + 1),
+            "image/jpeg",
+            "large-receipt.jpg",
+            ContractPaymentMethod.VodafoneCash,
+            null);
+
+        var response = await client.PostAsync($"/api/v1/payments/{bookingId}/receipt", content, cancellationToken);
+
+        Assert.Equal(HttpStatusCode.RequestEntityTooLarge, response.StatusCode);
+        await AssertProblemCodeAsync(response, "payment.receipt_too_large", cancellationToken);
+
+        await using var verifyScope = _factory.Services.CreateAsyncScope();
+        var context = verifyScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        var booking = await context.Bookings.AsNoTracking().SingleAsync(b => b.Id == bookingId, cancellationToken);
+        Assert.Equal(BookingStatus.PendingPayment, booking.Status);
+        Assert.NotNull(booking.ReceiptUploadDeadlineUtc);
+
+        var payment = await context.Payments.AsNoTracking().SingleAsync(p => p.BookingId == bookingId, cancellationToken);
+        Assert.Equal(PaymentStatus.AwaitingReceipt, payment.Status);
+
+        var receiptCount = await context.PaymentReceipts
+            .AsNoTracking()
+            .CountAsync(r => r.PaymentId == payment.Id, cancellationToken);
+        Assert.Equal(0, receiptCount);
+    }
+
+    [Fact]
     public async Task Upload_receipt_rejects_second_upload_while_pending_approval()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
@@ -312,6 +346,15 @@ public class PaymentEndpointTests : IDisposable
         }
 
         return content;
+    }
+
+    private static byte[] CreateJpegBytes(int length)
+    {
+        var bytes = new byte[length];
+        bytes[0] = 0xFF;
+        bytes[1] = 0xD8;
+        bytes[2] = 0xFF;
+        return bytes;
     }
 
     private static async Task AssertProblemCodeAsync(

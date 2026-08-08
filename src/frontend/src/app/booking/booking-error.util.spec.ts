@@ -9,11 +9,12 @@ describe('readBookingErrorMessage', () => {
     [ErrorCodes.Payment.ReceiptTooLarge, 'حجم ملف الإيصال أكبر من 5 ميجابايت.'],
     [ErrorCodes.Payment.InvalidMethod, 'يرجى اختيار طريقة الدفع المستخدمة.'],
     [ErrorCodes.Payment.InvalidStatus, 'لا يمكن رفع إيصال لهذا الحجز في حالته الحالية.'],
+    [ErrorCodes.Payment.NotFound, 'لم يتم العثور على الدفع.'],
   ])('maps payment error code %s to a checkout message', (code, expectedMessage) => {
     expect(readBookingErrorMessage(code, 'fallback')).toBe(expectedMessage);
   });
 
   it('keeps using the fallback for unknown payment errors', () => {
-    expect(readBookingErrorMessage(ErrorCodes.Payment.NotFound, 'fallback')).toBe('fallback');
+    expect(readBookingErrorMessage('payment.unhandled', 'fallback')).toBe('fallback');
   });
 });

@@ -69,7 +69,7 @@ Rationale: this keeps external, swappable concerns (payments, email) behind inte
   - `SystemDateTimeProvider : IDateTimeProvider` — live UTC clock.
   - `SmtpEmailSender : IEmailSender` — production SMTP via MailKit (spec 08.4); dev falls back to logging when `Email:Host` is unset.
   - `AzureBlobFileStorage : IFileStorage` — receipt blob storage (spec 05a); `NotImplementedFileStorage` when `Storage:ConnectionString` is unset.
-  - `PassThroughMalwareScanner : IMalwareScanner` — dev stub; replace in staging/prod (spec 05f).
+  - `PassThroughMalwareScanner : IMalwareScanner` — dev stub; replace in production (spec 05f).
   - `HttpContextCurrentUser : ICurrentUser` — resolves authenticated user id/role (spec 02).
   - `DatabaseSeeder` — idempotent seed for roles, singleton `Settings`, and admin user from config.
 - **Contracts** — `Shora.Contracts` records for all public API DTOs; mirrored manually in `src/contracts/` (spec 00).

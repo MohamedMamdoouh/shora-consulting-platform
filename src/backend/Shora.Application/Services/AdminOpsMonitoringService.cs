@@ -1,3 +1,4 @@
+using Shora.Application.Ops;
 using Shora.Contracts.Ops;
 
 namespace Shora.Application.Services;
@@ -17,4 +18,7 @@ public sealed class AdminOpsMonitoringService(OpsMonitoringService opsMonitoring
                 alert.Context))
             .ToList());
     }
+
+    public static AdminOpsRunbooksResponse GetRunbooks() =>
+        new(OpsRunbookCatalog.GetAll());
 }

@@ -7,7 +7,7 @@ Arabic-first (RTL) relationship consulting booking platform. Implementation foll
 ```text
 Shora/
 ├── specs/                # Spec-driven documentation (00–09)
-├── docs/                 # Operator runbooks (ops alerts)
+├── docs/                 # Operator docs (pointers to runbooks.json)
 ├── src/
 │   ├── contracts/        # TypeScript API contracts
 │   ├── backend/          # .NET 10 Clean Architecture API
@@ -198,7 +198,7 @@ Sub-phases 08.1–08.9:
 - **Email:** HTML transaction templates, outbox dispatcher (8-attempt retry, dead-letter), production SMTP (`MailKit`)
 - **Background jobs:** receipt-deadline cleanup, outbox dispatcher, cancellation auto-decline, booking auto-complete, blob reconciliation, refresh-token purge, temp blob cleanup, receipt retention purge, availability top-up, ops monitoring
 - **Rate limiting:** auth, availability, booking reserve, receipt upload, cancellation request (configurable via `RateLimiting` + `ReceiptUpload`)
-- **Ops monitoring:** `OpsMonitoringService` + `GET /api/v1/admin/ops/alerts`; runbooks in [`docs/ops-runbooks.md`](docs/ops-runbooks.md)
+- **Ops monitoring:** `OpsMonitoringService` + `GET /api/v1/admin/ops/alerts`; runbooks in [`runbooks.json`](src/backend/Shora.Application/Ops/runbooks.json), admin UI at `/admin/ops`, API at `GET /admin/ops/runbooks`
 
 Disable background jobs in tests via `BackgroundJobs:Enabled = false`.
 
@@ -209,4 +209,3 @@ See [spec 08](specs/08-cross-cutting-concerns.md) for intervals, thresholds, and
 - Public pages real content and polish (spec 03)
 - Azure CD deploy workflow (spec 09 Phase 2)
 - Full APM / WAF (spec 08 out of scope)
-- Admin ops alerts UI on frontend (API exists; dashboard wiring optional)

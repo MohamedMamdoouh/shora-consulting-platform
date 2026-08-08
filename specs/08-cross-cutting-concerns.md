@@ -58,7 +58,7 @@ Uses ASP.NET Core's built-in rate limiting middleware. Limits are per-endpoint a
 
 ### Monitoring & alerts
 
-**`OpsMonitoringService`** evaluates alert conditions every ~5 minutes (`OpsMonitoringJob`) and logs warnings/criticals. **`GET /api/v1/admin/ops/alerts`** (`AdminOpsController`) returns active alerts for the admin dashboard. Runbook IDs match [`docs/ops-runbooks.md`](../docs/ops-runbooks.md).
+**`OpsMonitoringService`** evaluates alert conditions every ~5 minutes (`OpsMonitoringJob`) and logs warnings/criticals. **`GET /api/v1/admin/ops/alerts`** (`AdminOpsController`) returns active alerts for the admin dashboard. Runbook IDs match [`OpsRunbookIds`](../src/backend/Shora.Application/Ops/OpsRunbookIds.cs) and [`runbooks.json`](../src/backend/Shora.Application/Ops/runbooks.json).
 
 | Condition                                   | Threshold                               |
 | ------------------------------------------- | --------------------------------------- |
@@ -74,7 +74,7 @@ MVP delivery: structured logs to the hosting provider's log sink. Full APM is ou
 
 ### Alert runbooks
 
-Operator runbooks with owner + response SLA: [`docs/ops-runbooks.md`](../docs/ops-runbooks.md).
+Source of truth: [`src/backend/Shora.Application/Ops/runbooks.json`](../src/backend/Shora.Application/Ops/runbooks.json) (embedded in the API; exposed via `GET /api/v1/admin/ops/runbooks` and the admin `/admin/ops` page). See [`docs/ops-runbooks.md`](../docs/ops-runbooks.md) for pointers.
 
 ## 3. Background Jobs — Execution Model (M6)
 

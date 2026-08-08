@@ -1,0 +1,83 @@
+{
+  "runbooks": [
+    {
+      "id": "pending-approval-backlog",
+      "owner": "Admin / operator",
+      "responseSla": "Warning: 4 h · Critical: 1 h",
+      "trigger": "Booking in PendingApproval longer than 6 h (warning) or 24 h (critical).",
+      "steps": [
+        "Confirm admin notification email delivery (outbox + SMTP logs).",
+        "Open admin bookings queue filtered to PendingApproval.",
+        "Prioritize review of flagged booking(s); approve or decline with reason.",
+        "If queue is empty but alert persists, check BookingStatusAudit vs current status for stale data."
+      ]
+    },
+    {
+      "id": "cancellation-request-near-auto-decline",
+      "owner": "Admin",
+      "responseSla": "15 min",
+      "trigger": "Pending cancellation request auto-declines within 30 minutes.",
+      "steps": [
+        "Surface the booking in the admin cancellation queue immediately.",
+        "Approve or decline deliberately before AutoDeclineAtUtc.",
+        "If unreachable, note auto-decline will restore booking to Confirmed and email the client."
+      ]
+    },
+    {
+      "id": "refund-due-ageing",
+      "owner": "Admin / finance",
+      "responseSla": "Warning: 1 business day · Critical: 4 h",
+      "trigger": "Cancelled booking with Payment.Status = Approved (refund owed) older than 24 h (warning) or 72 h (critical).",
+      "steps": [
+        "Reconcile manual transfer logs (Vodafone Cash / InstaPay).",
+        "Record refund via POST /api/v1/admin/payments/{id}/refunds/record when transfer completed.",
+        "Escalate if client contact is needed or amount is disputed."
+      ]
+    },
+    {
+      "id": "job-heartbeat-missing",
+      "owner": "Operator",
+      "responseSla": "Warning: 30 min · Critical: 15 min",
+      "trigger": "Background job last success older than 2× (warning) or 4× (critical) its configured interval.",
+      "steps": [
+        "Verify app process health and that BackgroundJobs:Enabled is true.",
+        "Inspect JobRunHistory for the named job (LastSuccessAtUtc, LastFailureAtUtc, LastError).",
+        "Check application logs around the last failure; restart the app if the worker loop stopped.",
+        "After recovery, confirm the next heartbeat updates LastSuccessAtUtc."
+      ]
+    },
+    {
+      "id": "job-failure",
+      "owner": "Operator",
+      "responseSla": "30 min",
+      "trigger": "Job recorded LastFailureAtUtc newer than LastSuccessAtUtc.",
+      "steps": [
+        "Read LastError in JobRunHistory for the job name.",
+        "Fix root cause (DB, storage, email provider, code defect).",
+        "Wait for the next scheduled run or restart the app; confirm success heartbeat."
+      ]
+    },
+    {
+      "id": "outbox-dead-letter",
+      "owner": "Operator",
+      "responseSla": "1 h",
+      "trigger": "Any OutboxMessage in DeadLettered status.",
+      "steps": [
+        "Inspect LastError, MessageType, and AggregateId for the message.",
+        "Fix template, recipient, or provider configuration.",
+        "Requeue via explicit operator action (manual resend / new outbox row per runbook in spec 01)."
+      ]
+    },
+    {
+      "id": "outbox-dead-letter-burst",
+      "owner": "Operator",
+      "responseSla": "15 min",
+      "trigger": "≥ 5 messages dead-lettered within 1 hour (systemic failure).",
+      "steps": [
+        "Treat as provider outage (SMTP, DNS, credentials).",
+        "Pause non-essential deploys; verify Email:* configuration and provider status.",
+        "Clear backlog incrementally after provider recovery; monitor for recurrence."
+      ]
+    }
+  ]
+}

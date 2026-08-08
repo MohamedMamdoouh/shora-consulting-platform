@@ -4,6 +4,7 @@ import { AdminShellComponent } from './admin-shell.component';
 import { AdminAvailabilityPageComponent } from './availability/admin-availability-page.component';
 import { AdminBookingsPageComponent } from './bookings/admin-bookings-page.component';
 import { AdminEarningsPageComponent } from './earnings/admin-earnings-page.component';
+import { AdminOpsPageComponent } from './ops/admin-ops-page.component';
 import { AdminSettingsPageComponent } from './settings/admin-settings-page.component';
 
 export const ADMIN_DASHBOARD_ROUTES: Routes = [
@@ -37,6 +38,11 @@ export const ADMIN_DASHBOARD_ROUTES: Routes = [
         path: 'earnings',
         component: AdminEarningsPageComponent,
         data: { title: 'الأرباح' },
+      },
+      {
+        path: 'ops',
+        component: AdminOpsPageComponent,
+        data: { title: 'تنبيهات التشغيل' },
       },
     ],
   },

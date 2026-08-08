@@ -8,3 +8,12 @@ public sealed record AdminOpsAlertDto(
     IReadOnlyDictionary<string, string> Context);
 
 public sealed record AdminOpsAlertsResponse(IReadOnlyList<AdminOpsAlertDto> Alerts);
+
+public sealed record AdminOpsRunbookDto(
+    string Id,
+    string Owner,
+    string ResponseSla,
+    string Trigger,
+    IReadOnlyList<string> Steps);
+
+public sealed record AdminOpsRunbooksResponse(IReadOnlyList<AdminOpsRunbookDto> Runbooks);

@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Email\Templates\**\*.html" />
+    <EmbeddedResource Include="Ops\runbooks.json" />
   </ItemGroup>
 
   <ItemGroup>

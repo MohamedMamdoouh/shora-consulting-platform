@@ -8,7 +8,7 @@ This spec defines how Shora is built, validated, and (later) deployed. It comple
 
 - **Fast PR feedback** — every change to `main` is buildable and testable before merge.
 - **Reproducible builds** — pinned toolchains (.NET 10, Node 22) and lock files (`package-lock.json`, NuGet restore).
-- **Safe deploy path (Phase 2)** — staging and production releases aligned with spec 08 hosting (Azure App Service + Azure SQL + Blob) and spec 02 same-site auth (`SameSite=Strict` refresh cookies).
+- **Safe deploy path (Phase 2)** — production releases aligned with spec 08 hosting (Azure App Service + Azure SQL + Blob) and spec 02 same-site auth (`SameSite=Strict` refresh cookies). Local development uses `Development` / dev tooling only — no separate staging environment.
 
 ## 2. Repository & Triggers
 
@@ -75,8 +75,8 @@ Planned workflow: `.github/workflows/deploy.yml` (separate from CI).
 
 | Concern           | Design                                                                                                                                                                                                       |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Environments**  | GitHub Environments: `staging`, `production` (production requires manual approval / reviewers)                                                                                                               |
-| **Triggers**      | `workflow_dispatch` for staging; tag `v`\* (semver) for production — not auto-deploy on every merge to `main`                                                                                                |
+| **Environments**  | GitHub Environment: `production` (manual approval / reviewers). No staging environment — validate locally in `Development`, then deploy to production.                                                                 |
+| **Triggers**      | Tag `v*` (semver) for production — not auto-deploy on every merge to `main`. Optional `workflow_dispatch` to production with approval.                                                                               |
 | **Build**         | `npm run build` → copy Angular output into API `wwwroot` → `dotnet publish`                                                                                                                                  |
 | **Deploy target** | Azure App Service (Linux, .NET 10, always-on, **instance count = 1**, no autoscaling rule — background jobs run in-process, spec 08 #3). No load balancer or traffic manager in front of multiple instances. |
 | **Secrets**       | App Service application settings or Azure Key Vault references — never in repo                                                                                                                               |

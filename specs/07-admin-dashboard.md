@@ -214,9 +214,9 @@ The single consultant's control panel: manage availability, edit the session pri
 
 - **Status-change audit trail:** every booking transition is recorded in `BookingStatusAudit` (spec 01) with actor (Client/Admin/System), reason, and UTC timestamp. This backs the cancelled-reason labels (spec 06) and gives the admin an authoritative history, including cancellation-request decisions.
 - **Payment/refund logging:** every payment action (receipt upload, admin approve/decline, manual `refunds/record`/`refunds/revoke`) is logged with a correlation id tied to the booking/payment (details in spec 08). Receipt image access (SAS URL minting) is logged too.
-- **Alerts:** `OpsMonitoringService` (spec 08) evaluates operational alerts every ~5 min and logs warnings/criticals. `GET /api/v1/admin/ops/alerts` exposes active alerts for the admin dashboard (implemented; frontend UI optional). Thresholds: `PendingApproval > 6 h` warning / `> 24 h` critical; cancellation request within `< 30 min` of auto-decline; refund-due > 24 h warning / > 72 h critical; job heartbeat stale; outbox dead-letters. Runbooks: [`docs/ops-runbooks.md`](../docs/ops-runbooks.md).
+- **Alerts:** `OpsMonitoringService` (spec 08) evaluates operational alerts every ~5 min and logs warnings/criticals. `GET /api/v1/admin/ops/alerts` exposes active alerts for the admin dashboard; `/admin/ops` shows runbook steps from [`runbooks.json`](../src/backend/Shora.Application/Ops/runbooks.json). Thresholds: `PendingApproval > 6 h` warning / `> 24 h` critical; cancellation request within `< 30 min` of auto-decline; refund-due > 24 h warning / > 72 h critical; job heartbeat stale; outbox dead-letters.
 - **Background-job intervals (M6):** the receipt-upload-deadline cleanup job runs ~**every 1 minute**, the cancellation-request auto-decline job ~**every 1 minute**, the auto-complete job ~**every 5 minutes**, and the availability top-up job **nightly**. All jobs run as in-process `BackgroundService` workers on the single app instance (spec 08).
 
 ## 8. Open Items for This Area
 
-- **Ops alerts UI (optional):** `GET /api/v1/admin/ops/alerts` and `AdminOpsController` are implemented (spec 08.9); wiring an admin page or banner is deferred — operators can use logs + runbooks until then.
+- None for MVP ops alerts — `/admin/ops` is wired (spec 08.9).

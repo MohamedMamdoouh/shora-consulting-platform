@@ -21,4 +21,15 @@ public sealed class AdminOpsController(AdminOpsMonitoringService adminOpsMonitor
         var response = await adminOpsMonitoringService.GetAlertsAsync(cancellationToken);
         return Ok(response);
     }
+
+    [HttpGet("runbooks")]
+    [EndpointName("AdminOps.GetRunbooks")]
+    [EndpointSummary("Get operational runbooks for admin alert response")]
+    [ProducesResponseType(typeof(AdminOpsRunbooksResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    public IActionResult GetRunbooks()
+    {
+        return Ok(AdminOpsMonitoringService.GetRunbooks());
+    }
 }

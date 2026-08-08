@@ -1,0 +1,101 @@
+<section class="admin-ops">
+  <header class="admin-ops__header">
+    <div class="admin-ops__title-row">
+      <div>
+        <h2>تنبيهات التشغيل</h2>
+        <p class="admin-ops__note">
+          تنبيهات نشطة من مراقبة النظام (تُقيَّم تقريباً كل 5 دقائق). اعرض دليل المعالجة لكل تنبيه.
+        </p>
+      </div>
+
+      <button type="button" class="btn" (click)="loadOpsData()">تحديث</button>
+    </div>
+  </header>
+
+  @switch (pageState.status) {
+    @case ('loading') {
+      <p class="admin-ops__state" aria-live="polite">جاري تحميل التنبيهات...</p>
+    }
+
+    @case ('error') {
+      <div class="admin-ops__panel admin-ops__panel--error">
+        <p>{{ pageState.message }}</p>
+        <button type="button" class="btn" (click)="loadOpsData()">إعادة المحاولة</button>
+      </div>
+    }
+
+    @case ('ready') {
+      @if (pageState.alerts.length === 0) {
+        <div class="admin-ops__panel admin-ops__panel--empty">
+          <p>لا توجد تنبيهات نشطة حالياً.</p>
+          <p class="admin-ops__note">يُعاد التقييم تلقائياً كل ~5 دقائق. استخدم «تحديث» لجلب أحدث الحالة.</p>
+        </div>
+      } @else {
+        <div class="admin-ops__summary" aria-live="polite">
+          <span class="admin-ops__count admin-ops__count--critical">
+            {{ pageState.counts.critical }} حرج
+          </span>
+          <span class="admin-ops__count admin-ops__count--warning">
+            {{ pageState.counts.warning }} تحذير
+          </span>
+        </div>
+
+        <ul class="admin-ops__list">
+          @for (alert of pageState.alerts; track alert.message + alert.runbookId + alert.severity) {
+            <li
+              class="admin-ops__card admin-ops__card--{{ severityCssModifier(alert.severity) }}"
+            >
+              <div class="admin-ops__card-header">
+                <span class="admin-ops__badge admin-ops__badge--{{ severityCssModifier(alert.severity) }}">
+                  {{ formatAlertSeverity(alert.severity) }}
+                </span>
+                <h3>{{ formatAlertKind(alert.kind) }}</h3>
+              </div>
+
+              <p class="admin-ops__message">{{ alert.message }}</p>
+
+              @if (formatContextEntries(alert.context).length > 0) {
+                <dl class="admin-ops__context">
+                  @for (entry of formatContextEntries(alert.context); track entry.key) {
+                    <div class="admin-ops__context-row">
+                      <dt>{{ entry.label }}</dt>
+                      <dd>{{ entry.value }}</dd>
+                    </div>
+                  }
+                </dl>
+              }
+
+              @if (getRunbook(alert.runbookId); as runbook) {
+                <details class="admin-ops__runbook">
+                  <summary>عرض دليل المعالجة</summary>
+
+                  <div class="admin-ops__runbook-body">
+                    <p><strong>المالك:</strong> {{ runbook.owner }}</p>
+                    <p><strong>SLA:</strong> {{ runbook.responseSla }}</p>
+                    <p><strong>المحفّز:</strong> {{ runbook.trigger }}</p>
+
+                    <ol class="admin-ops__steps">
+                      @for (step of runbook.steps; track step) {
+                        <li>{{ step }}</li>
+                      }
+                    </ol>
+                  </div>
+                </details>
+              } @else {
+                <p class="admin-ops__runbook-missing">
+                  تعذّر تحميل دليل المعالجة لهذا التنبيه ({{ alert.runbookId }}).
+                </p>
+              }
+
+              @if (getAlertActionRoute(alert); as actionRoute) {
+                <p class="admin-ops__action">
+                  <a [routerLink]="actionRoute">→ الحجوزات</a>
+                </p>
+              }
+            </li>
+          }
+        </ul>
+      }
+    }
+  }
+</section>

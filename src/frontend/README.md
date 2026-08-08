@@ -19,7 +19,7 @@ Open `http://localhost:4200/`. The dev server proxies `/api` to the backend (`pr
 | Public pages | `/`, `/about`, `/services` | 03 (placeholder copy) |
 | Booking flow | `/booking/start` → delivery → phone → review → `/booking/payment/:id` | 04 |
 | Client dashboard | `/dashboard` | 06 |
-| Admin dashboard | `/admin/settings`, `/admin/availability`, `/admin/bookings`, `/admin/earnings` | 07 |
+| Admin dashboard | `/admin/settings`, `/admin/availability`, `/admin/bookings`, `/admin/earnings`, `/admin/ops` | 07 / 08 |
 
 ### Booking flow (spec 04)
 
@@ -39,8 +39,7 @@ Open `http://localhost:4200/`. The dev server proxies `/api` to the backend (`pr
 - **Availability** — recurring windows + blocked date ranges
 - **Bookings** — filters, pagination, receipt review, cancellation queue, direct cancel, refund record/revoke
 - **Earnings** — gross / refunded / net summary with date filters
-
-**Not yet wired:** `GET /api/v1/admin/ops/alerts` (spec 08) — backend API exists; no admin UI page yet.
+- **Ops alerts** — active operational alerts with expandable runbook steps (`GET /admin/ops/alerts`, `GET /admin/ops/runbooks`)
 
 Admin HTTP services live under `src/app/core/admin/`.
 

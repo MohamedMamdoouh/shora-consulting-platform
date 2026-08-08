@@ -32,7 +32,7 @@ internal static class RateLimitPartitionFactory
     {
         var ip = GetClientIp(httpContext);
         var email = AuthRateLimitEmailMiddleware.TryGetAuthEmail(httpContext);
-        var emailBucket = string.IsNullOrWhiteSpace(email)
+        int? emailBucket = string.IsNullOrWhiteSpace(email)
             ? null
             : GetEmailBucket(email);
         var partitionKey = emailBucket is null

@@ -51,17 +51,21 @@ Concurrent pushes cancel the in-progress deploy (`concurrency` group) so only th
 
 ### What the workflow does
 
-1. **Build job** — `npm ci` + production Angular build → copy into `Shora.Api/wwwroot/` → `dotnet publish` → upload artifact (spec 09.8).
-2. **Deploy job** — fail if `AZURE_WEBAPP_NAME` is unset → download artifact → `azure/webapps-deploy` to App Service (spec 09.9). Also fails if `AZURE_WEBAPP_PUBLISH_PROFILE` is missing or invalid.
+1. **Build job** — optional `GOOGLE_CLIENT_ID` injection → `npm ci` + production Angular build → copy into `Shora.Api/wwwroot/` → `dotnet publish` → upload artifact (spec 09.8).
+2. **Deploy job** — fail if `AZURE_WEBAPP_NAME` is unset → download artifact → `azure/webapps-deploy` to App Service (spec 09.9).
+3. **Smoke-test job** — curl `/api/v1/health`, `/`, and `/about` on `https://<AZURE_WEBAPP_NAME>.azurewebsites.net`.
+
+Or run [`scripts/post-deploy-verify.ps1`](../scripts/post-deploy-verify.ps1) locally after deploy.
 
 ### One-time setup before first deploy
 
 1. **Azure Portal** — [docs/azure-prerequisites.md](../docs/azure-prerequisites.md): App Service, SQL, Blob, application settings.
 2. **GitHub → Settings → Environments** — create `production` (optional required reviewers).
 3. **Repository variable:** `AZURE_WEBAPP_NAME` = your Web App name.
-4. Optional **repository variable:** `DEPLOY_ENVIRONMENT` (defaults to `production`).
-5. **Environment secret:** `AZURE_WEBAPP_PUBLISH_PROFILE` = publish profile from App Service → **Get publish profile**.
-6. Enable **branch protection** on `main` so CI passes before merge — then push to `main` auto-deploys.
+4. Optional **repository variable:** `GOOGLE_CLIENT_ID` (build-time Google sign-in).
+5. Optional **repository variable:** `DEPLOY_ENVIRONMENT` (defaults to `production`).
+6. **Environment secret:** `AZURE_WEBAPP_PUBLISH_PROFILE` = publish profile from App Service → **Get publish profile**.
+7. Enable **branch protection** on `main` so CI passes before merge — or run `scripts/configure-github.ps1`.
 
 Optional later: OIDC federated credential instead of publish profile.
 

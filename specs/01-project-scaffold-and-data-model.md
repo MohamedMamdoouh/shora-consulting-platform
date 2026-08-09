@@ -1,6 +1,6 @@
 # 01 — Project Scaffold & Data Model
 
-**Status: Implemented** (foundation 2026-07-06; extended through 2026-08). Backend scaffold, data model, migrations, seed, Angular RTL shell, and the full MVP stack (specs 02–08) are in place on this foundation. Remaining MVP gaps: public-page real content (03) and Azure CD (09 Phase 2).
+**Status: Implemented** (foundation 2026-07-06; extended through 2026-08). Backend scaffold, data model, migrations, seed, Angular RTL shell, and the full MVP stack (specs 02–08) are in place on this foundation. Remaining MVP gaps: public-page real content (03); first Azure production deploy is operational ([docs/README.md](../docs/README.md)).
 
 ## 1. Architecture: Pragmatic Clean Architecture
 
@@ -27,7 +27,7 @@ flowchart LR
 ```
 Shora/
 ├── specs/                          # Spec-driven documentation (00–09)
-├── docs/                           # Operator runbooks (ops alerts, spec 08)
+├── docs/                           # Operator docs (Azure, production config, runbooks)
 ├── src/
 │   ├── contracts/                  # TypeScript mirrors of Shora.Contracts
 │   ├── frontend/                   # Angular 21 (standalone, RTL Arabic shell)
@@ -40,7 +40,7 @@ Shora/
 │       ├── Shora.Infrastructure/   # EF Core DbContext + migrations, seed, Azure Blob, SMTP email
 │       ├── Shora.Api/              # ASP.NET Core Web API: controllers, jobs, rate limiting, middleware
 │       └── Shora.Tests/            # xUnit integration + unit tests (~240 methods)
-├── .github/workflows/              # CI (spec 09 Phase 1)
+├── .github/workflows/              # CI + Deploy workflows (spec 09)
 ├── .gitignore
 └── README.md
 ```
@@ -393,6 +393,6 @@ Updated by `JobHeartbeatService` after each background job run. `OpsMonitoringSe
 
 **Namespaces:** all C# code uses the `Shora.`\* root namespace (`Shora.Domain`, `Shora.Application`, `Shora.Infrastructure`, `Shora.Api`).
 
-**Deferred:** public pages real content and polish (03); Azure CD (09 Phase 2); admin ops alerts UI (API done — spec 08).
+**Deferred:** public pages real content and polish (03); admin ops alerts UI (API done — spec 08).
 
-**Done on this foundation:** auth (02); booking flow + lifecycle jobs (04, 08); manual payments (05); client dashboard (06); admin dashboard (07); cross-cutting — outbox dispatcher, all background jobs, rate limits, ops monitoring (08); CI pipeline (09 Phase 1).
+**Done on this foundation:** auth (02); booking flow + lifecycle jobs (04, 08); manual payments (05); client dashboard (06); admin dashboard (07); cross-cutting — outbox dispatcher, all background jobs, rate limits, ops monitoring (08); CI/CD pipelines (09 — code complete; Azure go-live is operator steps in [docs/README.md](../docs/README.md)).

@@ -1,5 +1,7 @@
 # Shora
 
+[![CI](https://github.com/MohamedMamdoouh/shora-consulting-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/MohamedMamdoouh/shora-consulting-platform/actions/workflows/ci.yml)
+
 Arabic-first (RTL) relationship consulting booking platform. Implementation follows numbered specs in [`specs/`](specs/).
 
 ## Repository layout
@@ -7,12 +9,12 @@ Arabic-first (RTL) relationship consulting booking platform. Implementation foll
 ```text
 Shora/
 ├── specs/                # Spec-driven documentation (00–09)
-├── docs/                 # Operator docs (pointers to runbooks.json)
+├── docs/                 # Operator docs (Azure, production config, runbooks)
 ├── src/
 │   ├── contracts/        # TypeScript API contracts
 │   ├── backend/          # .NET 10 Clean Architecture API
 │   └── frontend/         # Angular 21 app
-├── .github/workflows/    # CI (Phase 1); CD planned (spec 09)
+├── .github/workflows/    # CI + deploy workflows (spec 09)
 ├── .gitignore
 └── README.md
 ```
@@ -59,11 +61,13 @@ On startup, migrations apply automatically and seed data runs idempotently:
 
 ### Deployment topology
 
-Production runs on a **single always-on server** (Azure App Service or equivalent):
+Production runs on a **single always-on server** (Azure App Service):
 
-- One process hosts the API, in-process background jobs, and in-memory cache
+- One process hosts the API, Angular static files (`wwwroot`), in-process background jobs, and in-memory cache
 - No load balancer, no horizontal scaling, and no distributed cache (Redis)
-- Azure SQL and Azure Blob Storage remain the shared external services
+- Azure SQL and Azure Blob Storage are the external services
+
+**Go-live (operator):** [docs/README.md](docs/README.md) — Azure Portal setup, app settings, GitHub Deploy workflow.
 
 ### Health check
 
@@ -121,6 +125,16 @@ npm run build
 $env:CI = "true"; npm test
 ```
 
+## Production deployment
+
+All pipeline **code** is in the repo (spec 09). Going live is **operator work** — no separate staging environment:
+
+1. [docs/azure-prerequisites.md](docs/azure-prerequisites.md) — Azure (Portal or `scripts/provision-azure.ps1`)
+2. [docs/production-config.md](docs/production-config.md) — app settings (`scripts/set-app-settings.ps1`)
+3. GitHub — `scripts/configure-github.ps1` or manual secrets; merges to `main` auto-deploy
+
+Full ordered checklist: [docs/README.md](docs/README.md).
+
 ## Spec implementation roadmap
 
 | Spec | Area                                                 | Status                                                       |
@@ -128,15 +142,15 @@ $env:CI = "true"; npm test
 | 00   | API conventions (Result, Problem Details, contracts) | **Done**                                                     |
 | 01   | Project scaffold & data model                        | **Done**                                                     |
 | 02   | Authentication (JWT, Google, refresh tokens)         | **Done**                                                     |
-| 03   | Public pages (Home, About, Services)                 | **Partial** (RTL pages + placeholder copy; real content TBD) |
+| 03   | Public pages (Home, About, Services)                 | **Done** (launch-ready Arabic copy + branding assets) |
 | 04   | Booking flow                                         | **Done**                                                     |
 | 05   | Manual payments (Vodafone Cash / InstaPay receipts)  | **Done**                                                     |
 | 06   | Client dashboard                                     | **Done** (06a–06j)                                           |
 | 07   | Admin dashboard                                      | **Done** (07a–07o; ops alerts UI optional)                   |
 | 08   | Cross-cutting concerns (jobs, rate limits, ops)      | **Done** (08.1–08.9)                                         |
-| 09   | CI/CD pipeline (GitHub Actions; Azure CD later)      | **CI done** (CD planned)                                     |
+| 09   | CI/CD pipeline (GitHub Actions + Azure deploy)       | **Done** in repo — [go-live checklist](docs/README.md) for Azure + GitHub secrets |
 
-Implement specs **01–08** in order for new features — the MVP backend and dashboards are **complete** except public-page content (03) and optional ops alerts UI. Spec 09 (CI/CD) Phase 1 is done; **Phase 2 Azure CD** is the main remaining infra item.
+Implement specs **01–08** in order for new features — the MVP backend and dashboards are **complete** except public-page content (03) and optional ops alerts UI. Spec **09** code is complete; remaining work is operational: provision Azure and run the first **Deploy** workflow ([docs/README.md](docs/README.md)).
 
 ## Architecture (backend)
 
@@ -203,9 +217,3 @@ Sub-phases 08.1–08.9:
 Disable background jobs in tests via `BackgroundJobs:Enabled = false`.
 
 See [spec 08](specs/08-cross-cutting-concerns.md) for intervals, thresholds, and deployment notes.
-
-## Remaining / out of scope (MVP)
-
-- Public pages real content and polish (spec 03)
-- Azure CD deploy workflow (spec 09 Phase 2)
-- Full APM / WAF (spec 08 out of scope)

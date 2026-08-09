@@ -1,0 +1,139 @@
+# Production configuration (spec 09.6)
+
+Non-secret **structure** lives in [`appsettings.Production.json`](../src/backend/Shora.Api/appsettings.Production.json). **Never commit real credentials** — set values in Azure App Service **Configuration → Application settings** (or local environment variables for testing).
+
+See also: [azure-prerequisites.md](azure-prerequisites.md) (Portal setup) · [spec 09.6](../specs/09-ci-cd-pipeline.md#096--production-config-contract)
+
+Use double-underscore nesting for nested JSON (e.g. `Jwt__SigningKey` → `Jwt:SigningKey`).
+
+## Required App Service settings (startup)
+
+These must be set or the app fails to start (or deploy fails in GitHub):
+
+| Setting | App Service name | Notes |
+| --- | --- | --- |
+| Environment | `ASPNETCORE_ENVIRONMENT` | `Production` |
+| SQL connection | `ConnectionStrings__DefaultConnection` | Azure SQL ADO.NET string |
+| JWT signing key | `Jwt__SigningKey` | Min 32 chars; strong random (spec 02) |
+
+## Required for MVP flows (app may start without these)
+
+| Setting | App Service name | Notes |
+| --- | --- | --- |
+| Production URL | `Frontend__BaseUrl` | `https://<your-app>.azurewebsites.net` — email links, password reset |
+| CORS origin | `Cors__AllowedOrigins__0` | **Same URL** as `Frontend__BaseUrl` (same-site auth) |
+| Blob storage | `Storage__ConnectionString` | Azure Storage account — receipt upload fails without it |
+| Receipt container | `Storage__ReceiptContainer` | Private container name (default `receipts`) |
+
+If `Frontend__BaseUrl` / `Cors__AllowedOrigins__0` are not set in Azure, the repo falls back to placeholder `https://YOUR_PRODUCTION_HOST` in `appsettings.Production.json` — refresh cookies and email links will not work until you override them.
+
+Refresh cookies use `Secure=true` and `SameSite=Strict` outside Development ([`RefreshCookieService`](../src/backend/Shora.Infrastructure/Services/RefreshCookieService.cs)).
+
+### Custom domain
+
+Full runbook: [custom-domain.md](custom-domain.md).
+
+When you bind a custom domain to App Service, update **all** of the following to the new HTTPS origin:
+
+- `Frontend__BaseUrl`
+- `Cors__AllowedOrigins__0`
+- Google Cloud **Authorized JavaScript origins** (if using Google sign-in)
+- `googleClientId` build in [`environment.production.ts`](../src/frontend/src/environments/environment.production.ts) (same client ID; origins must include the new domain)
+
+## SMTP (required for email verification and transactional mail)
+
+Without SMTP, signup works but **users cannot verify email and therefore cannot book** (spec 02). Password reset and booking/cancellation emails are also skipped ([`NoOpEmailSender`](../src/backend/Shora.Infrastructure/DependencyInjection.cs)).
+
+| Setting | App Service name | Notes |
+| --- | --- | --- |
+| SMTP host | `Email__Host` | Required with `FromAddress` for mail to send |
+| SMTP port | `Email__Port` | Default `587` (StartTLS); use `465` for SSL-on-connect |
+| SMTP user | `Email__Username` | Optional if your provider allows unauthenticated relay (unusual) |
+| SMTP password | `Email__Password` | Required when `Username` is set |
+| From address | `Email__FromAddress` | Verified sender at your provider |
+| From display name | `Email__FromName` | Optional; defaults to `Shora` in `appsettings.Production.json` |
+
+Example providers: SendGrid SMTP, Amazon SES, Mailgun, or your domain host’s SMTP. Use the provider’s SMTP hostname, port, and app-specific password — not your login password when the provider offers an API/app password.
+
+## Google OAuth (optional)
+
+Only needed if you want the Google sign-in button on the login page.
+
+| Layer | What to set |
+| --- | --- |
+| **Backend** | `Google__ClientId` — must match the OAuth client used by the frontend |
+| **Frontend (build-time)** | `googleClientId` in [`environment.production.ts`](../src/frontend/src/environments/environment.production.ts) **or** GitHub variable `GOOGLE_CLIENT_ID` (Deploy workflow injects at build) |
+| **Google Cloud Console** | See [Google Cloud setup](#google-cloud-setup) below |
+
+`Google__ClientSecret` is **not used** by the current ID-token flow — only `Google__ClientId` is validated server-side.
+
+### Google Cloud setup
+
+1. [Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services → Credentials** → **Create credentials → OAuth client ID**.
+2. Application type: **Web application**.
+3. **Authorized JavaScript origins:** add your production HTTPS URL (same as `Frontend__BaseUrl`), e.g. `https://<app-name>.azurewebsites.net`.
+4. **Authorized redirect URIs:** not required for the current Google Identity Services button flow (ID token only).
+5. Copy the **Client ID** into:
+   - App Service `Google__ClientId`
+   - `googleClientId` in `environment.production.ts`
+6. Redeploy (merge to `main`) after changing the frontend file.
+
+First-time Google users sign in from the **login** page (not signup) — spec 02.
+
+## Admin bootstrap (first production admin)
+
+There is no public admin registration. Choose one approach:
+
+### Recommended: one-time `AdminSeed` (then remove)
+
+1. Before first deploy (or before first app restart after deploy), set in App Service:
+   - `AdminSeed__Email` — admin login email
+   - `AdminSeed__Password` — strong password (Identity rules apply)
+2. On startup, [`DatabaseSeeder`](../src/backend/Shora.Infrastructure/Data/DatabaseSeeder.cs) creates the Admin user if it does not exist.
+3. Log in at `/auth/login`, confirm admin dashboard access.
+4. **Remove** `AdminSeed__Email` and `AdminSeed__Password` from App Service settings so credentials are not stored in configuration.
+
+If `AdminSeed` is omitted, the app starts but **no admin exists** — receipt approval and admin settings are unavailable until you add an admin (only practical path today is temporary `AdminSeed`).
+
+## Payment and contact defaults (first run)
+
+On first startup, the singleton `Settings` row is seeded from `Seed:*` in [`appsettings.json`](../src/backend/Shora.Api/appsettings.json) if no row exists yet. Defaults are **placeholder test values**:
+
+| Default | Value |
+| --- | --- |
+| `ConsultantWhatsAppNumber` | `+201000000000` |
+| `VodafoneCashNumber` | `01000000000` |
+| `InstaPayHandle` | `consultant@instapay` |
+
+Seeding runs **once** — later changes must go through `/admin/settings` (or set `Seed__*` env vars **before the first app startup**):
+
+| Setting | App Service name |
+| --- | --- |
+| WhatsApp | `Seed__ConsultantWhatsAppNumber` |
+| Vodafone Cash | `Seed__VodafoneCashNumber` |
+| InstaPay | `Seed__InstaPayHandle` |
+| Optional payment note | `Seed__PaymentInstructions` |
+
+**After first deploy:** log in as admin → **Settings** and set real payment numbers before accepting client bookings.
+
+## Optional tuning (inherits from base `appsettings.json`)
+
+No Azure override needed for MVP unless you want to change defaults:
+
+- `BackgroundJobs`, `OpsMonitoring`, `RateLimiting`, `Cache`, `Booking`, `ReceiptUpload`, `Brand`
+- `Jwt__Issuer`, `Jwt__Audience`, token lifetimes
+
+## Frontend (build-time, not App Service)
+
+| File | Purpose |
+| --- | --- |
+| [`environment.production.ts`](../src/frontend/src/environments/environment.production.ts) | `googleClientId` for Google button; `apiBaseUrl: '/api/v1'` is correct for same-site deploy |
+
+## Verify
+
+1. All required App Service settings saved (no secrets in git).
+2. Merge to `main` — **Deploy** runs automatically ([`deploy.yml`](../.github/workflows/deploy.yml)).
+3. Open `https://<host>/` (SPA) and `GET https://<host>/api/v1/health` (API).
+4. Log in as admin; confirm `/admin/settings` has real payment numbers.
+5. Test end-to-end: signup → verification email → book → upload receipt → admin approve.
+6. Remove `AdminSeed__*` from App Service after admin account exists.

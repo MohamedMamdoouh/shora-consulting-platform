@@ -22,12 +22,24 @@ app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseCors(CorsOptions.PolicyName);
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseDefaultFiles();
+    app.UseStaticFiles();
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseAuthRateLimitEmail();
 app.UseRateLimiter();
 app.UseOutputCache();
 app.MapControllers();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.MapFallbackToFile("index.html");
+}
 
 await app.Services.InitializeDatabaseAsync();
 

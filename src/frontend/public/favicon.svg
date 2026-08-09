@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Shora">
+  <rect width="32" height="32" rx="8" fill="#b85c38"/>
+  <path fill="#faf6f2" d="M8 22c0-6 3.5-10 8-10s8 4 8 10h-3c0-4-2.2-6.5-5-6.5S11 18 11 22H8zm8-12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+</svg>

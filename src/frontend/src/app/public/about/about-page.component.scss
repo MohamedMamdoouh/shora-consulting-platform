@@ -12,6 +12,31 @@
   margin-bottom: var(--space-md);
 }
 
-.section p:last-of-type {
-  margin-bottom: var(--space-lg);
+.about__hero {
+  text-align: center;
+}
+
+.about__photo {
+  margin-bottom: var(--space-md);
+}
+
+.about__lead {
+  font-size: 1.125rem;
+  color: var(--color-text-muted);
+}
+
+.about__list {
+  margin: 0;
+  padding-inline-start: var(--space-lg);
+
+  li {
+    margin-bottom: var(--space-sm);
+  }
+}
+
+.about__privacy {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
 }

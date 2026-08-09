@@ -3,6 +3,9 @@
 **/obj/
 **/dist/
 **/out/
+publish/
+src/backend/Shora.Api/wwwroot/*
+!src/backend/Shora.Api/wwwroot/.gitkeep
 
 # .NET
 *.user

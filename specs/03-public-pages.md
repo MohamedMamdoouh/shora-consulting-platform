@@ -1,6 +1,6 @@
 # 03 — Public Pages (Home, About, Services)
 
-Status: **Partially implemented** — RTL pages exist at `/`, `/about`, and `/services` with placeholder Arabic copy and working CTAs into `/booking/start`. Real consultant bio, topic descriptions, and final marketing copy are still TBD.
+Status: **Done** — RTL pages at `/`, `/about`, and `/services` with launch-ready Arabic copy, branding assets (`logo.svg`, `favicon.svg`), and working CTAs into `/booking/start`. Consultant-specific credentials and photo can replace generic bio text when provided.
 
 ## 1. Goals
 

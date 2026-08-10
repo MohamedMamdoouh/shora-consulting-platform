@@ -129,9 +129,9 @@ $env:CI = "true"; npm test
 
 All pipeline **code** is in the repo (spec 09). Going live is **operator work** — no separate staging environment:
 
-1. [docs/azure-prerequisites.md](docs/azure-prerequisites.md) — Azure (Portal or `scripts/provision-azure.ps1`)
-2. [docs/production-config.md](docs/production-config.md) — app settings (`scripts/set-app-settings.ps1`)
-3. GitHub — `scripts/configure-github.ps1` or manual secrets; merges to `main` auto-deploy
+1. [docs/azure-prerequisites.md](docs/azure-prerequisites.md) — Azure Portal or **Azure MCP** plugin in Cursor
+2. [docs/production-config.md](docs/production-config.md) — App Service application settings
+3. GitHub — repository variables + environment secrets; merges to `main` auto-deploy
 
 Full ordered checklist: [docs/README.md](docs/README.md).
 

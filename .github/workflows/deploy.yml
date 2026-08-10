@@ -25,14 +25,6 @@ jobs:
           cache: npm
           cache-dependency-path: src/frontend/package-lock.json
 
-      - name: Apply Google Client ID (build-time)
-        if: vars.GOOGLE_CLIENT_ID != ''
-        working-directory: src/frontend
-        env:
-          GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
-        run: |
-          sed -i "s/googleClientId: .*/googleClientId: '${GOOGLE_CLIENT_ID}',/" src/environments/environment.production.ts
-
       - name: Build frontend
         working-directory: src/frontend
         run: |
@@ -69,9 +61,14 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: ${{ vars.DEPLOY_ENVIRONMENT || 'production' }}
+    outputs:
+      webapp_name: ${{ steps.deploy-meta.outputs.webapp_name }}
     env:
       AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME }}
     steps:
+      - id: deploy-meta
+        run: echo "webapp_name=${AZURE_WEBAPP_NAME}" >> "$GITHUB_OUTPUT"
+
       - name: Require Azure configuration
         run: |
           if [ -z "$AZURE_WEBAPP_NAME" ]; then
@@ -96,9 +93,9 @@ jobs:
     name: Post-deploy smoke test
     needs: deploy
     runs-on: ubuntu-latest
-    if: vars.AZURE_WEBAPP_NAME != ''
+    if: ${{ needs.deploy.result == 'success' && needs.deploy.outputs.webapp_name != '' }}
     env:
-      BASE_URL: https://${{ vars.AZURE_WEBAPP_NAME }}.azurewebsites.net
+      BASE_URL: https://${{ needs.deploy.outputs.webapp_name }}.azurewebsites.net
     steps:
       - name: Wait for app startup
         run: sleep 30

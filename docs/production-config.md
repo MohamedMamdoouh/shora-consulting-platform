@@ -31,9 +31,11 @@ Refresh cookies use `Secure=true` and `SameSite=Strict` outside Development ([`R
 
 ### Custom domain
 
-Full runbook: [custom-domain.md](custom-domain.md).
+When you bind a custom domain to App Service:
 
-When you bind a custom domain to App Service, update **all** of the following to the new HTTPS origin:
+1. **Portal** → App Service → **Custom domains** → add hostname → complete DNS (CNAME to `<app>.azurewebsites.net` or apex A/ALIAS records).
+2. **TLS** → bind **App Service Managed Certificate** (Basic+ plan) or upload your own cert.
+3. Update **all** URL-dependent settings to the new HTTPS origin (no trailing slash):
 
 - `Frontend__BaseUrl`
 - `Cors__AllowedOrigins__0`
@@ -62,7 +64,7 @@ Only needed if you want the Google sign-in button on the login page.
 | Layer | What to set |
 | --- | --- |
 | **Backend** | `Google__ClientId` — must match the OAuth client used by the frontend |
-| **Frontend (build-time)** | `googleClientId` in [`environment.production.ts`](../src/frontend/src/environments/environment.production.ts) **or** GitHub variable `GOOGLE_CLIENT_ID` (Deploy workflow injects at build) |
+| **Frontend (build-time)** | `googleClientId` in [`environment.production.ts`](../src/frontend/src/environments/environment.production.ts) — commit before merge to `main` |
 | **Google Cloud Console** | See [Google Cloud setup](#google-cloud-setup) below |
 
 `Google__ClientSecret` is **not used** by the current ID-token flow — only `Google__ClientId` is validated server-side.

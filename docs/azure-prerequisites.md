@@ -2,18 +2,15 @@
 
 Create production resources in **Azure Portal** and configure GitHub **before** merging to `main` (which triggers Deploy automatically).
 
-**Related:** [production-config.md](production-config.md) (app settings) · [docs/README.md](README.md) (full go-live order) · [custom-domain.md](custom-domain.md)
+**Related:** [production-config.md](production-config.md) (app settings) · [docs/README.md](README.md) (full go-live order)
 
-## Automated provisioning (optional)
+## Azure MCP plugin (optional)
 
-Instead of manual Portal steps, deploy [`infra/`](../infra/) with Azure CLI:
+In **Cursor**, authenticate the **Azure MCP** plugin and ask the agent to provision resources or configure App Service settings using the checklists below. Requires an active Azure subscription signed in through MCP.
 
-```powershell
-.\scripts\provision-azure.ps1 -BaseName shora -Location westeurope -SqlAdminPassword 'YourStrongP@ssw0rd!'
-.\scripts\set-app-settings.ps1 -ResourceGroup rg-shora-prod -WebAppName app-shora-prod ...
-```
+Example: *"Using Azure MCP, create Shora production resources per azure-prerequisites.md in region westeurope."*
 
-Requires `az login` and an active subscription.
+Manual **Azure Portal** steps work the same way — follow the sections below.
 
 ## Go-live checklist
 
@@ -39,7 +36,7 @@ Requires `az login` and an active subscription.
 ### GitHub
 
 - [ ] Repository variable: `AZURE_WEBAPP_NAME` (exact Web App name from Portal)
-- [ ] Optional repository variable: `GOOGLE_CLIENT_ID` (build-time Google sign-in; or commit in `environment.production.ts`)
+- [ ] `googleClientId` in [`environment.production.ts`](../src/frontend/src/environments/environment.production.ts) (build-time; commit before merge)
 - [ ] GitHub Environment: `production` (optional required reviewers)
 - [ ] Environment secret: `AZURE_WEBAPP_PUBLISH_PROFILE` (App Service → **Get publish profile**)
 - [ ] Optional repository variable: `DEPLOY_ENVIRONMENT` (defaults to `production` if unset)
@@ -102,7 +99,7 @@ Minimum for a working MVP (add before go-live):
 1. Create SQL server + database.
 2. **Networking → Firewall:** enable **Allow Azure services and resources to access this server**.
 3. Copy ADO.NET connection string into App Service `ConnectionStrings__DefaultConnection`.
-4. **Backup:** Basic tier includes 7-day automated backups. Confirm under **Database → Backups** (or via Bicep `backupShortTermRetentionPolicies`). For production, document restore procedure before first schema migration.
+4. **Backup:** Basic tier includes 7-day automated backups. Confirm under **Database → Backups**. For production, document restore procedure before first schema migration.
 
 ## Blob storage
 
@@ -116,12 +113,11 @@ Minimum for a working MVP (add before go-live):
 | Item              | Where                                  | Value                                          |
 | ----------------- | -------------------------------------- | ---------------------------------------------- |
 | Web App name      | Repository **Variables**               | Exact name from Azure Portal                   |
-| Google Client ID  | Repository **Variables** (optional)    | `GOOGLE_CLIENT_ID` — injected at build in Deploy |
 | Publish profile   | Environment **Secrets** (`production`) | App Service → **Get publish profile**          |
 | Deploy environment | Repository **Variables** (optional)   | `DEPLOY_ENVIRONMENT` — defaults to `production`  |
 | Approval gate     | **Environments → production**          | Optional required reviewers                    |
 
-Deploy triggers on **push to `main` only** — there is no manual workflow dispatch. Configure Azure and GitHub secrets **before** the first merge to `main`. Or run `scripts/configure-github.ps1`.
+Deploy triggers on **push to `main` only** — there is no manual workflow dispatch. Configure Azure and GitHub secrets **before** the first merge to `main`.
 
 Optional later: Azure OIDC federated credential instead of publish profile.
 

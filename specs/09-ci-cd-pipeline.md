@@ -1,8 +1,6 @@
 # 09 — CI/CD Pipeline
 
-Status: **Sub-phases 09.1–09.10 done** in repo. **Active deploy target:** Railway + GHCR + Neon PostgreSQL + Azure Blob (receipts). Operator go-live: [docs/README.md](../docs/README.md) · [docs/railway-prerequisites.md](../docs/railway-prerequisites.md).
-
-Legacy Azure App Service path: [docs/azure-prerequisites.md](../docs/azure-prerequisites.md).
+Status: **Sub-phases 09.1–09.10 done** in repo. **Deploy target:** Railway + GHCR + Neon PostgreSQL + Azure Blob (receipts). Operator guide: [docs/deployment.md](../docs/deployment.md).
 
 This spec defines how Shora is built, validated, and deployed. It complements spec 08 #4 (hosting topology) with GitHub Actions workflows and sub-phases 09.1–09.10. Workflow YAML stays thin; this document is the authoritative design.
 
@@ -13,7 +11,7 @@ This spec defines how Shora is built, validated, and deployed. It complements sp
 | [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) | Build + test (backend and frontend separately) | Push/PR to `main` |
 | [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) | Production publish artifact + GHCR push + Railway redeploy | Push to `main` only |
 
-Operator go-live steps: [docs/README.md](../docs/README.md).
+Operator go-live steps: [docs/deployment.md](../docs/deployment.md).
 
 ### Implementation summary
 
@@ -25,7 +23,7 @@ Operator go-live steps: [docs/README.md](../docs/README.md).
 | 09.4 | CI hygiene (Dependabot, branch protection, CI badge) | **Done** |
 | 09.5 | Same-site static hosting (`wwwroot`, SPA fallback) | **Done** |
 | 09.6 | Production config contract (env vars, CORS origin) | **Done** |
-| 09.7 | Hosting prerequisites (Railway + Neon + Azure Blob; legacy Azure App Service doc) | **Done** (operator checklists) |
+| 09.7 | Hosting prerequisites (Railway + Neon + Azure Blob) | **Done** (operator checklist) |
 | 09.8 | Publish artifact build (npm → wwwroot → dotnet publish) | **Done** (deploy.yml) |
 | 09.9 | Deploy workflow (`deploy.yml`, production gate) | **Done** (needs Railway + GitHub secrets to run) |
 | 09.10 | Startup migrations & rollback policy | **Done** (code) |
@@ -36,7 +34,7 @@ Operator go-live steps: [docs/README.md](../docs/README.md).
 
 - **Fast PR feedback** — every change to `main` is buildable and testable before merge.
 - **Reproducible builds** — pinned toolchains (.NET 10, Node 22) and lock files (`package-lock.json`, NuGet restore).
-- **Safe deploy path (09.5–09.9)** — production releases on **Railway** (single container, same-site SPA + API) with **Neon PostgreSQL** and **Azure Blob** for receipts only; aligned with spec 02 same-site auth (`SameSite=Strict` refresh cookies). Legacy **Azure App Service + Azure SQL** documented in [docs/azure-prerequisites.md](../docs/azure-prerequisites.md). Local development uses `Development` / dev tooling only — no separate staging environment.
+- **Safe deploy path (09.5–09.9)** — production releases on **Railway** (single container, same-site SPA + API) with **Neon PostgreSQL** and **Azure Blob** for receipts only; aligned with spec 02 same-site auth (`SameSite=Strict` refresh cookies). Local development uses `Development` / dev tooling only — no separate staging environment.
 
 ## 2. Repository & Triggers
 
@@ -129,7 +127,7 @@ $env:CI = "true"; npm test
 | Item | Purpose | Status |
 | --- | --- | --- |
 | **Dependabot** ([`.github/dependabot.yml`](../.github/dependabot.yml)) | Monthly PRs for NuGet (`src/backend`) and npm (`src/frontend`) dependency updates | **Done** |
-| **Branch protection** (GitHub UI) | Require CI workflow green before merging to `main` | **Manual setup** — see [workflows README](../.github/workflows/README.md#branch-protection-094) |
+| **Branch protection** (GitHub UI) | Require CI workflow green before merging to `main` | **Manual setup** — see [workflows README](../.github/workflows/README.md#branch-protection) |
 | **CI badge** ([`README.md`](../README.md)) | Visibility of pipeline health on the default branch | **Done** |
 
 **Branch protection setup** (one-time, after first successful CI run on `main`):
@@ -173,23 +171,23 @@ dotnet run --project Shora.Api
 
 **Purpose:** Define the exact environment variables the production host must have — no guessing at deploy time.
 
-**Done.** Structure template: [`appsettings.Production.json`](../src/backend/Shora.Api/appsettings.Production.json). Operator guide: [`docs/production-config.md`](../docs/production-config.md). Set on **Railway** (active) or App Service (legacy).
+**Done.** Structure template: [`appsettings.Production.json`](../src/backend/Shora.Api/appsettings.Production.json). Operator guide: [`docs/deployment.md`](../docs/deployment.md). Set on **Railway**.
 
 Set secrets via environment variables (double-underscore nesting). Never commit values.
 
 | Setting | Notes |
 | --- | --- |
-| `ConnectionStrings__DefaultConnection` | Neon PostgreSQL (Railway path) or Azure SQL (legacy) |
+| `ConnectionStrings__DefaultConnection` | Neon PostgreSQL |
 | `Jwt__SigningKey` | Strong random key, min 32 chars (spec 02) |
-| `Storage__ConnectionString` | Blob account — `stshoraprodne001` in production (spec 05) |
+| `Storage__ConnectionString` | Blob account — private Azure Storage container (spec 05) |
 | `Storage__ReceiptContainer` | Private container name (`receipts`) |
 | `Google__ClientId` | Google OAuth client ID (optional; spec 02) — `ClientSecret` unused by ID-token flow |
 | `Email__*` | SMTP / provider settings (spec 02, outbox) — `Host` + `FromAddress` required at startup |
-| `Frontend__BaseUrl` | Production HTTPS URL (e.g. `https://shora-production.up.railway.app`) |
+| `Frontend__BaseUrl` | Production HTTPS URL (e.g. `https://<your-app>.up.railway.app`) |
 | `Cors__AllowedOrigins__0` | Same production HTTPS URL (same-site + `AllowCredentials`) |
 | `AllowedHosts` | Hostname only (no `https://`) |
 | `AdminSeed__Email`, `AdminSeed__Password` | One-time admin bootstrap — remove from Railway after first login |
-| `Seed__*` | Optional payment/contact defaults before first startup — see [`docs/production-config.md`](../docs/production-config.md) |
+| `Seed__*` | Optional payment/contact defaults before first startup — see [`docs/deployment.md`](../docs/deployment.md) |
 
 Refresh cookies automatically use `Secure=true` and `SameSite=Strict` outside Development ([`RefreshCookieService`](../src/backend/Shora.Infrastructure/Services/RefreshCookieService.cs)).
 
@@ -201,28 +199,16 @@ Refresh cookies automatically use `Secure=true` and `SameSite=Strict` outside De
 
 **Purpose:** Create the resources CD will target.
 
-**Done.** Active checklist: [`docs/railway-prerequisites.md`](../docs/railway-prerequisites.md). Legacy App Service checklist: [`docs/azure-prerequisites.md`](../docs/azure-prerequisites.md).
-
-### Path B-lite (active — Shora production)
+**Done.** Checklist: [`docs/deployment.md`](../docs/deployment.md).
 
 | Resource | Purpose |
 | --- | --- |
 | **Railway** | Host .NET 10 API + static Angular (single container) |
 | **Neon PostgreSQL** | Production database |
-| **Azure Blob Storage** | Private receipt container (`stshoraprodne001` / `receipts`, spec 05) |
-| **GHCR** | `ghcr.io/mohamedmamdoouh/shora-consulting-platform:production` |
+| **Azure Blob Storage** | Private receipt container (spec 05) |
+| **GHCR** | `ghcr.io/<owner>/<repo>:production` |
 
-**Verify:** Railway variables configured; GitHub Deploy workflow green; `GET https://shora-production.up.railway.app/api/v1/health` returns OK.
-
-### Path A (legacy — Azure App Service)
-
-| Resource | Purpose |
-| --- | --- |
-| **Azure App Service** | Host .NET 10 API + static Angular (always-on, single instance) |
-| **Azure SQL** | Production database |
-| **Azure Blob Storage** | Private receipt container (`Storage:ReceiptContainer`, spec 05) |
-
-**Verify:** App settings configured in Portal; merge to `main` deploys automatically; `/api/v1/health` returns OK.
+**Verify:** Railway variables configured; GitHub Deploy workflow green; `GET https://<production-url>/api/v1/health` returns OK.
 
 ---
 
@@ -246,7 +232,7 @@ Sequence:
 
 **Purpose:** Automate building the publish artifact, pushing a container to GHCR, and redeploying Railway after 09.5–09.8 are proven and hosting exists (09.7).
 
-**Done.** Workflow: [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml). Setup: [docs/railway-prerequisites.md](../docs/railway-prerequisites.md), [`.github/workflows/README.md`](../.github/workflows/README.md).
+**Done.** Workflow: [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml). Setup: [docs/deployment.md](../docs/deployment.md), [`.github/workflows/README.md`](../.github/workflows/README.md).
 
 | Concern | Design |
 | --- | --- |
@@ -260,11 +246,11 @@ Sequence:
 
 ### GitHub setup (Railway path)
 
-1. Neon + Azure Blob + Railway — [docs/railway-prerequisites.md](../docs/railway-prerequisites.md)
+1. Neon + Azure Blob + Railway — [docs/deployment.md](../docs/deployment.md)
 2. GitHub Environment `production` (optional reviewers)
 3. Repository variables: `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`
 4. Optional repository variable `DEPLOY_ENVIRONMENT` (defaults to `production`)
-5. Environment secret `RAILWAY_TOKEN` (Railway **project token** — project **shora** → Settings → Tokens → `production`; not an account token from [railway.app/account/tokens](https://railway.app/account/tokens))
+5. Environment secret `RAILWAY_TOKEN` (Railway **project token** for `production`; not an account token from [railway.app/account/tokens](https://railway.app/account/tokens))
 6. GHCR package public or Railway registry credentials for image pull
 7. Enable branch protection on `main` — CI green before merge, then push auto-deploys
 
@@ -277,10 +263,6 @@ Sequence:
 5. App startup applies EF migrations and idempotent seed (09.10)
 
 **Verify:** After Railway + GitHub secrets are configured, merge to `main` deploys automatically; app reachable over HTTPS with same-site cookies.
-
-### Legacy Azure App Service deploy
-
-The repo previously targeted App Service via publish profile. That path is documented in [docs/azure-prerequisites.md](../docs/azure-prerequisites.md) but is **not** the current `deploy.yml` target.
 
 ---
 

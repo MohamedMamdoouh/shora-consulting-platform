@@ -7,18 +7,32 @@ namespace Shora.Api.BackgroundJobs;
 
 public sealed class OpsMonitoringJob(
     IServiceScopeFactory scopeFactory,
-    IOptions<BackgroundJobOptions> options,
+    IOptions<BackgroundJobOptions> backgroundJobOptions,
+    IOptions<OpsMonitoringOptions> opsMonitoringOptions,
     ILogger<OpsMonitoringJob> logger) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        if (!options.Value.Enabled)
+        if (!backgroundJobOptions.Value.Enabled)
         {
             logger.LogInformation("Background jobs are disabled; ops monitoring will not run.");
             return;
         }
 
-        var interval = TimeSpan.FromSeconds(options.Value.OpsMonitoringIntervalSeconds);
+        var initialDelay = TimeSpan.FromSeconds(opsMonitoringOptions.Value.OpsMonitoringInitialDelaySeconds);
+        if (initialDelay > TimeSpan.Zero)
+        {
+            try
+            {
+                await Task.Delay(initialDelay, stoppingToken);
+            }
+            catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+            {
+                return;
+            }
+        }
+
+        var interval = TimeSpan.FromSeconds(backgroundJobOptions.Value.OpsMonitoringIntervalSeconds);
 
         await BackgroundJobHost.RunPeriodicAsync(
             scopeFactory,

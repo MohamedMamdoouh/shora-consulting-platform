@@ -11,6 +11,7 @@ namespace Shora.Application.Services;
 public sealed class OpsMonitoringService(
     IApplicationDbContext dbContext,
     IDateTimeProvider dateTimeProvider,
+    IApplicationStartedAtProvider applicationStartedAtProvider,
     IOptions<OpsMonitoringOptions> opsMonitoringOptions,
     IOptions<BackgroundJobOptions> backgroundJobOptions,
     ILogger<OpsMonitoringService> logger)
@@ -270,6 +271,16 @@ public sealed class OpsMonitoringService(
         BackgroundJobOptions jobOptions,
         CancellationToken cancellationToken)
     {
+        var uptime = now - applicationStartedAtProvider.StartedAtUtc;
+        if (uptime < TimeSpan.FromMinutes(options.JobHeartbeatStartupGraceMinutes))
+        {
+            logger.LogDebug(
+                "Skipping job heartbeat alerts during startup grace ({ElapsedMinutes:F1}/{GraceMinutes} min).",
+                uptime.TotalMinutes,
+                options.JobHeartbeatStartupGraceMinutes);
+            return [];
+        }
+
         var alerts = new List<OpsAlert>();
         var histories = await dbContext.JobRunHistories
             .AsNoTracking()

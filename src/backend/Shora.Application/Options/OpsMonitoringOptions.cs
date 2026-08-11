@@ -18,6 +18,10 @@ public sealed class OpsMonitoringOptions
 
     public int JobHeartbeatCriticalIntervals { get; set; } = 4;
 
+    public int JobHeartbeatStartupGraceMinutes { get; set; } = 20;
+
+    public int OpsMonitoringInitialDelaySeconds { get; set; } = 120;
+
     public int OutboxDeadLetterBurstCount { get; set; } = 5;
 
     public int OutboxDeadLetterBurstWindowHours { get; set; } = 1;

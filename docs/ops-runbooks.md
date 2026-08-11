@@ -2,7 +2,7 @@
 
 Runbook content is maintained in [`src/backend/Shora.Application/Ops/runbooks.json`](../src/backend/Shora.Application/Ops/runbooks.json) (embedded in the API at build time).
 
-Other operator docs: [docs/README.md](README.md) (Azure deploy, production config).
+Other operator docs: [deployment guide](deployment.md).
 
 | Where to read | How |
 | ------------- | --- |

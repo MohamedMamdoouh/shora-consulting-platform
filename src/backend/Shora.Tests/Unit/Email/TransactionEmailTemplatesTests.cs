@@ -28,7 +28,7 @@ public class TransactionEmailTemplatesTests
         var links = CreateLinks();
         var service = CreateTemplateService();
 
-        var request = TransactionEmailTemplates.BuildRequest(context, links, "منصة شورى");
+        var request = TransactionEmailTemplates.BuildRequest(context, links, "Shora");
         var html = service.Render(request);
 
         Assert.Contains(expectedHeading, html);
@@ -49,9 +49,9 @@ public class TransactionEmailTemplatesTests
     [InlineData(OutboxMessageTypes.AdminRefundRevocationEmail)]
     public void GetSubject_returns_branded_subject_for_each_message_type(string messageType)
     {
-        var subject = TransactionEmailTemplates.GetSubject(messageType, "منصة شورى");
+        var subject = TransactionEmailTemplates.GetSubject(messageType, "Shora");
 
-        Assert.Contains("منصة شورى", subject);
+        Assert.Contains("Shora", subject);
         Assert.False(string.IsNullOrWhiteSpace(subject));
     }
 
@@ -65,7 +65,7 @@ public class TransactionEmailTemplatesTests
         {
             Id = clientId,
             Email = "client@test.local",
-            DisplayName = "سارة"
+            DisplayName = "Alex"
         };
 
         var booking = new Booking
@@ -138,5 +138,5 @@ public class TransactionEmailTemplatesTests
         new(Options.Create(new FrontendOptions { BaseUrl = "https://app.test" }));
 
     private static EmailTemplateService CreateTemplateService() =>
-        new(Options.Create(new EmailBrandOptions { BrandName = "منصة شورى" }));
+        new(Options.Create(new EmailBrandOptions { BrandName = "Shora" }));
 }

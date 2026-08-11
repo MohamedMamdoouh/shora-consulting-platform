@@ -15,15 +15,15 @@ public class EmailTemplateTests
         var service = new EmailTemplateService(Options.Create(DefaultBrand));
         var request = AuthEmailTemplates.BuildRequest(
             AuthEmailKind.VerifyEmail,
-            recipientName: "سارة",
+            recipientName: "Alex",
             actionUrl: "https://example.com/auth/verify-email?email=test%40example.com&token=abc");
         var subject = AuthEmailTemplates.GetSubject(AuthEmailKind.VerifyEmail, DefaultBrand.BrandName);
         var htmlBody = service.Render(request);
 
         Assert.Contains("تأكيد بريدك الإلكتروني", subject);
-        Assert.Contains("منصة شورى", htmlBody);
+        Assert.Contains("Shora", htmlBody);
         Assert.Contains("تأكيد البريد الإلكتروني", htmlBody);
-        Assert.Contains("سارة", htmlBody);
+        Assert.Contains("Alex", htmlBody);
         Assert.Contains("https://example.com/auth/verify-email?email=test%40example.com&token=abc", htmlBody);
         Assert.DoesNotContain("{{", htmlBody);
     }
@@ -34,15 +34,15 @@ public class EmailTemplateTests
         var service = new EmailTemplateService(Options.Create(DefaultBrand));
         var request = AuthEmailTemplates.BuildRequest(
             AuthEmailKind.ResetPassword,
-            recipientName: "سارة",
+            recipientName: "Alex",
             actionUrl: "https://example.com/auth/reset-password?email=test%40example.com&token=abc");
         var subject = AuthEmailTemplates.GetSubject(AuthEmailKind.ResetPassword, DefaultBrand.BrandName);
         var htmlBody = service.Render(request);
 
         Assert.Contains("إعادة تعيين كلمة المرور", subject);
-        Assert.Contains("منصة شورى", htmlBody);
+        Assert.Contains("Shora", htmlBody);
         Assert.Contains("تعيين كلمة مرور جديدة", htmlBody);
-        Assert.Contains("سارة", htmlBody);
+        Assert.Contains("Alex", htmlBody);
         Assert.DoesNotContain("{{", htmlBody);
     }
 }

@@ -80,7 +80,7 @@ jobs:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
           if [ -z "$RAILWAY_SERVICE_ID" ]; then
-            echo "::error::RAILWAY_SERVICE_ID repository variable is not set. See docs/railway-prerequisites.md"
+            echo "::error::RAILWAY_SERVICE_ID repository variable is not set. See docs/deployment.md"
             exit 1
           fi
           if [ -z "$PRODUCTION_URL" ]; then

@@ -20,11 +20,11 @@ Status: **Done** (sub-phases 07a–07o). Payment receipt review, approve/decline
 | 07l       | Cancellation queue + direct cancel UI                  | **Done** |
 | 07m       | Refund due UI                                          | **Done** |
 | 07n       | Earnings API + UI                                      | **Done** |
-| 07o       | Ops alerts API (`GET /admin/ops/alerts`)               | **Done** (UI optional) |
+| 07o       | Ops alerts API + UI (`/admin/ops`)                     | **Done** |
 
 **Frontend (`src/frontend/src/app/admin-dashboard/`):**
 
-- `admin-shell.component.*` — page header, sub-nav (الإعدادات، المواعيد، الحجوزات، الأرباح), `router-outlet`.
+- `admin-shell.component.*` — page header, sub-nav (Settings, Availability, Bookings, Earnings), `router-outlet`.
 - `admin-dashboard.routes.ts` — `/admin` redirects to `/admin/bookings`; `adminGuard` on shell; child pages: settings, availability, bookings, earnings.
 - `settings/`, `availability/`, `bookings/`, `earnings/` — full UI for each admin area (07b–07n).
 
@@ -39,7 +39,7 @@ Status: **Done** (sub-phases 07a–07o). Payment receipt review, approve/decline
 **Frontend (07c):**
 
 - `settings/admin-settings-page.component.*` — reactive form at `/admin/settings` with H4 client validation, server field errors, success banner.
-- `settings/admin-settings-validation.util.ts` — Arabic field messages.
+- `settings/admin-settings-validation.util.ts` — Localized field messages.
 - `core/admin/admin-settings.service.ts` — `GET/PUT /admin/settings`; invalidates public settings cache after save.
 
 **Backend (07d):**
@@ -84,13 +84,13 @@ Status: **Done** (sub-phases 07a–07o). Payment receipt review, approve/decline
 **Frontend (07i):**
 
 - `bookings/admin-bookings-page.component.*` — paginated table at `/admin/bookings` with status and date filters.
-- `bookings/admin-bookings-labels.util.ts` — Arabic status/delivery labels, slot formatting, cancellation notes.
+- `bookings/admin-bookings-labels.util.ts` — Localized status/delivery labels, slot formatting, cancellation notes.
 - `core/admin/admin-bookings.service.ts` — `GET /admin/bookings` with query params.
 
 **Frontend (07j):**
 
 - `bookings/admin-receipt-review-panel.component.*` — modal panel for viewing receipt image/history and approve/decline actions on `PendingApproval` rows.
-- `bookings/admin-receipt-labels.util.ts` — Arabic payment/receipt labels, decline reason options, formatting helpers.
+- `bookings/admin-receipt-labels.util.ts` — Localized payment/receipt labels, decline reason options, formatting helpers.
 - `core/admin/admin-bookings.service.ts` — extended with `GET/POST` receipt review endpoints.
 
 **Backend (07k):**
@@ -113,7 +113,7 @@ Status: **Done** (sub-phases 07a–07o). Payment receipt review, approve/decline
 - `bookings/admin-refund-panel.component.*` — record manual refund (reference + note) and revoke mistaken refund.
 - `bookings/admin-refund-labels.util.ts` — refund-due / refunded row guards and action visibility.
 - `core/admin/admin-payments.service.ts` — `POST /admin/payments/{id}/refunds/record` and `refunds/revoke`.
-- `admin-bookings-page.*` — refund-due row highlight, «تسجيل الاسترداد» / «تراجع عن الاسترداد» actions.
+- `admin-bookings-page.*` — refund-due row highlight, Record refund / Revoke refund actions.
 
 **Backend (07n):**
 
@@ -126,7 +126,7 @@ Status: **Done** (sub-phases 07a–07o). Payment receipt review, approve/decline
 **Frontend (07n):**
 
 - `earnings/admin-earnings-page.component.*` — summary cards at `/admin/earnings` with date filters.
-- `earnings/admin-earnings-labels.util.ts` — Arabic amount/count formatting.
+- `earnings/admin-earnings-labels.util.ts` — Localized amount/count formatting.
 - `core/admin/admin-earnings.service.ts` — `GET /admin/earnings`.
 
 **Backend (07o):**

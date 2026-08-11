@@ -2,11 +2,11 @@
 
 Status: **Done.** Client booking flow UI, reserve/cancel-hold/cancellation-request APIs, receipt-upload deadline cleanup, lifecycle background jobs (auto-decline, auto-complete), and client dashboard are complete (specs 04/06/08). Admin cancel and cancellation approve/decline are complete (spec 07).
 
-## 1. Flow Overview (per SDD #8, flow 1)
+## 1. Flow Overview
 
 `Services page → Pick slot + delivery method → Contact phone (if Voice Call) → Log in / sign up (required to reserve) → Review & confirm → Transfer fee + upload receipt → Confirmation`
 
-Login is deliberately placed **at the reserve step, not the start**: visitors can browse availability and make their selections without an account (lower friction for social-media traffic per SDD #4.3), and are only asked to log in/sign up at the moment they commit to reserving. Booking still always requires an account — there is no guest booking.
+Login is deliberately placed **at the reserve step, not the start**: visitors can browse availability and make their selections without an account (lower friction for social-media traffic), and are only asked to log in/sign up at the moment they commit to reserving. Booking still always requires an account — there is no guest booking.
 
 ## 2. Step-by-Step
 
@@ -89,23 +89,7 @@ The admin can cancel **any** booking **any time before the session start** direc
 
 Every transition below writes a `BookingStatusAudit` row (spec 01) in the same DB transaction, and every transition is guarded by the `Booking.RowVersion` optimistic-concurrency token (spec 01) so racing actors resolve to exactly one winner. `now` always means UTC; `StartUtc`/`EndUtc` are the booking's **snapshotted** `SlotStartUtc`/`SlotEndUtc` (spec 01), never a live slot read.
 
-```mermaid
-stateDiagram-v2
-    [*] --> PendingPayment: POST /api/bookings (slot locked)
-    PendingPayment --> PendingApproval: client uploads receipt (spec 05)
-    PendingPayment --> Cancelled: upload deadline expired / client abandon / admin cancel
-    PendingApproval --> Confirmed: admin approves receipt (spec 05)
-    PendingApproval --> PendingPayment: admin declines receipt (new upload window)
-    PendingApproval --> Cancelled: client abandon / admin cancel
-    Confirmed --> CancellationRequested: client requests cancellation (now < StartUtc - AutoDeclineHours)
-    Confirmed --> Cancelled: admin direct cancel
-    CancellationRequested --> Cancelled: admin approves request (refund due)
-    CancellationRequested --> Confirmed: admin declines / System auto-decline at deadline
-    CancellationRequested --> Cancelled: admin direct cancel
-    Confirmed --> Completed: auto-complete job, now >= EndUtc (snapshot)
-    Cancelled --> [*]
-    Completed --> [*]
-```
+State summary: reserve → `PendingPayment` → (receipt upload) → `PendingApproval` → (admin approve) → `Confirmed` → (session end) → `Completed`. Cancellations, declined receipts, and deadline expiry transition to `Cancelled` or back to `PendingPayment` as described in the table below.
 
 **Allowed transitions & exact guards:**
 

@@ -1,6 +1,6 @@
 # Shora Web (Angular 21)
 
-Arabic-first (RTL) frontend for the Shora booking platform. API contracts live in `src/contracts/`; HTTP calls use `@contracts/*` types aligned with `Shora.Contracts`.
+RTL frontend for the Shora booking platform. API contracts live in `src/contracts/`; HTTP calls use `@contracts/*` types aligned with `Shora.Contracts`.
 
 ## Development server
 
@@ -11,29 +11,29 @@ npm start
 
 Open `http://localhost:4200/`. The dev server proxies `/api` to the backend (`proxy.conf.json`) so auth cookies work on same-origin `localhost:4200`.
 
-## Implemented features (by spec)
+## Routes and features
 
-| Area | Route(s) | Spec |
-| ---- | -------- | ---- |
-| Auth | `/auth/*` | 02 |
-| Public pages | `/`, `/about`, `/services`, `/privacy`, `/terms` | 03 (placeholder copy on marketing pages) |
-| Booking flow | `/booking/start` → delivery → phone → review → `/booking/payment/:id` | 04 |
-| Client dashboard | `/dashboard` | 06 |
-| Admin dashboard | `/admin/settings`, `/admin/availability`, `/admin/bookings`, `/admin/earnings`, `/admin/ops` | 07 / 08 |
+| Area | Route(s) |
+| ---- | -------- |
+| Auth | `/auth/*` |
+| Public pages | `/`, `/about`, `/services`, `/privacy`, `/terms` |
+| Booking flow | `/booking/start` → delivery → phone → review → `/booking/payment/:id` |
+| Client dashboard | `/dashboard` |
+| Admin dashboard | `/admin/settings`, `/admin/availability`, `/admin/bookings`, `/admin/earnings`, `/admin/ops` |
 
-### Booking flow (spec 04)
+### Booking flow
 
 - Slot picker, delivery method, contact phone (voice call), review & reserve
 - Post-reserve payment instructions with shared `PaymentInstructionsPanelComponent`
 
-### Client dashboard (spec 06)
+### Client dashboard
 
 - Three sections: upcoming, pending (payment / approval), past (paginated load-more)
 - Shared payment panel for upload + countdown
 - Upcoming cards: voice-call instructions, WhatsApp chat link, cancellation request UX
-- Arabic labels for past cancelled bookings (reason + refund)
+- Localized labels for past cancelled bookings (reason + refund)
 
-### Admin dashboard (spec 07)
+### Admin dashboard
 
 - **Settings** — consultant pricing, session duration, payment numbers
 - **Availability** — recurring windows + blocked date ranges

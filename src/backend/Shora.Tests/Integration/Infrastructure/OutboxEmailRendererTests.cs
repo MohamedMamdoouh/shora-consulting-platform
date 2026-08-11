@@ -180,7 +180,7 @@ public class OutboxEmailRendererTests
                 ["Seed:VodafoneCashNumber"] = "01012345678",
                 ["Seed:InstaPayHandle"] = "test@instapay",
                 ["Frontend:BaseUrl"] = "https://app.test",
-                ["Brand:BrandName"] = "منصة شورى"
+                ["Brand:BrandName"] = "Shora"
             })
             .Build();
 

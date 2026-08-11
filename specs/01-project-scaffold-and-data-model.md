@@ -1,6 +1,6 @@
 # 01 — Project Scaffold & Data Model
 
-**Status: Implemented** (foundation 2026-07-06; extended through 2026-08). Backend scaffold, data model, migrations, seed, Angular RTL shell, and the full MVP stack (specs 02–09) are in place on this foundation. Remaining work is operational: Railway go-live ([docs/README.md](../docs/README.md)); optional admin ops alerts UI (API done — spec 08).
+**Status: Implemented** (foundation 2026-07-06; extended through 2026-08). Backend scaffold, data model, migrations, seed, Angular RTL shell, and the full MVP stack (specs 02–09) are in place on this foundation.
 
 ## 1. Architecture: Pragmatic Clean Architecture
 
@@ -8,14 +8,10 @@ The backend follows **Clean Architecture** with four layers, applied pragmatical
 
 ### 1.1 Dependency Flow
 
-```mermaid
-flowchart LR
-    Api --> Application
-    Infrastructure --> Application
-    Application --> Domain
-    Infrastructure --> Domain
-    Api --> Infrastructure
-```
+- **Api** → Application, Infrastructure
+- **Infrastructure** → Application, Domain
+- **Application** → Domain
+- **Infrastructure** → Domain (implements persistence and external services)
 
 - **Domain** depends on nothing (no EF, no ASP.NET, no external services).
 - **Application** depends only on Domain. It defines interfaces (e.g. `IFileStorage`, `IEmailSender`, `IApplicationDbContext`) that outer layers implement.
@@ -27,10 +23,10 @@ flowchart LR
 ```
 Shora/
 ├── specs/                          # Spec-driven documentation (00–09)
-├── docs/                           # Operator docs (Railway, production config, runbooks)
+├── docs/                           # Deployment and ops docs
 ├── src/
 │   ├── contracts/                  # TypeScript mirrors of Shora.Contracts
-│   ├── frontend/                   # Angular 21 (standalone, RTL Arabic shell)
+│   ├── frontend/                   # Angular 21 (standalone, RTL shell)
 │   │
 │   └── backend/                    # .NET 10 solution
 │       ├── Shora.slnx
@@ -107,13 +103,13 @@ Rationale: this keeps external, swappable concerns (payments, email) behind inte
   ├── admin-dashboard/   # Admin shell + settings, availability, bookings, earnings (spec 07 — done)
   └── auth/              # Login, signup, verify, reset (spec 02)
   ```
-- **Localization/RTL**: `<html lang="ar" dir="rtl">` in `index.html`; Arabic-friendly font stack in global `styles.scss`; no i18n library (Arabic-only site).
+- **Localization/RTL**: `<html lang="ar" dir="rtl">` in `index.html`; RTL-friendly font stack in global `styles.scss`; no i18n library (single-locale RTL site).
 - **Styling**: CSS custom properties in `styles.scss` (warm palette: `--color-primary`, `--color-background`, spacing, radius). Component-level SCSS elsewhere.
 - **Routing**: lazy-loaded feature routes via `app.routes.ts`; API base URL in `src/environments/environment.ts` → `/api/v1` (dev proxy to backend — see README).
 
 ## 4. Data Model (detailed)
 
-Builds on the high-level ERD in the SDD (#7). Per the architecture in #1, these are **Domain entities** (plain C# classes, no EF attributes); their table mapping and relationships are configured in the **Infrastructure** layer's EF Core entity configurations, and they are persisted via `ApplicationDbContext` (exposed to the Application layer as `IApplicationDbContext`).
+These are **Domain entities** (plain C# classes, no EF attributes); their table mapping and relationships are configured in the **Infrastructure** layer's EF Core entity configurations, and they are persisted via `ApplicationDbContext` (exposed to the Application layer as `IApplicationDbContext`).
 
 **Timezone convention (cross-cutting):** all `DateTime` fields below are stored in **UTC**. Conversion to the visitor's local browser timezone happens in the Angular UI only. The database and API never deal in local time.
 
@@ -121,7 +117,7 @@ Builds on the high-level ERD in the SDD (#7). Per the architecture in #1, these 
 
 | Field       | Type                     | Notes                                                                                                                                                                        |
 | ----------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| DisplayName | `string`                 | Defaulted from the Google profile name or the email local-part at signup; editable and may be a pseudonym per SDD #5.7                                                       |
+| DisplayName | `string`                 | Defaulted from the Google profile name or the email local-part at signup; editable and may be a pseudonym (privacy-friendly display name)                                                       |
 | Email       | `string`                 | **Required and unique.** Every account has an email (either entered for email/password signup, or provided by Google). Used for login and the password-reset path (spec 02). |
 | Role        | `enum { Client, Admin }` | Enforced via Identity roles, mirrored here for convenience queries                                                                                                           |
 
@@ -386,10 +382,8 @@ Updated by `JobHeartbeatService` after each background job run. `OpsMonitoringSe
 | Health                | `GET /api/v1/health` → `{ status: "healthy", timestampUtc }` |
 | OpenAPI (dev)         | `/openapi/v1.json`                                           |
 | Frontend build        | `npm run build` in `src/frontend`                            |
-| Frontend dev          | `npm start` → RTL Arabic shell at `http://localhost:4200`    |
+| Frontend dev          | `npm start` → RTL shell at `http://localhost:4200`    |
 
 **Namespaces:** all C# code uses the `Shora.`\* root namespace (`Shora.Domain`, `Shora.Application`, `Shora.Infrastructure`, `Shora.Api`).
 
-**Deferred:** admin ops alerts UI (API done — spec 08).
-
-**Done on this foundation:** auth (02); public pages (03); booking flow + lifecycle jobs (04, 08); manual payments (05); client dashboard (06); admin dashboard (07); cross-cutting — outbox dispatcher, all background jobs, rate limits, ops monitoring (08); CI/CD pipelines (09 — code complete; Railway go-live is operator steps in [docs/README.md](../docs/README.md)).
+**Done on this foundation:** auth (02); public pages (03); booking flow + lifecycle jobs (04, 08); manual payments (05); client dashboard (06); admin dashboard (07); cross-cutting — outbox dispatcher, all background jobs, rate limits, ops monitoring (08); CI/CD pipelines (09).

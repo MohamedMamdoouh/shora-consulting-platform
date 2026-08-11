@@ -25,7 +25,7 @@ Status: **Done (backend 05a–05h; client UI in spec 06; admin UI in spec 07).**
 
 ## 1. Overview
 
-Per SDD #5.4: single flat session price (default 500 EGP, admin-editable). There is **no online payment gateway**. The client pays **out-of-band** by transferring the session fee to the consultant's **Vodafone Cash** number or **InstaPay** handle, then uploads a **receipt image** as proof. The **admin manually reviews the receipt and approves or declines** it. A booking is only `Confirmed` after the admin approves — never automatically.
+Single flat session price (default 500 EGP, admin-editable). There is **no online payment gateway**. The client pays **out-of-band** by transferring the session fee to the consultant's **Vodafone Cash** number or **InstaPay** handle, then uploads a **receipt image** as proof. The **admin manually reviews the receipt and approves or declines** it. A booking is only `Confirmed` after the admin approves — never automatically.
 
 This replaces the previous automated gateway entirely: there are no webhooks, no HMAC verification, no amount/currency auto-matching, no payment-initiate step, and no automated refund saga. Amount verification is now a **human step** (the admin eyeballs the receipt against the expected `Payment.Amount`).
 
@@ -79,19 +79,7 @@ All state changes are guarded by `Booking.RowVersion` (spec 01), so concurrent a
 
 ## 5. Payment State Machine
 
-```mermaid
-stateDiagram-v2
-    [*] --> AwaitingReceipt: booking reserved (POST /api/bookings)
-    AwaitingReceipt --> UnderReview: client uploads receipt
-    UnderReview --> Approved: admin approves (booking Confirmed)
-    UnderReview --> AwaitingReceipt: admin declines (client re-uploads)
-    Approved --> Refunded: admin records manual refund after cancellation (#6)
-    AwaitingReceipt --> Void: booking cancelled / upload deadline expired before approval
-    UnderReview --> Void: booking cancelled by admin/client before approval
-    Approved --> [*]
-    Refunded --> [*]
-    Void --> [*]
-```
+Payment states: `AwaitingReceipt` (booking reserved) → `UnderReview` (receipt uploaded) → `Approved` (admin confirms booking) or back to `AwaitingReceipt` (declined receipt). `Approved` may become `Refunded` after manual refund record. Unapproved bookings cancel to `Void`. See transitions in booking spec 04 and refund section below.
 
 ## 6. Refunds (manual)
 

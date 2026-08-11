@@ -1,20 +1,6 @@
 # GitHub Actions workflows
 
-Full CI/CD design: [specs/09-ci-cd-pipeline.md](../specs/09-ci-cd-pipeline.md) · Production status: [docs/README.md](../docs/README.md)
-
-## Shora production (current)
-
-| Item | Value |
-| --- | --- |
-| URL | `https://shora-production.up.railway.app` |
-| Railway project | `shora` |
-| Railway project ID | `2a876d36-cf24-4cf2-b6bf-ed0d1eee6e07` |
-| Railway environment ID | `907c0f6e-5118-459c-a7ea-d273663664d1` (`production`) |
-| Railway service ID | `f69a711c-b830-4a97-a269-fa5e2b6f4dc9` |
-| GHCR image | `ghcr.io/mohamedmamdoouh/shora-consulting-platform:production` |
-| GitHub repo | `MohamedMamdoouh/shora-consulting-platform` |
-
-See [docs/railway-prerequisites.md](../docs/railway-prerequisites.md) for GHCR pull access and remaining verify steps.
+CI/CD behavior for Shora. For hosting setup and secrets, see [docs/deployment.md](../docs/deployment.md). Full pipeline design: [specs/09-ci-cd-pipeline.md](../specs/09-ci-cd-pipeline.md).
 
 ## Overview
 
@@ -65,34 +51,33 @@ The deploy job fails if `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`, or `RAILWAY_TOKE
 
 ### What the workflow does
 
-1. **Build job** — `npm ci` + production Angular build → copy into `Shora.Api/wwwroot/` → `dotnet publish` → upload artifact (spec 09.8).
-2. **Deploy job** — download artifact → build [`Dockerfile`](../Dockerfile) → push `ghcr.io/<lowercase-repo>:production` (repository path lowercased for GHCR) → `railway redeploy` (Path B-lite).
+1. **Build job** — `npm ci` + production Angular build → copy into `Shora.Api/wwwroot/` → `dotnet publish` → upload artifact.
+2. **Deploy job** — download artifact → build [`Dockerfile`](../Dockerfile) → push `ghcr.io/<lowercase-repo>:production` (repository path lowercased for GHCR) → `railway redeploy`.
 
 After deploy, verify manually: `GET /api/v1/health`, `/`, and `/about` on `PRODUCTION_URL`.
 
 ### One-time setup before first deploy
 
-1. **Neon + Azure Storage** — PostgreSQL project + Blob storage (receipts): [docs/railway-prerequisites.md](../docs/railway-prerequisites.md) § B1.
-2. **Railway** — project, service, domain, GHCR image link: same doc § B2–B4.
-3. **GitHub → Settings → Environments** — create `production` (optional required reviewers).
-4. **Repository variables:** `RAILWAY_SERVICE_ID` = `f69a711c-b830-4a97-a269-fa5e2b6f4dc9`, `PRODUCTION_URL` = `https://shora-production.up.railway.app`.
-5. Optional **repository variable:** `DEPLOY_ENVIRONMENT` (defaults to `production`).
-6. **Environment secret:** `RAILWAY_TOKEN` = Railway **project token** (project **shora** → Settings → Tokens → `production`). Not an account token.
-7. Enable **branch protection** on `main` so CI passes before merge.
+See [docs/deployment.md](../docs/deployment.md) for:
+
+1. Neon PostgreSQL + Azure Blob storage
+2. Railway project, service, domain, and Docker image source
+3. Railway environment variables
+4. GHCR pull access
+5. GitHub `RAILWAY_*` secrets and variables
+6. Branch protection on `main`
 
 Google sign-in: set `googleClientId` in [`environment.production.ts`](../src/frontend/src/environments/environment.production.ts) before merge (build-time). Production builds use `fileReplacements` in [`angular.json`](../src/frontend/angular.json).
-
-**Legacy Azure App Service path:** [docs/azure-prerequisites.md](../docs/azure-prerequisites.md) if migrating back when quota is approved.
 
 ---
 
 ## Dependabot
 
-[`.github/dependabot.yml`](../dependabot.yml) opens **monthly** PRs for NuGet (`src/backend`) and npm (`src/frontend`) dependency updates (spec 09.4).
+[`.github/dependabot.yml`](../dependabot.yml) opens **monthly** PRs for NuGet (`src/backend`) and npm (`src/frontend`) dependency updates.
 
 ---
 
-## Branch protection (09.4)
+## Branch protection
 
 Configure once in GitHub after CI has passed at least once on `main`:
 

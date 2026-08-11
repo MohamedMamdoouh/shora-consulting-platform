@@ -16,14 +16,14 @@ public class EmailTemplateServiceTests
             Heading: "عنوان",
             ActionUrl: "https://example.com/action",
             ActionLabel: "اضغط هنا",
-            RecipientName: "سارة",
+            RecipientName: "Alex",
             FooterNote: "ملاحظة"));
 
         Assert.Contains("lang=\"ar\"", html);
         Assert.Contains("dir=\"rtl\"", html);
         Assert.Contains("#b85c38", html);
-        Assert.Contains("منصة شورى", html);
-        Assert.Contains("سارة", html);
+        Assert.Contains("Shora", html);
+        Assert.Contains("Alex", html);
         Assert.Contains("https://example.com/action", html);
         Assert.DoesNotContain("{{", html);
     }
@@ -59,11 +59,11 @@ public class EmailTemplateServiceTests
             Heading: "عنوان",
             ActionUrl: "https://example.com/action",
             ActionLabel: "اضغط هنا",
-            RecipientName: "سارة",
+            RecipientName: "Alex",
             FooterNote: "ملاحظة"));
 
         Assert.Contains(expectedPhrase, html);
-        Assert.Contains("سارة", html);
+        Assert.Contains("Alex", html);
         Assert.DoesNotContain("{{", html);
     }
 
@@ -81,7 +81,7 @@ public class EmailTemplateServiceTests
             Heading: "عنوان",
             ActionUrl: "https://example.com/action",
             ActionLabel: "اضغط هنا",
-            RecipientName: "سارة",
+            RecipientName: "Alex",
             FooterNote: "ملاحظة"));
 
         Assert.Contains("علامة مخصصة", html);

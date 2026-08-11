@@ -2,7 +2,7 @@
 
 Status: **Implemented** (sub-phases 06a–06j, 2026-08).
 
-The client dashboard at `/dashboard` is fully wired to `GET /api/v1/bookings/mine` and the booking/payment/cancellation client APIs described in specs 04–05. Arabic (RTL) UI; slot times render in the visitor's local browser timezone.
+The client dashboard at `/dashboard` is fully wired to `GET /api/v1/bookings/mine` and the booking/payment/cancellation client APIs described in specs 04–05. RTL UI; slot times render in the visitor's local browser timezone.
 
 ### Implementation status
 
@@ -27,7 +27,7 @@ The client dashboard at `/dashboard` is fully wired to `GET /api/v1/bookings/min
 - `pending-payment-card.*` + `booking/shared/payment-instructions-panel.*` — payment instructions, countdown, receipt upload (also reused by `/booking/payment/:id`).
 - `pending-approval-card.*` — review message, receipt thumbnail (`receiptThumbnailUrl`), cancel hold.
 - `upcoming-booking-card.*` + `upcoming-booking.util.ts` + `upcoming-cancellation.util.ts` — delivery instructions and full cancellation state machine.
-- `client-dashboard-labels.util.ts` — Arabic labels for past cancelled bookings (reason + refund).
+- `client-dashboard-labels.util.ts` — localized labels for past cancelled bookings (reason + refund).
 - `client-dashboard-slot.util.ts` — shared local slot formatting.
 
 **API client:** `BookingService` — `getMyBookings`, `getPaymentInstructions`, `uploadReceipt`, `cancelHold`, `requestCancellation`, `markCancellationDecisionSeen`.
@@ -68,8 +68,8 @@ A simple view for logged-in clients to see their booking history and upcoming se
 
 ## 4. Empty State
 
-First-time clients with no bookings see a friendly empty state with a CTA back to `/services` or `/booking/start` — keeps tone warm, not clinical (per SDD #4).
+First-time clients with no bookings see a friendly empty state with a CTA back to `/services` or `/booking/start` — keeps tone warm, not clinical.
 
 ## 5. Privacy Note
 
-This dashboard only ever shows the logged-in client's own data — no visibility into other clients' bookings, consultant's full calendar, or any other client's identity (reinforces SDD #5.7).
+This dashboard only ever shows the logged-in client's own data — no visibility into other clients' bookings, consultant's full calendar, or any other client's identity (privacy by design).

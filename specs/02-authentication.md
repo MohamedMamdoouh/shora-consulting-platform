@@ -15,7 +15,7 @@ Status: **Implemented** — JWT access tokens, HTTP-only refresh cookies, email 
 
 ## 2. Client Signup
 
-Two signup methods; both create an `ApplicationUser` with role `Client` and, on success, return the JWT access token in the body and set the refresh-token `httpOnly` cookie (#1, #11) — auto-login, to keep the flow low-friction per SDD #4.3.
+Two signup methods; both create an `ApplicationUser` with role `Client` and, on success, return the JWT access token in the body and set the refresh-token `httpOnly` cookie (#1, #11) — auto-login, to keep the flow low-friction.
 
 ### 2.1 Email + Password — `POST /api/auth/signup`
 
@@ -23,7 +23,7 @@ Request fields:
 
 - `email` (string, required — **unique**; rejected if already used)
 - `password` (string, required)
-- `displayName` (string, optional — defaults to the email local-part if omitted; may be a pseudonym per SDD #5.7)
+- `displayName` (string, optional — defaults to the email local-part if omitted; may be a pseudonym for privacy)
 
 On success, a **verification email** is sent automatically (see #7). The user is logged in immediately but cannot book until verified.
 

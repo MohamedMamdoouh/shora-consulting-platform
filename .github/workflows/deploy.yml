@@ -121,7 +121,7 @@ jobs:
       - name: Redeploy on Railway
         run: npx -y @railway/cli@latest redeploy --service "$RAILWAY_SERVICE_ID" --yes
         env:
-          RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
   smoke-test:
     name: Post-deploy smoke test

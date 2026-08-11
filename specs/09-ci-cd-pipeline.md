@@ -256,7 +256,7 @@ Sequence:
 | **Missing Railway config** | Deploy job **Require Railway configuration** step fails if `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`, or `RAILWAY_TOKEN` is unset — no silent skip |
 | **Build** | Same sequence as 09.8 in the `build` job |
 | **Deploy target** | Railway service (Docker image from GHCR) |
-| **Auth** | GitHub secret `RAILWAY_TOKEN` (account/workspace token) passed to CLI as `RAILWAY_API_TOKEN`; GHCR push via `GITHUB_TOKEN` |
+| **Auth** | GitHub secret `RAILWAY_TOKEN` (Railway **project token** for `production`); GHCR push via `GITHUB_TOKEN` |
 
 ### GitHub setup (Railway path)
 
@@ -264,7 +264,7 @@ Sequence:
 2. GitHub Environment `production` (optional reviewers)
 3. Repository variables: `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`
 4. Optional repository variable `DEPLOY_ENVIRONMENT` (defaults to `production`)
-5. Environment secret `RAILWAY_TOKEN` (Railway account or workspace token from [railway.app/account/tokens](https://railway.app/account/tokens))
+5. Environment secret `RAILWAY_TOKEN` (Railway **project token** — project Settings → Tokens → `production`)
 6. GHCR package public or Railway registry credentials for image pull
 7. Enable branch protection on `main` — CI green before merge, then push auto-deploys
 

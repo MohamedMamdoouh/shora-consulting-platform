@@ -183,7 +183,7 @@ Configure in [MohamedMamdoouh/shora-consulting-platform](https://github.com/Moha
 | --- | --- | --- |
 | `RAILWAY_SERVICE_ID` | Repository **variable** (not secret) | `f69a711c-b830-4a97-a269-fa5e2b6f4dc9` |
 | `PRODUCTION_URL` | Repository **variable** | `https://shora-production.up.railway.app` |
-| `RAILWAY_TOKEN` | Environment **secret** on `production` | [railway.app/account/tokens](https://railway.app/account/tokens) — create an **account** or **workspace** token (not a project token). The Deploy workflow passes this secret to the CLI as `RAILWAY_API_TOKEN`. |
+| `RAILWAY_TOKEN` | Environment **secret** on `production` | **Project token** for the `production` environment — Railway project **shora** → **Settings** → **Tokens** → Create token. Do **not** use an account token here. |
 | Branch protection | `main` | Require CI Backend + Frontend (recommended) |
 
 Optional repository variable: `DEPLOY_ENVIRONMENT` (defaults to `production`).
@@ -194,7 +194,8 @@ The Deploy job fails explicitly if any of `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`
 
 | Symptom | Fix |
 | --- | --- |
-| `Invalid RAILWAY_TOKEN` in Deploy workflow | Create a new token at [railway.app/account/tokens](https://railway.app/account/tokens) |
+| `Invalid RAILWAY_TOKEN` | Secret is an **account** token or expired. Create a **project token** (project → Settings → Tokens → `production`) and update the GitHub secret. |
+| `No linked project found` | Same fix — account tokens need `railway link`; project tokens do not. Use a project token with `RAILWAY_TOKEN`. |
 | Token set but still invalid | Must be an **environment secret** on GitHub Environment **`production`**, not a repository secret — `deploy.yml` uses `environment: production` |
 | Deploy skipped / empty token | Confirm Environment `production` exists under **Settings → Environments** |
 

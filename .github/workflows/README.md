@@ -75,7 +75,7 @@ You can also open those URLs in a browser after deploy.
 3. **GitHub → Settings → Environments** — create `production` (optional required reviewers).
 4. **Repository variables:** `RAILWAY_SERVICE_ID` = `f69a711c-b830-4a97-a269-fa5e2b6f4dc9`, `PRODUCTION_URL` = `https://shora-production.up.railway.app`.
 5. Optional **repository variable:** `DEPLOY_ENVIRONMENT` (defaults to `production`).
-6. **Environment secret:** `RAILWAY_TOKEN` = Railway **account** or **workspace** token from [railway.app/account/tokens](https://railway.app/account/tokens) (not a project token). The workflow maps it to `RAILWAY_API_TOKEN` for the CLI.
+6. **Environment secret:** `RAILWAY_TOKEN` = Railway **project token** (project **shora** → Settings → Tokens → `production`). Not an account token.
 7. Enable **branch protection** on `main` so CI passes before merge.
 
 Google sign-in: set `googleClientId` in [`environment.production.ts`](../src/frontend/src/environments/environment.production.ts) before merge (build-time). Production builds use `fileReplacements` in [`angular.json`](../src/frontend/angular.json).

@@ -1,5 +1,3 @@
-# Runtime image for Railway (and local smoke tests).
-# CI builds the app first and places output in ./publish (see .github/workflows/deploy.yml).
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libgssapi-krb5-2 \

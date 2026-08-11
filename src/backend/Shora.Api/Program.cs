@@ -16,12 +16,6 @@ if (builder.Environment.IsProduction())
     builder.Services.AddProductionOptionsValidation();
 }
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' is not configured.");
-
-builder.Services.AddHealthChecks()
-    .AddNpgSql(connectionString, name: "postgres");
-
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

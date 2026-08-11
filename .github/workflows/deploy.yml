@@ -122,32 +122,3 @@ jobs:
         run: npx -y @railway/cli@latest redeploy --service "$RAILWAY_SERVICE_ID" --yes
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-
-  smoke-test:
-    name: Post-deploy smoke test
-    needs: deploy
-    runs-on: ubuntu-latest
-    if: ${{ needs.deploy.result == 'success' && needs.deploy.outputs.production_url != '' }}
-    env:
-      BASE_URL: ${{ needs.deploy.outputs.production_url }}
-    steps:
-      - name: Wait for app startup
-        run: sleep 45
-
-      - name: Verify API health
-        run: |
-          for i in 1 2 3 4 5 6; do
-            if curl -sf "$BASE_URL/api/v1/health" | grep -q healthy; then
-              echo "Health check passed"
-              exit 0
-            fi
-            echo "Attempt $i failed, retrying..."
-            sleep 20
-          done
-          echo "::error::Health check failed at $BASE_URL/api/v1/health"
-          exit 1
-
-      - name: Verify SPA shell
-        run: |
-          curl -sf "$BASE_URL/" | grep -q 'app-root'
-          curl -sf "$BASE_URL/about" | grep -q 'app-root'

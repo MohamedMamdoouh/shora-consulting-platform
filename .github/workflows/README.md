@@ -61,15 +61,14 @@ Runs on **every push to `main`**. There is no manual dispatch — merging to `ma
 
 The deploy job fails if `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`, or `RAILWAY_TOKEN` is missing (no silent skip).
 
-**Concurrency:** only one Deploy run per branch at a time. A newer push to `main` **cancels** the in-progress run (build, Railway redeploy, or smoke test) via `cancel-in-progress: true` in [`deploy.yml`](deploy.yml). The latest commit is the only one that should finish and call `railway redeploy`.
+**Concurrency:** only one Deploy run per branch at a time. A newer push to `main` **cancels** the in-progress run (build or Railway redeploy) via `cancel-in-progress: true` in [`deploy.yml`](deploy.yml). The latest commit is the only one that should finish and call `railway redeploy`.
 
 ### What the workflow does
 
 1. **Build job** — `npm ci` + production Angular build → copy into `Shora.Api/wwwroot/` → `dotnet publish` → upload artifact (spec 09.8).
 2. **Deploy job** — download artifact → build [`Dockerfile`](../Dockerfile) → push `ghcr.io/<lowercase-repo>:production` (repository path lowercased for GHCR) → `railway redeploy` (Path B-lite).
-3. **Smoke-test job** — curl `/api/v1/health`, `/`, and `/about` on `PRODUCTION_URL`.
 
-You can also open those URLs in a browser after deploy.
+After deploy, verify manually: `GET /api/v1/health`, `/`, and `/about` on `PRODUCTION_URL`.
 
 ### One-time setup before first deploy
 

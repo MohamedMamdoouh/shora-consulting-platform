@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/MohamedMamdoouh/shora-consulting-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/MohamedMamdoouh/shora-consulting-platform/actions/workflows/ci.yml)
 
-Arabic-first (RTL) relationship consulting booking platform. Implementation follows numbered specs in [`specs/`](specs/).
+Arabic-first (RTL) relationship consulting booking platform. Implementation follows numbered specs in [`specs/`](specs/)..
 
 ## Repository layout
 
@@ -159,18 +159,18 @@ Production URL: `https://shora-production.up.railway.app`
 
 ## Spec implementation roadmap
 
-| Spec | Area                                                 | Status                                                       |
-| ---- | ---------------------------------------------------- | ------------------------------------------------------------ |
-| 00   | API conventions (Result, Problem Details, contracts) | **Done**                                                     |
-| 01   | Project scaffold & data model                        | **Done**                                                     |
-| 02   | Authentication (JWT, Google, refresh tokens)         | **Done**                                                     |
-| 03   | Public pages (Home, About, Services)                 | **Done** (launch-ready Arabic copy + branding assets) |
-| 04   | Booking flow                                         | **Done**                                                     |
-| 05   | Manual payments (Vodafone Cash / InstaPay receipts)  | **Done**                                                     |
-| 06   | Client dashboard                                     | **Done** (06a–06j)                                           |
-| 07   | Admin dashboard                                      | **Done** (07a–07o; ops alerts UI optional)                   |
-| 08   | Cross-cutting concerns (jobs, rate limits, ops)      | **Done** (08.1–08.9)                                         |
-| 09   | CI/CD pipeline (GitHub Actions + Railway deploy)       | **Done** in repo — [go-live checklist](docs/README.md) for Railway + GitHub secrets |
+| Spec | Area                                                 | Status                                                                              |
+| ---- | ---------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| 00   | API conventions (Result, Problem Details, contracts) | **Done**                                                                            |
+| 01   | Project scaffold & data model                        | **Done**                                                                            |
+| 02   | Authentication (JWT, Google, refresh tokens)         | **Done**                                                                            |
+| 03   | Public pages (Home, About, Services)                 | **Done** (launch-ready Arabic copy + branding assets)                               |
+| 04   | Booking flow                                         | **Done**                                                                            |
+| 05   | Manual payments (Vodafone Cash / InstaPay receipts)  | **Done**                                                                            |
+| 06   | Client dashboard                                     | **Done** (06a–06j)                                                                  |
+| 07   | Admin dashboard                                      | **Done** (07a–07o; ops alerts UI optional)                                          |
+| 08   | Cross-cutting concerns (jobs, rate limits, ops)      | **Done** (08.1–08.9)                                                                |
+| 09   | CI/CD pipeline (GitHub Actions + Railway deploy)     | **Done** in repo — [go-live checklist](docs/README.md) for Railway + GitHub secrets |
 
 Implement specs **01–08** in order for new features — the MVP backend and dashboards are **complete** except optional ops alerts UI. Spec **09** code is complete; remaining work is operational: finish Railway go-live ([docs/README.md](docs/README.md)).
 

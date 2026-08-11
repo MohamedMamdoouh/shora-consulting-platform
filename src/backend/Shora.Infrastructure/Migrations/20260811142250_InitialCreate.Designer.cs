@@ -777,7 +777,7 @@ namespace Shora.Infrastructure.Migrations
 
                     b.ToTable("Settings", t =>
                         {
-                            t.HasCheckConstraint("CK_Settings_Singleton", "[Id] = 1");
+                            t.HasCheckConstraint("CK_Settings_Singleton", "\"Id\" = 1");
                         });
                 });
 

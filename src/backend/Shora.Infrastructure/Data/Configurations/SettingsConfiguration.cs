@@ -8,7 +8,7 @@ public class SettingsConfiguration : IEntityTypeConfiguration<Settings>
 {
     public void Configure(EntityTypeBuilder<Settings> builder)
     {
-        builder.ToTable(t => t.HasCheckConstraint("CK_Settings_Singleton", "[Id] = 1"));
+        builder.ToTable(t => t.HasCheckConstraint("CK_Settings_Singleton", "\"Id\" = 1"));
 
         builder.Property(s => s.Id)
             .ValueGeneratedNever();

@@ -110,7 +110,7 @@ namespace Shora.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Settings", x => x.Id);
-                    table.CheckConstraint("CK_Settings_Singleton", "[Id] = 1");
+                    table.CheckConstraint("CK_Settings_Singleton", "\"Id\" = 1");
                 });
 
             migrationBuilder.CreateTable(

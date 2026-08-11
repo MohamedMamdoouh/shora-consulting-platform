@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Npgsql;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Shora.Api.Middleware;
 using Shora.Tests.Common;
 
@@ -120,6 +121,53 @@ public class HealthEndpointTests : IDisposable
         Assert.NotEqual(tooLong, returned);
         Assert.Matches("^[a-f0-9]{32}$", returned);
     }
+
+    [Fact]
+    public async Task Get_health_with_railway_healthcheck_host_returns_ok_when_allowed()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var connectionString = _sqlServer.CreateDatabaseAsync().GetAwaiter().GetResult();
+        var databaseName = new NpgsqlConnectionStringBuilder(connectionString).Database
+            ?? throw new InvalidOperationException("Test database name is missing from the connection string.");
+
+        using var factory = CreateProductionFactory(connectionString);
+        var client = factory.CreateClient(new WebApplicationFactoryClientOptions
+        {
+            AllowAutoRedirect = false
+        });
+        using var request = new HttpRequestMessage(HttpMethod.Get, "/api/v1/health");
+        request.Headers.Host = "healthcheck.railway.app";
+
+        var response = await client.SendAsync(request, cancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        await _sqlServer.DropDatabaseAsync(databaseName);
+    }
+
+    private static WebApplicationFactory<Program> CreateProductionFactory(string connectionString) =>
+        new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        {
+            builder.UseSetting(WebHostDefaults.EnvironmentKey, Environments.Production);
+            builder.UseSetting("ConnectionStrings:DefaultConnection", connectionString);
+            builder.UseSetting("AllowedHosts", "shora-production.up.railway.app;healthcheck.railway.app");
+            builder.UseSetting("Jwt:SigningKey", "test-signing-key-min-32-characters-long!");
+            builder.ConfigureAppConfiguration((_, config) =>
+            {
+                config.AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["Jwt:Issuer"] = "Shora",
+                    ["Jwt:Audience"] = "Shora.Web",
+                    ["Jwt:SigningKey"] = "test-signing-key-min-32-characters-long!",
+                    ["Frontend:BaseUrl"] = "https://shora-production.up.railway.app",
+                    ["Cors:AllowedOrigins:0"] = "https://shora-production.up.railway.app",
+                    ["Email:Host"] = "smtp.example.com",
+                    ["Email:FromAddress"] = "noreply@example.com",
+                    ["Storage:ConnectionString"] = "UseDevelopmentStorage=true",
+                    ["Storage:ReceiptContainer"] = "receipts",
+                    ["BackgroundJobs:Enabled"] = "false"
+                });
+            });
+        });
 
     public void Dispose()
     {

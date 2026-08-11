@@ -113,7 +113,7 @@ Set in Railway → service → **Variables**. Use `__` (double underscore) for n
 | SMTP host | `Email__Host` | e.g. `smtp.sendgrid.net` |
 | From address | `Email__FromAddress` | Verified sender at your provider |
 
-Also set `AllowedHosts` to the hostname only (e.g. `<your-app>.up.railway.app` — no `https://`).
+Also set `AllowedHosts` to the hostname only (e.g. `<your-app>.up.railway.app` — no `https://`). Include `healthcheck.railway.app` as well — Railway sends deploy healthchecks from that hostname, and omitting it causes HTTP 400 responses and failed deploys.
 
 [`appsettings.Production.json`](../src/backend/Shora.Api/appsettings.Production.json) may ship with example host values. **Railway variables override** JSON when set — ensure `Frontend__BaseUrl` and `Cors__AllowedOrigins__0` match your production URL, not `http://localhost:4200`, or startup validation fails.
 

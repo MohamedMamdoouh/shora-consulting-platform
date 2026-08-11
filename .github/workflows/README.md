@@ -1,6 +1,17 @@
 # GitHub Actions workflows
 
-Full CI/CD design: [specs/09-ci-cd-pipeline.md](../specs/09-ci-cd-pipeline.md) · Production go-live: [docs/README.md](../docs/README.md)
+Full CI/CD design: [specs/09-ci-cd-pipeline.md](../specs/09-ci-cd-pipeline.md) · Production status: [docs/README.md](../docs/README.md)
+
+## Shora production (current)
+
+| Item | Value |
+| --- | --- |
+| URL | `https://shora-production.up.railway.app` |
+| Railway service ID | `f69a711c-b830-4a97-a269-fa5e2b6f4dc9` |
+| GHCR image | `ghcr.io/mohamedmamdoouh/shora-consulting-platform:production` |
+| GitHub repo | `MohamedMamdoouh/shora-consulting-platform` |
+
+See [docs/railway-prerequisites.md](../docs/railway-prerequisites.md) for GHCR pull access and remaining verify steps.
 
 ## Overview
 
@@ -62,7 +73,7 @@ You can also open those URLs in a browser after deploy.
 1. **Neon + Azure Storage** — PostgreSQL project + Blob storage (receipts): [docs/railway-prerequisites.md](../docs/railway-prerequisites.md) § B1.
 2. **Railway** — project, service, domain, GHCR image link: same doc § B2–B4.
 3. **GitHub → Settings → Environments** — create `production` (optional required reviewers).
-4. **Repository variables:** `RAILWAY_SERVICE_ID`, `PRODUCTION_URL` (e.g. `https://your-app.up.railway.app`).
+4. **Repository variables:** `RAILWAY_SERVICE_ID` = `f69a711c-b830-4a97-a269-fa5e2b6f4dc9`, `PRODUCTION_URL` = `https://shora-production.up.railway.app`.
 5. Optional **repository variable:** `DEPLOY_ENVIRONMENT` (defaults to `production`).
 6. **Environment secret:** `RAILWAY_TOKEN` = Railway account token.
 7. Enable **branch protection** on `main` so CI passes before merge.

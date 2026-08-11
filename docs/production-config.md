@@ -5,6 +5,8 @@ Non-secret **structure** lives in [`appsettings.Production.json`](../src/backend
 **Active deploy path (Path B-lite):** [Railway](https://railway.app) variables — see [railway-prerequisites.md](railway-prerequisites.md).  
 **Legacy path:** Azure App Service application settings — see [azure-prerequisites.md](azure-prerequisites.md).
 
+**Current production host:** `https://shora-production.up.railway.app` — provisioning status in [docs/README.md](README.md).
+
 Use double-underscore nesting for nested JSON (e.g. `Jwt__SigningKey` → `Jwt:SigningKey`).
 
 ## Where to set values
@@ -18,31 +20,29 @@ Variable names are identical on both hosts.
 
 ## Required settings (startup)
 
-These must be set or the app fails to start (or deploy fails in GitHub):
+These must be set on Railway or the app **fails to start** (`ValidateOnStart` in Production):
 
 | Setting | Variable name | Notes |
 | --- | --- | --- |
 | Environment | `ASPNETCORE_ENVIRONMENT` | `Production` |
-| SQL connection | `ConnectionStrings__DefaultConnection` | Neon PostgreSQL connection string (pooled recommended) |
+| Database | `ConnectionStrings__DefaultConnection` | Neon PostgreSQL (pooled recommended) |
 | JWT signing key | `Jwt__SigningKey` | Min 32 chars; strong random (spec 02) |
-
-## Required for MVP flows (app may start without these)
-
-| Setting | Variable name | Notes |
-| --- | --- | --- |
-| Production URL | `Frontend__BaseUrl` | `https://<your-railway-domain>` or `https://<app>.azurewebsites.net` — email links, password reset |
+| Production URL | `Frontend__BaseUrl` | e.g. `https://shora-production.up.railway.app` — no trailing slash |
 | CORS origin | `Cors__AllowedOrigins__0` | **Same URL** as `Frontend__BaseUrl` (same-site auth) |
-| Allowed host | `AllowedHosts` | Hostname only, e.g. `your-app.up.railway.app` (no `https://`) |
-| Blob storage | `Storage__ConnectionString` | Azure Storage account — receipt upload fails without it |
+| Blob storage | `Storage__ConnectionString` | Azure Storage account (`stshoraprodne001`) |
 | Receipt container | `Storage__ReceiptContainer` | Private container name (default `receipts`) |
+| SMTP host | `Email__Host` | e.g. `smtp.sendgrid.net` |
+| From address | `Email__FromAddress` | Verified sender at your provider |
 
-If `Frontend__BaseUrl` / `Cors__AllowedOrigins__0` are not set in Azure, the repo falls back to placeholder `https://YOUR_PRODUCTION_HOST` in `appsettings.Production.json` — refresh cookies and email links will not work until you override them.
+Also set `AllowedHosts` to the hostname only (e.g. `shora-production.up.railway.app` — no `https://`).
+
+If `Frontend__BaseUrl` / `Cors__AllowedOrigins__0` are not set, the repo falls back to placeholder `https://YOUR_PRODUCTION_HOST` in `appsettings.Production.json` — refresh cookies and email links will not work until you override them.
 
 Refresh cookies use `Secure=true` and `SameSite=Strict` outside Development ([`RefreshCookieService`](../src/backend/Shora.Infrastructure/Services/RefreshCookieService.cs)).
 
 ### Custom domain
 
-When you bind a custom domain to App Service:
+When you bind a custom domain (Railway **Settings → Networking** or legacy App Service **Custom domains**):
 
 1. **Portal** → App Service → **Custom domains** → add hostname → complete DNS (CNAME to `<app>.azurewebsites.net` or apex A/ALIAS records).
 2. **TLS** → bind **App Service Managed Certificate** (Basic+ plan) or upload your own cert.
@@ -53,16 +53,16 @@ When you bind a custom domain to App Service:
 - Google Cloud **Authorized JavaScript origins** (if using Google sign-in)
 - `googleClientId` build in [`environment.production.ts`](../src/frontend/src/environments/environment.production.ts) (same client ID; origins must include the new domain)
 
-## SMTP (required for email verification and transactional mail)
+## SMTP (required for sending mail)
 
-Without SMTP, signup works but **users cannot verify email and therefore cannot book** (spec 02). Password reset and booking/cancellation emails are also skipped ([`NoOpEmailSender`](../src/backend/Shora.Infrastructure/DependencyInjection.cs)).
+`Email__Host` and `Email__FromAddress` are **required at startup** in Production. Without a working SMTP setup (including `Email__Password` when using SendGrid), signup may succeed but **verification and transactional emails fail** (spec 02).
 
 | Setting | Variable name | Notes |
 | --- | --- | --- |
-| SMTP host | `Email__Host` | Required with `FromAddress` for mail to send |
+| SMTP host | `Email__Host` | e.g. `smtp.sendgrid.net` |
 | SMTP port | `Email__Port` | Default `587` (StartTLS); use `465` for SSL-on-connect |
-| SMTP user | `Email__Username` | Optional if your provider allows unauthenticated relay (unusual) |
-| SMTP password | `Email__Password` | Required when `Username` is set |
+| SMTP user | `Email__Username` | SendGrid: literal `apikey` (constant, not a secret) |
+| SMTP password | `Email__Password` | SendGrid: API key (`SG.xxx…`) — **secret** |
 | From address | `Email__FromAddress` | Verified sender at your provider |
 | From display name | `Email__FromName` | Optional; defaults to `Shora` in `appsettings.Production.json` |
 
@@ -84,7 +84,7 @@ Only needed if you want the Google sign-in button on the login page.
 
 1. [Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services → Credentials** → **Create credentials → OAuth client ID**.
 2. Application type: **Web application**.
-3. **Authorized JavaScript origins:** add your production HTTPS URL (same as `Frontend__BaseUrl`), e.g. `https://your-app.up.railway.app`.
+3. **Authorized JavaScript origins:** add your production HTTPS URL (same as `Frontend__BaseUrl`), e.g. `https://shora-production.up.railway.app`.
 4. **Authorized redirect URIs:** not required for the current Google Identity Services button flow (ID token only).
 5. Copy the **Client ID** into:
    - Railway `Google__ClientId` (or App Service on legacy path)
@@ -145,7 +145,7 @@ No Azure override needed for MVP unless you want to change defaults:
 
 Set `googleClientId` in `environment.production.ts` **before merge to `main`** so the Deploy workflow bakes it into the SPA bundle.
 
-**SEO static files:** `robots.txt` and `sitemap.xml` are **not** part of the repo. They are optional for search indexing only — not needed for deploy or booking. If added later, place them in [`src/frontend/public/`](../src/frontend/public/) so they copy into the App Service `wwwroot` on build.
+**SEO static files:** `robots.txt` and `sitemap.xml` are **not** part of the repo. They are optional for search indexing only — not needed for deploy or booking. If added later, place them in [`src/frontend/public/`](../src/frontend/public/) so they copy into `wwwroot` on build.
 
 ## Verify
 

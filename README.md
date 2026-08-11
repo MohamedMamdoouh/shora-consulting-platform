@@ -9,7 +9,7 @@ Arabic-first (RTL) relationship consulting booking platform. Implementation foll
 ```text
 Shora/
 ├── specs/                # Spec-driven documentation (00–09)
-├── docs/                 # Operator docs (Azure, production config, runbooks)
+├── docs/                 # Operator docs (Railway, production config, runbooks)
 ├── src/
 │   ├── contracts/        # TypeScript API contracts
 │   ├── backend/          # .NET 10 Clean Architecture API
@@ -145,13 +145,17 @@ $env:CI = "true"; npm test
 
 ## Production deployment
 
-All pipeline **code** is in the repo (spec 09). Going live is **operator work** — no separate staging environment:
+Pipeline **code** is in the repo (spec 09). Going live is **operator work** — no separate staging environment.
 
-1. [docs/azure-prerequisites.md](docs/azure-prerequisites.md) — Azure Portal or **Azure MCP** plugin in Cursor
-2. [docs/production-config.md](docs/production-config.md) — App Service application settings
-3. GitHub — repository variables + environment secrets; merges to `main` auto-deploy
+**Active path (Railway + Neon + Azure Blob):**
 
-Full ordered checklist: [docs/README.md](docs/README.md).
+1. [docs/README.md](docs/README.md) — current provisioning status and checklist
+2. [docs/railway-prerequisites.md](docs/railway-prerequisites.md) — Neon, Azure Storage, Railway, GHCR, GitHub
+3. [docs/production-config.md](docs/production-config.md) — Railway variable reference
+
+**Legacy path (Azure App Service + Azure SQL):** [docs/azure-prerequisites.md](docs/azure-prerequisites.md) when quota is available.
+
+Production URL: `https://shora-production.up.railway.app`
 
 ## Spec implementation roadmap
 
@@ -166,9 +170,9 @@ Full ordered checklist: [docs/README.md](docs/README.md).
 | 06   | Client dashboard                                     | **Done** (06a–06j)                                           |
 | 07   | Admin dashboard                                      | **Done** (07a–07o; ops alerts UI optional)                   |
 | 08   | Cross-cutting concerns (jobs, rate limits, ops)      | **Done** (08.1–08.9)                                         |
-| 09   | CI/CD pipeline (GitHub Actions + Azure deploy)       | **Done** in repo — [go-live checklist](docs/README.md) for Azure + GitHub secrets |
+| 09   | CI/CD pipeline (GitHub Actions + Railway deploy)       | **Done** in repo — [go-live checklist](docs/README.md) for Railway + GitHub secrets |
 
-Implement specs **01–08** in order for new features — the MVP backend and dashboards are **complete** except public-page content (03) and optional ops alerts UI. Spec **09** code is complete; remaining work is operational: provision Azure and run the first **Deploy** workflow ([docs/README.md](docs/README.md)).
+Implement specs **01–08** in order for new features — the MVP backend and dashboards are **complete** except optional ops alerts UI. Spec **09** code is complete; remaining work is operational: finish Railway go-live ([docs/README.md](docs/README.md)).
 
 ## Architecture (backend)
 

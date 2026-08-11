@@ -1,4 +1,8 @@
-# Azure prerequisites (spec 09.7)
+# Azure prerequisites (spec 09.7) — **legacy path**
+
+> **Not the active production path.** Shora production runs on **Railway + Neon + Azure Blob (receipts only)**. See [railway-prerequisites.md](railway-prerequisites.md) and [docs/README.md](README.md) for current status.
+>
+> Use this document only if migrating to **Azure App Service + Azure SQL** when quota is available.
 
 Create production resources in **Azure Portal** and configure GitHub **before** merging to `main` (which triggers Deploy automatically).
 

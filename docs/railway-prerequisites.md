@@ -2,7 +2,7 @@
 
 Deploy Shora to **Railway** (API + Angular SPA in one container) with **Neon PostgreSQL** (database) and **Azure Blob Storage** (receipts only).
 
-**Related:** [production-config.md](production-config.md) · [`.github/workflows/README.md`](../.github/workflows/README.md)
+**Related:** [production-config.md](production-config.md) · [docs/README.md](README.md) (current status) · [`.github/workflows/README.md`](../.github/workflows/README.md)
 
 ## Architecture
 
@@ -12,8 +12,29 @@ Deploy Shora to **Railway** (API + Angular SPA in one container) with **Neon Pos
 | Database | Neon PostgreSQL (free tier) |
 | Receipt blobs | Azure Storage (`stshoraprodne001` / `receipts`) |
 | Email | SendGrid SMTP |
+| Container registry | GitHub Container Registry (GHCR) |
 
-Production URL is your Railway domain, e.g. `https://shora-production.up.railway.app`.
+**Production URL:** `https://shora-production.up.railway.app`
+
+---
+
+## Current provisioning (Shora)
+
+| Item | Value | Status |
+| --- | --- | --- |
+| Neon project | `shora-prod` | Done |
+| Azure RG | `rg-shora-prod-ne` (North Europe) | Done |
+| Storage account | `stshoraprodne001`, container `receipts` | Done |
+| Railway project | `Tansekak` (existing project — free plan project limit) | Done |
+| Railway service | `Shora` | Done |
+| Railway service ID | `f69a711c-b830-4a97-a269-fa5e2b6f4dc9` | Done |
+| Public domain | `shora-production.up.railway.app` | Done |
+| Docker image | `ghcr.io/mohamedmamdoouh/shora-consulting-platform:production` | Set on Railway |
+| Railway variables | See [B4](#b4--railway-variables) | Done (operator) |
+| GitHub deploy secrets | See [B5](#b5--github) | Operator |
+| GHCR pull + live deploy | See [B3](#b3--ghcr-image-pull) + [Verify](#verify) | Pending |
+
+> **Note:** Tansekak (another app) runs in a separate Railway project. Do not mix env vars or domains between the two apps.
 
 ---
 
@@ -21,11 +42,11 @@ Production URL is your Railway domain, e.g. `https://shora-production.up.railway
 
 ### Neon PostgreSQL
 
-1. [neon.tech](https://neon.tech) → create a project (e.g. `shora-prod`).
-2. Create a database (default `neondb` or rename to `Shora`).
-3. Copy the **pooled** connection string from the Neon dashboard (recommended for Railway serverless-style restarts).
-4. Ensure SSL is enabled — append `Ssl Mode=Require` if not already in the string.
-5. Set on Railway: `ConnectionStrings__DefaultConnection` = Neon connection string.
+**Project:** `shora-prod` on [neon.tech](https://neon.tech).
+
+1. Use the **pooled** connection string from the Neon dashboard (recommended for Railway restarts).
+2. Ensure SSL is enabled — append `Ssl Mode=Require` if not already in the string.
+3. Set on Railway: `ConnectionStrings__DefaultConnection`.
 
 Example formats:
 
@@ -36,86 +57,155 @@ Host=ep-xxx.region.aws.neon.tech;Database=neondb;Username=...;Password=...;Ssl M
 Or URI form (Npgsql accepts both):
 
 ```text
-postgresql://user:password@ep-xxx.region.aws.neon.tech/neondb?sslmode=require
+postgresql://user:password@ep-xxx-pooler.region.aws.neon.tech/neondb?sslmode=require
 ```
 
 On first deploy, EF Core migrations run automatically at startup.
 
 ### Azure Storage (receipts only)
 
-- Resource group: `rg-shora-prod-ne`
-- Account: `stshoraprodne001`, container `receipts` (private)
-- Rotate access keys if they were ever logged
-- Set `Storage__ConnectionString` and `Storage__ReceiptContainer` on Railway
+| Setting | Value |
+| --- | --- |
+| Resource group | `rg-shora-prod-ne` |
+| Storage account | `stshoraprodne001` |
+| Container | `receipts` (private) |
 
-No Azure SQL or App Service is required for this path.
+Set `Storage__ConnectionString` and `Storage__ReceiptContainer=receipts` on Railway.
+
+Retrieve connection string locally (do not commit):
+
+```powershell
+az storage account show-connection-string `
+  --name stshoraprodne001 `
+  --resource-group rg-shora-prod-ne `
+  --query connectionString `
+  -o tsv
+```
+
+Rotate storage keys if they were ever logged. No Azure SQL or App Service is required for this path.
 
 ---
 
 ## B2 — Railway project
 
-1. [railway.app](https://railway.app) → **New Project**.
-2. Add a service with **Docker Image** source (see below).
-3. **Settings → Networking → Generate Domain** → copy HTTPS URL (no trailing slash).
-4. Note **Service ID** (Settings → General).
+Shora runs as service **Shora** inside Railway project **Tansekak**.
 
-### Link GHCR image (for GitHub Actions deploy)
+| Setting | Value |
+| --- | --- |
+| Service name | `Shora` |
+| Service ID | `f69a711c-b830-4a97-a269-fa5e2b6f4dc9` |
+| Public URL | `https://shora-production.up.railway.app` |
+| Source | Docker image (see below) |
+| Health check path | `/api/v1/health` |
 
-The Deploy workflow pushes `ghcr.io/<owner>/<repo>:production` and runs `railway redeploy`.
+### Docker image (Railway source)
 
-1. Railway service → **Settings → Source** → **Docker Image**.
-2. Image: `ghcr.io/<github-owner>/Shora:production` (match GitHub owner/repo casing).
-3. Grant Railway access to GHCR or make the package public if pulls fail.
+Railway → **Shora** → **Settings → Source → Docker Image**:
+
+```text
+ghcr.io/mohamedmamdoouh/shora-consulting-platform:production
+```
+
+The **Deploy** workflow builds and pushes this tag on every push to `main`.
+
+---
+
+## B3 — GHCR image pull
+
+Railway must be able to pull from GitHub Container Registry. The image is created by the **Deploy** workflow — run that at least once before expecting Railway to succeed.
+
+### Option A — Public package (recommended for MVP)
+
+1. GitHub → **Packages** → `shora-consulting-platform`
+2. **Package settings** → **Change visibility** → **Public**
+3. Redeploy on Railway
+
+### Option B — Private package
+
+1. GitHub → **Settings → Developer settings** → create a PAT with `read:packages`
+2. Railway → **Shora** → **Settings → Registry** (or equivalent)
+3. Registry: `ghcr.io`, username: GitHub username, password: PAT
+4. Redeploy
+
+### Troubleshooting
+
+| Symptom | Likely cause |
+| --- | --- |
+| `pull access denied` / `unauthorized` | Package private without Railway registry creds |
+| `manifest unknown` / `not found` | Deploy workflow has not pushed the image yet |
+| Deployment FAILED, no app logs | Image pull failed before container start |
+| Health returns 404 | No healthy container behind Railway edge |
 
 ---
 
 ## B4 — Railway variables
 
-Set in Railway → service → **Variables** (same keys as [production-config.md](production-config.md)):
+Set in Railway → **Shora** → **Variables** (same keys as [production-config.md](production-config.md)).
 
-| Variable | Example |
+Use `__` (double underscore) for nested JSON keys.
+
+### Non-secret (example values for Shora)
+
+| Variable | Value |
 | --- | --- |
 | `ASPNETCORE_ENVIRONMENT` | `Production` |
-| `ConnectionStrings__DefaultConnection` | Neon pooled PostgreSQL string |
-| `Jwt__SigningKey` | 32+ char secret |
-| `Frontend__BaseUrl` | `https://<railway-domain>` |
-| `Cors__AllowedOrigins__0` | same as `Frontend__BaseUrl` |
-| `AllowedHosts` | `<railway-hostname>` only |
-| `Storage__ConnectionString` | Azure storage |
+| `Frontend__BaseUrl` | `https://shora-production.up.railway.app` |
+| `Cors__AllowedOrigins__0` | `https://shora-production.up.railway.app` |
+| `AllowedHosts` | `shora-production.up.railway.app` |
 | `Storage__ReceiptContainer` | `receipts` |
 | `Email__Host` | `smtp.sendgrid.net` |
 | `Email__Port` | `587` |
-| `Email__Username` | `apikey` |
-| `Email__Password` | SendGrid API key |
-| `Email__FromAddress` | verified sender |
+| `Email__Username` | `apikey` (SendGrid constant — not a secret) |
 | `Email__FromName` | `Shora` |
-| `Google__ClientId` | optional |
-| `AdminSeed__Email` / `AdminSeed__Password` | temporary; remove after first admin login |
+
+### Secrets (set in Railway only)
+
+| Variable | Source |
+| --- | --- |
+| `ConnectionStrings__DefaultConnection` | Neon pooled connection string |
+| `Jwt__SigningKey` | Random string, 32+ characters |
+| `Storage__ConnectionString` | Azure CLI or Portal |
+| `Email__Password` | SendGrid API key |
+| `Email__FromAddress` | SendGrid verified sender |
+| `AdminSeed__Email` / `AdminSeed__Password` | One-time admin bootstrap — **remove after first login** |
+| `Google__ClientId` | Optional |
+
+Production startup validation requires JWT, Neon, storage, email (`Host` + `FromAddress`), frontend URL, and CORS origin — see [production-config.md](production-config.md).
 
 ---
 
 ## B5 — GitHub
 
-| Item | Where | Value |
+Configure in [MohamedMamdoouh/shora-consulting-platform](https://github.com/MohamedMamdoouh/shora-consulting-platform) → **Settings**.
+
+| Item | Where | Shora value |
 | --- | --- | --- |
-| `RAILWAY_TOKEN` | Environment secret `production` | Railway → Account → Tokens |
-| `RAILWAY_SERVICE_ID` | Repository variable | Service UUID |
-| `PRODUCTION_URL` | Repository variable | `https://<railway-domain>` |
-| Branch protection | `main` | Require CI Backend + Frontend |
+| `RAILWAY_SERVICE_ID` | Repository **variable** (not secret) | `f69a711c-b830-4a97-a269-fa5e2b6f4dc9` |
+| `PRODUCTION_URL` | Repository **variable** | `https://shora-production.up.railway.app` |
+| `RAILWAY_TOKEN` | Environment **secret** on `production` | [railway.app/account/tokens](https://railway.app/account/tokens) |
+| Branch protection | `main` | Require CI Backend + Frontend (recommended) |
+
+Optional repository variable: `DEPLOY_ENVIRONMENT` (defaults to `production`).
+
+The Deploy job fails explicitly if any of `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`, or `RAILWAY_TOKEN` is missing.
 
 ---
 
-## Google OAuth
+## Google OAuth (optional)
 
 1. [Google Cloud Console](https://console.cloud.google.com/apis/credentials) → OAuth Web client.
-2. **Authorized JavaScript origins:** Railway HTTPS URL.
+2. **Authorized JavaScript origins:** `https://shora-production.up.railway.app`
 3. Set `Google__ClientId` on Railway and `googleClientId` in [`environment.production.ts`](../src/frontend/src/environments/environment.production.ts) before merge.
 
 ---
 
 ## Verify
 
-1. Merge to `main` → **Deploy** workflow builds, pushes GHCR image, redeploys Railway.
-2. `GET <PRODUCTION_URL>/api/v1/health` → healthy.
-3. SPA at `/`, admin login, E2E booking flow.
-4. Remove `AdminSeed__*` from Railway variables.
+1. **Deploy** workflow green on GitHub Actions (build → push GHCR → `railway redeploy` → smoke test).
+2. Railway deployment status **Success** (not FAILED).
+3. `GET https://shora-production.up.railway.app/api/v1/health` → `healthy`.
+4. SPA loads at `/` and `/about`.
+5. Log in as admin at `/auth/login` (AdminSeed account).
+6. **Admin → Settings** — set real WhatsApp, Vodafone Cash, and InstaPay values.
+7. Optional E2E: client signup → verification email → book → receipt upload → admin approve.
+8. **Remove** `AdminSeed__Email` and `AdminSeed__Password` from Railway variables.

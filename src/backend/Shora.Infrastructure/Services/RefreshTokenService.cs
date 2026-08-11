@@ -181,7 +181,7 @@ public sealed class RefreshTokenService(
     {
         // Serialize concurrent refresh attempts on the same token (multi-tab race).
         return context.RefreshTokens
-            .FromSqlInterpolated($"SELECT * FROM RefreshTokens WITH (UPDLOCK, ROWLOCK) WHERE TokenHash = {tokenHash}")
+            .FromSqlInterpolated($"SELECT * FROM \"RefreshTokens\" WHERE \"TokenHash\" = {tokenHash} FOR UPDATE")
             .FirstOrDefaultAsync(cancellationToken);
     }
 

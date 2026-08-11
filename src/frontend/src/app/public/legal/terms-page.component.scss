@@ -1,0 +1,33 @@
+@use '../shared/public-page' as *;
+
+:host {
+  display: block;
+}
+
+.legal h1 {
+  margin-top: 0;
+}
+
+.legal__updated {
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+}
+
+.legal ul {
+  margin: 0 0 var(--space-md);
+  padding-inline-start: var(--space-lg);
+}
+
+.legal li {
+  margin-bottom: var(--space-sm);
+}
+
+.legal__footer-note {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.legal__footer-note a {
+  color: var(--color-primary);
+}

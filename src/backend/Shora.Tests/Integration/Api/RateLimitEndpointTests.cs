@@ -6,12 +6,12 @@ using Shora.Tests.Common;
 
 namespace Shora.Tests.Integration.Api;
 
-[Collection("SqlServer")]
+[Collection("Postgres")]
 public class RateLimitEndpointTests : IDisposable
 {
     private readonly AuthWebApplicationFactory _factory;
 
-    public RateLimitEndpointTests(SqlServerFixture sqlServer)
+    public RateLimitEndpointTests(PostgresFixture sqlServer)
     {
         _factory = new AuthWebApplicationFactory(sqlServer);
     }

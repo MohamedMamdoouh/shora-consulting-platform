@@ -81,6 +81,24 @@
   text-align: center;
 }
 
+.shell__footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.shell__footer-nav a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.shell__footer-nav a:hover {
+  color: var(--color-primary);
+}
+
 @media (max-width: 640px) {
   .shell__header,
   .shell__main,

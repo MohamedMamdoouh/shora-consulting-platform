@@ -23,10 +23,28 @@ Shora/
 
 - .NET 10 SDK
 - Node.js 22+ (Angular CLI 21 used; Angular 22 requires Node 22.22.3+)
-- SQL Server LocalDB (or full SQL Server) for backend database
-- Docker Desktop (or Docker Engine) for backend tests (`dotnet test` uses Testcontainers SQL Server)
+- PostgreSQL 16+ (native install on Windows/macOS/Linux, or a [Neon](https://neon.tech) dev branch)
+- Docker Desktop (or Docker Engine) for backend tests only (`dotnet test` uses Testcontainers PostgreSQL)
 
 ## Backend setup
+
+**1. PostgreSQL (one-time)**
+
+Create the dev database using your local install (`psql`, pgAdmin, etc.):
+
+```sql
+CREATE DATABASE "Shora";
+```
+
+Set your **PostgreSQL install credentials** (the username/password you chose when installing — server-wide login, not per-database). Either edit [`appsettings.Development.json`](src/backend/Shora.Api/appsettings.Development.json), or use user-secrets (recommended; not committed to git):
+
+```powershell
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Port=5432;Database=Shora;Username=YOUR_PG_USER;Password=YOUR_PG_PASSWORD" --project src/backend/Shora.Api
+```
+
+User-secrets override `appsettings.Development.json` in Development.
+
+**2. Run the API**
 
 ```powershell
 cd src/backend
@@ -40,7 +58,7 @@ Default dev URLs: `https://localhost:7183` / `http://localhost:5107`
 
 ### Configuration
 
-- Connection string: `ConnectionStrings:DefaultConnection` in `appsettings.Development.json`
+- Connection string: `ConnectionStrings:DefaultConnection` — local PostgreSQL (see setup above); production uses Neon via Railway env vars
 - Admin seed (dev only): `AdminSeed:Email` and `AdminSeed:Password` in `appsettings.Development.json`
 - Receipt blob storage (dev): `Storage:ConnectionString` defaults to `UseDevelopmentStorage=true` in `appsettings.Development.json` — requires [Azurite](https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azurite) running locally:
 
@@ -61,13 +79,13 @@ On startup, migrations apply automatically and seed data runs idempotently:
 
 ### Deployment topology
 
-Production runs on a **single always-on server** (Azure App Service):
+Production runs on **Railway** (single container):
 
 - One process hosts the API, Angular static files (`wwwroot`), in-process background jobs, and in-memory cache
 - No load balancer, no horizontal scaling, and no distributed cache (Redis)
-- Azure SQL and Azure Blob Storage are the external services
+- **Neon PostgreSQL** for the database; **Azure Blob Storage** for receipt images only
 
-**Go-live (operator):** [docs/README.md](docs/README.md) — Azure Portal setup, app settings, GitHub Deploy workflow.
+**Go-live (operator):** [docs/README.md](docs/README.md) — Neon, Azure Storage, Railway, GitHub Deploy workflow.
 
 ### Health check
 
@@ -112,7 +130,7 @@ During local development, run the frontend with `npm start`. The dev server prox
 
 Same commands as [CI](.github/workflows/ci.yml) — see [spec 09](specs/09-ci-cd-pipeline.md) for the full pipeline design.
 
-**Backend tests** require Docker to be running. They use an ephemeral SQL Server container (Testcontainers), separate from the LocalDB instance used by `dotnet run`.
+**Backend tests** require Docker to be running. They use an ephemeral PostgreSQL container (Testcontainers), separate from your local PostgreSQL instance used by `dotnet run`.
 
 ```powershell
 cd src/backend

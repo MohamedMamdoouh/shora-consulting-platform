@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Data.SqlClient;
+using Npgsql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shora.Application.Abstractions;
@@ -10,16 +10,16 @@ namespace Shora.Tests.Common;
 
 public sealed class AuthWebApplicationFactory : WebApplicationFactory<Program>
 {
-    private readonly SqlServerFixture _sqlServer;
+    private readonly PostgresFixture _sqlServer;
     private readonly string _connectionString;
     private readonly string _databaseName;
     private bool _initialized;
 
-    public AuthWebApplicationFactory(SqlServerFixture sqlServer)
+    public AuthWebApplicationFactory(PostgresFixture sqlServer)
     {
         _sqlServer = sqlServer;
         _connectionString = sqlServer.CreateDatabaseAsync().GetAwaiter().GetResult();
-        _databaseName = new SqlConnectionStringBuilder(_connectionString).InitialCatalog
+        _databaseName = new NpgsqlConnectionStringBuilder(_connectionString).Database
             ?? throw new InvalidOperationException("Test database name is missing from the connection string.");
     }
 

@@ -14,12 +14,12 @@ using Shora.Tests.Common;
 
 namespace Shora.Tests.Integration.Auth;
 
-[Collection("SqlServer")]
+[Collection("Postgres")]
 public class AuthEndpointTests : IDisposable
 {
     private readonly AuthWebApplicationFactory _factory;
 
-    public AuthEndpointTests(SqlServerFixture sqlServer)
+    public AuthEndpointTests(PostgresFixture sqlServer)
     {
         _factory = new AuthWebApplicationFactory(sqlServer);
     }

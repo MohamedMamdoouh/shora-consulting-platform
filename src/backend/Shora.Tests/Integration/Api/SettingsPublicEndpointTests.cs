@@ -2,25 +2,25 @@ using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Data.SqlClient;
+using Npgsql;
 using Microsoft.Extensions.Configuration;
 using Shora.Contracts.Settings;
 using Shora.Tests.Common;
 
 namespace Shora.Tests.Integration.Api;
 
-[Collection("SqlServer")]
+[Collection("Postgres")]
 public class SettingsPublicEndpointTests : IDisposable
 {
     private readonly WebApplicationFactory<Program> _factory;
-    private readonly SqlServerFixture _sqlServer;
+    private readonly PostgresFixture _sqlServer;
     private readonly string _databaseName;
 
-    public SettingsPublicEndpointTests(SqlServerFixture sqlServer)
+    public SettingsPublicEndpointTests(PostgresFixture sqlServer)
     {
         _sqlServer = sqlServer;
         var connectionString = sqlServer.CreateDatabaseAsync().GetAwaiter().GetResult();
-        _databaseName = new SqlConnectionStringBuilder(connectionString).InitialCatalog
+        _databaseName = new NpgsqlConnectionStringBuilder(connectionString).Database
             ?? throw new InvalidOperationException("Test database name is missing from the connection string.");
 
         _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>

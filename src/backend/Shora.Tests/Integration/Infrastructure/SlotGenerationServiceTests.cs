@@ -1,4 +1,4 @@
-using Microsoft.Data.SqlClient;
+using Npgsql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Shora.Application.Services;
@@ -7,12 +7,12 @@ using Shora.Tests.Common;
 
 namespace Shora.Tests.Integration.Infrastructure;
 
-[Collection("SqlServer")]
+[Collection("Postgres")]
 public class SlotGenerationServiceTests
 {
-    private readonly SqlServerFixture _sqlServer;
+    private readonly PostgresFixture _sqlServer;
 
-    public SlotGenerationServiceTests(SqlServerFixture sqlServer)
+    public SlotGenerationServiceTests(PostgresFixture sqlServer)
     {
         _sqlServer = sqlServer;
     }
@@ -21,7 +21,7 @@ public class SlotGenerationServiceTests
     public async Task GenerateHorizonAsync_materializes_future_unbooked_slots()
     {
         var connectionString = await _sqlServer.CreateDatabaseAsync();
-        var databaseName = new SqlConnectionStringBuilder(connectionString).InitialCatalog!;
+        var databaseName = new NpgsqlConnectionStringBuilder(connectionString).Database!;
         var services = TestServiceProviderFactory.Create(connectionString);
 
         try
@@ -52,7 +52,7 @@ public class SlotGenerationServiceTests
     public async Task GenerateHorizonAsync_does_not_remove_booked_slots()
     {
         var connectionString = await _sqlServer.CreateDatabaseAsync();
-        var databaseName = new SqlConnectionStringBuilder(connectionString).InitialCatalog!;
+        var databaseName = new NpgsqlConnectionStringBuilder(connectionString).Database!;
         var services = TestServiceProviderFactory.Create(connectionString);
 
         try

@@ -16,7 +16,7 @@ Open `http://localhost:4200/`. The dev server proxies `/api` to the backend (`pr
 | Area | Route(s) | Spec |
 | ---- | -------- | ---- |
 | Auth | `/auth/*` | 02 |
-| Public pages | `/`, `/about`, `/services` | 03 (placeholder copy) |
+| Public pages | `/`, `/about`, `/services`, `/privacy`, `/terms` | 03 (placeholder copy on marketing pages) |
 | Booking flow | `/booking/start` → delivery → phone → review → `/booking/payment/:id` | 04 |
 | Client dashboard | `/dashboard` | 06 |
 | Admin dashboard | `/admin/settings`, `/admin/availability`, `/admin/bookings`, `/admin/earnings`, `/admin/ops` | 07 / 08 |
@@ -42,6 +42,10 @@ Open `http://localhost:4200/`. The dev server proxies `/api` to the backend (`pr
 - **Ops alerts** — active operational alerts with expandable runbook steps (`GET /admin/ops/alerts`, `GET /admin/ops/runbooks`)
 
 Admin HTTP services live under `src/app/core/admin/`.
+
+## Static assets (`public/`)
+
+Ships `logo.svg` and `favicon.svg` only. **`robots.txt` and `sitemap.xml` are not used** — traffic is expected from direct/social links, not search indexing. Add them under `public/` later if you want SEO.
 
 ## Build & test
 

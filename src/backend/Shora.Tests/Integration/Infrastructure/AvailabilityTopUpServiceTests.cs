@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient;
+using Npgsql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,12 +14,12 @@ using Shora.Tests.Common;
 
 namespace Shora.Tests.Integration.Infrastructure;
 
-[Collection("SqlServer")]
+[Collection("Postgres")]
 public class AvailabilityTopUpServiceTests
 {
-    private readonly SqlServerFixture _sqlServer;
+    private readonly PostgresFixture _sqlServer;
 
-    public AvailabilityTopUpServiceTests(SqlServerFixture sqlServer)
+    public AvailabilityTopUpServiceTests(PostgresFixture sqlServer)
     {
         _sqlServer = sqlServer;
     }
@@ -31,7 +31,7 @@ public class AvailabilityTopUpServiceTests
         var seedTime = new DateTime(2026, 8, 6, 12, 0, 0, DateTimeKind.Utc);
         var advancedTime = seedTime.AddDays(7);
         var connectionString = await _sqlServer.CreateDatabaseAsync();
-        var databaseName = new SqlConnectionStringBuilder(connectionString).InitialCatalog!;
+        var databaseName = new NpgsqlConnectionStringBuilder(connectionString).Database!;
         var services = CreateServices(connectionString, seedTime);
 
         try
@@ -80,7 +80,7 @@ public class AvailabilityTopUpServiceTests
         var cancellationToken = TestContext.Current.CancellationToken;
         var fixedNow = new DateTime(2026, 8, 6, 12, 0, 0, DateTimeKind.Utc);
         var connectionString = await _sqlServer.CreateDatabaseAsync();
-        var databaseName = new SqlConnectionStringBuilder(connectionString).InitialCatalog!;
+        var databaseName = new NpgsqlConnectionStringBuilder(connectionString).Database!;
         var cacheInvalidator = new RecordingCacheInvalidator();
         var services = CreateServices(connectionString, fixedNow, cacheInvalidator);
 
@@ -110,7 +110,7 @@ public class AvailabilityTopUpServiceTests
 
         services.AddLogging();
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(connectionString));
+            options.UseNpgsql(connectionString));
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
         services.AddSingleton<IDateTimeProvider>(new FixedDateTimeProvider(utcNow));
         services.AddScoped<SlotGenerationService>();

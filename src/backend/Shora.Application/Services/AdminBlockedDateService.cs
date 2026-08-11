@@ -35,8 +35,9 @@ public sealed class AdminBlockedDateService(
         var overlappingSlots = await dbContext.AvailabilitySlots
             .FromSqlInterpolated(
                 $"""
-                 SELECT * FROM AvailabilitySlots WITH (UPDLOCK, HOLDLOCK)
-                 WHERE StartTimeUtc < {validated.EndUtc} AND EndTimeUtc > {validated.StartUtc}
+                 SELECT * FROM "AvailabilitySlots"
+                 WHERE "StartTimeUtc" < {validated.EndUtc} AND "EndTimeUtc" > {validated.StartUtc}
+                 FOR UPDATE
                  """)
             .ToListAsync(cancellationToken);
 

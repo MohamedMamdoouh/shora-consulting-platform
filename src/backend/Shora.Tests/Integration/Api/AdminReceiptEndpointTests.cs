@@ -20,12 +20,12 @@ using ContractDeclineReasonCode = Shora.Contracts.Payments.ReceiptDeclineReasonC
 
 namespace Shora.Tests.Integration.Api;
 
-[Collection("SqlServer")]
+[Collection("Postgres")]
 public class AdminReceiptEndpointTests : IDisposable
 {
     private readonly AuthWebApplicationFactory _factory;
 
-    public AdminReceiptEndpointTests(SqlServerFixture sqlServer)
+    public AdminReceiptEndpointTests(PostgresFixture sqlServer)
     {
         _factory = new AuthWebApplicationFactory(sqlServer);
     }

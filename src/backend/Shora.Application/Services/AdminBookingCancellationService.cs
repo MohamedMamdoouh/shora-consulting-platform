@@ -316,8 +316,7 @@ public sealed class AdminBookingCancellationService(
         var slot = await dbContext.AvailabilitySlots
             .FromSqlInterpolated(
                 $"""
-                 SELECT * FROM AvailabilitySlots WITH (UPDLOCK, ROWLOCK)
-                 WHERE Id = {slotId}
+                 SELECT * FROM "AvailabilitySlots" WHERE "Id" = {slotId} FOR UPDATE
                  """)
             .FirstOrDefaultAsync(cancellationToken);
 

@@ -19,7 +19,7 @@ public static class TestServiceProviderFactory
 
         services.AddLogging();
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(connectionString));
+            options.UseNpgsql(connectionString));
 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
         services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();

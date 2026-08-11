@@ -19,12 +19,12 @@ using ContractCancellationRequestStatus = Shora.Contracts.Booking.CancellationRe
 
 namespace Shora.Tests.Integration.Api;
 
-[Collection("SqlServer")]
+[Collection("Postgres")]
 public class BookingEndpointTests : IDisposable
 {
     private readonly AuthWebApplicationFactory _factory;
 
-    public BookingEndpointTests(SqlServerFixture sqlServer)
+    public BookingEndpointTests(PostgresFixture sqlServer)
     {
         _factory = new AuthWebApplicationFactory(sqlServer);
     }

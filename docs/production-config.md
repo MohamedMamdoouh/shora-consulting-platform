@@ -1,27 +1,38 @@
 # Production configuration (spec 09.6)
 
-Non-secret **structure** lives in [`appsettings.Production.json`](../src/backend/Shora.Api/appsettings.Production.json). **Never commit real credentials** — set values in Azure App Service **Configuration → Application settings** (or local environment variables for testing).
+Non-secret **structure** lives in [`appsettings.Production.json`](../src/backend/Shora.Api/appsettings.Production.json). **Never commit real credentials** — set values as environment variables on your host.
 
-See also: [azure-prerequisites.md](azure-prerequisites.md) (Portal setup) · [spec 09.6](../specs/09-ci-cd-pipeline.md#096--production-config-contract)
+**Active deploy path (Path B-lite):** [Railway](https://railway.app) variables — see [railway-prerequisites.md](railway-prerequisites.md).  
+**Legacy path:** Azure App Service application settings — see [azure-prerequisites.md](azure-prerequisites.md).
 
 Use double-underscore nesting for nested JSON (e.g. `Jwt__SigningKey` → `Jwt:SigningKey`).
 
-## Required App Service settings (startup)
+## Where to set values
+
+| Host | UI location |
+| --- | --- |
+| **Railway** (current) | Service → **Variables** |
+| **Azure App Service** (legacy) | **Configuration → Application settings** |
+
+Variable names are identical on both hosts.
+
+## Required settings (startup)
 
 These must be set or the app fails to start (or deploy fails in GitHub):
 
-| Setting | App Service name | Notes |
+| Setting | Variable name | Notes |
 | --- | --- | --- |
 | Environment | `ASPNETCORE_ENVIRONMENT` | `Production` |
-| SQL connection | `ConnectionStrings__DefaultConnection` | Azure SQL ADO.NET string |
+| SQL connection | `ConnectionStrings__DefaultConnection` | Neon PostgreSQL connection string (pooled recommended) |
 | JWT signing key | `Jwt__SigningKey` | Min 32 chars; strong random (spec 02) |
 
 ## Required for MVP flows (app may start without these)
 
-| Setting | App Service name | Notes |
+| Setting | Variable name | Notes |
 | --- | --- | --- |
-| Production URL | `Frontend__BaseUrl` | `https://<your-app>.azurewebsites.net` — email links, password reset |
+| Production URL | `Frontend__BaseUrl` | `https://<your-railway-domain>` or `https://<app>.azurewebsites.net` — email links, password reset |
 | CORS origin | `Cors__AllowedOrigins__0` | **Same URL** as `Frontend__BaseUrl` (same-site auth) |
+| Allowed host | `AllowedHosts` | Hostname only, e.g. `your-app.up.railway.app` (no `https://`) |
 | Blob storage | `Storage__ConnectionString` | Azure Storage account — receipt upload fails without it |
 | Receipt container | `Storage__ReceiptContainer` | Private container name (default `receipts`) |
 
@@ -46,7 +57,7 @@ When you bind a custom domain to App Service:
 
 Without SMTP, signup works but **users cannot verify email and therefore cannot book** (spec 02). Password reset and booking/cancellation emails are also skipped ([`NoOpEmailSender`](../src/backend/Shora.Infrastructure/DependencyInjection.cs)).
 
-| Setting | App Service name | Notes |
+| Setting | Variable name | Notes |
 | --- | --- | --- |
 | SMTP host | `Email__Host` | Required with `FromAddress` for mail to send |
 | SMTP port | `Email__Port` | Default `587` (StartTLS); use `465` for SSL-on-connect |
@@ -73,10 +84,10 @@ Only needed if you want the Google sign-in button on the login page.
 
 1. [Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services → Credentials** → **Create credentials → OAuth client ID**.
 2. Application type: **Web application**.
-3. **Authorized JavaScript origins:** add your production HTTPS URL (same as `Frontend__BaseUrl`), e.g. `https://<app-name>.azurewebsites.net`.
+3. **Authorized JavaScript origins:** add your production HTTPS URL (same as `Frontend__BaseUrl`), e.g. `https://your-app.up.railway.app`.
 4. **Authorized redirect URIs:** not required for the current Google Identity Services button flow (ID token only).
 5. Copy the **Client ID** into:
-   - App Service `Google__ClientId`
+   - Railway `Google__ClientId` (or App Service on legacy path)
    - `googleClientId` in `environment.production.ts`
 6. Redeploy (merge to `main`) after changing the frontend file.
 
@@ -88,12 +99,12 @@ There is no public admin registration. Choose one approach:
 
 ### Recommended: one-time `AdminSeed` (then remove)
 
-1. Before first deploy (or before first app restart after deploy), set in App Service:
+1. Before first deploy (or before first app restart after deploy), set on Railway (or App Service on legacy path):
    - `AdminSeed__Email` — admin login email
    - `AdminSeed__Password` — strong password (Identity rules apply)
 2. On startup, [`DatabaseSeeder`](../src/backend/Shora.Infrastructure/Data/DatabaseSeeder.cs) creates the Admin user if it does not exist.
 3. Log in at `/auth/login`, confirm admin dashboard access.
-4. **Remove** `AdminSeed__Email` and `AdminSeed__Password` from App Service settings so credentials are not stored in configuration.
+4. **Remove** `AdminSeed__Email` and `AdminSeed__Password` from host variables so credentials are not stored in configuration.
 
 If `AdminSeed` is omitted, the app starts but **no admin exists** — receipt approval and admin settings are unavailable until you add an admin (only practical path today is temporary `AdminSeed`).
 
@@ -109,7 +120,7 @@ On first startup, the singleton `Settings` row is seeded from `Seed:*` in [`apps
 
 Seeding runs **once** — later changes must go through `/admin/settings` (or set `Seed__*` env vars **before the first app startup**):
 
-| Setting | App Service name |
+| Setting | Variable name |
 | --- | --- |
 | WhatsApp | `Seed__ConsultantWhatsAppNumber` |
 | Vodafone Cash | `Seed__VodafoneCashNumber` |
@@ -125,17 +136,22 @@ No Azure override needed for MVP unless you want to change defaults:
 - `BackgroundJobs`, `OpsMonitoring`, `RateLimiting`, `Cache`, `Booking`, `ReceiptUpload`, `Brand`
 - `Jwt__Issuer`, `Jwt__Audience`, token lifetimes
 
-## Frontend (build-time, not App Service)
+## Frontend (build-time, not Railway/App Service)
 
 | File | Purpose |
 | --- | --- |
 | [`environment.production.ts`](../src/frontend/src/environments/environment.production.ts) | `googleClientId` for Google button; `apiBaseUrl: '/api/v1'` is correct for same-site deploy |
+| [`angular.json`](../src/frontend/angular.json) | Production build uses `fileReplacements` to swap in `environment.production.ts` |
+
+Set `googleClientId` in `environment.production.ts` **before merge to `main`** so the Deploy workflow bakes it into the SPA bundle.
+
+**SEO static files:** `robots.txt` and `sitemap.xml` are **not** part of the repo. They are optional for search indexing only — not needed for deploy or booking. If added later, place them in [`src/frontend/public/`](../src/frontend/public/) so they copy into the App Service `wwwroot` on build.
 
 ## Verify
 
-1. All required App Service settings saved (no secrets in git).
+1. All required host variables saved (no secrets in git).
 2. Merge to `main` — **Deploy** runs automatically ([`deploy.yml`](../.github/workflows/deploy.yml)).
 3. Open `https://<host>/` (SPA) and `GET https://<host>/api/v1/health` (API).
 4. Log in as admin; confirm `/admin/settings` has real payment numbers.
 5. Test end-to-end: signup → verification email → book → upload receipt → admin approve.
-6. Remove `AdminSeed__*` from App Service after admin account exists.
+6. Remove `AdminSeed__*` from Railway (or App Service) after admin account exists.

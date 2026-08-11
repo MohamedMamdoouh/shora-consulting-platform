@@ -264,9 +264,10 @@ public static class DependencyInjection
         var jwtOptions = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()
             ?? throw new InvalidOperationException("Jwt configuration is missing.");
 
-        if (string.IsNullOrWhiteSpace(jwtOptions.SigningKey))
+        var validation = new JwtOptionsValidator().Validate(null, jwtOptions);
+        if (validation.Failed)
         {
-            throw new InvalidOperationException("Jwt:SigningKey is not configured.");
+            throw new InvalidOperationException(validation.FailureMessage);
         }
 
         return jwtOptions;

@@ -66,8 +66,7 @@ public sealed class BookingService(
         var slot = await dbContext.AvailabilitySlots
             .FromSqlInterpolated(
                 $"""
-                 SELECT * FROM AvailabilitySlots WITH (UPDLOCK, ROWLOCK)
-                 WHERE Id = {request.AvailabilitySlotId}
+                 SELECT * FROM "AvailabilitySlots" WHERE "Id" = {request.AvailabilitySlotId} FOR UPDATE
                  """)
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -174,8 +173,7 @@ public sealed class BookingService(
             var slot = await dbContext.AvailabilitySlots
                 .FromSqlInterpolated(
                     $"""
-                     SELECT * FROM AvailabilitySlots WITH (UPDLOCK, ROWLOCK)
-                     WHERE Id = {slotId}
+                     SELECT * FROM "AvailabilitySlots" WHERE "Id" = {slotId} FOR UPDATE
                      """)
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -563,9 +561,9 @@ public sealed class BookingService(
         var holdCount = await dbContext.Bookings
             .FromSqlInterpolated(
                 $"""
-                 SELECT * FROM Bookings WITH (UPDLOCK, HOLDLOCK)
-                 WHERE ClientId = {clientId}
-                 AND Status IN ({pendingPayment}, {pendingApproval})
+                 SELECT * FROM "Bookings" WHERE "ClientId" = {clientId}
+                 AND "Status" IN ({pendingPayment}, {pendingApproval})
+                 FOR UPDATE
                  """)
             .CountAsync(cancellationToken);
 

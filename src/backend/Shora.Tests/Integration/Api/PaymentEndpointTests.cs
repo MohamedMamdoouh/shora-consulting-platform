@@ -19,12 +19,12 @@ using ContractPaymentMethod = Shora.Contracts.Payments.PaymentMethod;
 
 namespace Shora.Tests.Integration.Api;
 
-[Collection("SqlServer")]
+[Collection("Postgres")]
 public class PaymentEndpointTests : IDisposable
 {
     private readonly AuthWebApplicationFactory _factory;
 
-    public PaymentEndpointTests(SqlServerFixture sqlServer)
+    public PaymentEndpointTests(PostgresFixture sqlServer)
     {
         _factory = new AuthWebApplicationFactory(sqlServer);
     }

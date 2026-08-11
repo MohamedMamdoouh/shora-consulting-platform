@@ -7,13 +7,13 @@ namespace Shora.Tests.Unit.Data;
 public class BookingSlotIndexTests
 {
     private const string ModelBuildConnectionString =
-        "Server=localhost;Database=ModelBuild;Trusted_Connection=True;TrustServerCertificate=True";
+        "Host=localhost;Database=ModelBuild;Username=shora;Password=shora";
 
     [Fact]
     public void Booking_has_unique_index_on_availability_slot_when_linked()
     {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseSqlServer(ModelBuildConnectionString)
+            .UseNpgsql(ModelBuildConnectionString)
             .Options;
 
         using var context = new ApplicationDbContext(options);
@@ -24,14 +24,14 @@ public class BookingSlotIndexTests
             .Single(i => i.Properties.Count == 1 && i.Properties[0].Name == nameof(Booking.AvailabilitySlotId));
 
         Assert.True(index.IsUnique);
-        Assert.Equal("[AvailabilitySlotId] IS NOT NULL", index.GetFilter());
+        Assert.Equal("\"AvailabilitySlotId\" IS NOT NULL", index.GetFilter());
     }
 
     [Fact]
     public void AvailabilitySlot_has_unique_index_on_booking_id_when_held()
     {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseSqlServer(ModelBuildConnectionString)
+            .UseNpgsql(ModelBuildConnectionString)
             .Options;
 
         using var context = new ApplicationDbContext(options);
@@ -42,6 +42,6 @@ public class BookingSlotIndexTests
             .Single(i => i.Properties.Count == 1 && i.Properties[0].Name == nameof(AvailabilitySlot.BookingId));
 
         Assert.True(index.IsUnique);
-        Assert.Equal("[BookingId] IS NOT NULL", index.GetFilter());
+        Assert.Equal("\"BookingId\" IS NOT NULL", index.GetFilter());
     }
 }

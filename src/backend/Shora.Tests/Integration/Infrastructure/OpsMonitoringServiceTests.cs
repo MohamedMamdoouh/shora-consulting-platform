@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient;
+using Npgsql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,12 +17,12 @@ using Shora.Tests.Common;
 
 namespace Shora.Tests.Integration.Infrastructure;
 
-[Collection("SqlServer")]
+[Collection("Postgres")]
 public class OpsMonitoringServiceTests
 {
-    private readonly SqlServerFixture _sqlServer;
+    private readonly PostgresFixture _sqlServer;
 
-    public OpsMonitoringServiceTests(SqlServerFixture sqlServer)
+    public OpsMonitoringServiceTests(PostgresFixture sqlServer)
     {
         _sqlServer = sqlServer;
     }
@@ -33,7 +33,7 @@ public class OpsMonitoringServiceTests
         var cancellationToken = TestContext.Current.CancellationToken;
         var fixedNow = new DateTime(2026, 8, 6, 18, 0, 0, DateTimeKind.Utc);
         var connectionString = await _sqlServer.CreateDatabaseAsync();
-        var databaseName = new SqlConnectionStringBuilder(connectionString).InitialCatalog!;
+        var databaseName = new NpgsqlConnectionStringBuilder(connectionString).Database!;
         var services = CreateServices(connectionString, fixedNow);
 
         try
@@ -68,7 +68,7 @@ public class OpsMonitoringServiceTests
         var cancellationToken = TestContext.Current.CancellationToken;
         var fixedNow = new DateTime(2026, 8, 6, 18, 0, 0, DateTimeKind.Utc);
         var connectionString = await _sqlServer.CreateDatabaseAsync();
-        var databaseName = new SqlConnectionStringBuilder(connectionString).InitialCatalog!;
+        var databaseName = new NpgsqlConnectionStringBuilder(connectionString).Database!;
         var services = CreateServices(connectionString, fixedNow);
 
         try
@@ -105,7 +105,7 @@ public class OpsMonitoringServiceTests
         var cancellationToken = TestContext.Current.CancellationToken;
         var fixedNow = new DateTime(2026, 8, 6, 18, 0, 0, DateTimeKind.Utc);
         var connectionString = await _sqlServer.CreateDatabaseAsync();
-        var databaseName = new SqlConnectionStringBuilder(connectionString).InitialCatalog!;
+        var databaseName = new NpgsqlConnectionStringBuilder(connectionString).Database!;
         var services = CreateServices(connectionString, fixedNow);
 
         try
@@ -184,7 +184,6 @@ public class OpsMonitoringServiceTests
             DeliveryMethod = DeliveryMethod.Chat,
             Status = BookingStatus.PendingApproval,
             CreatedAt = pendingSinceUtc.AddHours(-8),
-            RowVersion = [1]
         });
 
         context.Payments.Add(new Payment
@@ -218,7 +217,7 @@ public class OpsMonitoringServiceTests
 
         services.AddLogging();
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(connectionString));
+            options.UseNpgsql(connectionString));
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
         services.AddSingleton<IDateTimeProvider>(new FixedDateTimeProvider(utcNow));
         services.Configure<OpsMonitoringOptions>(_ => { });

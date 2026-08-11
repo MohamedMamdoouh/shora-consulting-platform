@@ -1,25 +1,25 @@
 using System.Net;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Data.SqlClient;
+using Npgsql;
 using Microsoft.Extensions.Configuration;
 using Shora.Api.Middleware;
 using Shora.Tests.Common;
 
 namespace Shora.Tests.Integration.Api;
 
-[Collection("SqlServer")]
+[Collection("Postgres")]
 public class HealthEndpointTests : IDisposable
 {
     private readonly WebApplicationFactory<Program> _factory;
-    private readonly SqlServerFixture _sqlServer;
+    private readonly PostgresFixture _sqlServer;
     private readonly string _databaseName;
 
-    public HealthEndpointTests(SqlServerFixture sqlServer)
+    public HealthEndpointTests(PostgresFixture sqlServer)
     {
         _sqlServer = sqlServer;
         var connectionString = sqlServer.CreateDatabaseAsync().GetAwaiter().GetResult();
-        _databaseName = new SqlConnectionStringBuilder(connectionString).InitialCatalog
+        _databaseName = new NpgsqlConnectionStringBuilder(connectionString).Database
             ?? throw new InvalidOperationException("Test database name is missing from the connection string.");
 
         _factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
@@ -48,6 +48,19 @@ public class HealthEndpointTests : IDisposable
         var response = await client.GetAsync("/api/v1/health", cancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Get_health_returns_healthy_status_when_database_is_available()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var client = _factory.CreateClient();
+
+        var response = await client.GetAsync("/api/v1/health", cancellationToken);
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("healthy", body, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

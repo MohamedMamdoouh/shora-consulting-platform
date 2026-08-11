@@ -34,8 +34,7 @@ public sealed class AdminRefundService(
         var payment = await dbContext.Payments
             .FromSqlInterpolated(
                 $"""
-                 SELECT * FROM Payments WITH (UPDLOCK, ROWLOCK)
-                 WHERE Id = {paymentId}
+                 SELECT * FROM "Payments" WHERE "Id" = {paymentId} FOR UPDATE
                  """)
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -112,8 +111,7 @@ public sealed class AdminRefundService(
         var payment = await dbContext.Payments
             .FromSqlInterpolated(
                 $"""
-                 SELECT * FROM Payments WITH (UPDLOCK, ROWLOCK)
-                 WHERE Id = {paymentId}
+                 SELECT * FROM "Payments" WHERE "Id" = {paymentId} FOR UPDATE
                  """)
             .FirstOrDefaultAsync(cancellationToken);
 

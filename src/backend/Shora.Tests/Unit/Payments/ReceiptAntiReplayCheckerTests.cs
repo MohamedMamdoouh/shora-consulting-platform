@@ -19,7 +19,7 @@ public class ReceiptAntiReplayCheckerTests
         var existingPaymentId = Guid.NewGuid();
         const string sharedHash = "abc123";
 
-        context.Bookings.Add(new Booking { Id = existingBookingId, ClientId = Guid.NewGuid(), Status = BookingStatus.PendingApproval, RowVersion = [] });
+        context.Bookings.Add(new Booking { Id = existingBookingId, ClientId = Guid.NewGuid(), Status = BookingStatus.PendingApproval });
         context.Payments.Add(new Payment
         {
             Id = existingPaymentId,
@@ -85,7 +85,6 @@ public class ReceiptAntiReplayCheckerTests
             Id = bookingId,
             ClientId = Guid.NewGuid(),
             Status = BookingStatus.PendingPayment,
-            RowVersion = []
         });
         context.Payments.Add(new Payment
         {

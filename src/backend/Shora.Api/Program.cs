@@ -11,6 +11,17 @@ builder.Services.AddShoraCaching(builder.Configuration);
 builder.Services.AddIdentityServices();
 builder.Services.AddApiAuthentication(builder.Configuration);
 
+if (builder.Environment.IsProduction())
+{
+    builder.Services.AddProductionOptionsValidation();
+}
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' is not configured.");
+
+builder.Services.AddHealthChecks()
+    .AddNpgSql(connectionString, name: "postgres");
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -20,6 +31,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseExceptionHandler();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHsts();
+}
+
 app.UseHttpsRedirection();
 app.UseCors(CorsOptions.PolicyName);
 

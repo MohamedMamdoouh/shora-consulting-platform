@@ -15,12 +15,12 @@ using Shora.Tests.Common;
 
 namespace Shora.Tests.Integration.Api;
 
-[Collection("SqlServer")]
+[Collection("Postgres")]
 public class AdminAvailabilityEndpointTests : IDisposable
 {
     private readonly AuthWebApplicationFactory _factory;
 
-    public AdminAvailabilityEndpointTests(SqlServerFixture sqlServer)
+    public AdminAvailabilityEndpointTests(PostgresFixture sqlServer)
     {
         _factory = new AuthWebApplicationFactory(sqlServer);
     }

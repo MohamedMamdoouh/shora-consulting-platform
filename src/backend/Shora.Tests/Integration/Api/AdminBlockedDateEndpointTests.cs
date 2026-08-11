@@ -19,12 +19,12 @@ using ContractDeliveryMethod = Shora.Contracts.Booking.DeliveryMethod;
 
 namespace Shora.Tests.Integration.Api;
 
-[Collection("SqlServer")]
+[Collection("Postgres")]
 public class AdminBlockedDateEndpointTests : IDisposable
 {
     private readonly AuthWebApplicationFactory _factory;
 
-    public AdminBlockedDateEndpointTests(SqlServerFixture sqlServer)
+    public AdminBlockedDateEndpointTests(PostgresFixture sqlServer)
     {
         _factory = new AuthWebApplicationFactory(sqlServer);
     }

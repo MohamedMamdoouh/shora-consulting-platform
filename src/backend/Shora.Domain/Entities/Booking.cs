@@ -28,7 +28,7 @@ public class Booking
 
     public DateTime CreatedAt { get; set; }
 
-    public byte[] RowVersion { get; set; } = [];
+    public uint RowVersion { get; set; }
 
     public Payment? Payment { get; set; }
 

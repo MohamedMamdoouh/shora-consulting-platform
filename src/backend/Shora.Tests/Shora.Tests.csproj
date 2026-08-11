@@ -19,11 +19,11 @@
 
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
 
-    <PackageReference Include="Microsoft.Data.SqlClient" />
+    <PackageReference Include="Npgsql" />
 
     <PackageReference Include="Testcontainers" />
 
-    <PackageReference Include="Testcontainers.MsSql" />
+    <PackageReference Include="Testcontainers.PostgreSql" />
 
     <PackageReference Include="Testcontainers.Azurite" />
 

@@ -42,6 +42,6 @@ public class BookingConfiguration : IEntityTypeConfiguration<Booking>
 
         builder.HasIndex(b => b.AvailabilitySlotId)
             .IsUnique()
-            .HasFilter("[AvailabilitySlotId] IS NOT NULL");
+            .HasFilter("\"AvailabilitySlotId\" IS NOT NULL");
     }
 }

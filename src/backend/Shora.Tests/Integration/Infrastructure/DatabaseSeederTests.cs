@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient;
+using Npgsql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Shora.Domain.Constants;
@@ -9,12 +9,12 @@ using Shora.Tests.Common;
 
 namespace Shora.Tests.Integration.Infrastructure;
 
-[Collection("SqlServer")]
+[Collection("Postgres")]
 public class DatabaseSeederTests
 {
-    private readonly SqlServerFixture _sqlServer;
+    private readonly PostgresFixture _sqlServer;
 
-    public DatabaseSeederTests(SqlServerFixture sqlServer)
+    public DatabaseSeederTests(PostgresFixture sqlServer)
     {
         _sqlServer = sqlServer;
     }
@@ -23,7 +23,7 @@ public class DatabaseSeederTests
     public async Task SeedAsync_creates_roles_settings_and_admin_user()
     {
         var connectionString = await _sqlServer.CreateDatabaseAsync();
-        var databaseName = new SqlConnectionStringBuilder(connectionString).InitialCatalog!;
+        var databaseName = new NpgsqlConnectionStringBuilder(connectionString).Database!;
         var services = TestServiceProviderFactory.Create(connectionString);
 
         try
@@ -61,7 +61,7 @@ public class DatabaseSeederTests
     public async Task SeedAsync_is_idempotent()
     {
         var connectionString = await _sqlServer.CreateDatabaseAsync();
-        var databaseName = new SqlConnectionStringBuilder(connectionString).InitialCatalog!;
+        var databaseName = new NpgsqlConnectionStringBuilder(connectionString).Database!;
         var services = TestServiceProviderFactory.Create(connectionString);
 
         try

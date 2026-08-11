@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient;
+using Npgsql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Shora.Application.Abstractions;
@@ -12,12 +12,12 @@ using Shora.Tests.Common;
 
 namespace Shora.Tests.Integration.Infrastructure;
 
-[Collection("SqlServer")]
+[Collection("Postgres")]
 public class ReceiptBlobReconciliationServiceTests
 {
-    private readonly SqlServerFixture _sqlServer;
+    private readonly PostgresFixture _sqlServer;
 
-    public ReceiptBlobReconciliationServiceTests(SqlServerFixture sqlServer)
+    public ReceiptBlobReconciliationServiceTests(PostgresFixture sqlServer)
     {
         _sqlServer = sqlServer;
     }
@@ -27,7 +27,7 @@ public class ReceiptBlobReconciliationServiceTests
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var connectionString = await _sqlServer.CreateDatabaseAsync();
-        var databaseName = new SqlConnectionStringBuilder(connectionString).InitialCatalog!;
+        var databaseName = new NpgsqlConnectionStringBuilder(connectionString).Database!;
         var fileStorage = new InMemoryFileStorage();
         var services = CreateServices(connectionString, fileStorage);
 
@@ -64,7 +64,7 @@ public class ReceiptBlobReconciliationServiceTests
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var connectionString = await _sqlServer.CreateDatabaseAsync();
-        var databaseName = new SqlConnectionStringBuilder(connectionString).InitialCatalog!;
+        var databaseName = new NpgsqlConnectionStringBuilder(connectionString).Database!;
         var fileStorage = new InMemoryFileStorage();
         var services = CreateServices(connectionString, fileStorage);
 
@@ -101,7 +101,7 @@ public class ReceiptBlobReconciliationServiceTests
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var connectionString = await _sqlServer.CreateDatabaseAsync();
-        var databaseName = new SqlConnectionStringBuilder(connectionString).InitialCatalog!;
+        var databaseName = new NpgsqlConnectionStringBuilder(connectionString).Database!;
         var fileStorage = new InMemoryFileStorage();
         fileStorage.AddBlob("temp/orphan", [1, 2, 3], DateTime.UtcNow.AddHours(-2));
         var services = CreateServices(connectionString, fileStorage);
@@ -207,7 +207,7 @@ public class ReceiptBlobReconciliationServiceTests
 
         services.AddLogging();
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(connectionString));
+            options.UseNpgsql(connectionString));
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
         services.AddSingleton<IFileStorage>(fileStorage);
         services.Configure<BackgroundJobOptions>(options =>

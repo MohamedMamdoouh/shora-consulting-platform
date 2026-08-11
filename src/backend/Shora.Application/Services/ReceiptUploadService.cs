@@ -79,8 +79,7 @@ public sealed class ReceiptUploadService(
             var booking = await dbContext.Bookings
                 .FromSqlInterpolated(
                     $"""
-                     SELECT * FROM Bookings WITH (UPDLOCK, ROWLOCK)
-                     WHERE Id = {bookingId}
+                     SELECT * FROM "Bookings" WHERE "Id" = {bookingId} FOR UPDATE
                      """)
                 .FirstOrDefaultAsync(cancellationToken);
 

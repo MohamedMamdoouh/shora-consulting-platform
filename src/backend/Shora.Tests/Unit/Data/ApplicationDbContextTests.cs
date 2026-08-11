@@ -7,13 +7,13 @@ namespace Shora.Tests.Unit.Data;
 public class ApplicationDbContextTests
 {
     private const string ModelBuildConnectionString =
-        "Server=localhost;Database=ModelBuild;Trusted_Connection=True;TrustServerCertificate=True";
+        "Host=localhost;Database=ModelBuild;Username=shora;Password=shora";
 
     [Fact]
     public void Model_builds_with_expected_entities()
     {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-            .UseSqlServer(ModelBuildConnectionString)
+            .UseNpgsql(ModelBuildConnectionString)
             .Options;
 
         using var context = new ApplicationDbContext(options);

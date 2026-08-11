@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient;
+using Npgsql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Shora.Application.Abstractions;
@@ -12,12 +12,12 @@ using Shora.Tests.Common;
 
 namespace Shora.Tests.Integration.Infrastructure;
 
-[Collection("SqlServer")]
+[Collection("Postgres")]
 public class RefreshTokenPurgeServiceTests
 {
-    private readonly SqlServerFixture _sqlServer;
+    private readonly PostgresFixture _sqlServer;
 
-    public RefreshTokenPurgeServiceTests(SqlServerFixture sqlServer)
+    public RefreshTokenPurgeServiceTests(PostgresFixture sqlServer)
     {
         _sqlServer = sqlServer;
     }
@@ -27,7 +27,7 @@ public class RefreshTokenPurgeServiceTests
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var connectionString = await _sqlServer.CreateDatabaseAsync();
-        var databaseName = new SqlConnectionStringBuilder(connectionString).InitialCatalog!;
+        var databaseName = new NpgsqlConnectionStringBuilder(connectionString).Database!;
         var fixedNow = new DateTime(2026, 8, 6, 12, 0, 0, DateTimeKind.Utc);
         var services = CreateServices(connectionString, fixedNow);
 
@@ -110,7 +110,7 @@ public class RefreshTokenPurgeServiceTests
 
         services.AddLogging();
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(connectionString));
+            options.UseNpgsql(connectionString));
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
         services.AddSingleton<IDateTimeProvider>(new FixedDateTimeProvider(utcNow));
         services.AddScoped<RefreshTokenPurgeService>();

@@ -8,12 +8,12 @@ using Shora.Tests.Common;
 
 namespace Shora.Tests.Integration.Auth;
 
-[Collection("SqlServer")]
+[Collection("Postgres")]
 public class JwtTokenServiceTests : IDisposable
 {
     private readonly AuthWebApplicationFactory _factory;
 
-    public JwtTokenServiceTests(SqlServerFixture sqlServer)
+    public JwtTokenServiceTests(PostgresFixture sqlServer)
     {
         _factory = new AuthWebApplicationFactory(sqlServer);
     }

@@ -1,6 +1,6 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient;
+using Npgsql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,12 +18,12 @@ using Shora.Tests.Common;
 
 namespace Shora.Tests.Integration.Infrastructure;
 
-[Collection("SqlServer")]
+[Collection("Postgres")]
 public class OutboxEmailRendererTests
 {
-    private readonly SqlServerFixture _sqlServer;
+    private readonly PostgresFixture _sqlServer;
 
-    public OutboxEmailRendererTests(SqlServerFixture sqlServer)
+    public OutboxEmailRendererTests(PostgresFixture sqlServer)
     {
         _sqlServer = sqlServer;
     }
@@ -33,7 +33,7 @@ public class OutboxEmailRendererTests
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var connectionString = await _sqlServer.CreateDatabaseAsync();
-        var databaseName = new SqlConnectionStringBuilder(connectionString).InitialCatalog!;
+        var databaseName = new NpgsqlConnectionStringBuilder(connectionString).Database!;
         var services = CreateServices(connectionString);
 
         try
@@ -159,7 +159,7 @@ public class OutboxEmailRendererTests
 
         services.AddLogging();
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(connectionString));
+            options.UseNpgsql(connectionString));
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
         services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
         services.AddSingleton<IEmailTemplateService, EmailTemplateService>();

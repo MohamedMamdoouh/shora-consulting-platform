@@ -56,23 +56,39 @@ jobs:
           retention-days: 7
 
   deploy:
-    name: Deploy to Azure
+    name: Deploy to Railway
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     environment:
       name: ${{ vars.DEPLOY_ENVIRONMENT || 'production' }}
     outputs:
-      webapp_name: ${{ steps.deploy-meta.outputs.webapp_name }}
+      production_url: ${{ steps.deploy-meta.outputs.production_url }}
     env:
-      AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME }}
+      RAILWAY_SERVICE_ID: ${{ vars.RAILWAY_SERVICE_ID }}
+      PRODUCTION_URL: ${{ vars.PRODUCTION_URL }}
     steps:
-      - id: deploy-meta
-        run: echo "webapp_name=${AZURE_WEBAPP_NAME}" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
 
-      - name: Require Azure configuration
+      - id: deploy-meta
+        run: echo "production_url=${PRODUCTION_URL}" >> "$GITHUB_OUTPUT"
+
+      - name: Require Railway configuration
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
         run: |
-          if [ -z "$AZURE_WEBAPP_NAME" ]; then
-            echo "::error::AZURE_WEBAPP_NAME repository variable is not set. Add it under Settings → Secrets and variables → Actions → Variables."
+          if [ -z "$RAILWAY_SERVICE_ID" ]; then
+            echo "::error::RAILWAY_SERVICE_ID repository variable is not set. See docs/railway-prerequisites.md"
+            exit 1
+          fi
+          if [ -z "$PRODUCTION_URL" ]; then
+            echo "::error::PRODUCTION_URL repository variable is not set (e.g. https://your-app.up.railway.app)."
+            exit 1
+          fi
+          if [ -z "$RAILWAY_TOKEN" ]; then
+            echo "::error::RAILWAY_TOKEN secret is not set on the production environment."
             exit 1
           fi
 
@@ -82,33 +98,47 @@ jobs:
           name: shora-publish
           path: ./publish
 
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
         with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: ./publish
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push container
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ghcr.io/${{ github.repository }}:production
+
+      - name: Redeploy on Railway
+        run: npx -y @railway/cli@latest redeploy --service "$RAILWAY_SERVICE_ID" --yes
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
   smoke-test:
     name: Post-deploy smoke test
     needs: deploy
     runs-on: ubuntu-latest
-    if: ${{ needs.deploy.result == 'success' && needs.deploy.outputs.webapp_name != '' }}
+    if: ${{ needs.deploy.result == 'success' && needs.deploy.outputs.production_url != '' }}
     env:
-      BASE_URL: https://${{ needs.deploy.outputs.webapp_name }}.azurewebsites.net
+      BASE_URL: ${{ needs.deploy.outputs.production_url }}
     steps:
       - name: Wait for app startup
-        run: sleep 30
+        run: sleep 45
 
       - name: Verify API health
         run: |
-          for i in 1 2 3 4 5; do
+          for i in 1 2 3 4 5 6; do
             if curl -sf "$BASE_URL/api/v1/health" | grep -q healthy; then
               echo "Health check passed"
               exit 0
             fi
             echo "Attempt $i failed, retrying..."
-            sleep 15
+            sleep 20
           done
           echo "::error::Health check failed at $BASE_URL/api/v1/health"
           exit 1

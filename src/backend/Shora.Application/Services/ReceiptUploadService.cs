@@ -79,7 +79,8 @@ public sealed class ReceiptUploadService(
             var booking = await dbContext.Bookings
                 .FromSqlInterpolated(
                     $"""
-                     SELECT * FROM "Bookings" WHERE "Id" = {bookingId} FOR UPDATE
+                     SELECT "Id", "ClientId", "AvailabilitySlotId", "SlotStartUtc", "SlotEndUtc", "DeliveryMethod", "ContactPhone", "Status", "ReceiptUploadDeadlineUtc", "CreatedAt", xmin
+                     FROM "Bookings" WHERE "Id" = {bookingId} FOR UPDATE
                      """)
                 .FirstOrDefaultAsync(cancellationToken);
 

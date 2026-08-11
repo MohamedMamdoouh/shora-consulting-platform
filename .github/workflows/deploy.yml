@@ -105,6 +105,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Prepare container image tag
+        id: image
+        run: echo "tag=ghcr.io/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]'):production" >> "$GITHUB_OUTPUT"
+
       - name: Build and push container
         uses: docker/build-push-action@v6
         with:
@@ -112,7 +116,7 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64
           push: true
-          tags: ghcr.io/${{ github.repository }}:production
+          tags: ${{ steps.image.outputs.tag }}
 
       - name: Redeploy on Railway
         run: npx -y @railway/cli@latest redeploy --service "$RAILWAY_SERVICE_ID" --yes

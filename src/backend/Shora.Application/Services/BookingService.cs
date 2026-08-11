@@ -561,7 +561,8 @@ public sealed class BookingService(
         var holdCount = await dbContext.Bookings
             .FromSqlInterpolated(
                 $"""
-                 SELECT * FROM "Bookings" WHERE "ClientId" = {clientId}
+                 SELECT "Id", "ClientId", "AvailabilitySlotId", "SlotStartUtc", "SlotEndUtc", "DeliveryMethod", "ContactPhone", "Status", "ReceiptUploadDeadlineUtc", "CreatedAt", xmin
+                 FROM "Bookings" WHERE "ClientId" = {clientId}
                  AND "Status" IN ({pendingPayment}, {pendingApproval})
                  FOR UPDATE
                  """)

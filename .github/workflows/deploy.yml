@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 concurrency:
-  group: deploy-production
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:

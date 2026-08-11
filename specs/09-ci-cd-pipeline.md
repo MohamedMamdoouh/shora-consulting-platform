@@ -251,6 +251,7 @@ Sequence:
 | Concern | Design |
 | --- | --- |
 | **Triggers** | Push to `main` only — no manual dispatch |
+| **Concurrency** | One run per branch; `cancel-in-progress: true` cancels an older in-progress Deploy when a newer push to `main` starts |
 | **Environments** | GitHub Environment `production` (optional approval gate) |
 | **Missing Railway config** | Deploy job **Require Railway configuration** step fails if `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`, or `RAILWAY_TOKEN` is unset — no silent skip |
 | **Build** | Same sequence as 09.8 in the `build` job |

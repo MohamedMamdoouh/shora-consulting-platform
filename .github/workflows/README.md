@@ -58,7 +58,7 @@ Runs on **every push to `main`**. There is no manual dispatch — merging to `ma
 
 The deploy job fails if `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`, or `RAILWAY_TOKEN` is missing (no silent skip).
 
-Concurrent pushes cancel the in-progress deploy (`concurrency` group) so only the latest `main` commit deploys.
+**Concurrency:** only one Deploy run per branch at a time. A newer push to `main` **cancels** the in-progress run (build, Railway redeploy, or smoke test) via `cancel-in-progress: true` in [`deploy.yml`](deploy.yml). The latest commit is the only one that should finish and call `railway redeploy`.
 
 ### What the workflow does
 

@@ -1,6 +1,6 @@
 # 01 — Project Scaffold & Data Model
 
-**Status: Implemented** (foundation 2026-07-06; extended through 2026-08). Backend scaffold, data model, migrations, seed, Angular RTL shell, and the full MVP stack (specs 02–08) are in place on this foundation. Remaining MVP gaps: public-page real content (03); first Azure production deploy is operational ([docs/README.md](../docs/README.md)).
+**Status: Implemented** (foundation 2026-07-06; extended through 2026-08). Backend scaffold, data model, migrations, seed, Angular RTL shell, and the full MVP stack (specs 02–09) are in place on this foundation. Remaining work is operational: Railway go-live ([docs/README.md](../docs/README.md)); optional admin ops alerts UI (API done — spec 08).
 
 ## 1. Architecture: Pragmatic Clean Architecture
 
@@ -27,7 +27,7 @@ flowchart LR
 ```
 Shora/
 ├── specs/                          # Spec-driven documentation (00–09)
-├── docs/                           # Operator docs (Azure, production config, runbooks)
+├── docs/                           # Operator docs (Railway, production config, runbooks)
 ├── src/
 │   ├── contracts/                  # TypeScript mirrors of Shora.Contracts
 │   ├── frontend/                   # Angular 21 (standalone, RTL Arabic shell)
@@ -39,7 +39,7 @@ Shora/
 │       ├── Shora.Contracts/        # Shared request/response records (no dependencies)
 │       ├── Shora.Infrastructure/   # EF Core DbContext + migrations, seed, Azure Blob, SMTP email
 │       ├── Shora.Api/              # ASP.NET Core Web API: controllers, jobs, rate limiting, middleware
-│       └── Shora.Tests/            # xUnit integration + unit tests (~240 methods)
+│       └── Shora.Tests/            # xUnit integration + unit tests
 ├── .github/workflows/              # CI + Deploy workflows (spec 09)
 ├── .gitignore
 └── README.md
@@ -65,7 +65,7 @@ Rationale: this keeps external, swappable concerns (payments, email) behind inte
   - Abstraction interfaces (implemented by Infrastructure): `IApplicationDbContext`, `IFileStorage` (stores receipt images in a private blob container, issues short-lived read URLs), `IEmailSender`, `IDateTimeProvider` (so time-based logic like the upload deadline and cancellation auto-decline is testable), `ICurrentUser` (resolves the authenticated user id/role).
   - Request/response DTOs and validation (e.g. FluentValidation or DataAnnotations).
 - **Infrastructure** — concrete implementations:
-  - `ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>` implementing `IApplicationDbContext`; fluent entity configurations in `Data/Configurations/`; migrations through `20260806084352_AddJobRunHistory` (see #5).
+  - `ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>` implementing `IApplicationDbContext`; fluent entity configurations in `Data/Configurations/`; consolidated PostgreSQL migration `20260811142250_InitialCreate` (see #5).
   - `SystemDateTimeProvider : IDateTimeProvider` — live UTC clock.
   - `SmtpEmailSender : IEmailSender` — production SMTP via MailKit (spec 08.4); dev falls back to logging when `Email:Host` is unset.
   - `AzureBlobFileStorage : IFileStorage` — receipt blob storage (spec 05a); `NotImplementedFileStorage` when `Storage:ConnectionString` is unset.
@@ -78,7 +78,7 @@ Rationale: this keeps external, swappable concerns (payments, email) behind inte
 ### 2.2 Configuration
 
 - **appsettings.json** structure (secrets via `dotnet user-secrets` / environment variables in real deployments, never committed):
-  - `ConnectionStrings:DefaultConnection` — SQL Server connection string (`Database=Shora` in dev)
+  - `ConnectionStrings:DefaultConnection` — PostgreSQL connection string (Npgsql; `Host=localhost;Port=5432;Database=Shora;...` in dev; Neon in production)
   - `Jwt:Issuer`, `Jwt:Audience`, `Jwt:SigningKey` — JWT auth (see spec 02); issuer/audience default to `Shora` / `Shora.Web`
   - `Storage:ConnectionString`, `Storage:ReceiptContainer` — Azure Blob Storage for receipt images (private container); used in spec 05
   - `Google:ClientId`, `Google:ClientSecret` — Google sign-in (see spec 02)
@@ -195,7 +195,7 @@ Creating a `BlockedDate` is **rejected** if the range overlaps any `Availability
 | Status                   | `enum { PendingPayment, PendingApproval, Confirmed, CancellationRequested, Completed, Cancelled }` | `PendingPayment` = reserved, awaiting the client's receipt upload; `PendingApproval` = receipt uploaded, awaiting admin review; `CancellationRequested` = client has asked to cancel a confirmed booking, awaiting the admin's decision (spec 04 #3). `Completed` is set **automatically** by a background job once `SlotEndUtc` has passed (see spec 07) — there is no manual "mark completed" action. A booking is also set to `Cancelled` **automatically** when its receipt-upload deadline expires while still `PendingPayment` (spec 04 #4) — no booking stays `PendingPayment` after its slot is released. |
 | ReceiptUploadDeadlineUtc | `DateTime?`                                                                                        | UTC. Set when the booking enters `PendingPayment` (reserve, or after a declined receipt) to `now + Settings.ReceiptUploadWindowMinutes`. The cleanup job cancels the booking if no receipt is uploaded by this time. Null once a receipt is under review (`PendingApproval`) — no auto-cancel while awaiting the admin.                                                                                                                                                                                                                                                                                           |
 | CreatedAt                | `DateTime`                                                                                         | UTC                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| RowVersion               | `rowversion`                                                                                       | **Optimistic-concurrency token.** Every status transition is a conditional update (`WHERE Status = expectedStatus`, token checked); when two actors race (e.g. client cancellation request vs admin approve vs the auto-decline job), exactly one transition commits and the loser gets a conflict (HTTP 409) — never two audit rows or duplicate emails for one transition.                                                                                                                                                                                                                                      |
+| RowVersion               | `byte[]`                                                                                           | **Optimistic-concurrency token.** Mapped with EF Core `IsRowVersion()` to PostgreSQL's system **`xmin`** column (no physical `xmin` column in the schema). Every status transition is a conditional update (`WHERE Status = expectedStatus`, token checked); when two actors race (e.g. client cancellation request vs admin approve vs the auto-decline job), exactly one transition commits and the loser gets a conflict (HTTP 409) — never two audit rows or duplicate emails for one transition. Raw SQL that reads booking rows for locking must select `xmin` explicitly (not `SELECT *`). |
 
 **Slot-history rule:** booking history never depends on the slot row surviving. `SlotStartUtc`/`SlotEndUtc` are snapshotted onto the booking at reserve time, so dashboards (specs 06/07) and time guards (spec 04 #4) always work even if the underlying unbooked `AvailabilitySlot` is later removed by regeneration or a `BlockedDate` (the FK is nullable with `SET NULL`). Slots referenced by an **active** booking are never removed (spec 07 #2).
 
@@ -322,7 +322,7 @@ These are enforced in domain/application guards and validated in tests:
 - `InstaPayHandle` non-empty when set (free-form IPA/handle).
   Changing `SessionDurationMinutes`/`BufferMinutes` only affects **future** slot generation; already-generated and booked slots keep their original duration (the snapshot lives on `AvailabilitySlot`). The admin UI surfaces these same rules (spec 07).
 
-**Singleton enforcement:** `PUT /api/admin/settings` always updates row `Id = 1` (upsert-if-missing at startup only). The table carries a `CHECK (Id = 1)` **constraint** (added in the initial migration) so a second row is structurally impossible at the database level — the PK alone only guarantees uniqueness, not that the single row is `Id = 1`.
+**Singleton enforcement:** `PUT /api/admin/settings` always updates row `Id = 1` (upsert-if-missing at startup only). The table carries a `CHECK ("Id" = 1)` **constraint** (PostgreSQL-quoted identifier syntax; added in the initial migration) so a second row is structurally impossible at the database level — the PK alone only guarantees uniqueness, not that the single row is `Id = 1`.
 
 ### `OutboxMessage` (reliable side-effect delivery)
 
@@ -352,27 +352,24 @@ Any side effect that must be reliable (emails, future integrations) is written a
 | LastFailureAtUtc  | `DateTime?` | UTC of the last failed run                                            |
 | LastError         | `string?`   | Last failure detail (truncated in logs; full text stored for ops)     |
 
-Updated by `JobHeartbeatService` after each background job run. `OpsMonitoringService` alerts when heartbeats go stale or `LastFailureAtUtc > LastSuccessAtUtc`. Added in migration `20260806084352_AddJobRunHistory`.
+Updated by `JobHeartbeatService` after each background job run. `OpsMonitoringService` alerts when heartbeats go stale or `LastFailureAtUtc > LastSuccessAtUtc`. Included in `20260811142250_InitialCreate`.
 
 ## 5. Migrations & Seed Data
 
 - **Migrations** (applied automatically on startup via `InitializeDatabaseAsync`):
-  - `20260706205915_InitialCreate` — Identity + all domain tables, indexes, `Settings` singleton constraint
-  - `20260706221230_FixSettingsSingletonId`, `20260706231838_SimplifyBookingSlotUniqueIndex`
-  - `20260709132945_SyncPendingModelChanges`, `20260712142357_RenameIdentityTables`
-  - `20260801004727_AddPaymentReceiptReviewWarnings`
-  - `20260806084352_AddJobRunHistory` — ops heartbeat table (spec 08)
+  - `20260811142250_InitialCreate` — consolidated PostgreSQL schema: Identity + all domain tables, indexes, `Settings` singleton constraint (`CHECK ("Id" = 1)`), `JobRunHistory`, payment/receipt/outbox/refresh-token tables, filtered unique indexes, and `Booking.RowVersion` mapped to system `xmin`
 - **Initial schema highlights:**
   - Unique indexes: `AvailabilitySlot.StartTime`, `Payment.BookingId`, `CancellationRequest.BookingId`, `OutboxMessage.IdempotencyKey`, `RefreshToken.TokenHash`
   - Filtered unique index on `Booking(AvailabilitySlotId) WHERE AvailabilitySlotId IS NOT NULL`
   - Filtered unique index on `AvailabilitySlot(BookingId) WHERE BookingId IS NOT NULL`
   - Non-unique index on `PaymentReceipt.ContentHashSha256`
-  - `CHECK (Id = 1)` constraint on `Settings`
-  - `Booking.RowVersion` concurrency token
+  - `CHECK ("Id" = 1)` constraint on `Settings`
+  - `Booking.RowVersion` → PostgreSQL system `xmin` via `IsRowVersion()` (no physical xmin column)
   - `BookingStatusAudit`, `CancellationRequest`, `PaymentReceipt`, `RefreshToken`, and `OutboxMessage` tables
-  - `JobRunHistory` table (added in `AddJobRunHistory`)
+  - `JobRunHistory` table
   - No payment-gateway columns (`Payment` has no provider/order/transaction fields)
-- **Admin FK delete behavior:** SQL Server cascade-path constraints require `ON DELETE NO ACTION` (not `SET NULL`) on optional admin-user FKs (`Payment.RefundedByAdminId`, `PaymentReceipt.ReviewedByAdminId`, etc.).
+- **Database provider:** Npgsql / PostgreSQL 16 (local dev, Neon production, Testcontainers in CI). `UseNpgsql` is configured **without** `EnableRetryOnFailure` because booking and payment flows use manual `BeginTransactionAsync()` with `FOR UPDATE` row locking — EF's retry execution strategy is incompatible with user-initiated transactions.
+- **Admin FK delete behavior:** PostgreSQL cascade-path constraints require `ON DELETE NO ACTION` (not `SET NULL`) on optional admin-user FKs (`Payment.RefundedByAdminId`, `PaymentReceipt.ReviewedByAdminId`, etc.).
 - **Apply migrations:** `dotnet ef database update --project Shora.Infrastructure --startup-project Shora.Api`. On startup, `InitializeDatabaseAsync()` auto-applies pending migrations and runs seed.
 - **Seed data** (idempotent, via `DatabaseSeeder`):
   - `Client` and `Admin` Identity roles
@@ -384,7 +381,7 @@ Updated by `JobHeartbeatService` after each background job run. `OpsMonitoringSe
 | Check                 | Command / endpoint                                           |
 | --------------------- | ------------------------------------------------------------ |
 | Backend build         | `dotnet build` in `src/backend`                              |
-| Tests                 | `dotnet test` — ~240 xUnit methods across integration + unit (Docker required for Testcontainers SQL Server) |
+| Tests                 | `dotnet test` — integration + unit (Docker required for Testcontainers PostgreSQL) |
 | Database              | `dotnet ef database update` or API startup auto-migrate      |
 | Health                | `GET /api/v1/health` → `{ status: "healthy", timestampUtc }` |
 | OpenAPI (dev)         | `/openapi/v1.json`                                           |
@@ -393,6 +390,6 @@ Updated by `JobHeartbeatService` after each background job run. `OpsMonitoringSe
 
 **Namespaces:** all C# code uses the `Shora.`\* root namespace (`Shora.Domain`, `Shora.Application`, `Shora.Infrastructure`, `Shora.Api`).
 
-**Deferred:** public pages real content and polish (03); admin ops alerts UI (API done — spec 08).
+**Deferred:** admin ops alerts UI (API done — spec 08).
 
-**Done on this foundation:** auth (02); booking flow + lifecycle jobs (04, 08); manual payments (05); client dashboard (06); admin dashboard (07); cross-cutting — outbox dispatcher, all background jobs, rate limits, ops monitoring (08); CI/CD pipelines (09 — code complete; Azure go-live is operator steps in [docs/README.md](../docs/README.md)).
+**Done on this foundation:** auth (02); public pages (03); booking flow + lifecycle jobs (04, 08); manual payments (05); client dashboard (06); admin dashboard (07); cross-cutting — outbox dispatcher, all background jobs, rate limits, ops monitoring (08); CI/CD pipelines (09 — code complete; Railway go-live is operator steps in [docs/README.md](../docs/README.md)).

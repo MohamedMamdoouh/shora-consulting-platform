@@ -44,9 +44,9 @@ Refresh cookies use `Secure=true` and `SameSite=Strict` outside Development ([`R
 
 When you bind a custom domain (Railway **Settings → Networking** or legacy App Service **Custom domains**):
 
-1. **Portal** → App Service → **Custom domains** → add hostname → complete DNS (CNAME to `<app>.azurewebsites.net` or apex A/ALIAS records).
-2. **TLS** → bind **App Service Managed Certificate** (Basic+ plan) or upload your own cert.
-3. Update **all** URL-dependent settings to the new HTTPS origin (no trailing slash):
+1. **Railway:** **Settings → Networking** → add custom domain → complete DNS (CNAME to Railway-provided target).
+   **Legacy App Service:** **Custom domains** → add hostname → CNAME to `<app>.azurewebsites.net` or apex A/ALIAS records → bind TLS certificate.
+2. Update **all** URL-dependent settings to the new HTTPS origin (no trailing slash):
 
 - `Frontend__BaseUrl`
 - `Cors__AllowedOrigins__0`

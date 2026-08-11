@@ -11,16 +11,18 @@ Pointers for running Shora in production. Application code lives under `src/`; t
 
 ## Production status (2026-08-11)
 
-**Repo:** [MohamedMamdoouh/shora-consulting-platform](https://github.com/MohamedMamdoouh/shora-consulting-platform) · **Branch:** `main` (PostgreSQL + Railway deploy path merged)
+**Repo:** [MohamedMamdoouh/shora-consulting-platform](https://github.com/MohamedMamdoouh/shora-consulting-platform) · **Branch:** `main` (PostgreSQL + Railway deploy path)
 
 | Step | Item | Status |
 | --- | --- | --- |
+| — | **CI** (backend + frontend tests on PostgreSQL Testcontainers) | **Done** |
 | B1 | Neon PostgreSQL (`shora-prod`) | **Done** |
 | B1 | Azure Blob (`stshoraprodne001` / `receipts`) | **Done** |
 | B2 | Railway service + public domain | **Done** |
 | B4 | Railway variables | **Done** (operator) |
-| B5 | GitHub `RAILWAY_*` + `PRODUCTION_URL` | **In progress** (operator) |
+| B5 | GitHub `RAILWAY_*` + `PRODUCTION_URL` | **Operator** — `RAILWAY_TOKEN` must be an environment **secret** on GitHub Environment `production` (not a repo secret) |
 | B3 | GHCR image pull (public package or registry auth) | **Pending** |
+| — | Deploy workflow: build → push GHCR (lowercase tag) → `railway redeploy` | **Code done** — blocked until B3/B5 complete |
 | — | First successful Railway deploy + `/api/v1/health` | **Pending** |
 | — | Admin login, payment settings, remove `AdminSeed__*` | **Pending** |
 
@@ -43,11 +45,12 @@ Secrets (Neon connection string, JWT, Azure storage key, SendGrid API key, `Admi
 
 ### What to do next
 
-1. Finish [GitHub setup](railway-prerequisites.md#b5--github) if not already done.
+1. Finish [GitHub setup](railway-prerequisites.md#b5--github) — especially `RAILWAY_TOKEN` on the **`production`** environment.
 2. [Make the GHCR package public](railway-prerequisites.md#b3--ghcr-image-pull) (or add Railway registry credentials).
-3. Confirm **Deploy** workflow is green on GitHub Actions, then redeploy on Railway if needed.
-4. Verify `GET https://shora-production.up.railway.app/api/v1/health` → `healthy`.
-5. Complete [post-deploy checklist](railway-prerequisites.md#verify).
+3. Merge to `main` or re-run **Deploy** — image tag is `ghcr.io/mohamedmamdoouh/shora-consulting-platform:production` (lowercase; required by GHCR).
+4. [Redeploy on Railway](railway-prerequisites.md#manual-redeploy) if the workflow succeeded but the service did not pick up the image.
+5. Verify `GET https://shora-production.up.railway.app/api/v1/health` → `healthy`.
+6. Complete [post-deploy checklist](railway-prerequisites.md#verify).
 
 ---
 

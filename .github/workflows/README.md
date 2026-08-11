@@ -32,7 +32,7 @@ See [docs/railway-prerequisites.md](../docs/railway-prerequisites.md) for GHCR p
 | **Backend** | `src/backend/**` or `.github/workflows/**` changed | `src/backend` | `dotnet restore` → `build` → `test` |
 | **Frontend** | `src/frontend/**` or `.github/workflows/**` changed | `src/frontend` | `npm ci` → `npm run build` → `npm test` (`CI=true`) |
 
-- Backend tests use Testcontainers PostgreSQL (~240 xUnit methods; Docker required on the runner).
+- Backend tests use Testcontainers PostgreSQL (Docker required on the runner).
 - Docs/spec-only changes skip the jobs that did not touch backend or frontend code.
 
 ### Reproduce locally
@@ -63,7 +63,7 @@ The deploy job fails if `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`, or `RAILWAY_TOKE
 ### What the workflow does
 
 1. **Build job** — `npm ci` + production Angular build → copy into `Shora.Api/wwwroot/` → `dotnet publish` → upload artifact (spec 09.8).
-2. **Deploy job** — download artifact → build [`Dockerfile`](../Dockerfile) → push `ghcr.io/<repo>:production` → `railway redeploy` (Path B-lite).
+2. **Deploy job** — download artifact → build [`Dockerfile`](../Dockerfile) → push `ghcr.io/<lowercase-repo>:production` (repository path lowercased for GHCR) → `railway redeploy` (Path B-lite).
 3. **Smoke-test job** — curl `/api/v1/health`, `/`, and `/about` on `PRODUCTION_URL`.
 
 You can also open those URLs in a browser after deploy.
@@ -75,7 +75,7 @@ You can also open those URLs in a browser after deploy.
 3. **GitHub → Settings → Environments** — create `production` (optional required reviewers).
 4. **Repository variables:** `RAILWAY_SERVICE_ID` = `f69a711c-b830-4a97-a269-fa5e2b6f4dc9`, `PRODUCTION_URL` = `https://shora-production.up.railway.app`.
 5. Optional **repository variable:** `DEPLOY_ENVIRONMENT` (defaults to `production`).
-6. **Environment secret:** `RAILWAY_TOKEN` = Railway account token.
+6. **Environment secret:** `RAILWAY_TOKEN` = Railway **account** or **workspace** token from [railway.app/account/tokens](https://railway.app/account/tokens) (not a project token). The workflow maps it to `RAILWAY_API_TOKEN` for the CLI.
 7. Enable **branch protection** on `main` so CI passes before merge.
 
 Google sign-in: set `googleClientId` in [`environment.production.ts`](../src/frontend/src/environments/environment.production.ts) before merge (build-time). Production builds use `fileReplacements` in [`angular.json`](../src/frontend/angular.json).

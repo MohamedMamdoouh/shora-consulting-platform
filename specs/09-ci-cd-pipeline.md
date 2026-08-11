@@ -68,7 +68,7 @@ Backend and frontend jobs run only when their paths (or `.github/workflows/**`) 
 
 ## 09.2 — Backend CI
 
-**Purpose:** Prove every backend change compiles and passes ~240 tests before merge.
+**Purpose:** Prove every backend change compiles and passes tests before merge.
 
 **Workflow:** [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) — `backend` job (needs `changes`, gated on path filter).
 
@@ -80,7 +80,7 @@ Backend and frontend jobs run only when their paths (or `.github/workflows/**`) 
 | Build | `dotnet build --no-restore` |
 | Test | `dotnet test --no-build --verbosity normal` |
 
-- **~240 xUnit tests** in `Shora.Tests` (59 test classes; SQL Server via Testcontainers — Docker required on the runner).
+- **xUnit tests** in `Shora.Tests` (PostgreSQL via Testcontainers — Docker required on the runner).
 - **Cache:** NuGet packages via `setup-dotnet` cache.
 
 **Verify locally:**
@@ -256,7 +256,7 @@ Sequence:
 | **Missing Railway config** | Deploy job **Require Railway configuration** step fails if `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`, or `RAILWAY_TOKEN` is unset — no silent skip |
 | **Build** | Same sequence as 09.8 in the `build` job |
 | **Deploy target** | Railway service (Docker image from GHCR) |
-| **Auth** | `RAILWAY_TOKEN` environment secret; GHCR push via `GITHUB_TOKEN` |
+| **Auth** | GitHub secret `RAILWAY_TOKEN` (account/workspace token) passed to CLI as `RAILWAY_API_TOKEN`; GHCR push via `GITHUB_TOKEN` |
 
 ### GitHub setup (Railway path)
 
@@ -264,7 +264,7 @@ Sequence:
 2. GitHub Environment `production` (optional reviewers)
 3. Repository variables: `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`
 4. Optional repository variable `DEPLOY_ENVIRONMENT` (defaults to `production`)
-5. Environment secret `RAILWAY_TOKEN`
+5. Environment secret `RAILWAY_TOKEN` (Railway account or workspace token from [railway.app/account/tokens](https://railway.app/account/tokens))
 6. GHCR package public or Railway registry credentials for image pull
 7. Enable branch protection on `main` — CI green before merge, then push auto-deploys
 
@@ -272,7 +272,7 @@ Sequence:
 
 1. CI should pass on the PR before merge (branch protection recommended); merge to `main` triggers Deploy
 2. Build job produces publish artifact (09.8)
-3. Deploy job builds [`Dockerfile`](../Dockerfile), pushes `ghcr.io/<repo>:production`, runs `railway redeploy`
+3. Deploy job builds [`Dockerfile`](../Dockerfile), pushes `ghcr.io/<lowercase-repo>:production` (repository path lowercased — GHCR tags must be lowercase), runs `railway redeploy`
 4. Smoke-test job curls `/api/v1/health`, `/`, `/about` on `PRODUCTION_URL`
 5. App startup applies EF migrations and idempotent seed (09.10)
 
@@ -309,7 +309,6 @@ MVP requires frontend and API on the **same registrable domain** over HTTPS (spe
 
 ## Out of Scope (MVP Pipeline)
 
-- Docker image build/push and container registry deploy (unless hosting choice changes)
 - Multi-region or blue/green deploy
 - Full APM / deployment smoke-test suite (add incrementally post-MVP)
 - Deploy gated on CI workflow completion (CI runs on PR; Deploy runs on push to `main` — use branch protection so only green PRs merge)

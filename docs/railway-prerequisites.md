@@ -106,7 +106,7 @@ Railway → **Shora** → **Settings → Source → Docker Image**:
 ghcr.io/mohamedmamdoouh/shora-consulting-platform:production
 ```
 
-The **Deploy** workflow builds and pushes this tag on every push to `main`.
+The **Deploy** workflow builds and pushes this tag on every push to `main`. The workflow lowercases `${{ github.repository }}` before tagging — GHCR rejects uppercase path segments (e.g. `MohamedMamdoouh` → `mohamedmamdoouh`).
 
 ---
 
@@ -133,6 +133,7 @@ Railway must be able to pull from GitHub Container Registry. The image is create
 | --- | --- |
 | `pull access denied` / `unauthorized` | Package private without Railway registry creds |
 | `manifest unknown` / `not found` | Deploy workflow has not pushed the image yet |
+| `invalid tag` / uppercase in image name | Use lowercase GHCR path (`mohamedmamdoouh/shora-consulting-platform`) |
 | Deployment FAILED, no app logs | Image pull failed before container start |
 | Health returns 404 | No healthy container behind Railway edge |
 
@@ -182,12 +183,36 @@ Configure in [MohamedMamdoouh/shora-consulting-platform](https://github.com/Moha
 | --- | --- | --- |
 | `RAILWAY_SERVICE_ID` | Repository **variable** (not secret) | `f69a711c-b830-4a97-a269-fa5e2b6f4dc9` |
 | `PRODUCTION_URL` | Repository **variable** | `https://shora-production.up.railway.app` |
-| `RAILWAY_TOKEN` | Environment **secret** on `production` | [railway.app/account/tokens](https://railway.app/account/tokens) |
+| `RAILWAY_TOKEN` | Environment **secret** on `production` | [railway.app/account/tokens](https://railway.app/account/tokens) — create an **account** or **workspace** token (not a project token). The Deploy workflow passes this secret to the CLI as `RAILWAY_API_TOKEN`. |
 | Branch protection | `main` | Require CI Backend + Frontend (recommended) |
 
 Optional repository variable: `DEPLOY_ENVIRONMENT` (defaults to `production`).
 
 The Deploy job fails explicitly if any of `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`, or `RAILWAY_TOKEN` is missing.
+
+### Troubleshooting `RAILWAY_TOKEN`
+
+| Symptom | Fix |
+| --- | --- |
+| `Invalid RAILWAY_TOKEN` in Deploy workflow | Create a new token at [railway.app/account/tokens](https://railway.app/account/tokens) |
+| Token set but still invalid | Must be an **environment secret** on GitHub Environment **`production`**, not a repository secret — `deploy.yml` uses `environment: production` |
+| Deploy skipped / empty token | Confirm Environment `production` exists under **Settings → Environments** |
+
+---
+
+## Manual redeploy
+
+Use when the Deploy workflow pushed a new image but Railway is still running an old build, or after fixing GHCR pull access.
+
+**Railway dashboard:** Project **Tansekak** → service **Shora** → **Deployments** → **Redeploy** (latest image).
+
+**Railway CLI** (with project linked):
+
+```powershell
+railway redeploy --service f69a711c-b830-4a97-a269-fa5e2b6f4dc9
+```
+
+**GitHub Actions:** Re-run the **Deploy** workflow on `main` after fixing secrets — it builds, pushes GHCR, and calls `railway redeploy`.
 
 ---
 

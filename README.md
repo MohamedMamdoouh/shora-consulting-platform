@@ -135,7 +135,7 @@ Same commands as [CI](.github/workflows/ci.yml) — see [spec 09](specs/09-ci-cd
 ```powershell
 cd src/backend
 dotnet build
-dotnet test   # ~240 xUnit tests; requires Docker (Testcontainers)
+dotnet test   # requires Docker (Testcontainers PostgreSQL)
 
 cd ../frontend
 npm ci

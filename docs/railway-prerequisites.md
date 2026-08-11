@@ -25,7 +25,9 @@ Deploy Shora to **Railway** (API + Angular SPA in one container) with **Neon Pos
 | Neon project | `shora-prod` | Done |
 | Azure RG | `rg-shora-prod-ne` (North Europe) | Done |
 | Storage account | `stshoraprodne001`, container `receipts` | Done |
-| Railway project | `Tansekak` (existing project — free plan project limit) | Done |
+| Railway project | `shora` | Done |
+| Railway project ID | `2a876d36-cf24-4cf2-b6bf-ed0d1eee6e07` | Done |
+| Railway environment ID | `907c0f6e-5118-459c-a7ea-d273663664d1` (`production`) | Done |
 | Railway service | `Shora` | Done |
 | Railway service ID | `f69a711c-b830-4a97-a269-fa5e2b6f4dc9` | Done |
 | Public domain | `shora-production.up.railway.app` | Done |
@@ -34,7 +36,7 @@ Deploy Shora to **Railway** (API + Angular SPA in one container) with **Neon Pos
 | GitHub deploy secrets | See [B5](#b5--github) | Operator |
 | GHCR pull + live deploy | See [B3](#b3--ghcr-image-pull) + [Verify](#verify) | Pending |
 
-> **Note:** Tansekak (another app) runs in a separate Railway project. Do not mix env vars or domains between the two apps.
+> **Note:** Neon also has a separate project named `tansekak` for another app — do not mix connection strings or domains between the two apps.
 
 ---
 
@@ -47,14 +49,15 @@ Deploy Shora to **Railway** (API + Angular SPA in one container) with **Neon Pos
 1. Use the **pooled** connection string from the Neon dashboard (recommended for Railway restarts).
 2. Ensure SSL is enabled — append `Ssl Mode=Require` if not already in the string.
 3. Set on Railway: `ConnectionStrings__DefaultConnection`.
+4. On Railway, prefer **Npgsql key-value format** — URI query params like `?sslmode=require` can be truncated at `=` and break startup.
 
-Example formats:
+Example for Railway (recommended):
 
 ```text
-Host=ep-xxx.region.aws.neon.tech;Database=neondb;Username=...;Password=...;Ssl Mode=Require
+Host=ep-xxx-pooler.region.aws.neon.tech;Database=neondb;Username=...;Password=...;Ssl Mode=Require
 ```
 
-Or URI form (Npgsql accepts both):
+URI form (works locally; avoid on Railway if values contain `=`):
 
 ```text
 postgresql://user:password@ep-xxx-pooler.region.aws.neon.tech/neondb?sslmode=require
@@ -88,10 +91,13 @@ Rotate storage keys if they were ever logged. No Azure SQL or App Service is req
 
 ## B2 — Railway project
 
-Shora runs as service **Shora** inside Railway project **Tansekak**.
+Shora runs as service **Shora** inside Railway project **shora**.
 
 | Setting | Value |
 | --- | --- |
+| Project name | `shora` |
+| Project ID | `2a876d36-cf24-4cf2-b6bf-ed0d1eee6e07` |
+| Environment | `production` (`907c0f6e-5118-459c-a7ea-d273663664d1`) |
 | Service name | `Shora` |
 | Service ID | `f69a711c-b830-4a97-a269-fa5e2b6f4dc9` |
 | Public URL | `https://shora-production.up.railway.app` |
@@ -159,6 +165,8 @@ Use `__` (double underscore) for nested JSON keys.
 | `Email__Username` | `apikey` (SendGrid constant — not a secret) |
 | `Email__FromName` | `Shora` |
 
+Do **not** set `Cors__AllowedOrigins__0` or `Frontend__BaseUrl` to `http://localhost:4200` in production — Railway variables override [`appsettings.Production.json`](../src/backend/Shora.Api/appsettings.Production.json) and startup validation requires a valid HTTPS origin.
+
 ### Secrets (set in Railway only)
 
 | Variable | Source |
@@ -194,8 +202,8 @@ The Deploy job fails explicitly if any of `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`
 
 | Symptom | Fix |
 | --- | --- |
-| `Invalid RAILWAY_TOKEN` | Secret is an **account** token or expired. Create a **project token** (project → Settings → Tokens → `production`) and update the GitHub secret. |
-| `No linked project found` | Same fix — account tokens need `railway link`; project tokens do not. Use a project token with `RAILWAY_TOKEN`. |
+| `Invalid RAILWAY_TOKEN` | Secret is an **account** token or expired. Create a **project token** (project **shora** → Settings → Tokens → `production`) and update the GitHub secret. |
+| `No linked project found` | Account tokens need `railway link`; this workflow uses **project tokens** with `RAILWAY_TOKEN` only. |
 | Token set but still invalid | Must be an **environment secret** on GitHub Environment **`production`**, not a repository secret — `deploy.yml` uses `environment: production` |
 | Deploy skipped / empty token | Confirm Environment `production` exists under **Settings → Environments** |
 
@@ -205,7 +213,7 @@ The Deploy job fails explicitly if any of `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`
 
 Use when the Deploy workflow pushed a new image but Railway is still running an old build, or after fixing GHCR pull access.
 
-**Railway dashboard:** Project **Tansekak** → service **Shora** → **Deployments** → **Redeploy** (latest image).
+**Railway dashboard:** Project **shora** → service **Shora** → **Deployments** → **Redeploy** (latest image).
 
 **Railway CLI** (with project linked):
 

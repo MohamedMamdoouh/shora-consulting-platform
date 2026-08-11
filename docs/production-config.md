@@ -25,7 +25,7 @@ These must be set on Railway or the app **fails to start** (`ValidateOnStart` in
 | Setting | Variable name | Notes |
 | --- | --- | --- |
 | Environment | `ASPNETCORE_ENVIRONMENT` | `Production` |
-| Database | `ConnectionStrings__DefaultConnection` | Neon PostgreSQL (pooled recommended) |
+| Database | `ConnectionStrings__DefaultConnection` | Neon PostgreSQL (pooled recommended) — see [Neon on Railway](#neon-on-railway) |
 | JWT signing key | `Jwt__SigningKey` | Min 32 chars; strong random (spec 02) |
 | Production URL | `Frontend__BaseUrl` | e.g. `https://shora-production.up.railway.app` — no trailing slash |
 | CORS origin | `Cors__AllowedOrigins__0` | **Same URL** as `Frontend__BaseUrl` (same-site auth) |
@@ -36,7 +36,21 @@ These must be set on Railway or the app **fails to start** (`ValidateOnStart` in
 
 Also set `AllowedHosts` to the hostname only (e.g. `shora-production.up.railway.app` — no `https://`).
 
-If `Frontend__BaseUrl` / `Cors__AllowedOrigins__0` are not set, the repo falls back to placeholder `https://YOUR_PRODUCTION_HOST` in `appsettings.Production.json` — refresh cookies and email links will not work until you override them.
+[`appsettings.Production.json`](../src/backend/Shora.Api/appsettings.Production.json) ships with the Shora production host and CORS origin baked in. **Railway variables still override** JSON when set — ensure `Frontend__BaseUrl` and `Cors__AllowedOrigins__0` on Railway match the production URL, not `http://localhost:4200`, or startup validation will fail.
+
+### Neon on Railway
+
+Prefer Npgsql **key-value** connection strings on Railway:
+
+```text
+Host=ep-xxx-pooler.region.aws.neon.tech;Database=neondb;Username=...;Password=...;Ssl Mode=Require
+```
+
+URI form (`postgresql://...?sslmode=require`) works locally but Railway can truncate values at `=`, leaving a broken `?sslmode` suffix.
+
+### CORS pitfall
+
+If `Cors__AllowedOrigins__0` on Railway is still `http://localhost:4200`, it overrides the baked production config and the app fails `ValidateOnStart` with a CORS validation error. Set it to the same HTTPS URL as `Frontend__BaseUrl`.
 
 Refresh cookies use `Secure=true` and `SameSite=Strict` outside Development ([`RefreshCookieService`](../src/backend/Shora.Infrastructure/Services/RefreshCookieService.cs)).
 

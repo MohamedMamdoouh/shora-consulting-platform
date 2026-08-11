@@ -264,7 +264,7 @@ Sequence:
 2. GitHub Environment `production` (optional reviewers)
 3. Repository variables: `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`
 4. Optional repository variable `DEPLOY_ENVIRONMENT` (defaults to `production`)
-5. Environment secret `RAILWAY_TOKEN` (Railway **project token** — project Settings → Tokens → `production`)
+5. Environment secret `RAILWAY_TOKEN` (Railway **project token** — project **shora** → Settings → Tokens → `production`; not an account token from [railway.app/account/tokens](https://railway.app/account/tokens))
 6. GHCR package public or Railway registry credentials for image pull
 7. Enable branch protection on `main` — CI green before merge, then push auto-deploys
 

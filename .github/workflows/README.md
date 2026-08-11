@@ -7,6 +7,9 @@ Full CI/CD design: [specs/09-ci-cd-pipeline.md](../specs/09-ci-cd-pipeline.md) Â
 | Item | Value |
 | --- | --- |
 | URL | `https://shora-production.up.railway.app` |
+| Railway project | `shora` |
+| Railway project ID | `2a876d36-cf24-4cf2-b6bf-ed0d1eee6e07` |
+| Railway environment ID | `907c0f6e-5118-459c-a7ea-d273663664d1` (`production`) |
 | Railway service ID | `f69a711c-b830-4a97-a269-fa5e2b6f4dc9` |
 | GHCR image | `ghcr.io/mohamedmamdoouh/shora-consulting-platform:production` |
 | GitHub repo | `MohamedMamdoouh/shora-consulting-platform` |

@@ -24,23 +24,10 @@
   position: absolute;
   inset-inline: 20%;
   top: 0;
-  height: 4px;
-  background: var(--gradient-brand);
+  height: 3px;
+  background: var(--color-primary);
   border-radius: 0 0 var(--radius-full) var(--radius-full);
-}
-
-.auth-brand {
-  display: flex;
-  justify-content: center;
-  margin-bottom: var(--space-lg);
-}
-
-.auth-brand app-brand-logo {
-  display: block;
-}
-
-.auth-brand:hover {
-  opacity: 0.85;
+  opacity: 0.6;
 }
 
 .auth-card h1 {
@@ -69,13 +56,13 @@
   width: 100%;
   margin-top: var(--space-sm);
   border-radius: var(--radius-full);
-  background: var(--gradient-brand);
+  background: var(--color-primary);
   border-color: transparent;
-  box-shadow: 0 4px 16px rgba(124, 92, 191, 0.25);
+  box-shadow: none;
 }
 
 .auth-form button[type='submit']:hover {
-  background: var(--gradient-brand-hover);
+  background: var(--color-primary-hover);
 }
 
 .auth-error {

@@ -106,7 +106,7 @@ export function getAdminSettingsFieldError(
   }
 
   if (control.errors['egyptMobile']) {
-    return 'رقم Vodafone Cash غير صالح. استخدم رقم موبايل مصري مثل 01012345678.';
+    return 'رقم فودافون كاش غير صالح. استخدم رقم موبايل مصري مثل 01012345678.';
   }
 
   return null;

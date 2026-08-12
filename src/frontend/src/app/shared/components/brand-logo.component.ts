@@ -1,14 +1,9 @@
-import { Component, input } from '@angular/core';
-
-export type BrandLogoSize = 'shell' | 'auth' | 'hero';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-brand-logo',
   host: {
-    '[class.brand-logo]': 'true',
-    '[class.brand-logo--shell]': 'size() === "shell"',
-    '[class.brand-logo--auth]': 'size() === "auth"',
-    '[class.brand-logo--hero]': 'size() === "hero"',
+    class: 'brand-logo',
   },
   template: `
     <svg viewBox="0 0 128 128" fill="none" role="img" aria-label="شورى">
@@ -42,14 +37,6 @@ export type BrandLogoSize = 'shell' | 'auth' | 'hero';
     svg {
       display: block;
       width: auto;
-      height: 2.25rem;
-    }
-
-    :host(.brand-logo--auth) svg {
-      height: 2.5rem;
-    }
-
-    :host(.brand-logo--hero) svg {
       height: 4.5rem;
     }
   `,
@@ -57,7 +44,6 @@ export type BrandLogoSize = 'shell' | 'auth' | 'hero';
 export class BrandLogoComponent {
   private static nextId = 0;
 
-  readonly size = input<BrandLogoSize>('shell');
   protected readonly bgId = `shora-bg-${BrandLogoComponent.nextId}`;
   protected readonly brandId = `shora-brand-${BrandLogoComponent.nextId++}`;
 }

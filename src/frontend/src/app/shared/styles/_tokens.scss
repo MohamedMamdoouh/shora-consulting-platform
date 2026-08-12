@@ -1,83 +1,82 @@
-/* Shora Design System — Warm Horizon tokens */
+/* Shora Design System — Warm Horizon tokens (calm edition) */
 
 :root {
-  /* Palette */
-  --color-linen: #fdf8f5;
-  --color-paper: #fffcfa;
-  --color-background: #fdf8f5;
-  --color-surface: #ffffff;
-  --color-surface-elevated: #ffffff;
+  /* Palette — warm stone, not bright linen */
+  --color-linen: #ebe6df;
+  --color-paper: #f0ece6;
+  --color-background: #ebe6df;
+  --color-surface: #f7f5f2;
+  --color-surface-elevated: #faf9f7;
   --color-ink: #1e293b;
   --color-text: var(--color-ink);
-  --color-text-muted: #64748b;
-  --color-text-subtle: #94a3b8;
+  --color-text-muted: #5c6678;
+  --color-text-subtle: #8b95a5;
 
-  /* Brand — purple / coral / peach */
-  --color-primary: #7c5cbf;
-  --color-primary-hover: #6b4eaa;
-  --color-primary-light: #9b7fd4;
-  --color-primary-muted: rgba(124, 92, 191, 0.1);
-  --color-primary-subtle: rgba(124, 92, 191, 0.06);
+  /* Brand — muted purple / dusty rose */
+  --color-primary: #6d5b8a;
+  --color-primary-hover: #5c4d78;
+  --color-primary-light: #8a7aa8;
+  --color-primary-muted: rgba(109, 91, 138, 0.08);
+  --color-primary-subtle: rgba(109, 91, 138, 0.04);
   --color-on-primary: #ffffff;
 
-  --color-accent: #e8847a;
-  --color-accent-hover: #d97066;
-  --color-accent-muted: rgba(232, 132, 122, 0.14);
-  --color-peach: #ffcdb2;
-  --color-peach-muted: rgba(255, 205, 178, 0.35);
-  --color-coral: #f0897a;
-  --color-lavender: #ede7f6;
-  --color-lavender-muted: rgba(237, 231, 246, 0.6);
+  --color-accent: #a67b73;
+  --color-accent-hover: #926861;
+  --color-accent-muted: rgba(166, 123, 115, 0.1);
+  --color-peach: #ddd0c4;
+  --color-peach-muted: rgba(221, 208, 196, 0.45);
+  --color-coral: #a67b73;
+  --color-lavender: #e4e0ea;
+  --color-lavender-muted: rgba(228, 224, 234, 0.55);
 
-  --color-glow: #f5a962;
-  --color-glow-muted: rgba(245, 169, 98, 0.15);
+  --color-glow: #b8956a;
+  --color-glow-muted: rgba(184, 149, 106, 0.1);
 
-  --color-border: rgba(124, 92, 191, 0.12);
-  --color-border-subtle: rgba(124, 92, 191, 0.08);
-  --color-header: rgba(255, 255, 255, 0.92);
+  --color-border: rgba(30, 41, 59, 0.09);
+  --color-border-subtle: rgba(30, 41, 59, 0.05);
+  --color-header: rgba(247, 245, 242, 0.9);
 
-  /* Gradients */
-  --gradient-brand: linear-gradient(135deg, #8b6fd4 0%, #e8847a 55%, #f5a962 100%);
-  --gradient-brand-hover: linear-gradient(135deg, #7c5cbf 0%, #d97066 55%, #e89a52 100%);
-  --gradient-text: linear-gradient(135deg, #7c5cbf 0%, #e8847a 50%, #f5a962 100%);
+  /* Gradients — restrained two-stop, no rainbow */
+  --gradient-brand: linear-gradient(135deg, #6d5b8a 0%, #8a7289 100%);
+  --gradient-brand-hover: linear-gradient(135deg, #5c4d78 0%, #7a6279 100%);
+  --gradient-text: linear-gradient(135deg, #6d5b8a 0%, #8a7289 100%);
   --gradient-bg-soft: linear-gradient(
     180deg,
-    #fdf8f5 0%,
-    #faf5ff 40%,
-    #fff5f0 100%
+    #ebe6df 0%,
+    #e6e1da 100%
   );
   --gradient-hero-glow: radial-gradient(
     ellipse 80% 60% at 30% 40%,
-    rgba(237, 231, 246, 0.7) 0%,
+    rgba(109, 91, 138, 0.07) 0%,
     transparent 70%
   );
 
   /* Semantic */
   --color-success: #2d7a5a;
-  --color-success-bg: #ecfdf3;
-  --color-success-border: #a7f3d0;
-  --color-warning: #92680a;
-  --color-warning-bg: #fffbeb;
-  --color-warning-border: #fde68a;
+  --color-success-bg: #e8f3ed;
+  --color-success-border: #b8dcc8;
+  --color-warning: #826510;
+  --color-warning-bg: #f8f3e6;
+  --color-warning-border: #e8d9a8;
   --color-error: #b42318;
   --color-error-hover: #912018;
-  --color-error-bg: #fef3f2;
-  --color-error-border: #fecdca;
+  --color-error-bg: #f9eeed;
+  --color-error-border: #e8c4c0;
   --color-info: #475569;
-  --color-info-bg: #f1f5f9;
-  --color-info-border: #cbd5e1;
+  --color-info-bg: #eef1f4;
+  --color-info-border: #c5cdd6;
 
-  /* Card accents */
-  --color-card-purple: #f3eeff;
-  --color-card-purple-accent: #7c5cbf;
-  --color-card-green: #ecfdf3;
+  /* Card accents — near-surface tints, not saturated blocks */
+  --color-card-purple: #f2eff5;
+  --color-card-purple-accent: #6d5b8a;
+  --color-card-green: #edf2ef;
   --color-card-green-accent: #2d7a5a;
-  --color-card-peach: #fff5f0;
-  --color-card-peach-accent: #e8847a;
-  --color-card-lavender: #f5f0ff;
-  --color-card-lavender-accent: #9b7fd4;
-  --color-card-sky: #f0f9ff;
-  --color-card-sky-accent: #0284c7;
+  --color-card-peach: #f3efec;
+  --color-card-peach-accent: #926861;
+  --color-card-lavender: #f0edf3;
+  --color-card-lavender-accent: #7a6a94;
+  --color-card-sky: #edf1f4;
+  --color-card-sky-accent: #4a7a96;
 
   /* Typography */
   --font-display: 'Cairo', 'IBM Plex Sans Arabic', 'Segoe UI', sans-serif;
@@ -121,13 +120,13 @@
   --radius-arch: 999px 999px 0 0;
   --radius-full: 999px;
 
-  /* Shadows */
+  /* Shadows — neutral slate, no purple tint */
   --shadow-sm: 0 2px 8px rgba(30, 41, 59, 0.04);
-  --shadow-md: 0 8px 24px rgba(124, 92, 191, 0.08);
-  --shadow-lg: 0 16px 48px rgba(124, 92, 191, 0.1);
-  --shadow-header: 0 4px 24px rgba(30, 41, 59, 0.06);
-  --shadow-card: 0 4px 20px rgba(124, 92, 191, 0.06);
-  --shadow-card-hover: 0 12px 32px rgba(124, 92, 191, 0.12);
+  --shadow-md: 0 6px 20px rgba(30, 41, 59, 0.05);
+  --shadow-lg: 0 12px 36px rgba(30, 41, 59, 0.07);
+  --shadow-header: 0 2px 16px rgba(30, 41, 59, 0.05);
+  --shadow-card: 0 2px 12px rgba(30, 41, 59, 0.04);
+  --shadow-card-hover: 0 8px 24px rgba(30, 41, 59, 0.07);
 
   /* Layout */
   --content-max: 44rem;

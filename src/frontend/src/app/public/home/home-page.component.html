@@ -2,10 +2,8 @@
   <section class="section hero">
     <div class="hero__inner">
       <div class="hero__content">
-        <span class="hero__eyebrow">
-          <app-brand-mark class="hero__eyebrow-icon" />
-          استشارات علاقات فردية
-        </span>
+        <app-brand-logo class="hero__logo" />
+        <span class="hero__eyebrow">استشارات علاقات فردية</span>
         <h1>
           مساحة آمنة لفهم<br />
           علاقتك <span class="hero__gradient">بشكل أوضح</span>
@@ -31,22 +29,22 @@
         <div class="hero__visual-glow"></div>
         <svg class="hero__scene" viewBox="0 0 400 360" xmlns="http://www.w3.org/2000/svg">
           <!-- Floor shadow -->
-          <ellipse cx="200" cy="310" rx="120" ry="16" fill="rgba(124,92,191,0.08)" />
+          <ellipse cx="200" cy="310" rx="120" ry="16" fill="rgba(109,91,138,0.06)" />
           <!-- Armchair -->
           <path
             d="M120 280 C120 220 140 190 175 185 C190 183 205 183 220 185 C255 190 275 220 275 280 L275 295 L120 295 Z"
-            fill="#E8847A"
+            fill="#A67B73"
           />
           <path
             d="M130 200 C130 170 150 155 175 152 C200 149 220 170 220 200 L220 280 L130 280 Z"
-            fill="#F0897A"
+            fill="#B08880"
           />
-          <rect x="155" y="295" width="90" height="12" rx="6" fill="#D97066" />
+          <rect x="155" y="295" width="90" height="12" rx="6" fill="#926861" />
           <!-- Side table -->
           <rect x="280" y="250" width="8" height="55" fill="#8B6B5A" />
           <rect x="268" y="245" width="32" height="8" rx="3" fill="#A07868" />
           <!-- Coffee cup -->
-          <ellipse cx="284" cy="242" rx="10" ry="4" fill="#F5A962" opacity="0.6" />
+          <ellipse cx="284" cy="242" rx="10" ry="4" fill="#B8956A" opacity="0.5" />
           <path d="M276 228 L276 240 Q284 244 292 240 L292 228 Z" fill="#fff" stroke="#E0D0C0" stroke-width="1" />
           <!-- Plant -->
           <rect x="95" y="268" width="14" height="30" rx="3" fill="#C4A882" />
@@ -58,18 +56,15 @@
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
             <path
               d="M4 6a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H9l-4 3v-3H6a2 2 0 01-2-2V6z"
-              fill="#7C5CBF"
+              fill="#6D5B8A"
             />
           </svg>
-        </div>
-        <div class="hero__float hero__float--mark">
-          <app-brand-mark [gradient]="true" />
         </div>
         <div class="hero__float hero__float--headset">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
             <path
               d="M4 14v-2a8 8 0 0116 0v2M4 14a2 2 0 002 2h1v-4H6a2 2 0 00-2 2zm14 0a2 2 0 01-2 2h-1v-4h1a2 2 0 012 2z"
-              stroke="#F5A962"
+              stroke="#8A7289"
               stroke-width="2"
               stroke-linecap="round"
             />
@@ -91,7 +86,7 @@
               @case ('premarital') { 💍 }
               @case ('dating-confidence') { ✨ }
               @case ('long-distance') { 🌍 }
-              @default { <app-brand-mark /> }
+              @default { ✦ }
             }
           </div>
           <h3>{{ topic.title }}</h3>

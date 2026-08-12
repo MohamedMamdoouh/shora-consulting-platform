@@ -29,7 +29,7 @@ export function formatPaymentMethod(method?: PaymentMethod | null): string {
     case 'VodafoneCash':
       return 'فودافون كاش';
     case 'InstaPay':
-      return 'InstaPay';
+      return 'إنستا باي';
     default:
       return method ?? '—';
   }

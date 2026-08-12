@@ -5,11 +5,10 @@ import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../core/auth/auth.service';
 import { readApiError } from '../core/api/api-error.util';
 import { getAuthFieldError } from '../core/forms/auth-field-error.util';
-import { BrandLogoComponent } from '../shared/components/brand-logo.component';
 
 @Component({
   selector: 'app-reset-password-page',
-  imports: [BrandLogoComponent, ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './reset-password-page.component.html',
   styleUrl: './reset-password-page.component.scss'
 })

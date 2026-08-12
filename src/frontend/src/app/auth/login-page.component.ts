@@ -6,7 +6,6 @@ import { environment } from '../../environments/environment';
 import { AuthService } from '../core/auth/auth.service';
 import { readApiError } from '../core/api/api-error.util';
 import { getAuthFieldError } from '../core/forms/auth-field-error.util';
-import { BrandLogoComponent } from '../shared/components/brand-logo.component';
 
 declare global {
   interface Window {
@@ -29,7 +28,7 @@ declare global {
 
 @Component({
   selector: 'app-login-page',
-  imports: [BrandLogoComponent, ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login-page.component.html',
   styleUrl: './login-page.component.scss',
 })

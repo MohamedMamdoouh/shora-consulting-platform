@@ -16,6 +16,11 @@
   padding-top: var(--space-xl);
 }
 
+.hero__logo {
+  display: block;
+  margin-bottom: var(--space-md);
+}
+
 @media (min-width: 768px) {
   .home .hero {
     padding-top: var(--space-2xl);

@@ -5,11 +5,10 @@ import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../core/auth/auth.service';
 import { readApiError } from '../core/api/api-error.util';
 import { getAuthFieldError } from '../core/forms/auth-field-error.util';
-import { BrandLogoComponent } from '../shared/components/brand-logo.component';
 
 @Component({
   selector: 'app-forgot-password-page',
-  imports: [BrandLogoComponent, ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './forgot-password-page.component.html',
   styleUrl: './forgot-password-page.component.scss',
 })

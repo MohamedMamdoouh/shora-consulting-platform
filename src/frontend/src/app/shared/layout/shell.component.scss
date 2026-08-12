@@ -25,7 +25,7 @@
   padding: var(--space-sm) var(--space-lg);
   min-height: var(--header-height);
   background: var(--color-header);
-  backdrop-filter: blur(20px) saturate(1.4);
+  backdrop-filter: blur(12px) saturate(1.05);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-2xl);
   box-shadow: var(--shadow-header);
@@ -129,17 +129,17 @@
 
 .shell__nav-cta {
   padding: var(--space-sm) var(--space-lg) !important;
-  background: var(--gradient-brand) !important;
+  background: var(--color-primary) !important;
   color: var(--color-on-primary) !important;
   border-radius: var(--radius-full) !important;
-  font-weight: 700 !important;
-  box-shadow: 0 4px 14px rgba(124, 92, 191, 0.28) !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
 }
 
 .shell__nav-cta:hover {
-  background: var(--gradient-brand-hover) !important;
+  background: var(--color-primary-hover) !important;
   color: var(--color-on-primary) !important;
-  transform: translateY(-1px);
+  transform: none;
 }
 
 .shell__nav-cta.active::after {
@@ -219,8 +219,7 @@
 .shell__footer {
   margin-top: auto;
   border-top: 1px solid var(--color-border-subtle);
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(8px);
+  background: var(--color-surface);
 }
 
 .shell__footer-inner {
@@ -260,18 +259,9 @@
 }
 
 .shell__footer-copy {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-xs);
   margin: 0;
   color: var(--color-text-subtle);
   font-size: var(--font-size-xs);
-}
-
-.shell__footer-mark {
-  color: var(--color-primary);
-  font-size: 0.875rem;
 }
 
 @media (max-width: 768px) {

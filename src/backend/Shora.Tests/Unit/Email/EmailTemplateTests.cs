@@ -21,7 +21,7 @@ public class EmailTemplateTests
         var htmlBody = service.Render(request);
 
         Assert.Contains("تأكيد بريدك الإلكتروني", subject);
-        Assert.Contains("Shora", htmlBody);
+        Assert.Contains(DefaultBrand.BrandName, htmlBody);
         Assert.Contains("تأكيد البريد الإلكتروني", htmlBody);
         Assert.Contains("Alex", htmlBody);
         Assert.Contains("https://example.com/auth/verify-email?email=test%40example.com&token=abc", htmlBody);
@@ -40,7 +40,7 @@ public class EmailTemplateTests
         var htmlBody = service.Render(request);
 
         Assert.Contains("إعادة تعيين كلمة المرور", subject);
-        Assert.Contains("Shora", htmlBody);
+        Assert.Contains(DefaultBrand.BrandName, htmlBody);
         Assert.Contains("تعيين كلمة مرور جديدة", htmlBody);
         Assert.Contains("Alex", htmlBody);
         Assert.DoesNotContain("{{", htmlBody);

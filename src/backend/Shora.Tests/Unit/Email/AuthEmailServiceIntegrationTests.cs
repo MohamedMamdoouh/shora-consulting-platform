@@ -33,7 +33,7 @@ public class AuthEmailServiceIntegrationTests
         Assert.NotNull(logger.LastMessage);
         Assert.Contains("client@test.local", logger.LastMessage);
         Assert.Contains("تأكيد بريدك الإلكتروني", logger.LastMessage);
-        Assert.Contains("Shora", logger.LastMessage);
+        Assert.Contains(brand.BrandName, logger.LastMessage);
         Assert.Contains("http://localhost:4200/auth/verify-email", logger.LastMessage);
         Assert.Contains("lang=\"ar\"", htmlBody);
     }

@@ -35,8 +35,9 @@
   padding: var(--admin-space-lg);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-xl);
   margin-bottom: var(--admin-space-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .admin-toolbar label {

@@ -9,23 +9,23 @@
 .auth-card {
   position: relative;
   width: 100%;
-  max-width: 26rem;
+  max-width: 28rem;
   padding: var(--space-2xl);
   padding-top: calc(var(--space-2xl) + 0.5rem);
-  background: var(--color-surface-elevated);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-lg);
   overflow: hidden;
 }
 
 .auth-card::before {
   content: '';
   position: absolute;
-  inset-inline: 15%;
+  inset-inline: 20%;
   top: 0;
-  height: 3px;
-  background: linear-gradient(to left, var(--color-accent), var(--color-primary));
+  height: 4px;
+  background: var(--gradient-brand);
   border-radius: 0 0 var(--radius-full) var(--radius-full);
 }
 
@@ -37,7 +37,7 @@
 
 .auth-brand img {
   display: block;
-  height: 2rem;
+  height: 2.5rem;
   width: auto;
 }
 
@@ -50,6 +50,7 @@
   margin-bottom: var(--space-lg);
   text-align: center;
   font-size: var(--font-size-2xl);
+  font-weight: 800;
 }
 
 .auth-form {
@@ -69,6 +70,14 @@
 .auth-form button[type='submit'] {
   width: 100%;
   margin-top: var(--space-sm);
+  border-radius: var(--radius-full);
+  background: var(--gradient-brand);
+  border-color: transparent;
+  box-shadow: 0 4px 16px rgba(124, 92, 191, 0.25);
+}
+
+.auth-form button[type='submit']:hover {
+  background: var(--gradient-brand-hover);
 }
 
 .auth-error {

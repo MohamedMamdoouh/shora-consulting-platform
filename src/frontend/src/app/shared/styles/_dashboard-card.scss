@@ -1,9 +1,12 @@
 @mixin dashboard-card-shell {
   padding: var(--space-lg);
-  background: var(--color-surface-elevated);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  transition:
+    box-shadow var(--transition-base),
+    transform var(--transition-base);
 }
 
 @mixin dashboard-card-header {
@@ -19,7 +22,7 @@
 
 @mixin dashboard-status-badge($bg, $color, $border) {
   display: inline-flex;
-  padding: 0.25rem 0.625rem;
+  padding: 0.25rem 0.75rem;
   border-radius: var(--radius-full);
   background: $bg;
   color: $color;
@@ -30,6 +33,10 @@
 
 .dashboard-card {
   @include dashboard-card-shell;
+
+  &:hover {
+    box-shadow: var(--shadow-card-hover);
+  }
 }
 
 .dashboard-card__header {
@@ -40,7 +47,7 @@
   margin: 0;
   font-family: var(--font-display);
   font-size: var(--font-size-lg);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .dashboard-card__actions {

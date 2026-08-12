@@ -2,6 +2,7 @@
 
 @use './app/shared/styles/tokens';
 @use './app/shared/styles/icons';
+@use './app/shared/styles/mixins' as *;
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -39,7 +40,8 @@ body {
 }
 
 body {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  background: var(--gradient-bg-soft);
+  @include paper-texture;
 }
 
 h1,
@@ -48,7 +50,7 @@ h3,
 h4 {
   font-family: var(--font-display);
   line-height: var(--line-height-heading);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--color-text);
 }
 
@@ -93,9 +95,9 @@ button,
   justify-content: center;
   gap: var(--space-sm);
   min-height: 2.75rem;
-  padding: 0.625rem 1.375rem;
+  padding: 0.625rem 1.5rem;
   border: 1px solid transparent;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-full);
   background: var(--color-primary);
   color: var(--color-on-primary);
   font: inherit;
@@ -109,7 +111,7 @@ button,
     background var(--transition-fast),
     border-color var(--transition-fast),
     color var(--transition-fast),
-    box-shadow var(--transition-fast),
+    box-shadow var(--transition-base),
     transform var(--transition-fast);
 }
 
@@ -136,9 +138,10 @@ button:disabled,
 button.secondary,
 .btn--secondary,
 .btn.secondary {
-  background: var(--color-surface-elevated);
+  background: var(--color-surface);
   color: var(--color-primary);
-  border-color: var(--color-primary);
+  border-color: var(--color-border);
+  box-shadow: var(--shadow-sm);
 }
 
 button.secondary:hover,
@@ -171,14 +174,21 @@ button.secondary:hover,
   color: var(--color-on-primary);
 }
 
-.btn--accent {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
+.btn--gradient {
+  @include btn-gradient;
+}
+
+.btn--gradient:hover {
+  background: var(--gradient-brand-hover);
   color: var(--color-on-primary);
 }
 
+.btn--accent {
+  @include btn-gradient;
+}
+
 .btn--accent:hover {
-  background: var(--color-accent-hover);
+  background: var(--gradient-brand-hover);
   color: var(--color-on-primary);
 }
 
@@ -210,10 +220,10 @@ input,
 select,
 textarea {
   width: 100%;
-  padding: 0.75rem 0.875rem;
+  padding: 0.75rem 1rem;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface-elevated);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
   color: var(--color-text);
   font: inherit;
   line-height: var(--line-height-tight);
@@ -331,8 +341,8 @@ label.field > span:first-child {
 .auth-banner,
 .decline-banner,
 .admin-alert {
-  padding: var(--space-md);
-  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
   background: var(--color-surface);
 }
@@ -378,9 +388,10 @@ label.field > span:first-child {
 
 .state-panel {
   padding: var(--space-lg);
-  background: var(--color-linen);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
 }
 
 .state-panel p {
@@ -410,19 +421,23 @@ label.field > span:first-child {
 /* Section heading */
 .section-heading {
   position: relative;
-  padding-inline-start: var(--space-md);
-  margin: 0 0 var(--space-lg);
+  text-align: center;
+  padding-inline-start: 0;
+  margin: 0 0 var(--space-2xl);
+  font-size: var(--font-size-2xl);
 }
 
 .section-heading::before {
-  content: '';
-  position: absolute;
-  inset-inline-start: 0;
-  top: 0.15em;
-  bottom: 0.15em;
-  width: 3px;
-  border-radius: var(--radius-full);
-  background: var(--color-accent);
+  display: none;
+}
+
+.section-heading::after {
+  content: '♥';
+  display: block;
+  margin-top: var(--space-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-accent);
+  opacity: 0.7;
 }
 
 /* Back link */
@@ -453,9 +468,9 @@ label.field > span:first-child {
   gap: var(--space-xs);
   padding: var(--space-md) var(--space-lg);
   margin-bottom: var(--space-lg);
-  background: var(--color-primary-muted);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-lg);
+  background: var(--color-lavender-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
 }
 
 .slot-summary__label {
@@ -476,8 +491,10 @@ label.field > span:first-child {
   margin: 0 0 var(--space-lg);
   padding: 0;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   overflow: hidden;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .summary-item {
@@ -516,19 +533,22 @@ label.field > span:first-child {
   width: 100%;
   padding: var(--space-lg);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-elevated);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
   text-align: start;
   cursor: pointer;
+  box-shadow: var(--shadow-sm);
   transition:
     border-color var(--transition-fast),
-    box-shadow var(--transition-fast),
-    background var(--transition-fast);
+    box-shadow var(--transition-base),
+    background var(--transition-fast),
+    transform var(--transition-base);
 }
 
 .choice-card:hover {
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary-light);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
 }
 
 .choice-card:focus-visible {
@@ -557,8 +577,8 @@ label.field > span:first-child {
   min-height: 2.5rem;
   padding: var(--space-sm) var(--space-md);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface-elevated);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
   color: var(--color-text);
   font: inherit;
   font-size: var(--font-size-sm);
@@ -595,9 +615,9 @@ label.field > span:first-child {
   gap: var(--space-xs);
   padding: var(--space-lg);
   margin-bottom: var(--space-lg);
-  background: var(--color-glow-muted);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  background: var(--color-peach-muted);
+  border: 1px solid rgba(245, 169, 98, 0.25);
+  border-radius: var(--radius-xl);
   text-align: center;
 }
 
@@ -610,8 +630,12 @@ label.field > span:first-child {
 .amount-value {
   font-family: var(--font-display);
   font-size: var(--font-size-2xl);
-  font-weight: 700;
-  color: var(--color-glow);
+  font-weight: 800;
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 .transfer-list {
@@ -620,8 +644,10 @@ label.field > span:first-child {
   margin: 0 0 var(--space-lg);
   padding: 0;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   overflow: hidden;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .transfer-item {
@@ -655,8 +681,9 @@ label.field > span:first-child {
   padding: var(--space-lg);
   margin-bottom: var(--space-lg);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-elevated);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .note-block h3,
@@ -694,8 +721,9 @@ label.field > span:first-child {
   gap: var(--space-md);
   padding: var(--space-lg);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-elevated);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .upload-error {
@@ -709,8 +737,9 @@ label.field > span:first-child {
 .admin-bookings__table-wrap {
   overflow-x: auto;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface-elevated);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .admin-table,
@@ -733,7 +762,7 @@ label.field > span:first-child {
 
 .admin-table th,
 .admin-bookings__table th {
-  background: var(--color-linen);
+  background: var(--color-lavender-muted);
   font-weight: 600;
   color: var(--color-text-muted);
   font-size: var(--admin-font-size-sm);

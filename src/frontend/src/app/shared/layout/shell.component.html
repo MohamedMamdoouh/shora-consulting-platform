@@ -39,7 +39,7 @@
             <a routerLink="/dashboard" routerLinkActive="active" (click)="closeNav()">لوحتي</a>
           }
           <span class="shell__user">{{ user.displayName }}</span>
-          <button type="button" class="btn btn--secondary btn--sm" (click)="logout()">خروج</button>
+          <button type="button" class="btn btn--sm" (click)="logout()">خروج</button>
         } @else {
           <a routerLink="/auth/login" routerLinkActive="active" (click)="closeNav()">تسجيل الدخول</a>
           <a routerLink="/auth/signup" routerLinkActive="active" class="shell__nav-signup" (click)="closeNav()"
@@ -54,7 +54,7 @@
     @if (auth.currentUser(); as user) {
       @if (!user.emailConfirmed && user.role === 'Client') {
         <div class="shell__banner" role="status">
-          <span class="shell__banner-icon" aria-hidden="true">!</span>
+          <span class="shell__banner-icon" aria-hidden="true">✓</span>
           <p>يرجى تأكيد بريدك الإلكتروني قبل حجز جلسة.</p>
         </div>
       }

@@ -14,38 +14,70 @@
   white-space: nowrap;
 }
 
-@mixin arch-frame {
-  position: relative;
+@mixin gradient-text {
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
 
-  &::before {
-    content: '';
-    position: absolute;
-    inset-inline-end: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: min(12rem, 40%);
-    aspect-ratio: 0.75;
-    border: 2px solid var(--color-primary);
-    border-bottom: none;
-    border-radius: var(--radius-arch);
-    opacity: 0.35;
-    pointer-events: none;
-    animation: arch-threshold var(--transition-arch) ease forwards;
+@mixin btn-gradient {
+  background: var(--gradient-brand);
+  border-color: transparent;
+  color: var(--color-on-primary);
+  box-shadow: 0 4px 16px rgba(124, 92, 191, 0.25);
+
+  &:hover {
+    background: var(--gradient-brand-hover);
+    color: var(--color-on-primary);
+    box-shadow: 0 6px 20px rgba(124, 92, 191, 0.32);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 }
 
-@keyframes arch-threshold {
-  from {
-    opacity: 0;
-    transform: translateY(-50%) scale(0.98);
-  }
+@mixin soft-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+}
 
-  to {
-    opacity: 0.35;
-    transform: translateY(-50%) scale(1);
+@mixin float-animation($duration: 4s, $distance: 6px) {
+  animation: float-gentle $duration ease-in-out infinite;
+
+  @keyframes float-gentle {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-#{$distance});
+    }
+  }
+}
+
+@mixin fade-in-up($delay: 0ms) {
+  animation: fade-in-up var(--transition-base) #{$delay} both;
+
+  @keyframes fade-in-up {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
 
 @mixin paper-texture {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
 }

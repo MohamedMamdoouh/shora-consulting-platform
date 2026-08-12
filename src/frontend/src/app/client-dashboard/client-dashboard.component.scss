@@ -6,7 +6,7 @@
 
 .dashboard {
   display: grid;
-  gap: var(--space-lg);
+  gap: var(--space-xl);
 }
 
 .dashboard__header h1 {
@@ -19,30 +19,19 @@
   font-size: var(--font-size-lg);
 }
 
+.dashboard .section--card {
+  margin-bottom: 0;
+}
+
 .dashboard__section-header h2 {
   margin: 0;
-}
-
-.dashboard__empty {
-  text-align: center;
-  padding: var(--space-2xl);
-}
-
-.dashboard__empty h2 {
-  margin-top: 0;
-}
-
-.dashboard__empty p {
-  max-width: 32ch;
-  margin: 0 auto var(--space-lg);
-  color: var(--color-text-muted);
 }
 
 .dashboard__empty-actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-md);
-  justify-content: center;
+  margin-top: var(--space-md);
 }
 
 .booking-list {
@@ -55,7 +44,7 @@
 
 .booking-row {
   padding: var(--space-lg);
-  background: var(--color-surface);
+  background: var(--color-surface-elevated);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
@@ -65,7 +54,7 @@
 }
 
 .booking-row:hover {
-  border-color: var(--color-primary);
+  border-color: var(--color-primary-light);
   box-shadow: var(--shadow-md);
 }
 

@@ -4,15 +4,31 @@
   display: block;
 }
 
-.section h1 {
+.services .section h1 {
   margin-top: 0;
 }
 
-.section h2 {
-  margin-top: var(--space-lg);
+.session-card {
+  text-align: center;
+  padding: var(--space-xl);
 }
 
-.pricing p {
-  font-size: 1rem;
-  color: var(--color-text);
+.session-card__duration {
+  margin: 0 0 var(--space-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.session-card .price {
+  margin: 0 0 var(--space-sm);
+}
+
+.session-card__note {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.services .section h2 {
+  margin-top: var(--space-xl);
 }

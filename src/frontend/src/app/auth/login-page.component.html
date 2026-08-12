@@ -1,7 +1,7 @@
 <div class="auth-page">
 <section class="auth-card">
   <a routerLink="/" class="auth-brand" aria-label="شورى — الرئيسية">
-    <img src="logo.png" alt="شورى" />
+    <img src="logo.svg" alt="شورى" />
   </a>
   <h1>تسجيل الدخول</h1>
 
@@ -42,7 +42,7 @@
       }
     </label>
 
-    <button type="submit" [disabled]="form.invalid || isSubmitting">
+    <button type="submit" class="btn" [disabled]="form.invalid || isSubmitting">
       {{ isSubmitting ? 'جاري تسجيل الدخول…' : 'دخول' }}
     </button>
   </form>

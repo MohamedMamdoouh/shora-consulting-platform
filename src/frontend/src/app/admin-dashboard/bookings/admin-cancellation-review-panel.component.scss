@@ -140,32 +140,6 @@
 .cancellation-panel__message--error {
   padding: var(--space-md);
   border-radius: var(--radius-sm);
-  background: #fff5f5;
-  color: #7a2e2e;
-}
-
-.btn {
-  padding: var(--space-sm) var(--space-lg);
-  border: 1px solid var(--color-primary);
-  border-radius: var(--radius-md);
-  background: var(--color-primary);
-  color: #fff;
-  cursor: pointer;
-  font: inherit;
-}
-
-.btn--secondary {
-  border-color: var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-text);
-}
-
-.btn--danger {
-  border-color: #c0392b;
-  background: #c0392b;
-}
-
-.btn:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
+  background: var(--color-error-bg);
+  color: var(--color-error);
 }

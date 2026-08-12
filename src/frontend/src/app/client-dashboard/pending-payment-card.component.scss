@@ -1,17 +1,15 @@
+@use '../shared/styles/dashboard-card' as card;
+
+:host {
+  display: block;
+}
+
 .pending-payment-card {
-  padding: var(--space-lg);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  @include card.dashboard-card-shell;
 }
 
 .pending-payment-card__header {
-  display: grid;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-lg);
-  padding-bottom: var(--space-lg);
-  border-bottom: 1px solid var(--color-border-subtle);
+  @include card.dashboard-card-header;
 }
 
 .pending-payment-card__main {
@@ -20,6 +18,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-sm);
+  width: 100%;
 }
 
 .pending-payment-card__time {
@@ -28,20 +27,18 @@
 }
 
 .pending-payment-card__status {
-  display: inline-flex;
-  padding: 0.25rem 0.625rem;
-  border-radius: var(--radius-full);
-  background: var(--color-warning-bg);
-  color: var(--color-warning);
-  border: 1px solid var(--color-warning-border);
-  font-size: var(--font-size-xs);
-  font-weight: 600;
+  @include card.dashboard-status-badge(
+    var(--color-warning-bg),
+    var(--color-warning),
+    var(--color-warning-border)
+  );
 }
 
 .pending-payment-card__intro {
   margin: 0;
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
+  width: 100%;
 }
 
 .pending-payment-card__success {

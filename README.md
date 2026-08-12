@@ -80,7 +80,7 @@ Design specs for maintainers live in [`specs/`](specs/). Operator deployment det
 | **Refunds**                | Admin records manual refunds (no payment provider integration)                            |
 | **Earnings**               | Gross / refunded / net revenue summary with date filters                                  |
 | **Ops monitoring**         | Background health checks with admin alerts and runbooks at `/admin/ops`                   |
-| **Transactional email**    | Auth emails (direct SMTP) + booking/payment emails (outbox with retry)                    |
+| **Transactional email**    | Auth emails (direct Resend) + booking/payment emails (outbox with retry)                    |
 | **Rate limiting**          | Per-endpoint limits on auth, availability, booking, receipts, cancellations               |
 | **CI/CD**                  | Path-filtered CI on PRs; deploy to Railway + GHCR on push to `main`                       |
 
@@ -101,7 +101,7 @@ Design specs for maintainers live in [`specs/`](specs/). Operator deployment det
 | API contracts        | `Shora.Contracts` (C#) + `src/contracts` (TS)                 | Shared DTO shapes, manual sync             |
 | File storage         | Azure Blob Storage (Azurite locally)                          | Private receipt images                     |
 | Email (dev)          | `DevLoggingEmailSender`                                       | Logs emails to console                     |
-| Email (prod)         | MailKit SMTP (e.g. SendGrid)                                  | Auth + transactional mail                  |
+| Email (prod)         | Resend HTTPS API                                              | Auth + transactional mail                  |
 | Caching              | In-memory cache + ASP.NET Output Cache                        | Public settings & availability             |
 | Rate limiting        | ASP.NET Core Rate Limiter                                     | Abuse protection                           |
 | Testing              | xUnit v3, Testcontainers (PostgreSQL, Azurite)                | Unit + integration tests                   |
@@ -132,7 +132,7 @@ Shora/
 │   │   ├── Shora.Application/      # Business logic, validators, email templates
 │   │   ├── Shora.Domain/           # Entities, enums
 │   │   ├── Shora.Contracts/        # Shared request/response DTOs
-│   │   ├── Shora.Infrastructure/   # EF Core, Identity, SMTP, Blob, seed
+│   │   ├── Shora.Infrastructure/   # EF Core, Identity, Resend email, Blob, seed
 │   │   └── Shora.Tests/            # xUnit tests
 │   ├── contracts/          # TypeScript mirrors of Shora.Contracts
 │   └── frontend/           # Angular app (shora-web)
@@ -145,7 +145,7 @@ Shora/
 | `src/backend/Shora.Api`            | Entry point, DI wiring, background job hosts, `Program.cs`  |
 | `src/backend/Shora.Application`    | Use-case services, outbox, ops monitoring, options classes  |
 | `src/backend/Shora.Domain`         | Pure domain model — no EF or ASP.NET references             |
-| `src/backend/Shora.Infrastructure` | PostgreSQL, Identity stores, JWT/refresh, Azure Blob, SMTP  |
+| `src/backend/Shora.Infrastructure` | PostgreSQL, Identity stores, JWT/refresh, Azure Blob, Resend email |
 | `src/backend/Shora.Contracts`      | API DTO records consumed by Api and mirrored in TS          |
 | `src/frontend`                     | Angular SPA; `@contracts/*` alias points to `src/contracts` |
 | `specs/`                           | Maintainer-facing design documentation                      |
@@ -157,7 +157,7 @@ Shora/
 
 Production runs as **one HTTPS origin**: the browser loads the Angular app and calls `/api/v1/*` on the same host. Refresh-token cookies use `SameSite=Strict`, which requires same-site deployment in MVP.
 
-The Railway container runs **Shora.Api** (HTTP + background jobs) and serves the Angular SPA from **wwwroot**. The API connects to **Neon PostgreSQL**, **Azure Blob Storage** (receipts), and an **SMTP** provider for email.
+The Railway container runs **Shora.Api** (HTTP + background jobs) and serves the Angular SPA from **wwwroot**. The API connects to **Neon PostgreSQL**, **Azure Blob Storage** (receipts), and **Resend** for email.
 
 **Dependency direction (backend):**
 
@@ -177,7 +177,7 @@ The Railway container runs **Shora.Api** (HTTP + background jobs) and serves the
 | ------------------ | ---------------------------------------------------------------------------- |
 | **Domain**         | Entities, enums, invariants                                                  |
 | **Application**    | Services, validators, `Result` pattern, `IApplicationDbContext`, outbox, ops |
-| **Infrastructure** | EF Core, Identity, JWT, refresh tokens, SMTP, Azure Blob, seeder             |
+| **Infrastructure** | EF Core, Identity, JWT, refresh tokens, Resend email, Azure Blob, seeder    |
 | **Api**            | Controllers, middleware, rate limits, background job hosts                   |
 | **Contracts**      | Shared DTO records (no business logic)                                       |
 
@@ -463,7 +463,7 @@ If `Storage:ConnectionString` is unset, `NotImplementedFileStorage` throws on up
 
 | Type              | Mechanism                              | Templates                                             |
 | ----------------- | -------------------------------------- | ----------------------------------------------------- |
-| **Auth emails**   | Direct SMTP via `AuthEmailService`     | Embedded HTML in `Shora.Application/Email/Templates/` |
+| **Auth emails**   | Direct Resend via `AuthEmailService`   | Embedded HTML in `Shora.Application/Email/Templates/` |
 | **Transactional** | Outbox pattern + `OutboxDispatcherJob` | Rendered by `OutboxEmailRenderer`                     |
 
 ### Outbox message types
@@ -477,7 +477,7 @@ If `Storage:ConnectionString` is unset, `NotImplementedFileStorage` throws on up
 
 ### Retry policy
 
-Max **8** attempts with escalating backoff; then `DeadLettered`. Dev uses log sender unless SMTP configured.
+Max **8** attempts with escalating backoff; then `DeadLettered`. Dev uses log sender.
 
 ### When emails fail
 
@@ -576,15 +576,13 @@ Use `__` (double underscore) for nested env vars on Railway (e.g. `Jwt__SigningK
 | `AllowedHosts`                         | Hostname only                        | `your-app.up.railway.app`                |
 | `Storage__ConnectionString`            | Azure Blob                           | From Azure Portal / CLI                  |
 | `Storage__ReceiptContainer`            | Private container                    | `receipts`                               |
-| `Email__Host`                          | SMTP server                          | `smtp.sendgrid.net`                      |
+| `Email__ApiKey`                        | Resend API key                       | `re_...`                                 |
 | `Email__FromAddress`                   | Verified sender                      | `noreply@yourdomain.com`                 |
 
 ### Required for full functionality (not always validated at startup)
 
 | Variable / setting                         | Purpose                                           |
 | ------------------------------------------ | ------------------------------------------------- |
-| `Email__Password`                          | SMTP credentials (required to actually send mail) |
-| `Email__Username`                          | SMTP user (`apikey` for SendGrid)                 |
 | `AdminSeed__Email` / `AdminSeed__Password` | One-time first admin (remove after login)         |
 
 ### Optional
@@ -821,7 +819,7 @@ Detail: [`.github/workflows/README.md`](.github/workflows/README.md), [`specs/09
 | Compute + SPA   | Railway (single container)     |
 | Database        | Neon PostgreSQL                |
 | Receipt storage | Azure Blob (private container) |
-| Email           | SMTP (e.g. SendGrid)           |
+| Email           | Resend (HTTPS API)             |
 | Images          | GHCR                           |
 
 - Frontend is baked into `Shora.Api/wwwroot` at build time

@@ -1,3 +1,5 @@
+@use '../../shared/styles/admin-alerts' as *;
+
 :host {
   display: block;
 }
@@ -9,7 +11,8 @@
 
 .admin-ops__header h2 {
   margin: 0 0 var(--space-sm);
-  font-size: 1.125rem;
+  font-size: var(--admin-font-size-base);
+  font-weight: 600;
 }
 
 .admin-ops__title-row {
@@ -26,23 +29,19 @@
 .admin-ops__runbook-missing {
   margin: 0;
   color: var(--color-text-muted);
-  font-size: 0.9375rem;
-}
-
-.admin-ops__panel {
-  padding: var(--space-lg);
-  border-radius: var(--radius-md);
+  font-size: var(--admin-font-size-base);
 }
 
 .admin-ops__panel--error {
-  border: 1px solid #e8c4c4;
-  background: #fff5f5;
-  color: #7a2e2e;
+  @extend .admin-alert;
+  @extend .admin-alert--error;
 }
 
 .admin-ops__panel--empty {
+  padding: var(--admin-space-lg);
   border: 1px solid var(--color-border);
-  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-elevated);
 }
 
 .admin-ops__summary {
@@ -56,20 +55,16 @@
   align-items: center;
   padding: var(--space-xs) var(--space-md);
   border-radius: var(--radius-md);
-  font-size: 0.875rem;
+  font-size: var(--admin-font-size-sm);
   font-weight: 600;
 }
 
 .admin-ops__count--critical {
-  border: 1px solid #e8c4c4;
-  background: #fff5f5;
-  color: #7a2e2e;
+  @extend .admin-alert--error;
 }
 
 .admin-ops__count--warning {
-  border: 1px solid #e8d4a8;
-  background: #fffaf0;
-  color: #7a5a2e;
+  @extend .admin-alert--warning;
 }
 
 .admin-ops__list {
@@ -82,21 +77,21 @@
 
 .admin-ops__card {
   display: grid;
-  gap: var(--space-md);
-  padding: var(--space-lg);
+  gap: var(--admin-space-md);
+  padding: var(--admin-space-lg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--color-surface-elevated);
 }
 
 .admin-ops__card--critical {
-  border-color: #e8c4c4;
-  background: #fffafa;
+  border-color: var(--color-error-border);
+  background: var(--color-error-bg);
 }
 
 .admin-ops__card--warning {
-  border-color: #e8d4a8;
-  background: #fffdf8;
+  border-color: var(--color-warning-border);
+  background: var(--color-warning-bg);
 }
 
 .admin-ops__card-header {
@@ -108,7 +103,8 @@
 
 .admin-ops__card-header h3 {
   margin: 0;
-  font-size: 1rem;
+  font-size: var(--admin-font-size-base);
+  font-family: var(--font-display);
 }
 
 .admin-ops__badge {
@@ -116,18 +112,18 @@
   align-items: center;
   padding: 0.125rem 0.5rem;
   border-radius: var(--radius-md);
-  font-size: 0.8125rem;
+  font-size: var(--admin-font-size-sm);
   font-weight: 700;
 }
 
 .admin-ops__badge--critical {
-  background: #7a2e2e;
-  color: #fff;
+  background: var(--color-error);
+  color: var(--color-on-primary);
 }
 
 .admin-ops__badge--warning {
-  background: #7a5a2e;
-  color: #fff;
+  background: var(--color-warning);
+  color: var(--color-on-primary);
 }
 
 .admin-ops__badge--default {
@@ -156,19 +152,19 @@
 .admin-ops__context-row dt {
   margin: 0;
   color: var(--color-text-muted);
-  font-size: 0.875rem;
+  font-size: var(--admin-font-size-sm);
 }
 
 .admin-ops__context-row dd {
   margin: 0;
-  font-size: 0.9375rem;
+  font-size: var(--admin-font-size-base);
   word-break: break-word;
 }
 
 .admin-ops__runbook {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-background);
+  background: var(--color-linen);
 }
 
 .admin-ops__runbook summary {
@@ -185,7 +181,7 @@
 
 .admin-ops__runbook-body p {
   margin: 0;
-  font-size: 0.9375rem;
+  font-size: var(--admin-font-size-base);
 }
 
 .admin-ops__steps {
@@ -196,7 +192,7 @@
 }
 
 .admin-ops__steps li {
-  font-size: 0.9375rem;
+  font-size: var(--admin-font-size-base);
 }
 
 .admin-ops__action {

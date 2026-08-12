@@ -1,0 +1,93 @@
+.step-indicator {
+  margin-bottom: var(--space-lg);
+}
+
+.step-indicator__list {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  overflow-x: auto;
+}
+
+.step-indicator__list::before {
+  content: '';
+  position: absolute;
+  inset-inline: var(--space-lg);
+  top: 1.125rem;
+  height: 2px;
+  background: var(--color-border);
+  z-index: 0;
+}
+
+.step-indicator__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  flex: 1 1 0;
+  min-width: 4.5rem;
+  padding: 0 var(--space-xs);
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.step-indicator__item--active {
+  color: var(--color-primary);
+}
+
+.step-indicator__item--done {
+  color: var(--color-success);
+}
+
+.step-indicator__marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-elevated);
+  border: 2px solid var(--color-border);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+}
+
+.step-indicator__item--active .step-indicator__marker {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.step-indicator__item--done .step-indicator__marker {
+  background: var(--color-success-bg);
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.step-indicator__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+@media (max-width: 480px) {
+  .step-indicator__item {
+    min-width: 3.5rem;
+    font-size: 0.6875rem;
+  }
+
+  .step-indicator__marker {
+    width: 1.875rem;
+    height: 1.875rem;
+  }
+}

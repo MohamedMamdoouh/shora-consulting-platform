@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using Shora.Application.Abstractions;
 using Shora.Application.Auth;
 using Shora.Application.Common;
@@ -16,19 +17,22 @@ public sealed class AuthService
     private readonly IRefreshTokenService _refreshTokenService;
     private readonly AuthEmailService _authEmailService;
     private readonly IGoogleTokenValidator _googleTokenValidator;
+    private readonly ILogger<AuthService> _logger;
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
         IJwtTokenService jwtTokenService,
         IRefreshTokenService refreshTokenService,
         AuthEmailService authEmailService,
-        IGoogleTokenValidator googleTokenValidator)
+        IGoogleTokenValidator googleTokenValidator,
+        ILogger<AuthService> logger)
     {
         _userManager = userManager;
         _jwtTokenService = jwtTokenService;
         _refreshTokenService = refreshTokenService;
         _authEmailService = authEmailService;
         _googleTokenValidator = googleTokenValidator;
+        _logger = logger;
     }
 
     public async Task<Result<AuthResult>> SignUpAsync(
@@ -67,7 +71,10 @@ public sealed class AuthService
         }
 
         await _userManager.AddToRoleAsync(user, AppRoles.Client);
-        await _authEmailService.SendVerificationAsync(user, cancellationToken);
+        await TrySendAuthEmailAsync(
+            () => _authEmailService.SendVerificationAsync(user, cancellationToken),
+            "verification",
+            user.Email);
 
         var authResult = await IssueTokensAsync(user, ipAddress, userAgent, cancellationToken);
         return authResult;
@@ -174,7 +181,10 @@ public sealed class AuthService
             return;
         }
 
-        await _authEmailService.SendVerificationAsync(user, cancellationToken);
+        await TrySendAuthEmailAsync(
+            () => _authEmailService.SendVerificationAsync(user, cancellationToken),
+            "verification",
+            user.Email);
     }
 
     public async Task ResendVerificationForUserAsync(
@@ -186,7 +196,10 @@ public sealed class AuthService
             return;
         }
 
-        await _authEmailService.SendVerificationAsync(user, cancellationToken);
+        await TrySendAuthEmailAsync(
+            () => _authEmailService.SendVerificationAsync(user, cancellationToken),
+            "verification",
+            user.Email);
     }
 
     public async Task ForgotPasswordAsync(
@@ -199,7 +212,10 @@ public sealed class AuthService
             return;
         }
 
-        await _authEmailService.SendPasswordResetAsync(user, cancellationToken);
+        await TrySendAuthEmailAsync(
+            () => _authEmailService.SendPasswordResetAsync(user, cancellationToken),
+            "password reset",
+            user.Email);
     }
 
     public async Task<Result> ResetPasswordAsync(
@@ -323,6 +339,25 @@ public sealed class AuthService
     private static AuthResponse BuildAuthResponse(string accessToken, ApplicationUser user, string role)
     {
         return new AuthResponse(accessToken, user.DisplayName, role, user.EmailConfirmed);
+    }
+
+    private async Task TrySendAuthEmailAsync(
+        Func<Task> sendEmail,
+        string emailKind,
+        string? recipientEmail)
+    {
+        try
+        {
+            await sendEmail();
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(
+                exception,
+                "Failed to send {EmailKind} email to {RecipientEmail}.",
+                emailKind,
+                recipientEmail);
+        }
     }
 
     private static Error MapIdentityErrors(IdentityResult identityResult)

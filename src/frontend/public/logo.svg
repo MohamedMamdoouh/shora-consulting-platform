@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" role="img" aria-label="شورى">
+  <rect x="8" y="8" width="112" height="112" rx="28" fill="#f6f3ec"/>
+  <path
+    d="M 64 24 C 48 24 34 38 32 56 C 30 72 38 88 50 96 C 44 88 40 72 42 58 C 44 42 54 30 64 24 Z"
+    fill="#4a5748"
+  />
+  <path
+    d="M 64 24 C 80 24 94 38 96 56 C 98 72 90 88 78 96 C 84 88 88 72 86 58 C 84 42 74 30 64 24 Z"
+    fill="#7a6250"
+  />
+  <circle cx="64" cy="58" r="4.5" fill="#fdfbf8"/>
+  <circle cx="64" cy="58" r="2.25" fill="#7a6250"/>
+</svg>

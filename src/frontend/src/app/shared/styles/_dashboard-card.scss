@@ -1,0 +1,75 @@
+@mixin dashboard-card-shell {
+  padding: var(--space-lg);
+  background: var(--color-surface-elevated);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+@mixin dashboard-card-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+@mixin dashboard-status-badge($bg, $color, $border) {
+  display: inline-flex;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-full);
+  background: $bg;
+  color: $color;
+  border: 1px solid $border;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.dashboard-card {
+  @include dashboard-card-shell;
+}
+
+.dashboard-card__header {
+  @include dashboard-card-header;
+}
+
+.dashboard-card__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+.dashboard-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.dashboard-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--color-primary-hover);
+  }
+}
+
+.dashboard-card__link--whatsapp {
+  color: #128c7e;
+
+  &:hover {
+    color: #0d6b60;
+  }
+}

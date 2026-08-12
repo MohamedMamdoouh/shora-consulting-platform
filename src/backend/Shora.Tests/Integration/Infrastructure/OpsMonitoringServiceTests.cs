@@ -161,7 +161,7 @@ public class OpsMonitoringServiceTests
                 CreatedAtUtc = fixedNow.AddHours(-2),
                 NextAttemptAtUtc = fixedNow.AddHours(-1),
                 Status = OutboxMessageStatus.DeadLettered,
-                LastError = "SMTP unavailable"
+                LastError = "Resend unavailable"
             });
             await context.SaveChangesAsync(cancellationToken);
 

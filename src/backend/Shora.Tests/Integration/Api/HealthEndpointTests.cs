@@ -160,7 +160,7 @@ public class HealthEndpointTests : IDisposable
                     ["Jwt:SigningKey"] = "test-signing-key-min-32-characters-long!",
                     ["Frontend:BaseUrl"] = "https://shora-production.up.railway.app",
                     ["Cors:AllowedOrigins:0"] = "https://shora-production.up.railway.app",
-                    ["Email:Host"] = "smtp.example.com",
+                    ["Email:ApiKey"] = "re_test",
                     ["Email:FromAddress"] = "noreply@example.com",
                     ["Storage:ConnectionString"] = "UseDevelopmentStorage=true",
                     ["Storage:ReceiptContainer"] = "receipts",

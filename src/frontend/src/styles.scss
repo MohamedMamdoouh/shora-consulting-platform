@@ -1,84 +1,7 @@
-/* Shora Design System — boutique consulting */
+/* Shora Design System — Majlis Threshold */
 
-:root {
-  /* Palette */
-  --color-paper: #f6f3ec;
-  --color-background: var(--color-paper);
-  --color-surface: #fdfbf8;
-  --color-surface-elevated: #ffffff;
-  --color-primary: #4a5748;
-  --color-primary-hover: #3a4538;
-  --color-primary-muted: rgba(74, 87, 72, 0.12);
-  --color-accent: #7a6250;
-  --color-accent-hover: #665040;
-  --color-text: #1a1816;
-  --color-text-muted: #6e6660;
-  --color-text-subtle: #9a928a;
-  --color-border: #e0d9cf;
-  --color-border-subtle: #ebe6de;
-  --color-success: #3d6b52;
-  --color-success-bg: #edf5ef;
-  --color-success-border: #c5dcc9;
-  --color-warning: #8a7344;
-  --color-warning-bg: #f8f2e6;
-  --color-warning-border: #e8dcc0;
-  --color-error: #8c4040;
-  --color-error-bg: #faf0ef;
-  --color-error-border: #e8c8c5;
-  --color-info: #4a6174;
-  --color-info-bg: #eef3f6;
-  --color-info-border: #c8d8e4;
-
-  /* Typography */
-  --font-display: 'El Messiri', 'Traditional Arabic', serif;
-  --font-body: 'Tajawal', 'Segoe UI', 'Tahoma', sans-serif;
-  --font-family: var(--font-body);
-  --font-size-xs: 0.8125rem;
-  --font-size-sm: 0.875rem;
-  --font-size-base: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.375rem;
-  --font-size-2xl: 1.75rem;
-  --font-size-3xl: 2.25rem;
-  --line-height-body: 1.75;
-  --line-height-heading: 1.35;
-  --line-height-tight: 1.25;
-
-  /* Spacing */
-  --space-2xs: 0.125rem;
-  --space-xs: 0.25rem;
-  --space-sm: 0.5rem;
-  --space-md: 1rem;
-  --space-lg: 1.5rem;
-  --space-xl: 2rem;
-  --space-2xl: 3rem;
-  --space-3xl: 4rem;
-
-  /* Radius */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-full: 999px;
-
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(26, 22, 18, 0.06);
-  --shadow-md: 0 4px 12px rgba(26, 22, 18, 0.08);
-  --shadow-lg: 0 8px 24px rgba(26, 22, 18, 0.1);
-  --shadow-header: 0 1px 0 var(--color-border-subtle);
-
-  /* Layout */
-  --content-max: 42rem;
-  --content-wide: 56rem;
-  --content-full: 72rem;
-  --header-height: 4rem;
-
-  /* Motion */
-  --transition-fast: 150ms ease;
-  --transition-base: 220ms ease;
-
-  /* Legacy aliases */
-  --color-primary-old: var(--color-primary);
-}
+@use './app/shared/styles/tokens';
+@use './app/shared/styles/icons';
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -113,6 +36,10 @@ body {
   line-height: var(--line-height-body);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+body {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
 }
 
 h1,
@@ -209,7 +136,7 @@ button:disabled,
 button.secondary,
 .btn--secondary,
 .btn.secondary {
-  background: var(--color-surface);
+  background: var(--color-surface-elevated);
   color: var(--color-primary);
   border-color: var(--color-primary);
 }
@@ -236,19 +163,34 @@ button.secondary:hover,
 .btn--danger {
   background: var(--color-error);
   border-color: var(--color-error);
+  color: var(--color-on-primary);
 }
 
 .btn--danger:hover {
   background: var(--color-error-hover);
+  color: var(--color-on-primary);
 }
 
 .btn--accent {
   background: var(--color-accent);
   border-color: var(--color-accent);
+  color: var(--color-on-primary);
 }
 
 .btn--accent:hover {
   background: var(--color-accent-hover);
+  color: var(--color-on-primary);
+}
+
+.btn--glow {
+  background: var(--color-glow);
+  border-color: var(--color-glow);
+  color: var(--color-ink);
+}
+
+.btn--glow:hover {
+  filter: brightness(0.95);
+  color: var(--color-ink);
 }
 
 .btn--sm {
@@ -258,8 +200,8 @@ button.secondary:hover,
 }
 
 .btn--lg {
-  min-height: 3rem;
-  padding: 0.75rem 1.75rem;
+  min-height: 3.125rem;
+  padding: 0.75rem 1.875rem;
   font-size: var(--font-size-base);
 }
 
@@ -303,7 +245,7 @@ textarea[aria-invalid='true'] {
 input:disabled,
 select:disabled,
 textarea:disabled {
-  background: var(--color-paper);
+  background: var(--color-linen);
   color: var(--color-text-muted);
   cursor: not-allowed;
 }
@@ -373,15 +315,22 @@ label.field > span:first-child {
 }
 
 .badge--neutral {
-  background: var(--color-paper);
+  background: var(--color-linen);
   color: var(--color-text-muted);
   border-color: var(--color-border);
+}
+
+.badge--accent {
+  background: var(--color-accent-muted);
+  color: var(--color-accent);
+  border-color: transparent;
 }
 
 /* Banners & alerts */
 .banner,
 .auth-banner,
-.decline-banner {
+.decline-banner,
+.admin-alert {
   padding: var(--space-md);
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
@@ -390,7 +339,8 @@ label.field > span:first-child {
 
 .banner p,
 .auth-banner p,
-.decline-banner p {
+.decline-banner p,
+.admin-alert p {
   margin: 0;
 }
 
@@ -428,7 +378,7 @@ label.field > span:first-child {
 
 .state-panel {
   padding: var(--space-lg);
-  background: var(--color-paper);
+  background: var(--color-linen);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
 }
@@ -457,7 +407,7 @@ label.field > span:first-child {
   font-size: var(--font-size-xl);
 }
 
-/* Section heading with listening mark */
+/* Section heading */
 .section-heading {
   position: relative;
   padding-inline-start: var(--space-md);
@@ -472,7 +422,7 @@ label.field > span:first-child {
   bottom: 0.15em;
   width: 3px;
   border-radius: var(--radius-full);
-  background: var(--color-primary);
+  background: var(--color-accent);
 }
 
 /* Back link */
@@ -491,6 +441,11 @@ label.field > span:first-child {
   color: var(--color-primary);
 }
 
+.back-link .icon {
+  width: 0.875em;
+  height: 0.875em;
+}
+
 /* Booking flow shared */
 .slot-summary {
   display: flex;
@@ -507,7 +462,6 @@ label.field > span:first-child {
   font-size: var(--font-size-xs);
   font-weight: 600;
   color: var(--color-text-muted);
-  text-transform: none;
 }
 
 .slot-summary strong {
@@ -563,7 +517,7 @@ label.field > span:first-child {
   padding: var(--space-lg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  background: var(--color-surface);
+  background: var(--color-surface-elevated);
   text-align: start;
   cursor: pointer;
   transition:
@@ -575,7 +529,11 @@ label.field > span:first-child {
 .choice-card:hover {
   border-color: var(--color-primary);
   box-shadow: var(--shadow-md);
-  background: var(--color-surface-elevated);
+}
+
+.choice-card:focus-visible {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-muted);
 }
 
 .choice-card__title {
@@ -591,6 +549,45 @@ label.field > span:first-child {
   line-height: var(--line-height-body);
 }
 
+/* Slot buttons */
+.slot-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-elevated);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.slot-btn:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-muted);
+}
+
+.slot-btn--selected,
+.slot-btn[aria-pressed='true'] {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.slot-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 /* Payment panel shared */
 .amount-block {
   display: flex;
@@ -598,8 +595,8 @@ label.field > span:first-child {
   gap: var(--space-xs);
   padding: var(--space-lg);
   margin-bottom: var(--space-lg);
-  background: var(--color-primary-muted);
-  border: 1px solid var(--color-border-subtle);
+  background: var(--color-glow-muted);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   text-align: center;
 }
@@ -614,7 +611,7 @@ label.field > span:first-child {
   font-family: var(--font-display);
   font-size: var(--font-size-2xl);
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--color-glow);
 }
 
 .transfer-list {
@@ -659,7 +656,7 @@ label.field > span:first-child {
   margin-bottom: var(--space-lg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  background: var(--color-surface);
+  background: var(--color-surface-elevated);
 }
 
 .note-block h3,
@@ -698,7 +695,7 @@ label.field > span:first-child {
   padding: var(--space-lg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  background: var(--color-surface);
+  background: var(--color-surface-elevated);
 }
 
 .upload-error {
@@ -720,14 +717,15 @@ label.field > span:first-child {
 .admin-bookings__table {
   width: 100%;
   border-collapse: collapse;
-  font-size: var(--font-size-sm);
+  font-size: var(--admin-font-size-base);
+  line-height: var(--line-height-admin);
 }
 
 .admin-table th,
 .admin-table td,
 .admin-bookings__table th,
 .admin-bookings__table td {
-  padding: var(--space-sm) var(--space-md);
+  padding: var(--admin-space-md) var(--space-md);
   text-align: start;
   border-bottom: 1px solid var(--color-border-subtle);
   vertical-align: top;
@@ -735,10 +733,10 @@ label.field > span:first-child {
 
 .admin-table th,
 .admin-bookings__table th {
-  background: var(--color-paper);
+  background: var(--color-linen);
   font-weight: 600;
   color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
+  font-size: var(--admin-font-size-sm);
   white-space: nowrap;
 }
 
@@ -750,6 +748,16 @@ label.field > span:first-child {
 .admin-table tbody tr:last-child td,
 .admin-bookings__table tbody tr:last-child td {
   border-bottom: none;
+}
+
+.admin-table tbody tr.row--attention,
+.admin-bookings__table tbody tr.row--attention {
+  background: var(--color-warning-bg);
+}
+
+.admin-table tbody tr.row--danger,
+.admin-bookings__table tbody tr.row--danger {
+  background: var(--color-error-bg);
 }
 
 /* Visually hidden */

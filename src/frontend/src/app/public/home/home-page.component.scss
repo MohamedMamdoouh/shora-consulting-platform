@@ -6,9 +6,18 @@
 
 .home {
   display: grid;
-  gap: var(--space-lg);
 }
 
 .home .section {
   margin-bottom: 0;
+}
+
+.home .hero {
+  padding-top: var(--space-2xl);
+}
+
+@media (min-width: 768px) {
+  .home .hero {
+    padding-top: var(--space-3xl);
+  }
 }

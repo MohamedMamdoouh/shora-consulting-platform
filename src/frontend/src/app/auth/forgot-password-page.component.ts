@@ -3,6 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../core/auth/auth.service';
+import { readApiError } from '../core/api/api-error.util';
 import { getAuthFieldError } from '../core/forms/auth-field-error.util';
 
 @Component({
@@ -17,6 +18,7 @@ export class ForgotPasswordPageComponent {
 
   submitted = false;
   isSubmitting = false;
+  errorMessage = '';
 
   readonly getFieldError = getAuthFieldError;
 
@@ -34,11 +36,14 @@ export class ForgotPasswordPageComponent {
       return;
     }
 
+    this.errorMessage = '';
     this.isSubmitting = true;
 
     try {
       await firstValueFrom(this.auth.forgotPassword(this.form.controls.email.value));
       this.submitted = true;
+    } catch (err) {
+      this.errorMessage = readApiError(err, 'تعذر إرسال رابط إعادة التعيين. حاول مرة أخرى.');
     } finally {
       this.isSubmitting = false;
     }

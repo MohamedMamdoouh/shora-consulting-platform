@@ -15,7 +15,7 @@ Use double-underscore nesting for nested JSON (e.g. `Jwt__SigningKey` → `Jwt:S
 | Compute (API + SPA) | Railway |
 | Database | Neon PostgreSQL |
 | Receipt blobs | Azure Blob Storage (private container) |
-| Email | SMTP (e.g. SendGrid) |
+| Email | Resend (HTTPS API) |
 | Container registry | GitHub Container Registry (GHCR) |
 
 One process hosts the API, Angular static files (`wwwroot`), in-process background jobs, and in-memory cache. There is no load balancer, horizontal scaling, or distributed cache.
@@ -110,8 +110,8 @@ Set in Railway → service → **Variables**. Use `__` (double underscore) for n
 | CORS origin | `Cors__AllowedOrigins__0` | **Same URL** as `Frontend__BaseUrl` (same-site auth) |
 | Blob storage | `Storage__ConnectionString` | Azure Storage connection string |
 | Receipt container | `Storage__ReceiptContainer` | Private container name (default `receipts`) |
-| SMTP host | `Email__Host` | e.g. `smtp.sendgrid.net` |
-| From address | `Email__FromAddress` | Verified sender at your provider |
+| Resend API key | `Email__ApiKey` | From [Resend dashboard](https://resend.com/api-keys) |
+| From address | `Email__FromAddress` | Verified sender at Resend |
 
 Also set `AllowedHosts` to the hostname only (e.g. `<your-app>.up.railway.app` — no `https://`). Include `healthcheck.railway.app` as well — Railway sends deploy healthchecks from that hostname, and omitting it causes HTTP 400 responses and failed deploys.
 
@@ -124,8 +124,8 @@ Also set `AllowedHosts` to the hostname only (e.g. `<your-app>.up.railway.app` �
 | `ConnectionStrings__DefaultConnection` | Neon pooled connection string |
 | `Jwt__SigningKey` | Random string, 32+ characters |
 | `Storage__ConnectionString` | Azure CLI or Portal |
-| `Email__Password` | SendGrid API key (or provider app password) |
-| `Email__FromAddress` | SendGrid verified sender |
+| `Email__ApiKey` | Resend API key (`re_...`) |
+| `Email__FromAddress` | Resend verified sender domain |
 | `AdminSeed__Email` / `AdminSeed__Password` | One-time admin bootstrap — **remove after first login** |
 | `Google__ClientId` | Optional |
 
@@ -133,8 +133,6 @@ Also set `AllowedHosts` to the hostname only (e.g. `<your-app>.up.railway.app` �
 
 | Variable | Example |
 | --- | --- |
-| `Email__Port` | `587` (StartTLS) |
-| `Email__Username` | `apikey` (SendGrid constant — not a secret) |
 | `Email__FromName` | `Shora` |
 
 ### CORS pitfall
@@ -143,18 +141,19 @@ If `Cors__AllowedOrigins__0` on Railway is still `http://localhost:4200`, it ove
 
 Refresh cookies use `Secure=true` and `SameSite=Strict` outside Development.
 
-### SMTP (required for sending mail)
+### Email (required for sending mail)
 
-`Email__Host` and `Email__FromAddress` are **required at startup** in Production. Without working SMTP (including `Email__Password` when using SendGrid), signup may succeed but **verification and transactional emails fail**.
+Shora uses the **Resend HTTPS API** for all production email (auth + transactional outbox). This works on all Railway plans.
+
+Set on Railway:
 
 | Setting | Variable name | Notes |
 | --- | --- | --- |
-| SMTP host | `Email__Host` | e.g. `smtp.sendgrid.net` |
-| SMTP port | `Email__Port` | Default `587`; use `465` for SSL-on-connect |
-| SMTP user | `Email__Username` | SendGrid: literal `apikey` |
-| SMTP password | `Email__Password` | SendGrid: API key — **secret** |
-| From address | `Email__FromAddress` | Verified sender |
+| API key | `Email__ApiKey` | From Resend dashboard — **secret** |
+| From address | `Email__FromAddress` | Must use a domain verified in Resend |
 | From display name | `Email__FromName` | Optional; defaults to `Shora` |
+
+After changing email variables, **redeploy** the service.
 
 ### Admin bootstrap (first production admin)
 

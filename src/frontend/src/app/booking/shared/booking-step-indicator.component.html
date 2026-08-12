@@ -1,0 +1,20 @@
+<nav class="step-indicator" aria-label="خطوات الحجز">
+  <ol class="step-indicator__list">
+    @for (step of visibleSteps(); track step.id; let index = $index) {
+      <li
+        class="step-indicator__item"
+        [class.step-indicator__item--active]="step.id === currentStep()"
+        [class.step-indicator__item--done]="isDone(step.id)"
+      >
+        <span class="step-indicator__marker" aria-hidden="true">
+          @if (isDone(step.id)) {
+            <span class="icon icon--check" aria-hidden="true"></span>
+          } @else {
+            {{ index + 1 }}
+          }
+        </span>
+        <span class="step-indicator__label">{{ step.label }}</span>
+      </li>
+    }
+  </ol>
+</nav>

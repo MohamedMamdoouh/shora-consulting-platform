@@ -4,24 +4,12 @@
     <p class="dashboard__intro">هنا تجد جلساتك القادمة، الحجوزات التي تحتاج إجراء، وسجلك السابق.</p>
   </header>
 
-  @if (isEmpty) {
-    <article class="dashboard__empty section">
-      <h2>لم تحجز جلسة بعد</h2>
-      <p>
-        عندما تحجز أول جلسة، ستظهر تفاصيلها هنا — موعدها، حالة الدفع، وكل ما تحتاج متابعته.
-      </p>
-      <div class="dashboard__empty-actions">
-        <a routerLink="/booking/start" class="btn">احجز جلسة</a>
-        <a routerLink="/services" class="btn btn--secondary">تعرف على الخدمات</a>
-      </div>
-    </article>
-  } @else {
-    <article class="section dashboard__section">
-      <div class="dashboard__section-header">
-        <h2 class="section-heading">الجلسات القادمة</h2>
-      </div>
+  <article class="section section--card dashboard__section">
+    <div class="dashboard__section-header">
+      <h2 class="section-heading">الجلسات القادمة</h2>
+    </div>
 
-      @switch (upcomingSection.status) {
+    @switch (upcomingSection.status) {
         @case ('loading') {
           <p class="state-message" aria-live="polite">جاري تحميل الجلسات القادمة...</p>
         }
@@ -34,6 +22,12 @@
         @case ('ready') {
           @if (upcomingSection.items.length === 0) {
             <p class="state-message">لا توجد جلسات قادمة حاليًا.</p>
+            @if (showFirstBookingPrompt) {
+              <div class="dashboard__empty-actions">
+                <a routerLink="/booking/start" class="btn">احجز جلسة</a>
+                <a routerLink="/services" class="btn btn--secondary">تعرف على الخدمات</a>
+              </div>
+            }
           } @else {
             <ul class="booking-list">
               @for (item of upcomingSection.items; track item.bookingId) {
@@ -52,7 +46,7 @@
       }
     </article>
 
-    <article class="section dashboard__section">
+    <article class="section section--card dashboard__section">
       <div class="dashboard__section-header">
         <h2 class="section-heading">في انتظار الدفع أو المراجعة</h2>
       </div>
@@ -95,7 +89,7 @@
       }
     </article>
 
-    <article class="section dashboard__section">
+    <article class="section section--card dashboard__section">
       <div class="dashboard__section-header">
         <h2 class="section-heading">السجل السابق</h2>
       </div>
@@ -150,8 +144,7 @@
               </div>
             }
           }
-        }
       }
-    </article>
-  }
+    }
+  </article>
 </section>

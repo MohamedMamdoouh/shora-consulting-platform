@@ -42,7 +42,7 @@ export class ClientDashboardComponent implements OnInit {
     void this.loadAllSections();
   }
 
-  get isEmpty(): boolean {
+  get showFirstBookingPrompt(): boolean {
     return (
       this.upcomingSection.status === 'ready' &&
       this.pendingSection.status === 'ready' &&

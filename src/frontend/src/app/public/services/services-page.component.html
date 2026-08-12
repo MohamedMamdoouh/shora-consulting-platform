@@ -1,18 +1,17 @@
-<section class="page">
+<section class="page services">
   <article class="section">
     <h1 class="section-heading">الخدمات</h1>
-    <p>
-      جلسة استشارية واحدة بسعر ثابت — بدون باقات أو مستويات. اختر الموضوع الذي يناسبك، واحجز موعدًا
-      يناسب جدولك.
+    <p class="intro">
+      جلسة استشارية واحدة بسعر ثابت — بدون باقات أو مستويات. اختر الموضوع الذي يناسبك، واحجز
+      موعدًا يناسب جدولك.
     </p>
 
     @if (settings(); as settings) {
-      <div class="info-block pricing">
+      <div class="info-block pricing session-card">
         <h3>السعر والمدة</h3>
-        <p>
-          جلسة واحدة مدتها {{ settings.sessionDurationMinutes }} دقيقة بسعر
-          {{ formatPrice(settings.sessionPrice) }} — عبر مكالمة صوتية أو محادثة واتساب.
-        </p>
+        <p class="session-card__duration">جلسة واحدة — {{ settings.sessionDurationMinutes }} دقيقة</p>
+        <p class="price">{{ formatPrice(settings.sessionPrice) }}</p>
+        <p class="session-card__note">عبر مكالمة صوتية أو محادثة واتساب</p>
       </div>
     }
 

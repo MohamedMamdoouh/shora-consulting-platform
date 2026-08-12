@@ -84,7 +84,8 @@ public static class DependencyInjection
         }
         else if (emailOptions.IsConfigured)
         {
-            services.AddScoped<IEmailSender, SmtpEmailSender>();
+            services.AddHttpClient<ResendEmailSender>();
+            services.AddScoped<IEmailSender, ResendEmailSender>();
         }
         else
         {

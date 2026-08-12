@@ -12,6 +12,7 @@ public class EmailOptionsValidatorTests
         var result = _validator.Validate(null, new EmailOptions());
 
         Assert.False(result.Succeeded);
+        Assert.Contains("Email:ApiKey and Email:FromAddress", result.FailureMessage, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -19,7 +20,7 @@ public class EmailOptionsValidatorTests
     {
         var result = _validator.Validate(null, new EmailOptions
         {
-            Host = "smtp.example.com",
+            ApiKey = "re_test",
             FromAddress = "noreply@example.com"
         });
 

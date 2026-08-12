@@ -22,8 +22,6 @@
 
     <PackageReference Include="Google.Apis.Auth" />
 
-    <PackageReference Include="MailKit" />
-
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">

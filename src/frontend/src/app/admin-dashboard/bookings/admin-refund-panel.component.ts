@@ -66,7 +66,7 @@ export class AdminRefundPanelComponent {
     } catch (error) {
       this.actionError = readBookingErrorMessage(
         readApiErrorCode(error),
-        readApiError(error, 'تعذّر تسجيل الاسترداد. حاول مرة أخرى.'),
+        readApiError(error, 'تعذر تسجيل الاسترداد. حاول مرة أخرى.'),
       );
     } finally {
       this.isSubmitting = false;
@@ -106,7 +106,7 @@ export class AdminRefundPanelComponent {
     } catch (error) {
       this.actionError = readBookingErrorMessage(
         readApiErrorCode(error),
-        readApiError(error, 'تعذّر التراجع عن تسجيل الاسترداد. حاول مرة أخرى.'),
+        readApiError(error, 'تعذر التراجع عن تسجيل الاسترداد. حاول مرة أخرى.'),
       );
     } finally {
       this.isSubmitting = false;

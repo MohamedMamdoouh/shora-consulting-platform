@@ -73,11 +73,11 @@ export function getAdminSettingsFieldError(
       case 'sessionDurationMinutes':
         return `المدة يجب أن تكون بين ${MIN_SESSION_DURATION} و${MAX_SESSION_DURATION} دقيقة.`;
       case 'bufferMinutes':
-        return 'وقت الفاصل يجب أن يكون صفراً أو أكثر.';
+        return 'وقت الفاصل يجب أن يكون صفرًا أو أكثر.';
       case 'receiptUploadWindowMinutes':
         return `مهلة رفع الإيصال يجب أن تكون ${MIN_RECEIPT_WINDOW} دقائق على الأقل.`;
       case 'cancellationRequestAutoDeclineHours':
-        return 'مهلة رفض طلب الإلغاء يجب أن تكون صفراً أو أكثر.';
+        return 'مهلة رفض طلب الإلغاء يجب أن تكون صفرًا أو أكثر.';
       default:
         return 'القيمة أقل من الحد المسموح.';
     }
@@ -93,7 +93,7 @@ export function getAdminSettingsFieldError(
 
   if (control.errors['maxlength']) {
     return field === 'paymentInstructions'
-      ? `الملاحظة يجب ألا تتجاوز ${MAX_PAYMENT_INSTRUCTIONS} حرفاً.`
+      ? `الملاحظة يجب ألا تتجاوز ${MAX_PAYMENT_INSTRUCTIONS} حرفًا.`
       : 'النص أطول من المسموح.';
   }
 

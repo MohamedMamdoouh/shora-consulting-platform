@@ -2,7 +2,7 @@
   <header class="admin-earnings__header">
     <h2>الأرباح</h2>
     <p class="admin-earnings__note">
-      ملخص الإيرادات حسب موعد الجلسة. الإجمالي يشمل كل الدفعات المقبولة (حتى التي اُستردت لاحقاً)،
+      ملخص الإيرادات حسب موعد الجلسة. الإجمالي يشمل كل الدفعات المقبولة (حتى التي استردت لاحقًا)،
       والصافي = الإجمالي − المبالغ المستردة.
     </p>
   </header>
@@ -49,14 +49,14 @@
           <h3>المبالغ المستردة</h3>
           <p class="admin-earnings__amount">{{ formatEarningsAmount(pageState.earnings.refundedAmount) }}</p>
           <p class="admin-earnings__meta">
-            {{ formatEarningsCount(pageState.earnings.refundedCount, 'استرداد مسجّل', 'استردادات مسجّلة') }}
+            {{ formatEarningsCount(pageState.earnings.refundedCount, 'استرداد مسجل', 'استردادات مسجلة') }}
           </p>
         </article>
 
         <article class="admin-earnings__card admin-earnings__card--highlight">
           <h3>صافي الإيرادات</h3>
           <p class="admin-earnings__amount">{{ formatEarningsAmount(pageState.earnings.netRevenue) }}</p>
-          <p class="admin-earnings__meta">بعد خصم الاستردادات المسجّلة</p>
+          <p class="admin-earnings__meta">بعد خصم الاستردادات المسجلة</p>
         </article>
 
         <article class="admin-earnings__card admin-earnings__card--warning">

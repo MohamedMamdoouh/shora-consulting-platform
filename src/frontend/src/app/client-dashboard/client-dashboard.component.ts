@@ -144,7 +144,7 @@ export class ClientDashboardComponent implements OnInit {
       if (reset) {
         this.pastSection = {
           status: 'error',
-          message: readApiError(error, 'تعذّر تحميل السجل. حاول مرة أخرى.'),
+          message: readApiError(error, 'تعذر تحميل السجل. حاول مرة أخرى.'),
         };
       }
     } finally {

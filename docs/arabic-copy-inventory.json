@@ -7,14 +7,14 @@
     ]
   },
   {
-    "text": "آخر فشل",
+    "text": "آخر عملية فاشلة",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
     ]
   },
   {
-    "text": "آخر موعد للرفع:",
+    "text": "آخر موعد لرفع الإيصال:",
     "category": "email",
     "sources": [
       "src/backend/Shora.Application/Email/Templates/Transaction/client-receipt-declined.content.html"
@@ -36,7 +36,7 @@
     ]
   },
   {
-    "text": "أدخل رقم الموبايل الذي سيتصل بك المستشار عليه.",
+    "text": "أدخل رقم الموبايل الذي سيستخدمه المستشار للتواصل معك.",
     "category": "booking",
     "sources": [
       "src/frontend/src/app/booking/contact-phone/contact-phone.component.html"
@@ -50,7 +50,7 @@
     ]
   },
   {
-    "text": "أرسل المبلغ للعميل عبر فودافون كاش أو InstaPay خارج النظام، ثم سجّل مرجع التحويل هنا. سيتلقى العميل رسالة تأكيد بالبريد.",
+    "text": "أرسل المبلغ للعميل عبر فودافون كاش أو InstaPay خارج النظام، ثم سجل مرجع التحويل هنا. سيصله بريد إلكتروني لتأكيد الاسترداد.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/bookings/admin-refund-panel.component.html"
@@ -85,14 +85,14 @@
     ]
   },
   {
-    "text": "ألغاها المستشار",
+    "text": "ألغى المستشار الحجز",
     "category": "client-dashboard",
     "sources": [
       "src/frontend/src/app/client-dashboard/client-dashboard-labels.util.ts"
     ]
   },
   {
-    "text": "ألغيتها أنت",
+    "text": "ألغيت الحجز بنفسك",
     "category": "client-dashboard",
     "sources": [
       "src/frontend/src/app/client-dashboard/client-dashboard-labels.util.ts"
@@ -128,7 +128,7 @@
     ]
   },
   {
-    "text": "إدارة الحجوزات، المواعيد، الإعدادات، الأرباح، وتنبيهات التشغيل.",
+    "text": "إدارة الحجوزات والمواعيد والإعدادات والأرباح وتنبيهات التشغيل.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/admin-shell.component.html"
@@ -142,7 +142,7 @@
     ]
   },
   {
-    "text": "إذا كان الحساب غير مؤكد، فقد أُرسل رابط التحقق إلى بريدك.",
+    "text": "إذا كان الحساب غير مؤكد، فقد أرسل رابط التحقق إلى بريدك.",
     "category": "booking",
     "sources": [
       "src/frontend/src/app/booking/review/review.component.ts"
@@ -220,7 +220,7 @@
     ]
   },
   {
-    "text": "إزالة حجب \"…\"؟ سيتم إعادة توليد المواعيد المتاحة في هذه الفترة.",
+    "text": "إزالة الحجب \"…\"؟ ستتم إعادة توليد المواعيد المتاحة خلال هذه الفترة.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
@@ -277,7 +277,7 @@
     ]
   },
   {
-    "text": "إعادة بناء الأمان العاطفي بعد الخذلان أو الشك.",
+    "text": "استعادة الأمان العاطفي بعد الخذلان أو الشك.",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/shared/topic.constants.ts"
@@ -454,7 +454,7 @@
     ]
   },
   {
-    "text": "استخدام المنصة باحترام دون إساءة أو محتوى غير لائق.",
+    "text": "استخدام المنصة باحترام، دون إساءة أو نشر محتوى غير لائق.",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/legal/terms-page.component.html"
@@ -475,7 +475,7 @@
     ]
   },
   {
-    "text": "استرداد مسجّل",
+    "text": "استرداد مسجل",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.html"
@@ -489,14 +489,14 @@
     ]
   },
   {
-    "text": "استردادات مسجّلة",
+    "text": "استردادات مسجلة",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.html"
     ]
   },
   {
-    "text": "استشارة طبية أو نفسية سريرية ولا تُغني عن الرعاية الطبية المتخصصة عند الحاجة.",
+    "text": "ليست استشارة طبية أو نفسية سريرية، ولا تغني عن الرعاية الطبية المتخصصة عند الحاجة.",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/legal/terms-page.component.html"
@@ -517,7 +517,7 @@
     ]
   },
   {
-    "text": "استلمنا إيصال الدفع. سيراجعه المستشار وستصلك رسالة تأكيد بالبريد الإلكتروني بعد الموافقة.",
+    "text": "استلمنا إيصال الدفع. سيراجعه المستشار، وستصلك رسالة تأكيد بالبريد الإلكتروني بعد الموافقة.",
     "category": "booking",
     "sources": [
       "src/frontend/src/app/booking/payment-instructions/payment-instructions.component.html"
@@ -538,21 +538,21 @@
     ]
   },
   {
-    "text": "اضغط على الرابط في موعد الجلسة لبدء المحادثة مع المستشار على واتساب.",
+    "text": "عند موعد الجلسة، اضغط على الرابط لبدء المحادثة مع المستشار عبر واتساب.",
     "category": "client-dashboard",
     "sources": [
       "src/frontend/src/app/client-dashboard/upcoming-booking-card.component.html"
     ]
   },
   {
-    "text": "اضغط على الزر أدناه لاختيار كلمة مرور جديدة. ينتهي صلاحية هذا الرابط بعد فترة محدودة.",
+    "text": "اضغط على الزر أدناه لاختيار كلمة مرور جديدة. صلاحية الرابط محدودة.",
     "category": "email",
     "sources": [
       "src/backend/Shora.Application/Email/Templates/Auth/reset-password.content.html"
     ]
   },
   {
-    "text": "اضغط على الزر أدناه لتأكيد بريدك.",
+    "text": "اضغط على الزر أدناه لتأكيد بريدك الإلكتروني.",
     "category": "email",
     "sources": [
       "src/backend/Shora.Application/Email/Templates/Auth/verify-email.content.html"
@@ -573,7 +573,7 @@
     ]
   },
   {
-    "text": "اقرأ سياسة الخصوصية الكاملة",
+    "text": "اقرأ سياسة الخصوصية كاملة",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/about/about-page.component.html"
@@ -603,7 +603,7 @@
     ]
   },
   {
-    "text": "الأسعار والمدة معروضة في المنصة وقد تُحدَّث من الإدارة.",
+    "text": "السعر والمدة موضحان في المنصة، وقد تعدلهما الإدارة.",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/legal/terms-page.component.html"
@@ -740,7 +740,7 @@
     ]
   },
   {
-    "text": "التعامل مع القلق والرفض في مرحلة التعارف.",
+    "text": "التعامل مع القلق والخوف من الرفض أثناء التعارف.",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/shared/topic.constants.ts"
@@ -754,7 +754,7 @@
     ]
   },
   {
-    "text": "التغييرات هنا تؤثر على الحجوزات والمواعيد الجديدة فقط — الحجوزات الحالية تحتفظ بسعرها وموعدها المحفوظ.",
+    "text": "هذه التغييرات تنطبق على الحجوزات والمواعيد الجديدة فقط. الحجوزات الحالية تحتفظ بسعرها وموعدها المسجل.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.html"
@@ -769,7 +769,7 @@
     ]
   },
   {
-    "text": "التواصل معك في موعد الجلسة عبر الهاتف أو واتساب حسب اختيارك.",
+    "text": "سنتواصل معك وقت الجلسة عبر الهاتف أو واتساب، حسب طريقة التواصل التي اخترتها.",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/legal/privacy-page.component.html"
@@ -783,7 +783,7 @@
     ]
   },
   {
-    "text": "الثقة تُبنى وتُكسَر ببطء. نناقش معك خطوات عملية لاستعادة الأمان في علاقتك، سواء بعد خيانة أو بعد فترة من الشك والتردد.",
+    "text": "الثقة تحتاج وقتا لتبنى من جديد. نساعدك على اتخاذ خطوات عملية لاستعادة الأمان في العلاقة، سواء بعد خيانة أو فترة طويلة من الشك والتردد.",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/shared/topic.constants.ts"
@@ -842,7 +842,7 @@
     ]
   },
   {
-    "text": "الحفاظ على القرب رغم المسافة والاختلاف الزمني.",
+    "text": "الحفاظ على القرب رغم المسافة واختلاف التوقيت.",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/shared/topic.constants.ts"
@@ -920,7 +920,7 @@
     ]
   },
   {
-    "text": "السبب غير كافٍ",
+    "text": "السبب غير كاف",
     "category": "email",
     "sources": [
       "src/backend/Shora.Application/Email/Outbox/TransactionEmailLabels.cs",
@@ -928,7 +928,7 @@
     ]
   },
   {
-    "text": "السبب يجب ألا يتجاوز … حرفًا.",
+    "text": "السبب يجب ألا يتجاوز … حرفا.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/availability/blocked-date.util.ts"
@@ -963,7 +963,7 @@
     ]
   },
   {
-    "text": "العلاقات عن بُعد",
+    "text": "العلاقات عن بعد",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/shared/topic.constants.ts"
@@ -1064,7 +1064,7 @@
     ]
   },
   {
-    "text": "المحفّز:",
+    "text": "المحفز:",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/ops/admin-ops-page.component.html"
@@ -1200,7 +1200,7 @@
     ]
   },
   {
-    "text": "باستخدامك منصة شورى، فإنك توافق على الشروط التالية. إذا لم توافق عليها، يرجى عدم استخدام المنصة.",
+    "text": "باستخدامك منصة شورى، فإنك توافق على الشروط التالية. إذا كنت لا توافق عليها، يرجى عدم استخدام المنصة.",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/legal/terms-page.component.html"
@@ -1221,14 +1221,14 @@
     ]
   },
   {
-    "text": "بعد خصم الاستردادات المسجّلة",
+    "text": "بعد خصم الاستردادات المسجلة",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.html"
     ]
   },
   {
-    "text": "بماذا نساعدك؟",
+    "text": "كيف يمكننا مساعدتك؟",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/home/home-page.component.html"
@@ -1242,7 +1242,7 @@
     ]
   },
   {
-    "text": "بيانات تقنية أساسية (مثل سجلات الخادم) لأغراض الأمان والتشغيل.",
+    "text": "بيانات تقنية أساسية، مثل سجلات الخادم، نستخدمها لأغراض الأمان وتشغيل المنصة.",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/legal/privacy-page.component.html"
@@ -1256,7 +1256,7 @@
     ]
   },
   {
-    "text": "تأكد من تفاصيل جلستك قبل الحجز.",
+    "text": "راجع تفاصيل جلستك وتأكد منها قبل تأكيد الحجز.",
     "category": "booking",
     "sources": [
       "src/frontend/src/app/booking/review/review.component.html"
@@ -1294,7 +1294,7 @@
     ]
   },
   {
-    "text": "تأكيد الحجز يعتمد على مراجعة الإيصال من قبل المستشار.",
+    "text": "يتأكد الحجز بعد أن يراجع المستشار إيصال الدفع ويوافق عليه.",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/legal/terms-page.component.html"
@@ -1345,14 +1345,14 @@
     ]
   },
   {
-    "text": "تتعارض فترة الحجب مع حجوزات قائمة. ألغِ الحجوزات المتعارضة أولًا ثم حاول مرة أخرى.",
+    "text": "تتعارض فترة الحجب مع حجوزات قائمة. ألغ الحجوزات المتعارضة أولا ثم حاول مرة أخرى.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
     ]
   },
   {
-    "text": "تتعارض فترة الحجب مع حجوزات قائمة. ألغِ هذه الحجوزات أولًا ثم حاول مرة أخرى.",
+    "text": "تتعارض فترة الحجب مع حجوزات قائمة. ألغ هذه الحجوزات أولا ثم حاول مرة أخرى.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
@@ -1501,7 +1501,7 @@
     ]
   },
   {
-    "text": "تعذر إنشاء الحساب. تحقق من البيانات وحاول مرة أخرى.",
+    "text": "تعذر إنشاء الحساب. راجع البيانات وحاول مرة أخرى.",
     "category": "auth",
     "sources": [
       "src/frontend/src/app/auth/signup-page.component.ts"
@@ -1536,28 +1536,28 @@
     ]
   },
   {
-    "text": "تعذّر إرسال طلب الإلغاء. حاول مرة أخرى.",
+    "text": "تعذر إرسال طلب الإلغاء. حاول مرة أخرى.",
     "category": "client-dashboard",
     "sources": [
       "src/frontend/src/app/client-dashboard/upcoming-booking-card.component.ts"
     ]
   },
   {
-    "text": "تعذّر إزالة فترة الحجب. حاول مرة أخرى.",
+    "text": "تعذر إزالة فترة الحجب. حاول مرة أخرى.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
     ]
   },
   {
-    "text": "تعذّر إضافة فترة الحجب. تحقق من البيانات وحاول مرة أخرى.",
+    "text": "تعذر إضافة فترة الحجب. تحقق من البيانات وحاول مرة أخرى.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
     ]
   },
   {
-    "text": "تعذّر إلغاء الحجز. حاول مرة أخرى.",
+    "text": "تعذر إلغاء الحجز. حاول مرة أخرى.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.ts",
@@ -1566,7 +1566,7 @@
     ]
   },
   {
-    "text": "تعذّر التحقق من التحويل",
+    "text": "تعذر التحقق من التحويل",
     "category": "email",
     "sources": [
       "src/backend/Shora.Application/Email/Outbox/TransactionEmailLabels.cs",
@@ -1574,42 +1574,42 @@
     ]
   },
   {
-    "text": "تعذّر التراجع عن تسجيل الاسترداد. حاول مرة أخرى.",
+    "text": "تعذر التراجع عن تسجيل الاسترداد. حاول مرة أخرى.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/bookings/admin-refund-panel.component.ts"
     ]
   },
   {
-    "text": "تعذّر الموافقة على طلب الإلغاء. حاول مرة أخرى.",
+    "text": "تعذر الموافقة على طلب الإلغاء. حاول مرة أخرى.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.ts"
     ]
   },
   {
-    "text": "تعذّر تحديث قائمة فترات الحجب.",
+    "text": "تعذر تحديث قائمة فترات الحجب.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
     ]
   },
   {
-    "text": "تعذّر تحميل الإعدادات. حاول مرة أخرى.",
+    "text": "تعذر تحميل الإعدادات. حاول مرة أخرى.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.ts"
     ]
   },
   {
-    "text": "تعذّر تحميل الإيصالات. حاول مرة أخرى.",
+    "text": "تعذر تحميل الإيصالات. حاول مرة أخرى.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.ts"
     ]
   },
   {
-    "text": "تعذّر تحميل الحجوزات. حاول مرة أخرى.",
+    "text": "تعذر تحميل الحجوزات. حاول مرة أخرى.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.ts",
@@ -1617,126 +1617,126 @@
     ]
   },
   {
-    "text": "تعذّر تحميل السجل. حاول مرة أخرى.",
+    "text": "تعذر تحميل السجل. حاول مرة أخرى.",
     "category": "client-dashboard",
     "sources": [
       "src/frontend/src/app/client-dashboard/client-dashboard.component.ts"
     ]
   },
   {
-    "text": "تعذّر تحميل المواعيد. يرجى المحاولة مرة أخرى.",
+    "text": "تعذر تحميل المواعيد. حاول مرة أخرى.",
     "category": "booking",
     "sources": [
       "src/frontend/src/app/booking/slot-picker/slot-picker.component.html"
     ]
   },
   {
-    "text": "تعذّر تحميل تفاصيل الدفع من لوحتك.",
+    "text": "تعذر تحميل تفاصيل الدفع من لوحة العميل.",
     "category": "client-dashboard",
     "sources": [
       "src/frontend/src/app/client-dashboard/pending-payment-card.component.html"
     ]
   },
   {
-    "text": "تعذّر تحميل تنبيهات التشغيل. حاول مرة أخرى.",
+    "text": "تعذر تحميل تنبيهات التشغيل. حاول مرة أخرى.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/ops/admin-ops-page.component.ts"
     ]
   },
   {
-    "text": "تعذّر تحميل رابط واتساب. تواصل مع المستشار إذا احتجت مساعدة.",
+    "text": "تعذر تحميل رابط واتساب. تواصل مع المستشار إذا احتجت مساعدة.",
     "category": "client-dashboard",
     "sources": [
       "src/frontend/src/app/client-dashboard/upcoming-booking-card.component.html"
     ]
   },
   {
-    "text": "تعذّر تحميل صفحة المواعيد. حاول مرة أخرى.",
+    "text": "تعذر تحميل صفحة المواعيد. حاول مرة أخرى.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
     ]
   },
   {
-    "text": "تعذّر تحميل ملخص الأرباح. حاول مرة أخرى.",
+    "text": "تعذر تحميل ملخص الأرباح. حاول مرة أخرى.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.ts"
     ]
   },
   {
-    "text": "تعذّر تحميل نوافذ التوفر. حاول مرة أخرى.",
+    "text": "تعذر تحميل نوافذ التوفر. حاول مرة أخرى.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
     ]
   },
   {
-    "text": "تعذّر تسجيل الإقرار. حاول مرة أخرى.",
+    "text": "تعذر تسجيل الإقرار. حاول مرة أخرى.",
     "category": "client-dashboard",
     "sources": [
       "src/frontend/src/app/client-dashboard/upcoming-booking-card.component.ts"
     ]
   },
   {
-    "text": "تعذّر تسجيل الاسترداد. حاول مرة أخرى.",
+    "text": "تعذر تسجيل الاسترداد. حاول مرة أخرى.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/bookings/admin-refund-panel.component.ts"
     ]
   },
   {
-    "text": "تعذّر حذف نافذة التوفر. حاول مرة أخرى.",
+    "text": "تعذر حذف نافذة التوفر. حاول مرة أخرى.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
     ]
   },
   {
-    "text": "تعذّر حفظ الإعدادات. تحقق من البيانات وحاول مرة أخرى.",
+    "text": "تعذر حفظ الإعدادات. راجع البيانات وحاول مرة أخرى.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.ts"
     ]
   },
   {
-    "text": "تعذّر حفظ نافذة التوفر. تحقق من البيانات وحاول مرة أخرى.",
+    "text": "تعذر حفظ نافذة التوفر. راجع البيانات وحاول مرة أخرى.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
     ]
   },
   {
-    "text": "تعذّر رفض الإيصال. حاول مرة أخرى.",
+    "text": "تعذر رفض الإيصال. حاول مرة أخرى.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.ts"
     ]
   },
   {
-    "text": "تعذّر رفض طلب الإلغاء. حاول مرة أخرى.",
+    "text": "تعذر رفض طلب الإلغاء. حاول مرة أخرى.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.ts"
     ]
   },
   {
-    "text": "تعذّر قبول الإيصال. حاول مرة أخرى.",
+    "text": "تعذر قبول الإيصال. حاول مرة أخرى.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.ts"
     ]
   },
   {
-    "text": "تعرّف على الخدمات",
+    "text": "تعرف على الخدمات",
     "category": "client-dashboard",
     "sources": [
       "src/frontend/src/app/client-dashboard/client-dashboard.component.html"
     ]
   },
   {
-    "text": "تعطّل جماعي للبريد",
+    "text": "تعطل جماعي للبريد",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
@@ -1765,21 +1765,21 @@
     ]
   },
   {
-    "text": "تفاصيل إضافية تُرسل للعميل",
+    "text": "تفاصيل إضافية ترسل للعميل",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html"
     ]
   },
   {
-    "text": "تفاصيل الحجز: الموعد، طريقة التواصل المفضلة، وحالة الجلسة.",
+    "text": "تفاصيل الحجز، مثل الموعد وطريقة التواصل المفضلة وحالة الجلسة.",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/legal/privacy-page.component.html"
     ]
   },
   {
-    "text": "تفاصيل تُرسل للعميل",
+    "text": "تفاصيل ترسل للعميل",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.html"
@@ -1957,7 +1957,7 @@
     ]
   },
   {
-    "text": "تم حجز موعدك. حوّل المبلغ أدناه عبر أحد وسائل الدفع، ثم ارفع إيصال التحويل قبل انتهاء المهلة.",
+    "text": "تم حجز موعدك. حول المبلغ أدناه عبر أحد وسائل الدفع، ثم ارفع إيصال التحويل قبل انتهاء المهلة.",
     "category": "booking",
     "sources": [
       "src/frontend/src/app/booking/payment-instructions/payment-instructions.component.html"
@@ -2246,7 +2246,7 @@
     ]
   },
   {
-    "text": "جاري تحميل الحجوزات المعلّقة...",
+    "text": "جاري تحميل الحجوزات المعلقة...",
     "category": "client-dashboard",
     "sources": [
       "src/frontend/src/app/client-dashboard/client-dashboard.component.html"
@@ -2447,28 +2447,28 @@
     ]
   },
   {
-    "text": "حوّل الرسوم وارفع الإيصال",
+    "text": "حول الرسوم وارفع الإيصال",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/shared/topic.constants.ts"
     ]
   },
   {
-    "text": "حوّل المبلغ عبر أحد وسائل الدفع أدناه، ثم ارفع إيصال التحويل قبل انتهاء المهلة.",
+    "text": "حول المبلغ عبر أحد وسائل الدفع أدناه، ثم ارفع إيصال التحويل قبل انتهاء المهلة.",
     "category": "client-dashboard",
     "sources": [
       "src/frontend/src/app/client-dashboard/pending-payment-card.component.html"
     ]
   },
   {
-    "text": "حوّل عبر فودافون كاش أو InstaPay ثم ارفع إيصال التحويل.",
+    "text": "حول عبر فودافون كاش أو InstaPay ثم ارفع إيصال التحويل.",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/shared/topic.constants.ts"
     ]
   },
   {
-    "text": "خبرتي تمتد لأكثر من عشر سنوات في الإرشاد الأسري والعلاقات. درست علم النفس التطبيقي وحصلت على شهادات في الإرشاد الزوجي والأسري. أؤمن أن كل علاقة تحتاج مساحة للاستماع قبل الحل — وهذا ما أقدّمه في كل جلسة.",
+    "text": "خبرتي تمتد لأكثر من عشر سنوات في الإرشاد الأسري والعلاقات. درست علم النفس التطبيقي وحصلت على شهادات في الإرشاد الزوجي والأسري. أؤمن أن كل علاقة تحتاج مساحة للاستماع قبل الحل — وهذا ما أقدمه في كل جلسة.",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/about/about-page.component.html"
@@ -2554,7 +2554,7 @@
     ]
   },
   {
-    "text": "رسالة بريد معطّلة",
+    "text": "رسالة بريد معطلة",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
@@ -2950,7 +2950,7 @@
     ]
   },
   {
-    "text": "عدد الرسائل المعطّلة",
+    "text": "عدد الرسائل المعطلة",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
@@ -3041,7 +3041,7 @@
     ]
   },
   {
-    "text": "فترة التكرار (ثوانٍ)",
+    "text": "فترة التكرار (ثوان)",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
@@ -3115,7 +3115,7 @@
     ]
   },
   {
-    "text": "قد نحدّث هذه الشروط من وقت لآخر. استمرارك في استخدام المنصة بعد التحديث يعني موافقتك على النسخة المحدّثة.",
+    "text": "قد نحدث هذه الشروط من وقت لآخر. استمرارك في استخدام المنصة بعد التحديث يعني موافقتك على النسخة المحدثة.",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/legal/terms-page.component.html"
@@ -3239,7 +3239,7 @@
     ]
   },
   {
-    "text": "لا توجد حجوزات تحتاج إجراءً الآن.",
+    "text": "لا توجد حجوزات تحتاج إجراء الآن.",
     "category": "client-dashboard",
     "sources": [
       "src/frontend/src/app/client-dashboard/client-dashboard.component.html"
@@ -3317,7 +3317,7 @@
     ]
   },
   {
-    "text": "لا يوجد دفع إلكتروني بالبطاقة. بعد حجز موعدك، حوّل الرسوم عبر",
+    "text": "لا يوجد دفع إلكتروني بالبطاقة. بعد حجز موعدك، حول الرسوم عبر",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/services/services-page.component.html"
@@ -3381,7 +3381,7 @@
     ]
   },
   {
-    "text": "لم يُذكر سبب.",
+    "text": "لم يذكر سبب.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.html",
@@ -3389,21 +3389,21 @@
     ]
   },
   {
-    "text": "لم يُرفَع الإيصال في الوقت المحدد",
+    "text": "لم يرفع الإيصال في الوقت المحدد",
     "category": "client-dashboard",
     "sources": [
       "src/frontend/src/app/client-dashboard/client-dashboard-labels.util.ts"
     ]
   },
   {
-    "text": "لم يُسجَّل استرداد يمكن التراجع عنه.",
+    "text": "لم يسجل استرداد يمكن التراجع عنه.",
     "category": "booking",
     "sources": [
       "src/frontend/src/app/booking/booking-error.util.ts"
     ]
   },
   {
-    "text": "لم يُسجَّل رقم للمكالمة. تواصل مع المستشار إذا احتجت مساعدة.",
+    "text": "لم يسجل رقم للمكالمة. تواصل مع المستشار إذا احتجت مساعدة.",
     "category": "client-dashboard",
     "sources": [
       "src/frontend/src/app/client-dashboard/upcoming-booking-card.component.html"
@@ -3679,7 +3679,7 @@
     ]
   },
   {
-    "text": "معرّف الحجز",
+    "text": "معرف الحجز",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.spec.ts",
@@ -3687,42 +3687,42 @@
     ]
   },
   {
-    "text": "معرّف الحجز غير صالح.",
+    "text": "معرف الحجز غير صالح.",
     "category": "booking",
     "sources": [
       "src/frontend/src/app/booking/payment-instructions/payment-instructions.component.ts"
     ]
   },
   {
-    "text": "معرّف الحجز:",
+    "text": "معرف الحجز:",
     "category": "email",
     "sources": [
       "src/backend/Shora.Application/Email/Templates/Transaction/admin-refund-revocation.content.html"
     ]
   },
   {
-    "text": "معرّف الدفع",
+    "text": "معرف الدفع",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
     ]
   },
   {
-    "text": "معرّف الرسالة",
+    "text": "معرف الرسالة",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
     ]
   },
   {
-    "text": "معرّف الكيان",
+    "text": "معرف الكيان",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
     ]
   },
   {
-    "text": "معرّف طلب الإلغاء",
+    "text": "معرف طلب الإلغاء",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
@@ -3871,7 +3871,7 @@
     ]
   },
   {
-    "text": "منصة شورى تقدّم جلسات استشارية في العلاقات. الخدمة",
+    "text": "منصة شورى تقدم جلسات استشارية في العلاقات. الخدمة",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/legal/terms-page.component.html"
@@ -3990,28 +3990,28 @@
     ]
   },
   {
-    "text": "نحتفظ ببيانات الحجز والإيصالات للمدة اللازمة لتقديم الخدمة والامتثال للمتطلبات التشغيلية. تُحذف إيصالات الدفع وفق سياسة الاحتفاظ الداخلية بعد انتهاء الغرض منها.",
+    "text": "نحتفظ ببيانات الحجز والإيصالات للمدة اللازمة لتقديم الخدمة والامتثال للمتطلبات التشغيلية. تحذف إيصالات الدفع وفق سياسة الاحتفاظ الداخلية بعد انتهاء الغرض منها.",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/legal/privacy-page.component.html"
     ]
   },
   {
-    "text": "نحن في منصة شورى نلتزم بحماية خصوصيتك. توضّح هذه السياسة ما نجمعه من بيانات، وكيف نستخدمها، وحقوقك في التحكم بها.",
+    "text": "نحن في منصة شورى نلتزم بحماية خصوصيتك. توضح هذه السياسة ما نجمعه من بيانات، وكيف نستخدمها، وحقوقك في التحكم بها.",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/legal/privacy-page.component.html"
     ]
   },
   {
-    "text": "نساعدك على تحسين طريقة التواصل مع شريكك — من الاستماع الفعّال إلى التعبير عن المشاعر دون تصعيد. مناسب عندما تشعر أن الحوار متكرر أو أن أحدكم لا يُسمَع.",
+    "text": "نساعدك على تحسين طريقة التواصل مع شريكك — من الاستماع الفعال إلى التعبير عن المشاعر دون تصعيد. مناسب عندما تشعر أن الحوار متكرر أو أن أحدكم لا يسمع.",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/shared/topic.constants.ts"
     ]
   },
   {
-    "text": "نستخدم اتصالات مشفّرة (HTTPS) ونخزّن كلمات المرور بشكل آمن. إيصالات الدفع تُحفظ في تخزين خاص غير متاح للعامة.",
+    "text": "نستخدم اتصالات مشفرة (HTTPS) ونخزن كلمات المرور بشكل آمن. إيصالات الدفع تحفظ في تخزين خاص غير متاح للعامة.",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/legal/privacy-page.component.html"
@@ -4147,7 +4147,7 @@
     ]
   },
   {
-    "text": "هنا تجد جلساتك القادمة، الحجوزات التي تحتاج إجراءً، وسجلّك السابق.",
+    "text": "هنا تجد جلساتك القادمة، الحجوزات التي تحتاج إجراء، وسجلك السابق.",
     "category": "client-dashboard",
     "sources": [
       "src/frontend/src/app/client-dashboard/client-dashboard.component.html"
@@ -4218,7 +4218,7 @@
     ]
   },
   {
-    "text": "يحجب النطاق الزمني المواعيد المفتوحة المتداخلة. لا يمكن الحجب فوق حجوزات نشطة — ألغِ الحجز أولًا من لوحة الحجوزات.",
+    "text": "يحجب النطاق الزمني المواعيد المفتوحة المتداخلة. لا يمكن الحجب فوق حجوزات نشطة — ألغ الحجز أولا من لوحة الحجوزات.",
     "category": "admin-dashboard",
     "sources": [
       "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
@@ -4313,7 +4313,7 @@
     ]
   },
   {
-    "text": "يمكنك طلب إلغاء الحجز وفق سياسة الإلغاء المعروضة في لوحة العميل. تُراجع طلبات الاسترداد حسب حالة الحجز وقرار المستشار.",
+    "text": "يمكنك طلب إلغاء الحجز وفق سياسة الإلغاء المعروضة في لوحة العميل. تراجع طلبات الاسترداد حسب حالة الحجز وقرار المستشار.",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/legal/terms-page.component.html"
@@ -4362,7 +4362,7 @@
     ]
   },
   {
-    "text": "— يمكنك استخدام اسم مستعار؛ ما يُقال في الجلسة يبقى بيننا.",
+    "text": "— يمكنك استخدام اسم مستعار؛ ما يقال في الجلسة يبقى بيننا.",
     "category": "public",
     "sources": [
       "src/frontend/src/app/public/about/about-page.component.html"

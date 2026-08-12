@@ -21,7 +21,7 @@ internal static class TransactionEmailLabels
             "UnreadableImage" => "صورة غير واضحة",
             "AmountMismatch" => "المبلغ غير مطابق",
             "DuplicateReceipt" => "إيصال مكرر",
-            "UnverifiableTransfer" => "تعذّر التحقق من التحويل",
+            "UnverifiableTransfer" => "تعذر التحقق من التحويل",
             "Other" => "سبب آخر",
             null or "" => "—",
             _ => reasonCode
@@ -31,7 +31,7 @@ internal static class TransactionEmailLabels
         reasonCode switch
         {
             "TimingConflict" => "تعارض في المواعيد",
-            "InsufficientReason" => "السبب غير كافٍ",
+            "InsufficientReason" => "السبب غير كاف",
             "Policy" => "سياسة الإلغاء",
             "Other" => "سبب آخر",
             null or "" => "—",

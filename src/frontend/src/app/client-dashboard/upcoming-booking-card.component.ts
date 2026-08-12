@@ -96,7 +96,7 @@ export class UpcomingBookingCardComponent {
     }
 
     const confirmed = window.confirm(
-      'طلب الإلغاء يحتاج موافقة المستشار. إذا وُافق، سيُسترد المبلغ يدوياً. هل تريد المتابعة؟',
+      'طلب الإلغاء يحتاج موافقة المستشار. إذا وافق، سيسترد المبلغ يدويًا. هل تريد المتابعة؟',
     );
 
     if (!confirmed) {
@@ -120,7 +120,7 @@ export class UpcomingBookingCardComponent {
       const code = readApiErrorCode(err);
       this.cancellationActionError = readBookingErrorMessage(
         code,
-        readApiError(err, 'تعذّر إرسال طلب الإلغاء. حاول مرة أخرى.'),
+        readApiError(err, 'تعذر إرسال طلب الإلغاء. حاول مرة أخرى.'),
       );
     } finally {
       this.requestingCancellation = false;
@@ -144,7 +144,7 @@ export class UpcomingBookingCardComponent {
       const code = readApiErrorCode(err);
       this.cancellationActionError = readBookingErrorMessage(
         code,
-        readApiError(err, 'تعذّر تسجيل الإقرار. حاول مرة أخرى.'),
+        readApiError(err, 'تعذر تسجيل الإقرار. حاول مرة أخرى.'),
       );
     } finally {
       this.acknowledgingDecision = false;

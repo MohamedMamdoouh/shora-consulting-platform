@@ -2,9 +2,9 @@ import { ErrorCodes } from '@contracts/error-codes';
 
 const BOOKING_ERROR_MESSAGES: Record<string, string> = {
   [ErrorCodes.Booking.SlotUnavailable]:
-    'هذا الموعد لم يعد متاحاً. يرجى اختيار موعد آخر.',
+    'هذا الموعد لم يعد متاحًا. يرجى اختيار موعد آخر.',
   [ErrorCodes.Booking.HoldCapExceeded]:
-    'لديك الحد الأقصى من الحجوزات غير المؤكدة. ألغِ أحدها من لوحتك ثم حاول مجدداً.',
+    'لديك الحد الأقصى من الحجوزات غير المؤكدة. ألغ أحدها من لوحتك ثم حاول مجددًا.',
   [ErrorCodes.Booking.EmailNotVerified]:
     'يرجى تأكيد بريدك الإلكتروني قبل حجز جلسة.',
   [ErrorCodes.Booking.ContactPhoneRequired]:
@@ -28,7 +28,7 @@ const BOOKING_ERROR_MESSAGES: Record<string, string> = {
   [ErrorCodes.Cancellation.InvalidDecisionReason]: 'سبب رفض طلب الإلغاء غير صالح.',
   [ErrorCodes.Payment.NotFound]: 'لم يتم العثور على الدفع.',
   [ErrorCodes.Payment.RefundNotDue]: 'لا يوجد استرداد مستحق لهذا الحجز.',
-  [ErrorCodes.Payment.NotRefunded]: 'لم يُسجَّل استرداد يمكن التراجع عنه.',
+  [ErrorCodes.Payment.NotRefunded]: 'لم يسجل استرداد يمكن التراجع عنه.',
   [ErrorCodes.Payment.InvalidRefundReference]: 'مرجع الاسترداد مطلوب.',
   [ErrorCodes.Payment.InvalidRefundRevocationReason]: 'سبب التصحيح مطلوب.',
 };

@@ -31,6 +31,6 @@ export function buildWhatsAppChatUrl(
 ): string {
   const digits = consultantWhatsAppNumber.replace(/\D/g, '');
   const slotLabel = formatSlotRange({ slotStartUtc, slotEndUtc });
-  const text = encodeURIComponent(`مرحباً، لدي جلسة محجوزة في ${slotLabel}`);
+  const text = encodeURIComponent(`مرحبًا، لدي جلسة محجوزة في ${slotLabel}`);
   return `https://wa.me/${digits}?text=${text}`;
 }

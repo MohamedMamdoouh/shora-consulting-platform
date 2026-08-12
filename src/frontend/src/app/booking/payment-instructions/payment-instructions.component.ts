@@ -48,7 +48,7 @@ export class PaymentInstructionsComponent implements OnInit {
     if (!bookingId) {
       this.viewModel = {
         status: 'error',
-        message: 'معرّف الحجز غير صالح.',
+        message: 'معرف الحجز غير صالح.',
       };
       return;
     }

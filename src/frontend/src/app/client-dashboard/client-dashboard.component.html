@@ -1,7 +1,7 @@
 <section class="page dashboard">
   <header class="dashboard__header">
     <h1>لوحتي</h1>
-    <p class="dashboard__intro">هنا تجد جلساتك القادمة، الحجوزات التي تحتاج إجراءً، وسجلّك السابق.</p>
+    <p class="dashboard__intro">هنا تجد جلساتك القادمة، الحجوزات التي تحتاج إجراء، وسجلك السابق.</p>
   </header>
 
   @if (isEmpty) {
@@ -12,7 +12,7 @@
       </p>
       <div class="dashboard__empty-actions">
         <a routerLink="/booking/start" class="btn">احجز جلسة</a>
-        <a routerLink="/services" class="btn btn--secondary">تعرّف على الخدمات</a>
+        <a routerLink="/services" class="btn btn--secondary">تعرف على الخدمات</a>
       </div>
     </article>
   } @else {
@@ -33,7 +33,7 @@
         }
         @case ('ready') {
           @if (upcomingSection.items.length === 0) {
-            <p class="state-message">لا توجد جلسات قادمة حالياً.</p>
+            <p class="state-message">لا توجد جلسات قادمة حاليًا.</p>
           } @else {
             <ul class="booking-list">
               @for (item of upcomingSection.items; track item.bookingId) {
@@ -59,7 +59,7 @@
 
       @switch (pendingSection.status) {
         @case ('loading') {
-          <p class="state-message" aria-live="polite">جاري تحميل الحجوزات المعلّقة...</p>
+          <p class="state-message" aria-live="polite">جاري تحميل الحجوزات المعلقة...</p>
         }
         @case ('error') {
           <div class="state-panel state-panel--error">
@@ -69,7 +69,7 @@
         }
         @case ('ready') {
           @if (pendingSection.items.length === 0) {
-            <p class="state-message">لا توجد حجوزات تحتاج إجراءً الآن.</p>
+            <p class="state-message">لا توجد حجوزات تحتاج إجراء الآن.</p>
           } @else {
             <ul class="booking-list">
               @for (item of pendingSection.items; track item.bookingId) {

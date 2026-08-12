@@ -218,7 +218,7 @@ export class AdminBookingsPageComponent implements OnInit {
     } catch (error) {
       this.actionError = readBookingErrorMessage(
         readApiErrorCode(error),
-        readApiError(error, 'تعذّر إلغاء الحجز. حاول مرة أخرى.'),
+        readApiError(error, 'تعذر إلغاء الحجز. حاول مرة أخرى.'),
       );
     } finally {
       this.cancellingBookingId = null;
@@ -260,7 +260,7 @@ export class AdminBookingsPageComponent implements OnInit {
     } catch (error) {
       this.pageState = {
         status: 'error',
-        message: readApiError(error, 'تعذّر تحميل الحجوزات. حاول مرة أخرى.'),
+        message: readApiError(error, 'تعذر تحميل الحجوزات. حاول مرة أخرى.'),
       };
     }
   }

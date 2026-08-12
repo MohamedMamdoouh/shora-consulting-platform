@@ -30,7 +30,7 @@
 
       <div class="cancellation-panel__reason">
         <h4>سبب العميل</h4>
-        <p>{{ request.clientReason?.trim() || 'لم يُذكر سبب.' }}</p>
+        <p>{{ request.clientReason?.trim() || 'لم يذكر سبب.' }}</p>
       </div>
 
       @if (item.paymentStatus === 'Approved') {
@@ -78,7 +78,7 @@
 
           <label>
             ملاحظة للعميل (اختياري)
-            <textarea formControlName="reasonNote" rows="3" placeholder="تفاصيل تُرسل للعميل"></textarea>
+            <textarea formControlName="reasonNote" rows="3" placeholder="تفاصيل ترسل للعميل"></textarea>
           </label>
 
           <div class="cancellation-panel__actions">

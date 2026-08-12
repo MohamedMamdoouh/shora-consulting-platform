@@ -270,12 +270,12 @@ internal static class TransactionEmailTemplates
 
         return new EmailTemplateRequest(
             ContentTemplate: "Transaction/client-cancellation-request-declined.content.html",
-            PreviewText: "تم رفض طلب الإلغاء ويبقى موعدك قائماً.",
+            PreviewText: "تم رفض طلب الإلغاء ويبقى موعدك قائمًا.",
             Heading: "تم رفض طلب الإلغاء",
             ActionUrl: links.ClientDashboard(),
             ActionLabel: "عرض حجوزاتي",
             RecipientName: context.Recipient.DisplayName,
-            FooterNote: "موعدك ما زال مؤكداً كما هو.",
+            FooterNote: "موعدك ما زال مؤكدًا كما هو.",
             AdditionalTokens: BuildDetailTokens(
                 ("DeclineReason", TransactionEmailLabels.HtmlEncode(reason)),
                 ("ReasonNoteHtml", note),

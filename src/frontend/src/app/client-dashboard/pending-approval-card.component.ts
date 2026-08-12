@@ -27,7 +27,7 @@ export class PendingApprovalCardComponent {
     }
 
     const confirmed = window.confirm(
-      'هل تريد إلغاء هذا الحجز؟ سيتم تحرير الموعد ويمكنك حجز موعد آخر لاحقاً.',
+      'هل تريد إلغاء هذا الحجز؟ سيتم تحرير الموعد ويمكنك حجز موعد آخر لاحقًا.',
     );
 
     if (!confirmed) {

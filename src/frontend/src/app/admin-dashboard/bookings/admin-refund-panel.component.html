@@ -22,8 +22,8 @@
 
     @if (mode === 'record') {
       <p class="refund-panel__hint">
-        أرسل المبلغ للعميل عبر فودافون كاش أو InstaPay خارج النظام، ثم سجّل مرجع التحويل هنا.
-        سيتلقى العميل رسالة تأكيد بالبريد.
+        أرسل المبلغ للعميل عبر فودافون كاش أو InstaPay خارج النظام، ثم سجل مرجع التحويل هنا.
+        سيصله بريد إلكتروني لتأكيد الاسترداد.
       </p>
 
       <form class="refund-panel__form" [formGroup]="recordForm" (ngSubmit)="submitRecord()">
@@ -52,7 +52,7 @@
       </form>
     } @else {
       <p class="refund-panel__hint refund-panel__hint--warning">
-        استخدم هذا فقط إذا سجّلت الاسترداد بالخطأ. سيعود الدفع إلى «مقبول» ويظهر «استرداد مستحق» مجدداً.
+        استخدم هذا فقط إذا سجلت الاسترداد بالخطأ. سيعود الدفع إلى «مقبول» ويظهر «استرداد مستحق» مجددًا.
       </p>
 
       <form class="refund-panel__form" [formGroup]="revokeForm" (ngSubmit)="submitRevoke()">

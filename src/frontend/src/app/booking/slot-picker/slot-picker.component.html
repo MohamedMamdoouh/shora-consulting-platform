@@ -1,44 +1,44 @@
-<section class="page">
-  <article class="section">
-    <h1>اختر موعداً</h1>
-    <p class="intro">
-      اختر وقتاً يناسبك — لا حاجة لتسجيل الدخول حتى تصل إلى خطوة تأكيد الحجز.
-    </p>
-
-    @if (viewModel(); as viewModel) {
-      @switch (viewModel.status) {
-        @case ('loading') {
-          <p class="state-message" aria-live="polite">جاري تحميل المواعيد المتاحة...</p>
-        }
-        @case ('error') {
-          <div class="state-panel state-panel--error">
-            <p>تعذّر تحميل المواعيد. يرجى المحاولة مرة أخرى.</p>
-            <button type="button" class="btn" (click)="reload()">إعادة المحاولة</button>
-          </div>
-        }
-        @case ('ready') {
-          @if (viewModel.groups.length === 0) {
-            <div class="state-panel">
-              <p>لا توجد مواعيد متاحة حالياً. يرجى المحاولة لاحقاً.</p>
-            </div>
-          } @else {
-            <div class="day-list">
-              @for (day of viewModel.groups; track day.dateKey; let first = $first) {
-                <details class="day-group" [open]="first">
-                  <summary>{{ day.label }}</summary>
-                  <div class="slot-list">
-                    @for (slot of day.slots; track slot.id) {
-                      <button type="button" class="slot-btn" (click)="selectSlot(slot)">
-                        {{ formatSlotTime(slot) }}
-                      </button>
-                    }
-                  </div>
-                </details>
-              }
-            </div>
-          }
-        }
-      }
-    }
-  </article>
-</section>
+<section class="page">
+  <article class="section">
+    <h1>اختر موعدًا</h1>
+    <p class="intro">
+      اختر وقتًا يناسبك — لا حاجة لتسجيل الدخول حتى تصل إلى خطوة تأكيد الحجز.
+    </p>
+
+    @if (viewModel(); as viewModel) {
+      @switch (viewModel.status) {
+        @case ('loading') {
+          <p class="state-message" aria-live="polite">جاري تحميل المواعيد المتاحة...</p>
+        }
+        @case ('error') {
+          <div class="state-panel state-panel--error">
+            <p>تعذر تحميل المواعيد. حاول مرة أخرى.</p>
+            <button type="button" class="btn" (click)="reload()">إعادة المحاولة</button>
+          </div>
+        }
+        @case ('ready') {
+          @if (viewModel.groups.length === 0) {
+            <div class="state-panel">
+              <p>لا توجد مواعيد متاحة حاليًا. يرجى المحاولة لاحقًا.</p>
+            </div>
+          } @else {
+            <div class="day-list">
+              @for (day of viewModel.groups; track day.dateKey; let first = $first) {
+                <details class="day-group" [open]="first">
+                  <summary>{{ day.label }}</summary>
+                  <div class="slot-list">
+                    @for (slot of day.slots; track slot.id) {
+                      <button type="button" class="slot-btn" (click)="selectSlot(slot)">
+                        {{ formatSlotTime(slot) }}
+                      </button>
+                    }
+                  </div>
+                </details>
+              }
+            </div>
+          }
+        }
+      }
+    }
+  </article>
+</section>

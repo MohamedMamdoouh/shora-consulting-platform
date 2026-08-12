@@ -1,7 +1,7 @@
 const CANCELLATION_REASON_LABELS: Record<string, string> = {
-  'Cancelled by you': 'ألغيتها أنت',
-  'Cancelled by the consultant': 'ألغاها المستشار',
-  'Receipt not uploaded in time': 'لم يُرفَع الإيصال في الوقت المحدد',
+  'Cancelled by you': 'ألغيت الحجز بنفسك',
+  'Cancelled by the consultant': 'ألغى المستشار الحجز',
+  'Receipt not uploaded in time': 'لم يرفع الإيصال في الوقت المحدد',
 };
 
 const REFUND_LABELS: Record<string, string> = {

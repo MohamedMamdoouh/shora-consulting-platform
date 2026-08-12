@@ -18,7 +18,7 @@ export function getAuthFieldError(control: AbstractControl | null, fieldName: st
   }
 
   if (control.errors['email']) {
-    return 'أدخل بريداً إلكترونياً صالحاً';
+    return 'أدخل بريدًا إلكترونيًا صالحًا';
   }
 
   if (control.errors['minlength']) {

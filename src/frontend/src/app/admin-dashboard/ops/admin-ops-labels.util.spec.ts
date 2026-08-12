@@ -35,7 +35,7 @@ describe('admin ops labels util', () => {
   });
 
   it('formats known context keys in Arabic', () => {
-    expect(formatContextKey('bookingId')).toBe('معرّف الحجز');
+    expect(formatContextKey('bookingId')).toBe('معرف الحجز');
     expect(formatContextKey('customKey')).toBe('customKey');
   });
 

@@ -58,7 +58,7 @@ export class SignupPageComponent {
 
       this.errorMessage = readApiError(
         err,
-        'تعذر إنشاء الحساب. تحقق من البيانات وحاول مرة أخرى.',
+        'تعذر إنشاء الحساب. راجع البيانات وحاول مرة أخرى.',
       );
     } finally {
       this.isSubmitting = false;

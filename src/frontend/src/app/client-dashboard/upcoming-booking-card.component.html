@@ -19,19 +19,19 @@
       <p class="upcoming-booking-card__instruction">{{ instruction }}</p>
     } @else {
       <p class="upcoming-booking-card__instruction upcoming-booking-card__instruction--muted">
-        لم يُسجَّل رقم للمكالمة. تواصل مع المستشار إذا احتجت مساعدة.
+        لم يسجل رقم للمكالمة. تواصل مع المستشار إذا احتجت مساعدة.
       </p>
     }
   } @else if (whatsAppChatUrl; as chatUrl) {
     <div class="upcoming-booking-card__instruction">
-      <p>اضغط على الرابط في موعد الجلسة لبدء المحادثة مع المستشار على واتساب.</p>
+      <p>عند موعد الجلسة، اضغط على الرابط لبدء المحادثة مع المستشار عبر واتساب.</p>
       <a [href]="chatUrl" target="_blank" rel="noopener noreferrer" class="upcoming-booking-card__chat-link">
         فتح محادثة واتساب
       </a>
     </div>
   } @else {
     <p class="upcoming-booking-card__instruction upcoming-booking-card__instruction--muted">
-      تعذّر تحميل رابط واتساب. تواصل مع المستشار إذا احتجت مساعدة.
+      تعذر تحميل رابط واتساب. تواصل مع المستشار إذا احتجت مساعدة.
     </p>
   }
 
@@ -55,7 +55,7 @@
         [disabled]="acknowledgingDecision"
         (click)="acknowledgeDecision()"
       >
-        {{ acknowledgingDecision ? 'جاري التسجيل...' : 'حسناً' }}
+        {{ acknowledgingDecision ? 'جاري التسجيل...' : 'حسنًا' }}
       </button>
     </div>
   }

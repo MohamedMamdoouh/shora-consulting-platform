@@ -23,6 +23,6 @@ import { ActivatedRoute } from '@angular/router';
 export class PlaceholderPageComponent {
   private readonly route = inject(ActivatedRoute);
 
-  title = this.route.snapshot.data['title'] ?? 'قريباً';
+  title = this.route.snapshot.data['title'] ?? 'قريبًا';
   message = this.route.snapshot.data['message'] ?? 'هذا القسم سيتم تنفيذه في المواصفة التالية.';
 }

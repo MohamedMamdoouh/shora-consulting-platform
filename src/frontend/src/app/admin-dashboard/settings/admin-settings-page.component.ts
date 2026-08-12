@@ -71,7 +71,7 @@ export class AdminSettingsPageComponent implements OnInit {
     } catch (error) {
       this.pageState = {
         status: 'error',
-        message: readApiError(error, 'تعذّر تحميل الإعدادات. حاول مرة أخرى.'),
+        message: readApiError(error, 'تعذر تحميل الإعدادات. حاول مرة أخرى.'),
       };
     }
   }
@@ -102,7 +102,7 @@ export class AdminSettingsPageComponent implements OnInit {
         return;
       }
 
-      this.errorMessage = readApiError(error, 'تعذّر حفظ الإعدادات. تحقق من البيانات وحاول مرة أخرى.');
+      this.errorMessage = readApiError(error, 'تعذر حفظ الإعدادات. راجع البيانات وحاول مرة أخرى.');
     } finally {
       this.isSubmitting = false;
     }

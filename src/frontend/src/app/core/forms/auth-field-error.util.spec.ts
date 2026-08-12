@@ -30,6 +30,6 @@ describe('getAuthFieldError', () => {
     control.markAsTouched();
     control.setErrors({ email: true });
 
-    expect(getAuthFieldError(control, 'email')).toBe('أدخل بريداً إلكترونياً صالحاً');
+    expect(getAuthFieldError(control, 'email')).toBe('أدخل بريدًا إلكترونيًا صالحًا');
   });
 });

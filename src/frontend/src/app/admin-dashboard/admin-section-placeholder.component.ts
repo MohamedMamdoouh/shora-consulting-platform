@@ -30,14 +30,14 @@ export class AdminSectionPlaceholderComponent {
   private readonly route = inject(ActivatedRoute);
 
   readonly title = toSignal(
-    this.route.data.pipe(map((data) => (data['title'] as string | undefined) ?? 'قريباً')),
-    { initialValue: 'قريباً' },
+    this.route.data.pipe(map((data) => (data['title'] as string | undefined) ?? 'قريبًا')),
+    { initialValue: 'قريبًا' },
   );
 
   readonly message = toSignal(
     this.route.data.pipe(
-      map((data) => (data['message'] as string | undefined) ?? 'هذا القسم سيتم تنفيذه قريباً.'),
+      map((data) => (data['message'] as string | undefined) ?? 'هذا القسم سيتم تنفيذه قريبًا.'),
     ),
-    { initialValue: 'هذا القسم سيتم تنفيذه قريباً.' },
+    { initialValue: 'هذا القسم سيتم تنفيذه قريبًا.' },
   );
 }

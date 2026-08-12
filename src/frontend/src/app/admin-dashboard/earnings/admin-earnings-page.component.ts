@@ -60,7 +60,7 @@ export class AdminEarningsPageComponent implements OnInit {
     } catch (error) {
       this.pageState = {
         status: 'error',
-        message: readApiError(error, 'تعذّر تحميل ملخص الأرباح. حاول مرة أخرى.'),
+        message: readApiError(error, 'تعذر تحميل ملخص الأرباح. حاول مرة أخرى.'),
       };
     }
   }

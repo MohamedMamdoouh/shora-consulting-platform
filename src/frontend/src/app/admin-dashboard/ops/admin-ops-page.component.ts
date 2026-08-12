@@ -68,7 +68,7 @@ export class AdminOpsPageComponent implements OnInit {
     } catch (error) {
       this.pageState = {
         status: 'error',
-        message: readApiError(error, 'تعذّر تحميل تنبيهات التشغيل. حاول مرة أخرى.'),
+        message: readApiError(error, 'تعذر تحميل تنبيهات التشغيل. حاول مرة أخرى.'),
       };
     }
   }

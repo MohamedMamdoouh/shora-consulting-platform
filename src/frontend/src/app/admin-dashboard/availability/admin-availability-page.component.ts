@@ -147,7 +147,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
     } catch (error) {
       this.pageState = {
         status: 'error',
-        message: readApiError(error, 'تعذّر تحميل صفحة المواعيد. حاول مرة أخرى.'),
+        message: readApiError(error, 'تعذر تحميل صفحة المواعيد. حاول مرة أخرى.'),
       };
     }
   }
@@ -222,7 +222,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
         return;
       }
 
-      this.errorMessage = readApiError(error, 'تعذّر حفظ نافذة التوفر. تحقق من البيانات وحاول مرة أخرى.');
+      this.errorMessage = readApiError(error, 'تعذر حفظ نافذة التوفر. راجع البيانات وحاول مرة أخرى.');
     } finally {
       this.isSubmitting = false;
     }
@@ -259,17 +259,17 @@ export class AdminAvailabilityPageComponent implements OnInit {
       if (conflictingIds?.length) {
         this.conflictingBookingIds = conflictingIds;
         this.blockedErrorMessage =
-          'تتعارض فترة الحجب مع حجوزات قائمة. ألغِ هذه الحجوزات أولًا ثم حاول مرة أخرى.';
+          'تتعارض فترة الحجب مع حجوزات قائمة. ألغ هذه الحجوزات أولًا ثم حاول مرة أخرى.';
         return;
       }
 
       if (readApiErrorCode(error) === ErrorCodes.Availability.BlockedRangeConflictsWithBookings) {
         this.blockedErrorMessage =
-          'تتعارض فترة الحجب مع حجوزات قائمة. ألغِ الحجوزات المتعارضة أولًا ثم حاول مرة أخرى.';
+          'تتعارض فترة الحجب مع حجوزات قائمة. ألغ الحجوزات المتعارضة أولًا ثم حاول مرة أخرى.';
         return;
       }
 
-      this.blockedErrorMessage = readApiError(error, 'تعذّر إضافة فترة الحجب. تحقق من البيانات وحاول مرة أخرى.');
+      this.blockedErrorMessage = readApiError(error, 'تعذر إضافة فترة الحجب. تحقق من البيانات وحاول مرة أخرى.');
     } finally {
       this.isSubmittingBlocked = false;
     }
@@ -299,7 +299,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
       this.successMessage = 'تم حذف نافذة التوفر.';
       await this.refreshWindows();
     } catch (error) {
-      this.errorMessage = readApiError(error, 'تعذّر حذف نافذة التوفر. حاول مرة أخرى.');
+      this.errorMessage = readApiError(error, 'تعذر حذف نافذة التوفر. حاول مرة أخرى.');
     } finally {
       this.deletingWindowId = null;
     }
@@ -311,7 +311,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
     }
 
     const confirmed = confirm(
-      `إزالة حجب "${formatBlockedRangeSummary(blockedDate)}"؟ سيتم إعادة توليد المواعيد المتاحة في هذه الفترة.`,
+      `إزالة الحجب "${formatBlockedRangeSummary(blockedDate)}"؟ ستتم إعادة توليد المواعيد المتاحة خلال هذه الفترة.`,
     );
     if (!confirmed) {
       return;
@@ -326,7 +326,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
       this.blockedSuccessMessage = 'تمت إزالة فترة الحجب.';
       await this.refreshBlockedDates();
     } catch (error) {
-      this.blockedErrorMessage = readApiError(error, 'تعذّر إزالة فترة الحجب. حاول مرة أخرى.');
+      this.blockedErrorMessage = readApiError(error, 'تعذر إزالة فترة الحجب. حاول مرة أخرى.');
     } finally {
       this.deletingBlockedDateId = null;
     }
@@ -344,7 +344,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
     } catch (error) {
       this.pageState = {
         status: 'error',
-        message: readApiError(error, 'تعذّر تحميل نوافذ التوفر. حاول مرة أخرى.'),
+        message: readApiError(error, 'تعذر تحميل نوافذ التوفر. حاول مرة أخرى.'),
       };
     }
   }
@@ -359,7 +359,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
       const blockedDates = await firstValueFrom(this.adminBlockedDateService.listBlockedDates());
       this.pageState = { ...this.pageState, blockedDates: sortBlockedDates(blockedDates) };
     } catch (error) {
-      this.blockedErrorMessage = readApiError(error, 'تعذّر تحديث قائمة فترات الحجب.');
+      this.blockedErrorMessage = readApiError(error, 'تعذر تحديث قائمة فترات الحجب.');
     }
   }
 

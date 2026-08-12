@@ -86,7 +86,7 @@ export class AdminReceiptReviewPanelComponent implements OnInit {
     } catch (error) {
       this.panelState = {
         status: 'error',
-        message: readApiError(error, 'تعذّر تحميل الإيصالات. حاول مرة أخرى.'),
+        message: readApiError(error, 'تعذر تحميل الإيصالات. حاول مرة أخرى.'),
       };
     }
   }
@@ -116,7 +116,7 @@ export class AdminReceiptReviewPanelComponent implements OnInit {
     } catch (error) {
       this.actionError = readBookingErrorMessage(
         readApiErrorCode(error),
-        readApiError(error, 'تعذّر قبول الإيصال. حاول مرة أخرى.'),
+        readApiError(error, 'تعذر قبول الإيصال. حاول مرة أخرى.'),
       );
     } finally {
       this.isApproving = false;
@@ -160,7 +160,7 @@ export class AdminReceiptReviewPanelComponent implements OnInit {
     } catch (error) {
       this.actionError = readBookingErrorMessage(
         readApiErrorCode(error),
-        readApiError(error, 'تعذّر رفض الإيصال. حاول مرة أخرى.'),
+        readApiError(error, 'تعذر رفض الإيصال. حاول مرة أخرى.'),
       );
     } finally {
       this.isDeclining = false;

@@ -94,7 +94,7 @@ export class AdminCancellationReviewPanelComponent implements OnInit, OnDestroy 
     } catch (error) {
       this.actionError = readBookingErrorMessage(
         readApiErrorCode(error),
-        readApiError(error, 'تعذّر الموافقة على طلب الإلغاء. حاول مرة أخرى.'),
+        readApiError(error, 'تعذر الموافقة على طلب الإلغاء. حاول مرة أخرى.'),
       );
     } finally {
       this.isApproving = false;
@@ -136,7 +136,7 @@ export class AdminCancellationReviewPanelComponent implements OnInit, OnDestroy 
     } catch (error) {
       this.actionError = readBookingErrorMessage(
         readApiErrorCode(error),
-        readApiError(error, 'تعذّر رفض طلب الإلغاء. حاول مرة أخرى.'),
+        readApiError(error, 'تعذر رفض طلب الإلغاء. حاول مرة أخرى.'),
       );
     } finally {
       this.isDeclining = false;

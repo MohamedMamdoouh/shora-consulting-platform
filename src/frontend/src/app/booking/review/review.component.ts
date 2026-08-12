@@ -66,7 +66,7 @@ export class ReviewComponent implements OnInit {
 
     try {
       await firstValueFrom(this.auth.resendVerification(email));
-      this.infoMessage = 'إذا كان الحساب غير مؤكد، فقد أُرسل رابط التحقق إلى بريدك.';
+      this.infoMessage = 'إذا كان الحساب غير مؤكد، فقد أرسل رابط التحقق إلى بريدك.';
     } catch (err) {
       this.errorMessage = readApiError(err, 'تعذر إرسال رابط التحقق. حاول مرة أخرى.');
     } finally {

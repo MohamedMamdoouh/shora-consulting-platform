@@ -4,7 +4,7 @@
       <div>
         <h2>تنبيهات التشغيل</h2>
         <p class="admin-ops__note">
-          تنبيهات نشطة من مراقبة النظام (تُقيَّم تقريباً كل 5 دقائق). اعرض دليل المعالجة لكل تنبيه.
+          تنبيهات نشطة من مراقبة النظام (تقيم تقريبًا كل 5 دقائق). اعرض دليل المعالجة لكل تنبيه.
         </p>
       </div>
 
@@ -27,8 +27,8 @@
     @case ('ready') {
       @if (pageState.alerts.length === 0) {
         <div class="admin-ops__panel admin-ops__panel--empty">
-          <p>لا توجد تنبيهات نشطة حالياً.</p>
-          <p class="admin-ops__note">يُعاد التقييم تلقائياً كل ~5 دقائق. استخدم «تحديث» لجلب أحدث الحالة.</p>
+          <p>لا توجد تنبيهات نشطة حاليًا.</p>
+          <p class="admin-ops__note">يعاد التقييم تلقائيًا كل ~5 دقائق. استخدم «تحديث» لجلب أحدث الحالة.</p>
         </div>
       } @else {
         <div class="admin-ops__summary" aria-live="polite">
@@ -72,7 +72,7 @@
                   <div class="admin-ops__runbook-body">
                     <p><strong>المالك:</strong> {{ runbook.owner }}</p>
                     <p><strong>SLA:</strong> {{ runbook.responseSla }}</p>
-                    <p><strong>المحفّز:</strong> {{ runbook.trigger }}</p>
+                    <p><strong>المحفز:</strong> {{ runbook.trigger }}</p>
 
                     <ol class="admin-ops__steps">
                       @for (step of runbook.steps; track step) {

@@ -18,7 +18,7 @@ public sealed class CancellationRequestAutoDeclineService(
     ILogger<CancellationRequestAutoDeclineService> logger)
 {
     private const string AutoDeclineReasonNote =
-        "تم إغلاق الطلب تلقائياً لعدم اتخاذ قرار قبل موعد الجلسة.";
+        "تم إغلاق الطلب تلقائيًا لعدم اتخاذ قرار قبل موعد الجلسة.";
 
     public async Task<int> RunAsync(CancellationToken cancellationToken = default)
     {

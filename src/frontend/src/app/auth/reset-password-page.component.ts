@@ -55,7 +55,7 @@ export class ResetPasswordPageComponent implements OnInit {
       this.success = true;
       await this.router.navigate(['/auth/login']);
     } catch (err) {
-      this.errorMessage = readApiError(err, 'تعذر إعادة تعيين كلمة المرور. قد يكون الرابط منتهياً.');
+      this.errorMessage = readApiError(err, 'تعذر إعادة تعيين كلمة المرور. قد تكون صلاحية الرابط انتهت.');
     } finally {
       this.isSubmitting = false;
     }

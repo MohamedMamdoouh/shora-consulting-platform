@@ -70,7 +70,10 @@
         <span aria-hidden="true">·</span>
         <a routerLink="/terms">شروط الاستخدام</a>
       </nav>
-      <p class="shell__footer-copy">© {{ currentYear }} شورى</p>
+      <p class="shell__footer-copy">
+        <app-brand-mark class="shell__footer-mark" />
+        <span>© {{ currentYear }} شورى</span>
+      </p>
     </div>
   </footer>
 </div>

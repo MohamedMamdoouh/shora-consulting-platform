@@ -432,12 +432,7 @@ label.field > span:first-child {
 }
 
 .section-heading::after {
-  content: '♥';
-  display: block;
-  margin-top: var(--space-sm);
-  font-size: var(--font-size-sm);
-  color: var(--color-accent);
-  opacity: 0.7;
+  @include brand-mark-accent;
 }
 
 /* Back link */

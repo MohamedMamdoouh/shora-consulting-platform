@@ -81,3 +81,17 @@
 @mixin paper-texture {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
 }
+
+@mixin brand-mark-accent($size: 1.125rem) {
+  content: '';
+  display: block;
+  width: $size;
+  height: $size;
+  margin: var(--space-sm) auto 0;
+  background: var(--gradient-brand);
+  opacity: 0.85;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' fill-rule='evenodd' d='M4 18V11C4 7.134 7.134 4 12 4s8 3.134 8 7v7H4Zm2.5-2H17.5V11C17.5 8.462 15.038 6 12 6S6.5 8.462 6.5 11v5Z'/%3E%3Cpath stroke='black' stroke-width='1.2' d='M7 18h10'/%3E%3Ccircle cx='12' cy='4' r='1' fill='black'/%3E%3C/svg%3E");
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+}

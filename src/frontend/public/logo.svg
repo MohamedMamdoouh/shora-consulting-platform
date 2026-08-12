@@ -1,21 +1,27 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" role="img" aria-label="شورى">
   <defs>
-    <linearGradient id="logo-bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#F3EEFF"/>
-      <stop offset="100%" stop-color="#FFF5F0"/>
+    <linearGradient id="shora-bg" x1="8" y1="8" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F3EEFF"/>
+      <stop offset="1" stop-color="#FFF5F0"/>
     </linearGradient>
-    <linearGradient id="logo-heart" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#8B6FD4"/>
-      <stop offset="50%" stop-color="#E8847A"/>
-      <stop offset="100%" stop-color="#F5A962"/>
+    <linearGradient id="shora-brand" x1="28" y1="96" x2="100" y2="24" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7C5CBF"/>
+      <stop offset="0.55" stop-color="#E8847A"/>
+      <stop offset="1" stop-color="#F5A962"/>
     </linearGradient>
   </defs>
-  <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#logo-bg)"/>
+  <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#shora-bg)"/>
   <path
-    d="M64 88 C48 72 32 58 32 44 C32 32 42 24 52 24 C58 24 62 28 64 32 C66 28 70 24 76 24 C86 24 96 32 96 44 C96 58 80 72 64 88Z"
-    fill="url(#logo-heart)"
+    fill="url(#shora-brand)"
+    fill-rule="evenodd"
+    d="M28 96V52C28 30.536 44.536 16 64 16C83.464 16 100 30.536 100 52V96H28ZM42 92H86V54C86 40.745 76.255 30 64 30C51.745 30 42 40.745 42 54V92Z"
   />
-  <circle cx="52" cy="42" r="3" fill="#fff" opacity="0.9"/>
-  <circle cx="76" cy="42" r="3" fill="#fff" opacity="0.9"/>
-  <path d="M58 52 Q64 58 70 52" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.8"/>
+  <path
+    d="M46 92H82"
+    stroke="#F5A962"
+    stroke-width="4"
+    stroke-linecap="round"
+    opacity="0.95"
+  />
+  <circle cx="64" cy="24" r="4.5" fill="#F5A962"/>
 </svg>

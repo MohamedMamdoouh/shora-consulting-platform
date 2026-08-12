@@ -128,7 +128,8 @@
 }
 
 .hero__eyebrow-icon {
-  font-size: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--color-primary);
 }
 
 .hero__trust {
@@ -208,8 +209,7 @@
   z-index: 2;
   @include float-animation(5s, 8px);
 
-  span {
-    font-size: 1.125rem;
+  app-brand-mark {
     color: var(--color-accent);
   }
 }
@@ -219,7 +219,7 @@
   inset-inline-start: 5%;
 }
 
-.hero__float--heart {
+.hero__float--mark {
   top: 15%;
   inset-inline-end: 8%;
   animation-delay: 1.5s;

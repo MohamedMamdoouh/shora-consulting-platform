@@ -17,10 +17,9 @@
   padding-top: var(--space-2xl);
 }
 
-.about__logo {
+.about__hero app-brand-logo {
+  display: block;
   margin-bottom: var(--space-lg);
-  height: 4.5rem;
-  width: auto;
 }
 
 .about__hero .pull-quote {

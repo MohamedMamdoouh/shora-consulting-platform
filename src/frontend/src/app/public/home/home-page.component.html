@@ -3,7 +3,7 @@
     <div class="hero__inner">
       <div class="hero__content">
         <span class="hero__eyebrow">
-          <span class="hero__eyebrow-icon" aria-hidden="true">♥</span>
+          <app-brand-mark class="hero__eyebrow-icon" />
           استشارات علاقات فردية
         </span>
         <h1>
@@ -62,8 +62,8 @@
             />
           </svg>
         </div>
-        <div class="hero__float hero__float--heart">
-          <span>♥</span>
+        <div class="hero__float hero__float--mark">
+          <app-brand-mark [gradient]="true" />
         </div>
         <div class="hero__float hero__float--headset">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
@@ -91,7 +91,7 @@
               @case ('premarital') { 💍 }
               @case ('dating-confidence') { ✨ }
               @case ('long-distance') { 🌍 }
-              @default { ♥ }
+              @default { <app-brand-mark /> }
             }
           </div>
           <h3>{{ topic.title }}</h3>

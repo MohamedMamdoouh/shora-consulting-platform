@@ -1,6 +1,6 @@
 # 03 — Public Pages (Home, About, Services)
 
-Status: **Done** — RTL pages at `/`, `/about`, and `/services` with localized copy, branding assets (`logo.svg`, `favicon.svg`), and working CTAs into `/booking/start`. Consultant-specific credentials and photo can replace generic bio text when provided.
+Status: **Done** — RTL pages at `/`, `/about`, and `/services` with localized copy, branding asset (`logo.svg` via `BrandLogoComponent`), and working CTAs into `/booking/start`. Consultant-specific credentials and photo can replace generic bio text when provided.
 
 ## 1. Goals
 

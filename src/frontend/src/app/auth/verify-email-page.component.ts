@@ -4,10 +4,11 @@ import { firstValueFrom } from 'rxjs';
 import { ErrorCodes } from '@contracts/error-codes';
 import { AuthService } from '../core/auth/auth.service';
 import { readApiError, readApiErrorCode } from '../core/api/api-error.util';
+import { BrandLogoComponent } from '../shared/components/brand-logo.component';
 
 @Component({
   selector: 'app-verify-email-page',
-  imports: [RouterLink],
+  imports: [BrandLogoComponent, RouterLink],
   templateUrl: './verify-email-page.component.html',
   styleUrl: './verify-email-page.component.scss',
 })

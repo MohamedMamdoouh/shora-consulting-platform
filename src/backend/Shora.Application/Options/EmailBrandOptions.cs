@@ -4,5 +4,5 @@ public sealed class EmailBrandOptions
 {
     public const string SectionName = "Brand";
 
-    public string BrandName { get; set; } = "Shora";
+    public string BrandName { get; set; } = "شورى";
 }

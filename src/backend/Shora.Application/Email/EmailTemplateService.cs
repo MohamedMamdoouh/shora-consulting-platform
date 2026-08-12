@@ -9,6 +9,9 @@ public sealed class EmailTemplateService(IOptions<EmailBrandOptions> brandOption
 {
     private const string ResourcePrefix = "Shora.Application.Email.Templates.";
     private const string LayoutTemplate = "_layout.html";
+    private const string BrandPrimaryColor = "#4a5748";
+    private const string BrandAccentColor = "#7a6250";
+    private const string BrandTextColor = "#1a1816";
 
     private static readonly Assembly TemplateAssembly = typeof(EmailTemplateService).Assembly;
 
@@ -37,7 +40,7 @@ public sealed class EmailTemplateService(IOptions<EmailBrandOptions> brandOption
             ["ActionUrl"] = request.ActionUrl,
             ["ActionLabel"] = HtmlEncode(request.ActionLabel),
             ["FooterNote"] = HtmlEncode(request.FooterNote),
-            ["BrandHeader"] = $"""<p style="margin:0;font-size:20px;font-weight:700;color:#b85c38;">{brandName}</p>""",
+            ["BrandHeader"] = BuildBrandHeader(brandName),
             ["Year"] = DateTime.UtcNow.Year.ToString()
         };
 
@@ -51,6 +54,24 @@ public sealed class EmailTemplateService(IOptions<EmailBrandOptions> brandOption
 
         return tokens;
     }
+
+    private static string BuildBrandHeader(string brandName) =>
+        $"""
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto;">
+          <tr>
+            <td style="padding:0 0 0 10px;font-size:22px;line-height:1;font-weight:700;color:{BrandTextColor};font-family:Georgia,'Times New Roman',serif;">
+              {brandName}
+            </td>
+            <td style="padding:0;line-height:0;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" role="img" aria-label="{brandName}">
+                <path d="M6 22 Q6 10 12 5" fill="none" stroke="{BrandAccentColor}" stroke-width="2.3" stroke-linecap="round"/>
+                <path d="M18 22 Q18 10 12 5" fill="none" stroke="{BrandPrimaryColor}" stroke-width="2.3" stroke-linecap="round"/>
+                <circle cx="12" cy="21" r="2" fill="{BrandPrimaryColor}"/>
+              </svg>
+            </td>
+          </tr>
+        </table>
+        """;
 
     private static string LoadTemplate(string templatePath)
     {

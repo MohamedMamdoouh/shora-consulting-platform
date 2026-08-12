@@ -21,9 +21,10 @@
     var(--color-surface);
 }
 
-.about__photo {
+.about__logo {
   margin-bottom: var(--space-lg);
-  opacity: 0.85;
+  height: 2.5rem;
+  width: auto;
 }
 
 .about__lead {

@@ -45,7 +45,7 @@ Admin HTTP services live under `src/app/core/admin/`.
 
 ## Static assets (`public/`)
 
-Ships `logo.svg` and `favicon.svg` only. **`robots.txt` and `sitemap.xml` are not used** — traffic is expected from direct/social links, not search indexing. Add them under `public/` later if you want SEO.
+Ships `logo.svg`, `logo-mark.svg`, and `favicon.svg` only. **`robots.txt` and `sitemap.xml` are not used** — traffic is expected from direct/social links, not search indexing. Add them under `public/` later if you want SEO.
 
 ## Build & test
 

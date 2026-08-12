@@ -3,101 +3,51 @@
     <div class="hero__inner">
       <div class="hero__content">
         <app-brand-logo class="hero__logo" />
-        <span class="hero__eyebrow">استشارات علاقات فردية</span>
+        <span class="hero__eyebrow">{{ copy.home.eyebrow }}</span>
         <h1>
-          مساحة آمنة لفهم<br />
-          علاقتك <span class="hero__gradient">بشكل أوضح</span>
+          {{ copy.home.heroTitleLine1 }}<br />
+          <span class="hero__gradient">{{ copy.home.heroTitleHighlight }}</span>
         </h1>
-        <p>
-          جلسات استشارية فردية عبر مكالمة صوتية أو محادثة واتساب — بخصوصية تامة
-          وبدون أحكام.
-        </p>
+        <p>{{ copy.home.heroDescription }}</p>
         <div class="hero__actions">
-          <app-booking-cta label="احجز جلسة الآن" />
+          <app-booking-cta [label]="copy.cta.bookSessionNow" [showCalendarIcon]="true" />
           <div class="hero__trust">
             <span class="hero__trust-avatars" aria-hidden="true">
               <span></span>
               <span></span>
               <span></span>
             </span>
-            <p>جلسات بخصوصية تامة — أنت في مساحة آمنة</p>
+            <p>{{ copy.home.trustNote }}</p>
           </div>
         </div>
       </div>
 
-      <div class="hero__visual" aria-hidden="true">
-        <div class="hero__visual-glow"></div>
-        <svg class="hero__scene" viewBox="0 0 400 360" xmlns="http://www.w3.org/2000/svg">
-          <!-- Floor shadow -->
-          <ellipse cx="200" cy="310" rx="120" ry="16" fill="rgba(109,91,138,0.06)" />
-          <!-- Armchair -->
-          <path
-            d="M120 280 C120 220 140 190 175 185 C190 183 205 183 220 185 C255 190 275 220 275 280 L275 295 L120 295 Z"
-            fill="#A67B73"
-          />
-          <path
-            d="M130 200 C130 170 150 155 175 152 C200 149 220 170 220 200 L220 280 L130 280 Z"
-            fill="#B08880"
-          />
-          <rect x="155" y="295" width="90" height="12" rx="6" fill="#926861" />
-          <!-- Side table -->
-          <rect x="280" y="250" width="8" height="55" fill="#8B6B5A" />
-          <rect x="268" y="245" width="32" height="8" rx="3" fill="#A07868" />
-          <!-- Coffee cup -->
-          <ellipse cx="284" cy="242" rx="10" ry="4" fill="#B8956A" opacity="0.5" />
-          <path d="M276 228 L276 240 Q284 244 292 240 L292 228 Z" fill="#fff" stroke="#E0D0C0" stroke-width="1" />
-          <!-- Plant -->
-          <rect x="95" y="268" width="14" height="30" rx="3" fill="#C4A882" />
-          <ellipse cx="102" cy="255" rx="22" ry="18" fill="#4CAF7A" opacity="0.85" />
-          <ellipse cx="92" cy="248" rx="14" ry="12" fill="#5CB88A" opacity="0.9" />
-          <ellipse cx="112" cy="250" rx="12" ry="10" fill="#3D9A6A" opacity="0.8" />
-        </svg>
-        <div class="hero__float hero__float--chat">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
-            <path
-              d="M4 6a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H9l-4 3v-3H6a2 2 0 01-2-2V6z"
-              fill="#6D5B8A"
-            />
-          </svg>
-        </div>
-        <div class="hero__float hero__float--headset">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
-            <path
-              d="M4 14v-2a8 8 0 0116 0v2M4 14a2 2 0 002 2h1v-4H6a2 2 0 00-2 2zm14 0a2 2 0 01-2 2h-1v-4h1a2 2 0 012 2z"
-              stroke="#8A7289"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-          </svg>
-        </div>
+      <div class="hero__visual">
+        <app-counseling-scene />
       </div>
     </div>
   </section>
 
+  @if (settings(); as settings) {
+    <app-featured-session-card
+      [sessionPrice]="settings.sessionPrice"
+      [sessionDurationMinutes]="settings.sessionDurationMinutes"
+    />
+  }
+
   <section class="section section--help">
-    <h2 class="section-heading">كيف يمكننا مساعدتك؟</h2>
-    <div class="card-grid">
+    <header class="section__centered-header">
+      <h2 class="section__title">{{ copy.home.topicsHeading }}</h2>
+    </header>
+    <div class="topics-grid">
       @for (topic of topics; track topic.id) {
-        <article class="topic-card" [class]="'topic-card--' + topic.id">
-          <div class="topic-card__icon" aria-hidden="true">
-            @switch (topic.id) {
-              @case ('communication') { 💬 }
-              @case ('trust') { 🛡️ }
-              @case ('premarital') { 💍 }
-              @case ('dating-confidence') { ✨ }
-              @case ('long-distance') { 🌍 }
-              @default { ✦ }
-            }
-          </div>
-          <h3>{{ topic.title }}</h3>
-          <p>{{ topic.shortDescription }}</p>
-        </article>
+        <app-topic-card [topic]="topic" [description]="topic.shortDescription" />
       }
     </div>
   </section>
 
   <section class="section section--steps">
-    <h2 class="section-heading">كيف تعمل الجلسة؟</h2>
+    <h2 class="section-heading">{{ copy.home.stepsHeading }}</h2>
     <ol class="steps">
       @for (step of steps; track step.title; let i = $index) {
         <li class="step">
@@ -111,8 +61,8 @@
     </ol>
   </section>
 
-  <section class="section cta-block">
-    <p>جاهز للبدء؟ اختر موعدًا يناسبك — لا حاجة لتسجيل الدخول الآن.</p>
-    <app-booking-cta />
-  </section>
+  <app-footer-cta-banner
+    [title]="copy.home.footerCtaTitle"
+    [subtitle]="copy.home.footerCtaSubtitle"
+  />
 </section>

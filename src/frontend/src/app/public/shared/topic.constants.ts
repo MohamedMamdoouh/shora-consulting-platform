@@ -1,8 +1,11 @@
+export type TopicAccent = 'purple' | 'green' | 'orange' | 'pink' | 'sky';
+
 export interface Topic {
   id: string;
   title: string;
   shortDescription: string;
   longDescription: string;
+  accent: TopicAccent;
 }
 
 export const CONSULTATION_TOPICS: Topic[] = [
@@ -12,6 +15,7 @@ export const CONSULTATION_TOPICS: Topic[] = [
     shortDescription: 'فهم احتياجات بعضكم والتعبير عنها باحترام.',
     longDescription:
       'نساعدك على تحسين طريقة التواصل مع شريكك — من الاستماع الفعال إلى التعبير عن المشاعر دون تصعيد. مناسب عندما تشعر أن الحوار متكرر أو أن أحدكم لا يسمع.',
+    accent: 'purple',
   },
   {
     id: 'trust',
@@ -19,6 +23,7 @@ export const CONSULTATION_TOPICS: Topic[] = [
     shortDescription: 'استعادة الأمان العاطفي بعد الخذلان أو الشك.',
     longDescription:
       'الثقة تحتاج وقتًا لتبنى من جديد. نساعدك على اتخاذ خطوات عملية لاستعادة الأمان في العلاقة، سواء بعد خيانة أو فترة طويلة من الشك والتردد.',
+    accent: 'green',
   },
   {
     id: 'premarital',
@@ -26,6 +31,7 @@ export const CONSULTATION_TOPICS: Topic[] = [
     shortDescription: 'الاستعداد للزواج بتوافق ووضوح في التوقعات.',
     longDescription:
       'قبل أن تخطوا خطوة الزواج، من المهم أن تتفقوا على القيم والأهداف والتوقعات. نساعدكما على طرح الأسئلة الصعبة قبل الالتزام.',
+    accent: 'orange',
   },
   {
     id: 'dating-confidence',
@@ -33,6 +39,7 @@ export const CONSULTATION_TOPICS: Topic[] = [
     shortDescription: 'التعامل مع القلق والخوف من الرفض أثناء التعارف.',
     longDescription:
       'مرحلة التعارف قد تكون مرهقة، خاصة مع الخوف من الرفض أو عدم وضوح الطرف الآخر أو صعوبة التعبير عن نفسك. نساعدك على التعامل معها بثقة ووضوح أكبر.',
+    accent: 'pink',
   },
   {
     id: 'long-distance',
@@ -40,6 +47,7 @@ export const CONSULTATION_TOPICS: Topic[] = [
     shortDescription: 'الحفاظ على القرب رغم المسافة واختلاف التوقيت.',
     longDescription:
       'العلاقات عن بعد تحتاج جهدًا أكبر في التواصل وبناء الثقة. نساعدك على وضع عادات يومية تحافظ على القرب حتى مع المسافة.',
+    accent: 'sky',
   },
 ];
 

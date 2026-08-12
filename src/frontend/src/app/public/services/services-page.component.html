@@ -1,54 +1,43 @@
-<section class="page services">
-  <article class="section">
-    <h1 class="section-heading">الخدمات</h1>
-    <p class="intro">
-      جلسة استشارية واحدة بسعر ثابت — بدون باقات أو مستويات. اختر الموضوع الذي يناسبك، واحجز
-      موعدًا يناسب جدولك.
-    </p>
+<section class="page page--full services">
+  <app-page-header [title]="copy.services.title" [description]="copy.services.intro" />
 
-    @if (settings(); as settings) {
-      <div class="info-block pricing session-card">
-        <h3>السعر والمدة</h3>
-        <p class="session-card__duration">جلسة واحدة — {{ settings.sessionDurationMinutes }} دقيقة</p>
-        <p class="price">{{ formatPrice(settings.sessionPrice) }}</p>
-        <p class="session-card__note">عبر مكالمة صوتية أو محادثة واتساب</p>
-      </div>
-    }
+  @if (settings(); as settings) {
+    <app-featured-session-card
+      [sessionPrice]="settings.sessionPrice"
+      [sessionDurationMinutes]="settings.sessionDurationMinutes"
+    />
+  }
 
-    <h2 class="section-heading">الموضوعات</h2>
-    <div class="card-grid">
+  <section class="section section--topics">
+    <header class="section__centered-header">
+      <h2 class="section__title">{{ copy.services.topicsHeading }}</h2>
+      <p class="section__subtitle">{{ copy.services.topicsSubtitle }}</p>
+    </header>
+
+    <div class="topics-grid">
       @for (topic of topics; track topic.id) {
-        <article class="topic-card">
-          <h3>{{ topic.title }}</h3>
-          <p>{{ topic.longDescription }}</p>
-        </article>
+        <app-topic-card
+          [topic]="topic"
+          [description]="topic.longDescription"
+          [showDiscoverLink]="true"
+        />
       }
     </div>
-  </article>
+  </section>
 
-  <article class="section">
-    <h2 class="section-heading">الدفع</h2>
+  <section class="section section--info">
+    <h2 class="section-heading">{{ copy.services.paymentHeading }}</h2>
     <div class="info-block">
-      <p>
-        لا يوجد دفع إلكتروني بالبطاقة. بعد حجز موعدك، حول الرسوم عبر
-        <strong>فودافون كاش</strong> أو <strong>إنستا باي</strong> ثم ارفع إيصال التحويل. يراجع
-        المستشار الإيصال ويؤكد حجزك.
-      </p>
+      <p>{{ copy.services.paymentBody }}</p>
     </div>
-  </article>
+  </section>
 
-  <article class="section">
-    <h2 class="section-heading">الخصوصية</h2>
+  <section class="section section--info">
+    <h2 class="section-heading">{{ copy.services.privacyHeading }}</h2>
     <div class="info-block">
-      <p>
-        يمكنك استخدام اسم مستعار (display name) بدلًا من اسمك الحقيقي. جميع معلوماتك ومحادثاتك
-        تُعامَل بسرية تامة — نحن نفهم حساسية موضوعات العلاقات.
-      </p>
+      <p>{{ copy.services.privacyBody }}</p>
     </div>
-  </article>
+  </section>
 
-  <article class="section cta-block">
-    <p>اختر موعدًا الآن — لا حاجة لتسجيل الدخول حتى تصل لخطوة الحجز.</p>
-    <app-booking-cta />
-  </article>
+  <app-footer-cta-banner />
 </section>

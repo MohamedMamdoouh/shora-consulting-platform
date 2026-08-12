@@ -1,4 +1,4 @@
-/* Shora Design System — calm horizon */
+/* Shora Design System — Soft Lavender */
 
 @use './app/shared/styles/tokens';
 @use './app/shared/styles/icons';
@@ -40,8 +40,7 @@ body {
 }
 
 body {
-  background: var(--gradient-bg-soft);
-  @include paper-texture;
+  background: var(--color-background);
 }
 
 h1,
@@ -97,7 +96,7 @@ button,
   min-height: 2.75rem;
   padding: 0.625rem 1.5rem;
   border: 1px solid transparent;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);
   background: var(--color-primary);
   color: var(--color-on-primary);
   font: inherit;
@@ -255,7 +254,7 @@ textarea[aria-invalid='true'] {
 input:disabled,
 select:disabled,
 textarea:disabled {
-  background: var(--color-linen);
+  background: var(--color-surface);
   color: var(--color-text-muted);
   cursor: not-allowed;
 }
@@ -325,7 +324,7 @@ label.field > span:first-child {
 }
 
 .badge--neutral {
-  background: var(--color-linen);
+  background: var(--color-surface);
   color: var(--color-text-muted);
   border-color: var(--color-border);
 }
@@ -421,14 +420,22 @@ label.field > span:first-child {
 /* Section heading */
 .section-heading {
   position: relative;
-  text-align: center;
-  padding-inline-start: 0;
-  margin: 0 0 var(--space-2xl);
-  font-size: var(--font-size-2xl);
+  text-align: start;
+  padding-inline-start: var(--space-lg);
+  margin: 0 0 var(--space-xl);
+  font-size: var(--font-size-xl);
+  font-weight: 800;
 }
 
 .section-heading::before {
-  display: none;
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0.15em;
+  bottom: 0.15em;
+  width: 4px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
 }
 
 /* Back link */

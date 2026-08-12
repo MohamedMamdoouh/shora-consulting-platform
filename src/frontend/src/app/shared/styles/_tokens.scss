@@ -1,82 +1,92 @@
-/* Shora Design System — Warm Horizon tokens (calm edition) */
+/* Shora Design System — Soft Lavender (reference-aligned) */
 
 :root {
-  /* Palette — warm stone, not bright linen */
-  --color-linen: #ebe6df;
-  --color-paper: #f0ece6;
-  --color-background: #ebe6df;
-  --color-surface: #f7f5f2;
-  --color-surface-elevated: #faf9f7;
+  /* Palette */
+  --color-background: #f9fafc;
+  --color-paper: #ffffff;
+  --color-linen: #f4f6fa;
+  --color-surface: #ffffff;
+  --color-surface-elevated: #ffffff;
   --color-ink: #1e293b;
   --color-text: var(--color-ink);
-  --color-text-muted: #5c6678;
-  --color-text-subtle: #8b95a5;
+  --color-text-muted: #64748b;
+  --color-text-subtle: #94a3b8;
 
-  /* Brand — muted purple / dusty rose */
-  --color-primary: #6d5b8a;
-  --color-primary-hover: #5c4d78;
-  --color-primary-light: #8a7aa8;
-  --color-primary-muted: rgba(109, 91, 138, 0.08);
-  --color-primary-subtle: rgba(109, 91, 138, 0.04);
+  /* Brand — soft purple */
+  --color-primary: #8a79c4;
+  --color-primary-hover: #7a6bb4;
+  --color-primary-light: #a394d4;
+  --color-primary-muted: rgba(138, 121, 196, 0.12);
+  --color-primary-subtle: rgba(138, 121, 196, 0.06);
+  --color-primary-soft: #ede9f8;
   --color-on-primary: #ffffff;
 
-  --color-accent: #a67b73;
-  --color-accent-hover: #926861;
-  --color-accent-muted: rgba(166, 123, 115, 0.1);
-  --color-peach: #ddd0c4;
-  --color-peach-muted: rgba(221, 208, 196, 0.45);
-  --color-coral: #a67b73;
-  --color-lavender: #e4e0ea;
-  --color-lavender-muted: rgba(228, 224, 234, 0.55);
+  --color-accent: #e8847a;
+  --color-accent-hover: #d97368;
+  --color-accent-muted: rgba(232, 132, 122, 0.12);
+  --color-peach: #f5ebe8;
+  --color-peach-muted: rgba(245, 235, 232, 0.8);
+  --color-coral: #e8847a;
+  --color-lavender: #ede9f8;
+  --color-lavender-muted: rgba(237, 233, 248, 0.65);
 
-  --color-glow: #b8956a;
-  --color-glow-muted: rgba(184, 149, 106, 0.1);
+  --color-glow: #8a79c4;
+  --color-glow-muted: rgba(138, 121, 196, 0.1);
 
-  --color-border: rgba(30, 41, 59, 0.09);
-  --color-border-subtle: rgba(30, 41, 59, 0.05);
-  --color-header: rgba(247, 245, 242, 0.9);
+  --color-border: rgba(30, 41, 59, 0.08);
+  --color-border-subtle: rgba(30, 41, 59, 0.04);
+  --color-header: rgba(255, 255, 255, 0.92);
 
-  /* Gradients — restrained two-stop, no rainbow */
-  --gradient-brand: linear-gradient(135deg, #6d5b8a 0%, #8a7289 100%);
-  --gradient-brand-hover: linear-gradient(135deg, #5c4d78 0%, #7a6279 100%);
-  --gradient-text: linear-gradient(135deg, #6d5b8a 0%, #8a7289 100%);
-  --gradient-bg-soft: linear-gradient(
-    180deg,
-    #ebe6df 0%,
-    #e6e1da 100%
-  );
+  /* Gradients */
+  --gradient-brand: linear-gradient(135deg, #8a79c4 0%, #9d8fd0 100%);
+  --gradient-brand-hover: linear-gradient(135deg, #7a6bb4 0%, #8a79c4 100%);
+  --gradient-text: linear-gradient(135deg, #8a79c4 0%, #b08fd4 100%);
+  --gradient-bg-soft: linear-gradient(180deg, #f9fafc 0%, #f4f6fa 100%);
   --gradient-hero-glow: radial-gradient(
     ellipse 80% 60% at 30% 40%,
-    rgba(109, 91, 138, 0.07) 0%,
+    rgba(138, 121, 196, 0.08) 0%,
     transparent 70%
   );
+  --gradient-cta-banner: linear-gradient(135deg, #ede9f8 0%, #f3f0fa 100%);
 
   /* Semantic */
-  --color-success: #2d7a5a;
-  --color-success-bg: #e8f3ed;
-  --color-success-border: #b8dcc8;
-  --color-warning: #826510;
-  --color-warning-bg: #f8f3e6;
-  --color-warning-border: #e8d9a8;
-  --color-error: #b42318;
-  --color-error-hover: #912018;
-  --color-error-bg: #f9eeed;
-  --color-error-border: #e8c4c0;
+  --color-success: #22a06b;
+  --color-success-bg: #ecfdf3;
+  --color-success-border: #abefc6;
+  --color-warning: #b45309;
+  --color-warning-bg: #fffbeb;
+  --color-warning-border: #fde68a;
+  --color-error: #dc2626;
+  --color-error-hover: #b91c1c;
+  --color-error-bg: #fef2f2;
+  --color-error-border: #fecaca;
   --color-info: #475569;
-  --color-info-bg: #eef1f4;
-  --color-info-border: #c5cdd6;
+  --color-info-bg: #f1f5f9;
+  --color-info-border: #cbd5e1;
 
-  /* Card accents — near-surface tints, not saturated blocks */
-  --color-card-purple: #f2eff5;
-  --color-card-purple-accent: #6d5b8a;
-  --color-card-green: #edf2ef;
-  --color-card-green-accent: #2d7a5a;
-  --color-card-peach: #f3efec;
-  --color-card-peach-accent: #926861;
-  --color-card-lavender: #f0edf3;
-  --color-card-lavender-accent: #7a6a94;
-  --color-card-sky: #edf1f4;
-  --color-card-sky-accent: #4a7a96;
+  /* Topic accents */
+  --color-topic-purple: #8a79c4;
+  --color-topic-purple-bg: rgba(138, 121, 196, 0.1);
+  --color-topic-green: #22a06b;
+  --color-topic-green-bg: rgba(34, 160, 107, 0.1);
+  --color-topic-orange: #e8847a;
+  --color-topic-orange-bg: rgba(232, 132, 122, 0.12);
+  --color-topic-pink: #d473a8;
+  --color-topic-pink-bg: rgba(212, 115, 168, 0.1);
+  --color-topic-sky: #0284c7;
+  --color-topic-sky-bg: rgba(2, 132, 199, 0.1);
+
+  /* Legacy card aliases */
+  --color-card-purple: #ffffff;
+  --color-card-purple-accent: var(--color-topic-purple);
+  --color-card-green: #ffffff;
+  --color-card-green-accent: var(--color-topic-green);
+  --color-card-peach: #ffffff;
+  --color-card-peach-accent: var(--color-topic-orange);
+  --color-card-lavender: #ffffff;
+  --color-card-lavender-accent: var(--color-topic-pink);
+  --color-card-sky: #ffffff;
+  --color-card-sky-accent: var(--color-topic-sky);
 
   /* Typography */
   --font-display: 'Cairo', 'IBM Plex Sans Arabic', 'Segoe UI', sans-serif;
@@ -114,19 +124,19 @@
   /* Radius */
   --radius-sm: 8px;
   --radius-md: 12px;
-  --radius-lg: 20px;
+  --radius-lg: 24px;
   --radius-xl: 28px;
   --radius-2xl: 36px;
   --radius-arch: 999px 999px 0 0;
   --radius-full: 999px;
 
-  /* Shadows — neutral slate, no purple tint */
+  /* Shadows */
   --shadow-sm: 0 2px 8px rgba(30, 41, 59, 0.04);
-  --shadow-md: 0 6px 20px rgba(30, 41, 59, 0.05);
-  --shadow-lg: 0 12px 36px rgba(30, 41, 59, 0.07);
-  --shadow-header: 0 2px 16px rgba(30, 41, 59, 0.05);
-  --shadow-card: 0 2px 12px rgba(30, 41, 59, 0.04);
-  --shadow-card-hover: 0 8px 24px rgba(30, 41, 59, 0.07);
+  --shadow-md: 0 6px 20px rgba(30, 41, 59, 0.06);
+  --shadow-lg: 0 12px 36px rgba(30, 41, 59, 0.08);
+  --shadow-header: 0 2px 16px rgba(30, 41, 59, 0.04);
+  --shadow-card: 0 2px 16px rgba(30, 41, 59, 0.05);
+  --shadow-card-hover: 0 8px 28px rgba(30, 41, 59, 0.08);
 
   /* Layout */
   --content-max: 44rem;

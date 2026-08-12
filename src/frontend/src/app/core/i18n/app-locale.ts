@@ -23,6 +23,10 @@ export function formatCurrency(
   })} ${formatCurrencyLabel(currency)}`;
 }
 
+export function formatDurationMinutes(minutes: number, unitLabel = 'دقيقة'): string {
+  return `${formatNumber(minutes)} ${unitLabel}`;
+}
+
 export function formatDateTime(
   value: Date | string | number,
   options?: Intl.DateTimeFormatOptions,

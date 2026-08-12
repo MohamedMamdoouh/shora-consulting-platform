@@ -1,5 +1,5 @@
 using System.Net;
-using Shora.Application.Email;
+using Shora.Domain.Constants;
 using Shora.Domain.Entities;
 using Shora.Domain.Enums;
 
@@ -52,7 +52,7 @@ internal static class TransactionEmailLabels
     }
 
     public static string FormatMoney(decimal amount, string currency) =>
-        $"{amount:N0} {currency}";
+        $"{amount:N0} {CurrencyCodes.DisplayLabel(currency)}";
 
     public static string HtmlEncode(string? value) =>
         string.IsNullOrEmpty(value) ? string.Empty : WebUtility.HtmlEncode(value);

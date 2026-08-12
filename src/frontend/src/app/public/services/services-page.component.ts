@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { SettingsService } from '../../core/settings/settings.service';
+import { formatCurrency } from '../../core/i18n/app-locale';
 import { BookingCtaComponent } from '../shared/booking-cta.component';
 import { CONSULTATION_TOPICS } from '../shared/topic.constants';
 
@@ -16,11 +17,5 @@ export class ServicesPageComponent {
   readonly topics = CONSULTATION_TOPICS;
   readonly settings = toSignal(this.settingsService.getPublicSettings());
 
-  formatPrice(amount: number): string {
-    return new Intl.NumberFormat('ar-EG', {
-      style: 'currency',
-      currency: 'EGP',
-      maximumFractionDigits: 0,
-    }).format(amount);
-  }
+  readonly formatPrice = (amount: number) => formatCurrency(amount, 'EGP');
 }

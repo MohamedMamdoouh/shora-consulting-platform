@@ -13,6 +13,7 @@ import { PaymentInstructionsResponse, PaymentMethod } from '@contracts/payments'
 import { firstValueFrom } from 'rxjs';
 import { readApiError, readApiErrorCode } from '../../core/api/api-error.util';
 import { BookingService } from '../../core/booking/booking.service';
+import { formatCurrency, formatNumber } from '../../core/i18n/app-locale';
 import { readBookingErrorMessage } from '../booking-error.util';
 
 @Component({
@@ -50,13 +51,7 @@ export class PaymentInstructionsPanelComponent implements OnChanges, OnDestroy {
     this.clearCountdown();
   }
 
-  formatPrice(amount: number, currency: string): string {
-    return new Intl.NumberFormat('ar-EG', {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  }
+  readonly formatPrice = formatCurrency;
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -108,8 +103,7 @@ export class PaymentInstructionsPanelComponent implements OnChanges, OnDestroy {
   }
 
   private updateCountdown(): void {
-    const remainingMs =
-      new Date(this.instructions.receiptUploadDeadlineUtc).getTime() - Date.now();
+    const remainingMs = new Date(this.instructions.receiptUploadDeadlineUtc).getTime() - Date.now();
 
     if (remainingMs <= 0) {
       this.countdownLabel = 'انتهت مهلة رفع الإيصال';
@@ -124,15 +118,14 @@ export class PaymentInstructionsPanelComponent implements OnChanges, OnDestroy {
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
 
-    const formatter = new Intl.NumberFormat('ar-EG');
     const parts: string[] = [];
 
     if (hours > 0) {
-      parts.push(`${formatter.format(hours)} س`);
+      parts.push(`${formatNumber(hours)} ساعة`);
     }
 
-    parts.push(`${formatter.format(minutes)} د`);
-    parts.push(`${formatter.format(seconds)} ث`);
+    parts.push(`${formatNumber(minutes)} دقيقة`);
+    parts.push(`${formatNumber(seconds)} ثانية`);
 
     this.countdownLabel = parts.join(' ');
   }

@@ -17,13 +17,13 @@
   text-align: center;
   padding: var(--space-2xl);
   background:
-    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(74, 87, 72, 0.05), transparent 70%),
+    radial-gradient(ellipse 70% 50% at 50% 0%, var(--color-primary-subtle), transparent 70%),
     var(--color-surface);
 }
 
 .about__logo {
   margin-bottom: var(--space-lg);
-  height: 2.5rem;
+  height: 4rem;
   width: auto;
 }
 
@@ -69,7 +69,7 @@
 }
 
 .about__privacy a {
-  color: var(--color-accent);
+  color: var(--color-primary);
   font-weight: 600;
   text-decoration: none;
 }

@@ -51,9 +51,10 @@ const STEPS: StepDef[] = [
       list-style: none;
       margin: 0;
       padding: var(--space-sm);
-      background: var(--color-paper);
-      border: 1px solid var(--color-border-subtle);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
       border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
     }
 
     .step-indicator__item {
@@ -70,9 +71,9 @@ const STEPS: StepDef[] = [
     }
 
     .step-indicator__item--active {
-      background: var(--color-surface-elevated);
+      background: var(--color-primary-muted);
       color: var(--color-primary);
-      box-shadow: var(--shadow-sm);
+      box-shadow: none;
     }
 
     .step-indicator__item--done {
@@ -94,7 +95,7 @@ const STEPS: StepDef[] = [
 
     .step-indicator__item--active .step-indicator__marker {
       background: var(--color-primary);
-      color: #fff;
+      color: var(--color-on-primary);
     }
 
     .step-indicator__item--done .step-indicator__marker {

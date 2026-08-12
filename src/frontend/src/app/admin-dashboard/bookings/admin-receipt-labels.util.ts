@@ -3,6 +3,7 @@ import {
   PaymentMethod,
   ReceiptDeclineReasonCode,
 } from '@contracts/payments';
+import { formatCurrency, formatDateTime } from '../../core/i18n/app-locale';
 
 export const RECEIPT_DECLINE_REASON_OPTIONS: ReadonlyArray<{
   value: ReceiptDeclineReasonCode;
@@ -95,12 +96,12 @@ export function findPendingReceipt(
 }
 
 export function formatReceiptUploadedAt(uploadedAtUtc: string): string {
-  return new Date(uploadedAtUtc).toLocaleString(undefined, {
+  return formatDateTime(uploadedAtUtc, {
     dateStyle: 'medium',
     timeStyle: 'short',
   });
 }
 
 export function formatMoney(amount: number, currency: string): string {
-  return `${amount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })} ${currency}`;
+  return formatCurrency(amount, currency, 2);
 }

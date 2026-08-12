@@ -1,4 +1,5 @@
 import { AvailabilitySlot } from '@contracts/availability';
+import { APP_LOCALE } from '../../core/i18n/app-locale';
 
 export interface SlotDayGroup {
   dateKey: string;
@@ -6,7 +7,7 @@ export interface SlotDayGroup {
   slots: AvailabilitySlot[];
 }
 
-const dayLabelFormatter = new Intl.DateTimeFormat('ar-EG', {
+const dayLabelFormatter = new Intl.DateTimeFormat(APP_LOCALE, {
   weekday: 'long',
   day: 'numeric',
   month: 'long',
@@ -44,7 +45,7 @@ export function groupSlotsByLocalDay(slots: AvailabilitySlot[]): SlotDayGroup[] 
 }
 
 export function formatSlotTime(slot: AvailabilitySlot): string {
-  return new Intl.DateTimeFormat('ar-EG', {
+  return new Intl.DateTimeFormat(APP_LOCALE, {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
@@ -53,12 +54,12 @@ export function formatSlotTime(slot: AvailabilitySlot): string {
 
 export function formatSlotSummary(startTimeUtc: string): string {
   const start = new Date(startTimeUtc);
-  const date = new Intl.DateTimeFormat('ar-EG', {
+  const date = new Intl.DateTimeFormat(APP_LOCALE, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
   }).format(start);
-  const time = new Intl.DateTimeFormat('ar-EG', {
+  const time = new Intl.DateTimeFormat(APP_LOCALE, {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,

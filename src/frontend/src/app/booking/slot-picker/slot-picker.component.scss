@@ -10,10 +10,11 @@
 }
 
 .day-group {
-  border: 1px solid var(--color-border-subtle);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  background: var(--color-paper);
+  background: var(--color-surface);
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
 .day-group summary {
@@ -76,6 +77,24 @@
   border-color: var(--color-primary);
   background: var(--color-primary-muted);
   box-shadow: var(--shadow-sm);
+}
+
+.slot-btn--selected,
+.slot-btn[aria-pressed='true'] {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.slot-btn--selected .slot-btn__time,
+.slot-btn[aria-pressed='true'] .slot-btn__time {
+  color: var(--color-on-primary);
+}
+
+.slot-btn--selected .slot-btn__hint,
+.slot-btn[aria-pressed='true'] .slot-btn__hint {
+  color: rgba(255, 255, 255, 0.85);
 }
 
 .slot-btn:active {

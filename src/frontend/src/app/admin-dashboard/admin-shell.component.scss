@@ -14,7 +14,7 @@
   gap: var(--space-lg);
   padding: var(--space-xl);
   background: var(--color-surface);
-  border: 1px solid var(--color-border-subtle);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
 }
@@ -57,8 +57,9 @@
 }
 
 .admin-shell__nav a.active {
-  color: #fff;
+  color: var(--color-on-primary);
   background: var(--color-primary);
+  box-shadow: var(--shadow-sm);
 }
 
 .admin-shell__content {

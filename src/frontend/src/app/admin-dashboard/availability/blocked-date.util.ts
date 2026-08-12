@@ -1,5 +1,6 @@
 import { AbstractControl, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { BlockedDate } from '@contracts/availability';
+import { APP_LOCALE } from '../../core/i18n/app-locale';
 import { CONSULTANT_TIME_ZONE_LABEL } from './availability-window.util';
 
 const MAX_REASON_LENGTH = 500;
@@ -16,7 +17,7 @@ export function formatBlockedRangeSummary(blockedDate: BlockedDate): string {
 }
 
 export function formatUtcInstant(isoUtc: string): string {
-  return new Intl.DateTimeFormat('ar-EG', {
+  return new Intl.DateTimeFormat(APP_LOCALE, {
     timeZone: CONSULTANT_TIME_ZONE_LABEL,
     dateStyle: 'medium',
     timeStyle: 'short',

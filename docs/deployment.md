@@ -243,6 +243,8 @@ First-time Google users sign in from the **login** page (not signup).
    - Google Cloud **Authorized JavaScript origins** (if using Google sign-in)
    - Rebuild frontend if origins change (same `googleClientId`; origins must include the new domain)
 
+Optional: add **`shora.dev`** as a second custom domain on the same Railway service so RFC 7807 `type` URIs (`https://shora.dev/errors/{code}`) resolve to the live error reference pages without changing API responses.
+
 ## 8. Manual redeploy
 
 Use when the Deploy workflow pushed a new image but Railway is still running an old build, or after fixing GHCR pull access.

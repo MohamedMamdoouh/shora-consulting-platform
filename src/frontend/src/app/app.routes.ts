@@ -32,6 +32,18 @@ export const routes: Routes = [
           import('./public/legal/terms-page.component').then((m) => m.TermsPageComponent),
       },
       {
+        path: 'errors',
+        loadComponent: () =>
+          import('./public/errors/errors-index-page.component').then((m) => m.ErrorsIndexPageComponent),
+      },
+      {
+        path: 'errors/:code',
+        loadComponent: () =>
+          import('./public/errors/errors-detail-page.component').then(
+            (m) => m.ErrorsDetailPageComponent,
+          ),
+      },
+      {
         path: 'booking',
         loadChildren: () => import('./booking/booking.routes').then((m) => m.BOOKING_ROUTES),
       },

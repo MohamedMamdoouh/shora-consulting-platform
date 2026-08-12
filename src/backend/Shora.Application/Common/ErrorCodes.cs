@@ -74,4 +74,9 @@ public static class ErrorCodes
         public const string Unexpected = "general.unexpected";
         public const string Forbidden = "general.forbidden";
     }
+
+    public static class Errors
+    {
+        public const string NotFound = "errors.not_found";
+    }
 }

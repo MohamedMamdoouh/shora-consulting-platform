@@ -53,4 +53,7 @@ export const ErrorCodes = {
     InvalidRefundReference: 'payment.invalid_refund_reference',
     InvalidRefundRevocationReason: 'payment.invalid_refund_revocation_reason',
   },
+  Errors: {
+    NotFound: 'errors.not_found',
+  },
 } as const;

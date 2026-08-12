@@ -1,0 +1,4437 @@
+[
+  {
+    "text": "آخر خطأ",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "آخر فشل",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "آخر موعد للرفع:",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/client-receipt-declined.content.html"
+    ]
+  },
+  {
+    "text": "آمن",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-labels.util.ts"
+    ]
+  },
+  {
+    "text": "أدخل بريداً إلكترونياً صالحاً",
+    "category": "forms",
+    "sources": [
+      "src/frontend/src/app/core/forms/auth-field-error.util.spec.ts",
+      "src/frontend/src/app/core/forms/auth-field-error.util.ts"
+    ]
+  },
+  {
+    "text": "أدخل رقم الموبايل الذي سيتصل بك المستشار عليه.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/contact-phone/contact-phone.component.html"
+    ]
+  },
+  {
+    "text": "أدخل رقم موبايل مصري صالح.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/contact-phone/contact-phone.component.ts"
+    ]
+  },
+  {
+    "text": "أرسل المبلغ للعميل عبر فودافون كاش أو InstaPay خارج النظام، ثم سجّل مرجع التحويل هنا. سيتلقى العميل رسالة تأكيد بالبريد.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-refund-panel.component.html"
+    ]
+  },
+  {
+    "text": "أعد تعيين كلمة المرور لحسابك.",
+    "category": "backend",
+    "sources": [
+      "src/backend/Shora.Application/Auth/AuthEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "أعمل باللغة العربية، وأفهم السياق الثقافي والحساسية التي ترافق موضوعات العلاقات في مجتمعنا. لا أقدّم حلولاً جاهزة، بل أساعدك على اكتشاف ما يناسبك أنت وشريكك.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/about/about-page.component.html"
+    ]
+  },
+  {
+    "text": "أقسام لوحة الإدارة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/admin-shell.component.html"
+    ]
+  },
+  {
+    "text": "أكد بريدك الإلكتروني لتفعيل حسابك.",
+    "category": "backend",
+    "sources": [
+      "src/backend/Shora.Application/Auth/AuthEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "ألغاها المستشار",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard-labels.util.ts"
+    ]
+  },
+  {
+    "text": "ألغيتها أنت",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard-labels.util.ts"
+    ]
+  },
+  {
+    "text": "أنا مستشار علاقات مرخّص، أعمل مع الأفراد والأزواج في مصر والعالم العربي على فهم أنفسهم وعلاقاتهم بشكل أوضح — في مساحة آمنة بعيداً عن الحكم أو الضغط.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/about/about-page.component.html"
+    ]
+  },
+  {
+    "text": "أو",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/login-page.component.html",
+      "src/frontend/src/app/public/services/services-page.component.html"
+    ]
+  },
+  {
+    "text": "إجراءات",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html"
+    ]
+  },
+  {
+    "text": "إجمالي الإيرادات",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.html"
+    ]
+  },
+  {
+    "text": "إدارة الحجوزات، المواعيد، الإعدادات، الأرباح، وتنبيهات التشغيل.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/admin-shell.component.html"
+    ]
+  },
+  {
+    "text": "إدارة حسابك وحجوزاتك وتأكيد الدفع.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/privacy-page.component.html"
+    ]
+  },
+  {
+    "text": "إذا كان الحساب غير مؤكد، فقد أُرسل رابط التحقق إلى بريدك.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/review/review.component.ts"
+    ]
+  },
+  {
+    "text": "إذا كان لديك أي استفسار، راسلنا عبر لوحة العميل.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "إذا كان لديك أي استفسار، يمكنك التواصل معنا عبر لوحة العميل.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/client-booking-cancelled.content.html"
+    ]
+  },
+  {
+    "text": "إذا كان هناك حساب بهذا البريد، فقد أرسلنا رابط إعادة التعيين.",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/forgot-password-page.component.html"
+    ]
+  },
+  {
+    "text": "إذا لم تستلم المبلغ بعد، تواصل معنا عبر لوحة العميل.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs",
+      "src/backend/Shora.Application/Email/Templates/Transaction/client-refund-confirmation.content.html"
+    ]
+  },
+  {
+    "text": "إذا لم تطلب إعادة التعيين، يمكنك تجاهل هذه الرسالة.",
+    "category": "backend",
+    "sources": [
+      "src/backend/Shora.Application/Auth/AuthEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "إذا لم تنشئ هذا الحساب، يمكنك تجاهل هذه الرسالة.",
+    "category": "backend",
+    "sources": [
+      "src/backend/Shora.Application/Auth/AuthEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "إذا لم يعمل الزر، انسخ الرابط التالي إلى المتصفح:",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/_layout.html"
+    ]
+  },
+  {
+    "text": "إرسال الرابط",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/forgot-password-page.component.html"
+    ]
+  },
+  {
+    "text": "إرسال رسائل المعاملات (تأكيد البريد، تذكيرات الحجز، إشعارات الإلغاء).",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/privacy-page.component.html"
+    ]
+  },
+  {
+    "text": "إزالة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "إزالة حجب \"…\"؟ سيتم إعادة توليد المواعيد المتاحة في هذه الفترة.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "إضافة الحجب",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "إضافة النافذة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "إضافة فترة حجب",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "إضافة نافذة توفر",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "إعادة إرسال رابط التحقق",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/review/review.component.html"
+    ]
+  },
+  {
+    "text": "إعادة المحاولة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html",
+      "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.html",
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-page.component.html",
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.html",
+      "src/frontend/src/app/booking/payment-instructions/payment-instructions.component.html",
+      "src/frontend/src/app/booking/slot-picker/slot-picker.component.html",
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.html"
+    ]
+  },
+  {
+    "text": "إعادة بناء الأمان العاطفي بعد الخذلان أو الشك.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "إعادة تعيين كلمة المرور",
+    "category": "backend",
+    "sources": [
+      "src/backend/Shora.Application/Auth/AuthEmailTemplates.cs",
+      "src/backend/Shora.Tests/Unit/Email/EmailTemplateServiceTests.cs",
+      "src/backend/Shora.Tests/Unit/Email/EmailTemplateTests.cs",
+      "src/frontend/src/app/auth/reset-password-page.component.html"
+    ]
+  },
+  {
+    "text": "إعدادات الجلسة والدفع",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.html"
+    ]
+  },
+  {
+    "text": "إغلاق",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.html",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-refund-panel.component.html"
+    ]
+  },
+  {
+    "text": "إلغاء",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.html",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-refund-panel.component.html"
+    ]
+  },
+  {
+    "text": "إلغاء الحجز",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html",
+      "src/frontend/src/app/client-dashboard/pending-approval-card.component.html",
+      "src/frontend/src/app/client-dashboard/pending-payment-card.component.html"
+    ]
+  },
+  {
+    "text": "إلى",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "إلى (UTC)",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "إلى تاريخ",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html",
+      "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.html"
+    ]
+  },
+  {
+    "text": "إنستا باي",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/shared/payment-instructions-panel.component.html"
+    ]
+  },
+  {
+    "text": "إنشاء حساب",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/signup-page.component.html",
+      "src/frontend/src/app/shared/layout/shell.component.html"
+    ]
+  },
+  {
+    "text": "إنشاء حساب جديد",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/login-page.component.html"
+    ]
+  },
+  {
+    "text": "إيصال الدفع —",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "إيصال جديد بانتظار المراجعة",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs",
+      "src/backend/Shora.Tests/Unit/Email/TransactionEmailTemplatesTests.cs"
+    ]
+  },
+  {
+    "text": "إيصال دفع جديد بانتظار مراجعتك.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "إيصال مكرر",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailLabels.cs",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-labels.util.ts"
+    ]
+  },
+  {
+    "text": "احجز جلسة",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.html",
+      "src/frontend/src/app/public/shared/booking-cta.component.ts",
+      "src/frontend/src/app/shared/layout/shell.component.html"
+    ]
+  },
+  {
+    "text": "احجز موعداً",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "اختر الوقت المناسب لك من المواعيد المتاحة.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "اختر موعداً",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/slot-picker/slot-picker.component.html"
+    ]
+  },
+  {
+    "text": "اختر موعداً الآن — لا حاجة لتسجيل الدخول حتى تصل لخطوة الحجز.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/services/services-page.component.html"
+    ]
+  },
+  {
+    "text": "اختر وقتاً يناسبك — لا حاجة لتسجيل الدخول حتى تصل إلى خطوة تأكيد الحجز.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/slot-picker/slot-picker.component.html"
+    ]
+  },
+  {
+    "text": "اختيار موعد آخر",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/review/review.component.html"
+    ]
+  },
+  {
+    "text": "استخدام المنصة باحترام دون إساءة أو محتوى غير لائق.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/terms-page.component.html"
+    ]
+  },
+  {
+    "text": "استخدم هذا فقط إذا سجّلت الاسترداد بالخطأ. سيعود الدفع إلى «مقبول» ويظهر «استرداد مستحق» مجدداً.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-refund-panel.component.html"
+    ]
+  },
+  {
+    "text": "استرداد مستحق",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-labels.util.ts"
+    ]
+  },
+  {
+    "text": "استرداد مسجّل",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.html"
+    ]
+  },
+  {
+    "text": "استردادات مستحقة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.html"
+    ]
+  },
+  {
+    "text": "استردادات مسجّلة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.html"
+    ]
+  },
+  {
+    "text": "استشارة طبية أو نفسية سريرية ولا تُغني عن الرعاية الطبية المتخصصة عند الحاجة.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/terms-page.component.html"
+    ]
+  },
+  {
+    "text": "استلم جلستك",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "استلمنا إيصال الدفع وهو قيد المراجعة. سنرسل لك بريداً إلكترونياً بعد موافقة المستشار.",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/pending-approval-card.component.html"
+    ]
+  },
+  {
+    "text": "استلمنا إيصال الدفع. سيراجعه المستشار وستصلك رسالة تأكيد بالبريد الإلكتروني بعد الموافقة.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/payment-instructions/payment-instructions.component.html"
+    ]
+  },
+  {
+    "text": "اسم المهمة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "اشرح سبب التراجع عن تسجيل الاسترداد",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-refund-panel.component.html"
+    ]
+  },
+  {
+    "text": "اضغط على الرابط في موعد الجلسة لبدء المحادثة مع المستشار على واتساب.",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/upcoming-booking-card.component.html"
+    ]
+  },
+  {
+    "text": "اضغط على الزر أدناه لاختيار كلمة مرور جديدة. ينتهي صلاحية هذا الرابط بعد فترة محدودة.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Auth/reset-password.content.html"
+    ]
+  },
+  {
+    "text": "اضغط على الزر أدناه لتأكيد بريدك.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Auth/verify-email.content.html"
+    ]
+  },
+  {
+    "text": "اضغط هنا",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Tests/Unit/Email/EmailTemplateServiceTests.cs"
+    ]
+  },
+  {
+    "text": "اضغط هنا للتواصل",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/delivery-whatsapp.fragment.html"
+    ]
+  },
+  {
+    "text": "اقرأ سياسة الخصوصية الكاملة",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/about/about-page.component.html"
+    ]
+  },
+  {
+    "text": "الأحد",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/availability-window.util.ts"
+    ]
+  },
+  {
+    "text": "الأرباح",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/admin-dashboard.routes.ts",
+      "src/frontend/src/app/admin-dashboard/admin-shell.component.html",
+      "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.html"
+    ]
+  },
+  {
+    "text": "الأربعاء",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/availability-window.util.ts"
+    ]
+  },
+  {
+    "text": "الأسعار والمدة معروضة في المنصة وقد تُحدَّث من الإدارة.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/terms-page.component.html"
+    ]
+  },
+  {
+    "text": "الأمان",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/privacy-page.component.html"
+    ]
+  },
+  {
+    "text": "الإثنين",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/availability-window.util.ts"
+    ]
+  },
+  {
+    "text": "الإعدادات",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/admin-dashboard.routes.ts",
+      "src/frontend/src/app/admin-dashboard/admin-shell.component.html"
+    ]
+  },
+  {
+    "text": "الإغلاق التلقائي:",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/admin-new-cancellation-request.content.html"
+    ]
+  },
+  {
+    "text": "الإلغاء والاسترداد",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/terms-page.component.html"
+    ]
+  },
+  {
+    "text": "الإيصال المرفوع",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/pending-approval-card.component.html"
+    ]
+  },
+  {
+    "text": "الاحتفاظ بالبيانات",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/privacy-page.component.html"
+    ]
+  },
+  {
+    "text": "الاسترداد قيد المعالجة",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard-labels.util.ts"
+    ]
+  },
+  {
+    "text": "الاستعداد للزواج بتوافق ووضوح في التوقعات.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "الاسم المعروض (اختياري)",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/signup-page.component.html"
+    ]
+  },
+  {
+    "text": "الالتزام بالموعد المتفق عليه أو إبلاغنا مبكراً عند التعذّر.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/terms-page.component.html"
+    ]
+  },
+  {
+    "text": "الانتقال إلى لوحة العميل",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/payment-instructions/payment-instructions.component.html"
+    ]
+  },
+  {
+    "text": "البريد الإلكتروني",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/forgot-password-page.component.html",
+      "src/frontend/src/app/auth/login-page.component.html",
+      "src/frontend/src/app/auth/signup-page.component.html",
+      "src/frontend/src/app/core/forms/auth-field-error.util.ts"
+    ]
+  },
+  {
+    "text": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/login-page.component.ts"
+    ]
+  },
+  {
+    "text": "البريد الإلكتروني واسم العرض (يمكنك استخدام اسم مستعار).",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/privacy-page.component.html"
+    ]
+  },
+  {
+    "text": "البيانات التي نجمعها",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/privacy-page.component.html"
+    ]
+  },
+  {
+    "text": "التالي",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html"
+    ]
+  },
+  {
+    "text": "التعارف قد يكون مرهقاً — القلق من الرفض، عدم الوضوح، أو صعوبة التعبير عن نفسك. نناقش كيف تتعامل مع هذه المرحلة بثقة أكبر.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "التعامل مع القلق والرفض في مرحلة التعارف.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "التعديلات",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/terms-page.component.html"
+    ]
+  },
+  {
+    "text": "التغييرات هنا تؤثر على الحجوزات والمواعيد الجديدة فقط — الحجوزات الحالية تحتفظ بسعرها وموعدها المحفوظ.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.html"
+    ]
+  },
+  {
+    "text": "التواصل",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.html",
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "التواصل معك في موعد الجلسة عبر الهاتف أو واتساب حسب اختيارك.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/privacy-page.component.html"
+    ]
+  },
+  {
+    "text": "الثقة",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "الثقة تُبنى وتُكسَر ببطء. نناقش معك خطوات عملية لاستعادة الأمان في علاقتك، سواء بعد خيانة أو بعد فترة من الشك والتردد.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "الثلاثاء",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/availability-window.util.ts"
+    ]
+  },
+  {
+    "text": "الجلسات القادمة",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.html"
+    ]
+  },
+  {
+    "text": "الجلسة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.html"
+    ]
+  },
+  {
+    "text": "الجمعة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/availability-window.util.ts"
+    ]
+  },
+  {
+    "text": "الحالة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html"
+    ]
+  },
+  {
+    "text": "الحجز والدفع",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/terms-page.component.html"
+    ]
+  },
+  {
+    "text": "الحجوزات",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/admin-dashboard.routes.ts",
+      "src/frontend/src/app/admin-dashboard/admin-shell.component.html",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html",
+      "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.html"
+    ]
+  },
+  {
+    "text": "الحفاظ على القرب رغم المسافة والاختلاف الزمني.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "الخدمات",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/services/services-page.component.html",
+      "src/frontend/src/app/shared/layout/shell.component.html"
+    ]
+  },
+  {
+    "text": "الخصوصية",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/services/services-page.component.html"
+    ]
+  },
+  {
+    "text": "الخصوصية والأمان",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/about/about-page.component.html"
+    ]
+  },
+  {
+    "text": "الخميس",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/availability-window.util.ts"
+    ]
+  },
+  {
+    "text": "الدفع",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/services/services-page.component.html"
+    ]
+  },
+  {
+    "text": "الدفع مقبول — الموافقة على الإلغاء ستضع علامة «استرداد مستحق».",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "الدقائق المتبقية",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "الرئيسية",
+    "category": "other",
+    "sources": [
+      "src/frontend/src/app/shared/layout/shell.component.html"
+    ]
+  },
+  {
+    "text": "السابق",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html"
+    ]
+  },
+  {
+    "text": "السبب (اختياري)",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "السبب غير كافٍ",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailLabels.cs",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-labels.util.ts"
+    ]
+  },
+  {
+    "text": "السبب يجب ألا يتجاوز … حرفًا.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/blocked-date.util.ts"
+    ]
+  },
+  {
+    "text": "السبت",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/availability-window.util.ts"
+    ]
+  },
+  {
+    "text": "السجل السابق",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.html"
+    ]
+  },
+  {
+    "text": "السعر والمدة",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/services/services-page.component.html"
+    ]
+  },
+  {
+    "text": "السعر يجب ألا يحتوي على أكثر من منزلتين عشريتين.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-validation.util.ts"
+    ]
+  },
+  {
+    "text": "العلاقات عن بُعد",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "العلاقات عن بُعد تحتاج جهداً إضافياً في التواصل والثقة. نساعدك على وضع عادات يومية تحافظ على القرب رغم البعد.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "العمر (ساعات)",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "العميل",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html"
+    ]
+  },
+  {
+    "text": "العميل:",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/admin-new-booking.content.html"
+    ]
+  },
+  {
+    "text": "العودة لتسجيل الدخول",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/forgot-password-page.component.html",
+      "src/frontend/src/app/auth/reset-password-page.component.html",
+      "src/frontend/src/app/auth/verify-email-page.component.html"
+    ]
+  },
+  {
+    "text": "القيمة أقل من الحد المسموح.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-validation.util.ts"
+    ]
+  },
+  {
+    "text": "القيمة أكبر من الحد المسموح.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-validation.util.ts"
+    ]
+  },
+  {
+    "text": "المالك:",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-page.component.html"
+    ]
+  },
+  {
+    "text": "المبالغ المستردة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.html"
+    ]
+  },
+  {
+    "text": "المبلغ",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "المبلغ المطلوب",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/shared/payment-instructions-panel.component.html"
+    ]
+  },
+  {
+    "text": "المبلغ غير مطابق",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailLabels.cs",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-labels.util.ts"
+    ]
+  },
+  {
+    "text": "المبلغ:",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/client-refund-confirmation.content.html"
+    ]
+  },
+  {
+    "text": "المحفّز:",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-page.component.html"
+    ]
+  },
+  {
+    "text": "المدة يجب أن تكون بين … و… دقيقة.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-validation.util.ts"
+    ]
+  },
+  {
+    "text": "المرجع السابق:",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/admin-refund-revocation.content.html"
+    ]
+  },
+  {
+    "text": "الملاحظة يجب ألا تتجاوز … حرفاً.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-validation.util.ts"
+    ]
+  },
+  {
+    "text": "المواعيد",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/admin-dashboard.routes.ts",
+      "src/frontend/src/app/admin-dashboard/admin-shell.component.html"
+    ]
+  },
+  {
+    "text": "المواعيد والتوفر",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "الموافقة على الإلغاء",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "الموضوعات",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/services/services-page.component.html"
+    ]
+  },
+  {
+    "text": "الموعد",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/review/review.component.html"
+    ]
+  },
+  {
+    "text": "الموعد المختار",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/contact-phone/contact-phone.component.html",
+      "src/frontend/src/app/booking/delivery-method/delivery-method.component.html"
+    ]
+  },
+  {
+    "text": "الموعد النهائي للقرار",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "النافذة نشطة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "النص أطول من المسموح.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-validation.util.ts"
+    ]
+  },
+  {
+    "text": "الهاتف",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html"
+    ]
+  },
+  {
+    "text": "اليوم",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "انتهت جلستك. يرجى تسجيل الدخول مرة أخرى.",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/login-page.component.ts"
+    ]
+  },
+  {
+    "text": "انتهت مهلة القرار",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-labels.util.ts"
+    ]
+  },
+  {
+    "text": "انتهت مهلة رفع الإيصال",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/shared/payment-instructions-panel.component.ts"
+    ]
+  },
+  {
+    "text": "انتهت مهلة رفع الإيصال.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.spec.ts",
+      "src/frontend/src/app/booking/booking-error.util.ts"
+    ]
+  },
+  {
+    "text": "باستخدامك منصة شورى، فإنك توافق على الشروط التالية. إذا لم توافق عليها، يرجى عدم استخدام المنصة.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/terms-page.component.html"
+    ]
+  },
+  {
+    "text": "بانتظار الموافقة منذ",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "بدون أحكام",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/about/about-page.component.html"
+    ]
+  },
+  {
+    "text": "بعد خصم الاستردادات المسجّلة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.html"
+    ]
+  },
+  {
+    "text": "بماذا نساعدك؟",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/home/home-page.component.html"
+    ]
+  },
+  {
+    "text": "بيانات الدفع اليدوي",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.html"
+    ]
+  },
+  {
+    "text": "بيانات تقنية أساسية (مثل سجلات الخادم) لأغراض الأمان والتشغيل.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/privacy-page.component.html"
+    ]
+  },
+  {
+    "text": "تأخر تسجيل الاسترداد",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "تأكد من تفاصيل جلستك قبل الحجز.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/review/review.component.html"
+    ]
+  },
+  {
+    "text": "تأكيد الاسترداد",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs",
+      "src/backend/Shora.Tests/Unit/Email/TransactionEmailTemplatesTests.cs"
+    ]
+  },
+  {
+    "text": "تأكيد البريد الإلكتروني",
+    "category": "backend",
+    "sources": [
+      "src/backend/Shora.Application/Auth/AuthEmailTemplates.cs",
+      "src/backend/Shora.Tests/Unit/Email/EmailTemplateTests.cs",
+      "src/frontend/src/app/auth/verify-email-page.component.html"
+    ]
+  },
+  {
+    "text": "تأكيد التراجع",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-refund-panel.component.html"
+    ]
+  },
+  {
+    "text": "تأكيد الحجز",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/review/review.component.html"
+    ]
+  },
+  {
+    "text": "تأكيد الحجز يعتمد على مراجعة الإيصال من قبل المستشار.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/terms-page.component.html"
+    ]
+  },
+  {
+    "text": "تأكيد الرفض",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.html",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "تأكيد المستشار",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "تأكيد بريدك الإلكتروني",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Tests/Unit/Email/AuthEmailServiceIntegrationTests.cs",
+      "src/backend/Shora.Tests/Unit/Email/EmailTemplateTests.cs"
+    ]
+  },
+  {
+    "text": "تاريخ الإلغاء",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "تاريخ الرفع",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "تاريخ الطلب",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "تتعارض فترة الحجب مع حجوزات قائمة. ألغِ الحجوزات المتعارضة أولًا ثم حاول مرة أخرى.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "تتعارض فترة الحجب مع حجوزات قائمة. ألغِ هذه الحجوزات أولًا ثم حاول مرة أخرى.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "تحديث",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-page.component.html"
+    ]
+  },
+  {
+    "text": "تحذير",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.spec.ts",
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "تحقق من الحقول المظللة.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts",
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.ts"
+    ]
+  },
+  {
+    "text": "تراجع عن الاسترداد",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html"
+    ]
+  },
+  {
+    "text": "تراجع عن تسجيل الاسترداد",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-refund-panel.component.html"
+    ]
+  },
+  {
+    "text": "تراكم انتظار الموافقة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.spec.ts",
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "تسجيل",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/signup-page.component.html"
+    ]
+  },
+  {
+    "text": "تسجيل استرداد يدوي",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-refund-panel.component.html"
+    ]
+  },
+  {
+    "text": "تسجيل الاسترداد",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-refund-panel.component.html"
+    ]
+  },
+  {
+    "text": "تسجيل الدخول",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/login-page.component.html",
+      "src/frontend/src/app/booking/review/review.component.html",
+      "src/frontend/src/app/shared/layout/shell.component.html"
+    ]
+  },
+  {
+    "text": "تصحيح",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Tests/Unit/Email/TransactionEmailTemplatesTests.cs"
+    ]
+  },
+  {
+    "text": "تصحيح تسجيل استرداد",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs",
+      "src/backend/Shora.Tests/Unit/Email/TransactionEmailTemplatesTests.cs"
+    ]
+  },
+  {
+    "text": "تطبيق التصفية",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html",
+      "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.html"
+    ]
+  },
+  {
+    "text": "تعارض في المواعيد",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailLabels.cs",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-labels.util.ts"
+    ]
+  },
+  {
+    "text": "تعديل",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "تعديل نافذة التوفر",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "تعذر إتمام الحجز. حاول مرة أخرى.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/review/review.component.ts"
+    ]
+  },
+  {
+    "text": "تعذر إرسال رابط التحقق. حاول مرة أخرى.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/review/review.component.ts"
+    ]
+  },
+  {
+    "text": "تعذر إعادة تعيين كلمة المرور. قد يكون الرابط منتهياً.",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/reset-password-page.component.ts"
+    ]
+  },
+  {
+    "text": "تعذر إنشاء الحساب. تحقق من البيانات وحاول مرة أخرى.",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/signup-page.component.ts"
+    ]
+  },
+  {
+    "text": "تعذر تأكيد البريد الإلكتروني. حاول مرة أخرى.",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/verify-email-page.component.ts"
+    ]
+  },
+  {
+    "text": "تعذر تحميل تعليمات الدفع. حاول مرة أخرى.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/payment-instructions/payment-instructions.component.ts"
+    ]
+  },
+  {
+    "text": "تعذر تسجيل الدخول عبر جوجل.",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/login-page.component.ts"
+    ]
+  },
+  {
+    "text": "تعذر رفع الإيصال. حاول مرة أخرى.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/shared/payment-instructions-panel.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر إرسال طلب الإلغاء. حاول مرة أخرى.",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/upcoming-booking-card.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر إزالة فترة الحجب. حاول مرة أخرى.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر إضافة فترة الحجب. تحقق من البيانات وحاول مرة أخرى.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر إلغاء الحجز. حاول مرة أخرى.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.ts",
+      "src/frontend/src/app/client-dashboard/pending-approval-card.component.ts",
+      "src/frontend/src/app/client-dashboard/pending-payment-card.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر التحقق من التحويل",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailLabels.cs",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-labels.util.ts"
+    ]
+  },
+  {
+    "text": "تعذّر التراجع عن تسجيل الاسترداد. حاول مرة أخرى.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-refund-panel.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر الموافقة على طلب الإلغاء. حاول مرة أخرى.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر تحديث قائمة فترات الحجب.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر تحميل الإعدادات. حاول مرة أخرى.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر تحميل الإيصالات. حاول مرة أخرى.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر تحميل الحجوزات. حاول مرة أخرى.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.ts",
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر تحميل السجل. حاول مرة أخرى.",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر تحميل المواعيد. يرجى المحاولة مرة أخرى.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/slot-picker/slot-picker.component.html"
+    ]
+  },
+  {
+    "text": "تعذّر تحميل تفاصيل الدفع من لوحتك.",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/pending-payment-card.component.html"
+    ]
+  },
+  {
+    "text": "تعذّر تحميل تنبيهات التشغيل. حاول مرة أخرى.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-page.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر تحميل رابط واتساب. تواصل مع المستشار إذا احتجت مساعدة.",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/upcoming-booking-card.component.html"
+    ]
+  },
+  {
+    "text": "تعذّر تحميل صفحة المواعيد. حاول مرة أخرى.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر تحميل ملخص الأرباح. حاول مرة أخرى.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر تحميل نوافذ التوفر. حاول مرة أخرى.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر تسجيل الإقرار. حاول مرة أخرى.",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/upcoming-booking-card.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر تسجيل الاسترداد. حاول مرة أخرى.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-refund-panel.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر حذف نافذة التوفر. حاول مرة أخرى.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر حفظ الإعدادات. تحقق من البيانات وحاول مرة أخرى.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر حفظ نافذة التوفر. تحقق من البيانات وحاول مرة أخرى.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر رفض الإيصال. حاول مرة أخرى.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر رفض طلب الإلغاء. حاول مرة أخرى.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.ts"
+    ]
+  },
+  {
+    "text": "تعذّر قبول الإيصال. حاول مرة أخرى.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.ts"
+    ]
+  },
+  {
+    "text": "تعرّف على الخدمات",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.html"
+    ]
+  },
+  {
+    "text": "تعطّل جماعي للبريد",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "تعليمات الدفع",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/payment-instructions/payment-instructions.component.html"
+    ]
+  },
+  {
+    "text": "تعليمات الدفع غير متاحة لهذا الحجز.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.ts"
+    ]
+  },
+  {
+    "text": "تعيين كلمة مرور جديدة",
+    "category": "backend",
+    "sources": [
+      "src/backend/Shora.Application/Auth/AuthEmailTemplates.cs",
+      "src/backend/Shora.Tests/Unit/Email/EmailTemplateTests.cs"
+    ]
+  },
+  {
+    "text": "تفاصيل إضافية تُرسل للعميل",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "تفاصيل الحجز: الموعد، طريقة التواصل المفضلة، وحالة الجلسة.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/privacy-page.component.html"
+    ]
+  },
+  {
+    "text": "تفاصيل تُرسل للعميل",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "تفعيل حسابك",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Tests/Unit/Email/EmailTemplateServiceTests.cs"
+    ]
+  },
+  {
+    "text": "تقديم بيانات صحيحة والحفاظ على سرية حسابك.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/terms-page.component.html"
+    ]
+  },
+  {
+    "text": "تم إغلاق الطلب تلقائياً لعدم اتخاذ قرار قبل موعد الجلسة.",
+    "category": "backend",
+    "sources": [
+      "src/backend/Shora.Application/Services/CancellationRequestAutoDeclineService.cs"
+    ]
+  },
+  {
+    "text": "تم إلغاء الحجز",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs",
+      "src/backend/Shora.Tests/Unit/Email/TransactionEmailTemplatesTests.cs"
+    ]
+  },
+  {
+    "text": "تم إلغاء الحجز — استرداد مستحق.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.ts"
+    ]
+  },
+  {
+    "text": "تم إلغاء الحجز.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.ts"
+    ]
+  },
+  {
+    "text": "تم إلغاء تسجيل استرداد سابق وإعادة حالة الاسترداد إلى «مستحق».",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/admin-refund-revocation.content.html"
+    ]
+  },
+  {
+    "text": "تم إلغاء تسجيل استرداد سابق.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "تم إلغاء حجزك.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "تم استرداد المبلغ",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard-labels.util.ts"
+    ]
+  },
+  {
+    "text": "تم التحويل",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Tests/Unit/Email/TransactionEmailTemplatesTests.cs"
+    ]
+  },
+  {
+    "text": "تم التراجع عن تسجيل الاسترداد.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.ts"
+    ]
+  },
+  {
+    "text": "تم تأكيد بريدك الإلكتروني بنجاح. سيتم تحويلك لتسجيل الدخول.",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/verify-email-page.component.ts"
+    ]
+  },
+  {
+    "text": "تم تأكيد حجز جديد بعد قبول الإيصال.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/admin-new-booking.content.html"
+    ]
+  },
+  {
+    "text": "تم تأكيد حجز جديد.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "تم تأكيد حجزك",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs",
+      "src/backend/Shora.Tests/Integration/Infrastructure/OutboxEmailRendererTests.cs",
+      "src/backend/Shora.Tests/Unit/Email/TransactionEmailTemplatesTests.cs"
+    ]
+  },
+  {
+    "text": "تم تأكيد حجزك بنجاح.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "تم تحديث حالة الحجز.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.ts"
+    ]
+  },
+  {
+    "text": "تم تحديث حالة طلب الإلغاء.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.ts"
+    ]
+  },
+  {
+    "text": "تم تحديث كلمة المرور. يمكنك تسجيل الدخول الآن.",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/reset-password-page.component.html"
+    ]
+  },
+  {
+    "text": "تم تحديث نافذة التوفر.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "تم تسجيل استرداد المبلغ لحجزك الملغى.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/client-refund-confirmation.content.html"
+    ]
+  },
+  {
+    "text": "تم تسجيل استرداد المبلغ.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "تم تسجيل الاسترداد وإرسال تأكيد للعميل.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.ts"
+    ]
+  },
+  {
+    "text": "تم حجز موعدك. حوّل المبلغ أدناه عبر أحد وسائل الدفع، ثم ارفع إيصال التحويل قبل انتهاء المهلة.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/payment-instructions/payment-instructions.component.html"
+    ]
+  },
+  {
+    "text": "تم حذف نافذة التوفر.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "تم حفظ الإعدادات بنجاح.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.ts"
+    ]
+  },
+  {
+    "text": "تم رفض الإيصال وإعادة فتح مهلة الرفع للعميل.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.ts"
+    ]
+  },
+  {
+    "text": "تم رفض طلب الإلغاء",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs",
+      "src/backend/Shora.Tests/Unit/Email/TransactionEmailTemplatesTests.cs"
+    ]
+  },
+  {
+    "text": "تم رفض طلب الإلغاء ويبقى موعدك قائماً.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "تم رفض طلب الإلغاء، وموعدك ما زال مؤكداً.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/client-cancellation-request-declined.content.html"
+    ]
+  },
+  {
+    "text": "تم رفع الإيصال",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/payment-instructions/payment-instructions.component.html"
+    ]
+  },
+  {
+    "text": "تم رفع الإيصال. سيراجعه المستشار وستصلك رسالة تأكيد بالبريد الإلكتروني بعد الموافقة.",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/pending-payment-card.component.html"
+    ]
+  },
+  {
+    "text": "تم قبول الإيصال وتأكيد الحجز.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.ts"
+    ]
+  },
+  {
+    "text": "تمت إزالة فترة الحجب.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "تمت إضافة فترة الحجب.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "تمت إضافة نافذة التوفر.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "تنبيهات التشغيل",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/admin-dashboard.routes.ts",
+      "src/frontend/src/app/admin-dashboard/admin-shell.component.html",
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-page.component.html"
+    ]
+  },
+  {
+    "text": "تنبيهات نشطة من مراقبة النظام (تُقيَّم تقريباً كل 5 دقائق). اعرض دليل المعالجة لكل تنبيه.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-page.component.html"
+    ]
+  },
+  {
+    "text": "توقف نبض مهمة خلفية",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "ثقة في التعارف",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "ثم ارفع إيصال التحويل. يراجع المستشار الإيصال ويؤكد حجزك.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/services/services-page.component.html"
+    ]
+  },
+  {
+    "text": "جاري الإرسال...",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/upcoming-booking-card.component.html"
+    ]
+  },
+  {
+    "text": "جاري الإرسال…",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/forgot-password-page.component.html",
+      "src/frontend/src/app/booking/review/review.component.html"
+    ]
+  },
+  {
+    "text": "جاري الإزالة...",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "جاري الإضافة...",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "جاري الإلغاء...",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html",
+      "src/frontend/src/app/client-dashboard/pending-approval-card.component.html",
+      "src/frontend/src/app/client-dashboard/pending-payment-card.component.html"
+    ]
+  },
+  {
+    "text": "جاري التحقق...",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/verify-email-page.component.html"
+    ]
+  },
+  {
+    "text": "جاري التحميل...",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.html"
+    ]
+  },
+  {
+    "text": "جاري التراجع...",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-refund-panel.component.html"
+    ]
+  },
+  {
+    "text": "جاري التسجيل...",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-refund-panel.component.html",
+      "src/frontend/src/app/client-dashboard/upcoming-booking-card.component.html"
+    ]
+  },
+  {
+    "text": "جاري التسجيل…",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/signup-page.component.html"
+    ]
+  },
+  {
+    "text": "جاري الحجز…",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/review/review.component.html"
+    ]
+  },
+  {
+    "text": "جاري الحذف...",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "جاري الحفظ...",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts",
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.html"
+    ]
+  },
+  {
+    "text": "جاري الحفظ…",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/reset-password-page.component.html"
+    ]
+  },
+  {
+    "text": "جاري الرفض...",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.html",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "جاري الرفع...",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/shared/payment-instructions-panel.component.html"
+    ]
+  },
+  {
+    "text": "جاري القبول...",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "جاري الموافقة...",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "جاري تحميل الإعدادات...",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.html"
+    ]
+  },
+  {
+    "text": "جاري تحميل الإيصالات...",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "جاري تحميل التنبيهات...",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-page.component.html"
+    ]
+  },
+  {
+    "text": "جاري تحميل الجلسات القادمة...",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.html"
+    ]
+  },
+  {
+    "text": "جاري تحميل الحجوزات المعلّقة...",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.html"
+    ]
+  },
+  {
+    "text": "جاري تحميل الحجوزات...",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html"
+    ]
+  },
+  {
+    "text": "جاري تحميل السجل...",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.html"
+    ]
+  },
+  {
+    "text": "جاري تحميل المواعيد المتاحة...",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/slot-picker/slot-picker.component.html"
+    ]
+  },
+  {
+    "text": "جاري تحميل المواعيد...",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "جاري تحميل تعليمات الدفع...",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/payment-instructions/payment-instructions.component.html"
+    ]
+  },
+  {
+    "text": "جاري تحميل ملخص الأرباح...",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.html"
+    ]
+  },
+  {
+    "text": "جاري تسجيل الدخول…",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/login-page.component.html"
+    ]
+  },
+  {
+    "text": "جاهز للبدء؟ احجز موعدك الأول — لا حاجة لتسجيل الدخول حتى خطوة الحجز.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/about/about-page.component.html"
+    ]
+  },
+  {
+    "text": "جاهز للبدء؟ اختر موعداً يناسبك — لا حاجة لتسجيل الدخول الآن.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/home/home-page.component.html"
+    ]
+  },
+  {
+    "text": "جلسات استشارية فردية عبر مكالمة صوتية أو محادثة واتساب.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/home/home-page.component.html"
+    ]
+  },
+  {
+    "text": "جلسات استشارية فردية للعلاقات — حجز موعد، دفع آمن، وخصوصية تامة.",
+    "category": "public",
+    "sources": [
+      "publish/wwwroot/index.html",
+      "src/backend/Shora.Api/wwwroot/index.html",
+      "src/frontend/src/index.html"
+    ]
+  },
+  {
+    "text": "جلسة استشارية واحدة بسعر ثابت — بدون باقات أو مستويات. اختر الموضوع الذي يناسبك، واحجز موعداً يناسب جدولك.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/services/services-page.component.html"
+    ]
+  },
+  {
+    "text": "جميع حجوزات العملاء — الأوقات معروضة بتوقيت متصفحك المحلي. استخدم تصفية «ملغاة» لمعالجة الاستردادات المستحقة.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html"
+    ]
+  },
+  {
+    "text": "حالة الدفع",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "حجز جديد مؤكد",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs",
+      "src/backend/Shora.Tests/Unit/Email/TransactionEmailTemplatesTests.cs"
+    ]
+  },
+  {
+    "text": "حجم ملف الإيصال أكبر من 5 ميجابايت.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.spec.ts",
+      "src/frontend/src/app/booking/booking-error.util.ts"
+    ]
+  },
+  {
+    "text": "حجوزات ملغاة بانتظار تسجيل الاسترداد — راجع",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.html"
+    ]
+  },
+  {
+    "text": "حدود المسؤولية",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/terms-page.component.html"
+    ]
+  },
+  {
+    "text": "حذف",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "حذف \"…\"؟ سيتم إعادة توليد المواعيد المتاحة.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "حرج",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.spec.ts",
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "حسابك مؤكد بالفعل. سيتم تحويلك لتسجيل الدخول.",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/verify-email-page.component.ts"
+    ]
+  },
+  {
+    "text": "حسناً",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/upcoming-booking-card.component.html"
+    ]
+  },
+  {
+    "text": "حفظ",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/reset-password-page.component.html"
+    ]
+  },
+  {
+    "text": "حفظ الإعدادات",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.html"
+    ]
+  },
+  {
+    "text": "حفظ التعديلات",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.ts"
+    ]
+  },
+  {
+    "text": "حقوقك",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/privacy-page.component.html"
+    ]
+  },
+  {
+    "text": "حوّل الرسوم وارفع الإيصال",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "حوّل المبلغ عبر أحد وسائل الدفع أدناه، ثم ارفع إيصال التحويل قبل انتهاء المهلة.",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/pending-payment-card.component.html"
+    ]
+  },
+  {
+    "text": "حوّل عبر فودافون كاش أو InstaPay ثم ارفع إيصال التحويل.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "خبرتي تمتد لأكثر من عشر سنوات في الإرشاد الأسري والعلاقات. درست علم النفس التطبيقي وحصلت على شهادات في الإرشاد الزوجي والأسري. أؤمن أن كل علاقة تحتاج مساحة للاستماع قبل الحل — وهذا ما أقدّمه في كل جلسة.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/about/about-page.component.html"
+    ]
+  },
+  {
+    "text": "خروج",
+    "category": "other",
+    "sources": [
+      "src/frontend/src/app/shared/layout/shell.component.html"
+    ]
+  },
+  {
+    "text": "خصوصية تامة",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/about/about-page.component.html"
+    ]
+  },
+  {
+    "text": "خطوات عملية",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/about/about-page.component.html"
+    ]
+  },
+  {
+    "text": "دخول",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/login-page.component.html"
+    ]
+  },
+  {
+    "text": "دفعات مقبولة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.html"
+    ]
+  },
+  {
+    "text": "دفعة مقبولة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.html"
+    ]
+  },
+  {
+    "text": "دقائق التوقف",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "رابط التحقق غير صالح.",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/verify-email-page.component.ts"
+    ]
+  },
+  {
+    "text": "رابط التحقق منتهي أو غير صالح.",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/verify-email-page.component.ts"
+    ]
+  },
+  {
+    "text": "راجع تفاصيل الحجز في لوحة الإدارة.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs",
+      "src/backend/Shora.Application/Email/Templates/Transaction/admin-new-booking.content.html"
+    ]
+  },
+  {
+    "text": "راجع حالة الاسترداد في لوحة الإدارة.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs",
+      "src/backend/Shora.Application/Email/Templates/Transaction/admin-refund-revocation.content.html"
+    ]
+  },
+  {
+    "text": "رسالة بريد معطّلة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "رفض الإيصال",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "رفض الطلب",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "رفض طلب الإلغاء",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "رفع إيصال جديد",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "رفع الإيصال",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/shared/payment-instructions-panel.component.html"
+    ]
+  },
+  {
+    "text": "رقم التواصل:",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/admin-new-booking.content.html"
+    ]
+  },
+  {
+    "text": "رقم العملية أو رقم المحفظة",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/shared/payment-instructions-panel.component.html"
+    ]
+  },
+  {
+    "text": "رقم الموبايل",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/contact-phone/contact-phone.component.html"
+    ]
+  },
+  {
+    "text": "رقم الهاتف",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/contact-phone/contact-phone.component.html",
+      "src/frontend/src/app/booking/review/review.component.html"
+    ]
+  },
+  {
+    "text": "رقم الهاتف غير صالح. استخدم رقم موبايل مصري صحيح.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.ts"
+    ]
+  },
+  {
+    "text": "رقم الهاتف مطلوب للمكالمة الصوتية.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.ts",
+      "src/frontend/src/app/booking/contact-phone/contact-phone.component.ts"
+    ]
+  },
+  {
+    "text": "رقمك المسجل",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailLabels.cs"
+    ]
+  },
+  {
+    "text": "روابط قانونية",
+    "category": "other",
+    "sources": [
+      "src/frontend/src/app/shared/layout/shell.component.html"
+    ]
+  },
+  {
+    "text": "سبب آخر",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailLabels.cs",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-labels.util.ts",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-labels.util.ts"
+    ]
+  },
+  {
+    "text": "سبب الإلغاء (اختياري)",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/upcoming-booking-card.component.html"
+    ]
+  },
+  {
+    "text": "سبب التصحيح",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-refund-panel.component.html"
+    ]
+  },
+  {
+    "text": "سبب التصحيح مطلوب.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.ts"
+    ]
+  },
+  {
+    "text": "سبب التصحيح:",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/admin-refund-revocation.content.html"
+    ]
+  },
+  {
+    "text": "سبب الرفض",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.html",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "سبب الرفض غير صالح.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.ts"
+    ]
+  },
+  {
+    "text": "سبب الرفض:",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/client-cancellation-request-declined.content.html",
+      "src/backend/Shora.Application/Email/Templates/Transaction/client-receipt-declined.content.html"
+    ]
+  },
+  {
+    "text": "سبب العميل",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "سبب العميل:",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/admin-new-cancellation-request.content.html"
+    ]
+  },
+  {
+    "text": "سبب رفض طلب الإلغاء غير صالح.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.ts"
+    ]
+  },
+  {
+    "text": "ستبدأ المحادثة عبر رابط واتساب في الموعد المحدد.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/delivery-method/delivery-method.component.html"
+    ]
+  },
+  {
+    "text": "ستتلقى مكالمة في … على الرقم ….",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/upcoming-booking.util.ts"
+    ]
+  },
+  {
+    "text": "ستتم الجلسة عبر واتساب.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/delivery-whatsapp.fragment.html"
+    ]
+  },
+  {
+    "text": "سجل الدخول لإرسال رابط التحقق",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/review/review.component.html"
+    ]
+  },
+  {
+    "text": "سجل المحاولات",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "سعر الجلسة (جنيه)",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.html"
+    ]
+  },
+  {
+    "text": "سياسات الحجز",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.html"
+    ]
+  },
+  {
+    "text": "سياسة الإلغاء",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailLabels.cs",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-labels.util.ts"
+    ]
+  },
+  {
+    "text": "سياسة الخصوصية",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/privacy-page.component.html",
+      "src/frontend/src/app/public/legal/terms-page.component.html",
+      "src/frontend/src/app/shared/layout/shell.component.html"
+    ]
+  },
+  {
+    "text": "سيتصل بك المستشار في الموعد على رقم هاتفك.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/delivery-method/delivery-method.component.html"
+    ]
+  },
+  {
+    "text": "سيتم وضع علامة «استرداد مستحق» لأن الدفع مقبول.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-labels.util.ts",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.ts"
+    ]
+  },
+  {
+    "text": "شروط الاستخدام",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/privacy-page.component.html",
+      "src/frontend/src/app/public/legal/terms-page.component.html",
+      "src/frontend/src/app/shared/layout/shell.component.html"
+    ]
+  },
+  {
+    "text": "صافي الإيرادات",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.html"
+    ]
+  },
+  {
+    "text": "صفحات الحجوزات",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html"
+    ]
+  },
+  {
+    "text": "صورة إيصال الدفع المرفوع",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/pending-approval-card.component.html"
+    ]
+  },
+  {
+    "text": "صورة الإيصال",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/shared/payment-instructions-panel.component.html"
+    ]
+  },
+  {
+    "text": "صورة غير واضحة",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailLabels.cs",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-labels.util.ts"
+    ]
+  },
+  {
+    "text": "طبيعة الخدمة",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/terms-page.component.html"
+    ]
+  },
+  {
+    "text": "طريقة التسليم:",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/admin-new-booking.content.html",
+      "src/backend/Shora.Application/Email/Templates/Transaction/client-booking-confirmed.content.html"
+    ]
+  },
+  {
+    "text": "طريقة التواصل",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html",
+      "src/frontend/src/app/booking/delivery-method/delivery-method.component.html",
+      "src/frontend/src/app/booking/review/review.component.html"
+    ]
+  },
+  {
+    "text": "طريقة الدفع",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "طريقة الدفع المستخدمة",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/shared/payment-instructions-panel.component.html"
+    ]
+  },
+  {
+    "text": "طلب إلغاء",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-labels.util.ts",
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.ts"
+    ]
+  },
+  {
+    "text": "طلب إلغاء الجلسة",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/upcoming-booking-card.component.html"
+    ]
+  },
+  {
+    "text": "طلب إلغاء جديد",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs",
+      "src/backend/Shora.Tests/Unit/Email/TransactionEmailTemplatesTests.cs"
+    ]
+  },
+  {
+    "text": "طلب إلغاء جديد بانتظار قرارك.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "طلب إلغاء قريب من الرفض التلقائي",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "طلب الإلغاء قيد المراجعة — بانتظار قرار المستشار.",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/upcoming-booking-card.component.html"
+    ]
+  },
+  {
+    "text": "طلب الإلغاء يحتاج موافقة المستشار. إذا وُافق، سيُسترد المبلغ يدوياً. هل تريد المتابعة؟",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/upcoming-booking-card.component.ts"
+    ]
+  },
+  {
+    "text": "عدد الرسائل المعطّلة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "عرض المزيد",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.html"
+    ]
+  },
+  {
+    "text": "عرض حجوزاتي",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "عرض دليل المعالجة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-page.component.html"
+    ]
+  },
+  {
+    "text": "علامة مخصصة",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Tests/Unit/Email/EmailTemplateServiceTests.cs"
+    ]
+  },
+  {
+    "text": "عن المستشار",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/about/about-page.component.html"
+    ]
+  },
+  {
+    "text": "عند موعد الجلسة.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/delivery-whatsapp.fragment.html"
+    ]
+  },
+  {
+    "text": "عندما تحجز أول جلسة، ستظهر تفاصيلها هنا — موعدها، حالة الدفع، وكل ما تحتاج متابعته.",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.html"
+    ]
+  },
+  {
+    "text": "عنوان",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Tests/Unit/Email/EmailTemplateServiceTests.cs"
+    ]
+  },
+  {
+    "text": "فات الأوان لطلب الإلغاء عبر الموقع — تواصل مع المستشار على واتساب.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.ts"
+    ]
+  },
+  {
+    "text": "فتح صفحة الدفع",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/pending-payment-card.component.html"
+    ]
+  },
+  {
+    "text": "فتح محادثة واتساب",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/upcoming-booking-card.component.html"
+    ]
+  },
+  {
+    "text": "فترات الحجب (إجازات)",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "فترة التكرار (ثوانٍ)",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "فحص الأمان",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "فشل مهمة خلفية",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "فهم احتياجات بعضكم والتعبير عنها باحترام.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "فودافون كاش",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-labels.util.ts",
+      "src/frontend/src/app/booking/shared/payment-instructions-panel.component.html",
+      "src/frontend/src/app/public/services/services-page.component.html"
+    ]
+  },
+  {
+    "text": "في انتظار الإيصال",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-labels.util.ts"
+    ]
+  },
+  {
+    "text": "في انتظار الدفع",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-labels.util.ts",
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.ts",
+      "src/frontend/src/app/client-dashboard/pending-payment-card.component.html"
+    ]
+  },
+  {
+    "text": "في انتظار الدفع أو المراجعة",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.html"
+    ]
+  },
+  {
+    "text": "قبل أن تخطوا خطوة الزواج، من المهم أن تتفقوا على القيم والأهداف والتوقعات. نساعدكما على طرح الأسئلة الصعبة قبل الالتزام.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "قبول الإيصال",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "قد نحدّث هذه الشروط من وقت لآخر. استمرارك في استخدام المنصة بعد التحديث يعني موافقتك على النسخة المحدّثة.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/terms-page.component.html"
+    ]
+  },
+  {
+    "text": "قريباً",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/admin-section-placeholder.component.ts",
+      "src/frontend/src/app/shared/components/placeholder-page.component.ts"
+    ]
+  },
+  {
+    "text": "قيد الفحص",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-labels.util.ts"
+    ]
+  },
+  {
+    "text": "قيد المراجعة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-labels.util.ts"
+    ]
+  },
+  {
+    "text": "قيد مراجعة الدفع",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-labels.util.ts",
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.ts",
+      "src/frontend/src/app/client-dashboard/pending-approval-card.component.html"
+    ]
+  },
+  {
+    "text": "كل الحالات",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-labels.util.ts"
+    ]
+  },
+  {
+    "text": "كلمة المرور",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/login-page.component.html",
+      "src/frontend/src/app/auth/signup-page.component.html",
+      "src/frontend/src/app/core/forms/auth-field-error.util.ts"
+    ]
+  },
+  {
+    "text": "كلمة المرور الجديدة",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/reset-password-page.component.html"
+    ]
+  },
+  {
+    "text": "كلمة المرور مطلوب",
+    "category": "forms",
+    "sources": [
+      "src/frontend/src/app/core/forms/auth-field-error.util.spec.ts"
+    ]
+  },
+  {
+    "text": "كيف تعمل الجلسة؟",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/home/home-page.component.html"
+    ]
+  },
+  {
+    "text": "كيف تفضل إجراء الجلسة؟",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/delivery-method/delivery-method.component.html"
+    ]
+  },
+  {
+    "text": "كيف نستخدم بياناتك",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/privacy-page.component.html"
+    ]
+  },
+  {
+    "text": "لا أستطيع الحضور",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Tests/Unit/Email/TransactionEmailTemplatesTests.cs"
+    ]
+  },
+  {
+    "text": "لا توجد إيصالات لهذا الحجز.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "لا توجد تنبيهات نشطة حالياً.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-page.component.html"
+    ]
+  },
+  {
+    "text": "لا توجد جلسات سابقة بعد.",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.html"
+    ]
+  },
+  {
+    "text": "لا توجد جلسات قادمة حالياً.",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.html"
+    ]
+  },
+  {
+    "text": "لا توجد حجوزات تحتاج إجراءً الآن.",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.html"
+    ]
+  },
+  {
+    "text": "لا توجد حجوزات مطابقة للتصفية.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html"
+    ]
+  },
+  {
+    "text": "لا توجد فترات حجب بعد.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "لا توجد مواعيد متاحة حالياً. يرجى المحاولة لاحقاً.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/slot-picker/slot-picker.component.html"
+    ]
+  },
+  {
+    "text": "لا توجد نوافذ توفر بعد.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "لا نبيع بياناتك ولا نشاركها مع أطراف ثالثة لأغراض تسويقية. نشارك الحد الأدنى اللازم فقط مع مزودي البنية التحتية (استضافة، بريد إلكتروني، تخزين آمن للإيصالات) لتشغيل الخدمة.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/privacy-page.component.html"
+    ]
+  },
+  {
+    "text": "لا يمكن تقديم طلب إلغاء آخر عبر الموقع — تواصل مع المستشار على واتساب.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.ts"
+    ]
+  },
+  {
+    "text": "لا يمكن رفع إيصال لهذا الحجز في حالته الحالية.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.spec.ts",
+      "src/frontend/src/app/booking/booking-error.util.ts"
+    ]
+  },
+  {
+    "text": "لا يمكنك عرض تعليمات هذا الحجز.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.ts"
+    ]
+  },
+  {
+    "text": "لا يوجد إيصال قيد المراجعة لهذا الحجز.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.ts"
+    ]
+  },
+  {
+    "text": "لا يوجد استرداد مستحق لهذا الحجز.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.ts"
+    ]
+  },
+  {
+    "text": "لا يوجد دفع إلكتروني بالبطاقة. بعد حجز موعدك، حوّل الرسوم عبر",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/services/services-page.component.html"
+    ]
+  },
+  {
+    "text": "لديك الحد الأقصى من الحجوزات غير المؤكدة. ألغِ أحدها من لوحتك ثم حاول مجدداً.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.ts"
+    ]
+  },
+  {
+    "text": "لديك حساب؟ سجل الدخول",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/signup-page.component.html"
+    ]
+  },
+  {
+    "text": "للاطلاع على شروط استخدام الخدمة، راجع",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/privacy-page.component.html"
+    ]
+  },
+  {
+    "text": "للاطلاع على كيفية تعاملنا مع بياناتك، راجع",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/terms-page.component.html"
+    ]
+  },
+  {
+    "text": "لم تحجز جلسة بعد",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.html"
+    ]
+  },
+  {
+    "text": "لم نتمكن من قبول إيصال الدفع الأخير.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/client-receipt-declined.content.html"
+    ]
+  },
+  {
+    "text": "لم يتم العثور على الحجز.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.ts"
+    ]
+  },
+  {
+    "text": "لم يتم العثور على الدفع.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.spec.ts",
+      "src/frontend/src/app/booking/booking-error.util.ts"
+    ]
+  },
+  {
+    "text": "لم يُذكر سبب.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.html",
+      "src/frontend/src/app/client-dashboard/upcoming-booking-card.component.ts"
+    ]
+  },
+  {
+    "text": "لم يُرفَع الإيصال في الوقت المحدد",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard-labels.util.ts"
+    ]
+  },
+  {
+    "text": "لم يُسجَّل استرداد يمكن التراجع عنه.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.ts"
+    ]
+  },
+  {
+    "text": "لم يُسجَّل رقم للمكالمة. تواصل مع المستشار إذا احتجت مساعدة.",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/upcoming-booking-card.component.html"
+    ]
+  },
+  {
+    "text": "لوحة الإدارة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/admin-dashboard.routes.ts",
+      "src/frontend/src/app/admin-dashboard/admin-shell.component.html",
+      "src/frontend/src/app/shared/layout/shell.component.html"
+    ]
+  },
+  {
+    "text": "لوحة العميل",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard.routes.ts"
+    ]
+  },
+  {
+    "text": "لوحتي",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.html",
+      "src/frontend/src/app/shared/layout/shell.component.html"
+    ]
+  },
+  {
+    "text": "ليست",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/terms-page.component.html"
+    ]
+  },
+  {
+    "text": "مؤكدة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-labels.util.ts",
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.ts"
+    ]
+  },
+  {
+    "text": "ما قبل الزواج",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "متابعة",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/contact-phone/contact-phone.component.html"
+    ]
+  },
+  {
+    "text": "متوقفة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "مثال: استرداد عبر فودافون كاش",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-refund-panel.component.html"
+    ]
+  },
+  {
+    "text": "مثال: تعارض في الموعد",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/upcoming-booking-card.component.html"
+    ]
+  },
+  {
+    "text": "محادثة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-labels.util.ts"
+    ]
+  },
+  {
+    "text": "محادثة واتساب",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailLabels.cs",
+      "src/frontend/src/app/booking/delivery-method/delivery-method.component.html",
+      "src/frontend/src/app/booking/review/review.component.ts",
+      "src/frontend/src/app/client-dashboard/upcoming-booking.util.ts"
+    ]
+  },
+  {
+    "text": "محتوى مطابق لإيصال سابق",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-labels.util.ts"
+    ]
+  },
+  {
+    "text": "محظور",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-labels.util.ts"
+    ]
+  },
+  {
+    "text": "مدة الجلسة (دقيقة)",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.html"
+    ]
+  },
+  {
+    "text": "مراجعة إيصال الدفع",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "مراجعة الإيصال",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html"
+    ]
+  },
+  {
+    "text": "مراجعة الحجز",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/review/review.component.html"
+    ]
+  },
+  {
+    "text": "مراجعة الحجوزات",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "مراجعة طلب الإلغاء",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "مراسلة المستشار على واتساب",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/upcoming-booking-card.component.html"
+    ]
+  },
+  {
+    "text": "مرجع الاسترداد مطلوب.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.ts"
+    ]
+  },
+  {
+    "text": "مرجع التحويل",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-refund-panel.component.html"
+    ]
+  },
+  {
+    "text": "مرجع التحويل:",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/client-refund-confirmation.content.html"
+    ]
+  },
+  {
+    "text": "مرجع المرسل",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "مرجع المرسل (اختياري)",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/shared/payment-instructions-panel.component.html"
+    ]
+  },
+  {
+    "text": "مرحباً، لدي جلسة محجوزة في …",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/upcoming-booking.util.ts"
+    ]
+  },
+  {
+    "text": "مرفوض",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-labels.util.ts"
+    ]
+  },
+  {
+    "text": "مرونة في التواصل",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/about/about-page.component.html"
+    ]
+  },
+  {
+    "text": "مسؤولياتك",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/terms-page.component.html"
+    ]
+  },
+  {
+    "text": "مساحة دافئة لفهم علاقتك بشكل أوضح",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/home/home-page.component.html"
+    ]
+  },
+  {
+    "text": "مساحة دافئة للاستشارة — ليس سريراً طبياً.",
+    "category": "other",
+    "sources": [
+      "src/frontend/src/app/shared/layout/shell.component.html"
+    ]
+  },
+  {
+    "text": "مسترد",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-labels.util.ts"
+    ]
+  },
+  {
+    "text": "مشاركة البيانات",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/privacy-page.component.html"
+    ]
+  },
+  {
+    "text": "مشبوه",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-labels.util.ts"
+    ]
+  },
+  {
+    "text": "مضاعف الفترة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "معاينة",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Tests/Unit/Email/EmailTemplateServiceTests.cs"
+    ]
+  },
+  {
+    "text": "معرّف الحجز",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.spec.ts",
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "معرّف الحجز غير صالح.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/payment-instructions/payment-instructions.component.ts"
+    ]
+  },
+  {
+    "text": "معرّف الحجز:",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/admin-refund-revocation.content.html"
+    ]
+  },
+  {
+    "text": "معرّف الدفع",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "معرّف الرسالة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "معرّف الكيان",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "معرّف طلب الإلغاء",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "مقبول",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-labels.util.ts"
+    ]
+  },
+  {
+    "text": "مكالمة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-labels.util.ts"
+    ]
+  },
+  {
+    "text": "مكالمة صوتية",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailLabels.cs",
+      "src/frontend/src/app/booking/delivery-method/delivery-method.component.html",
+      "src/frontend/src/app/booking/review/review.component.ts",
+      "src/frontend/src/app/client-dashboard/upcoming-booking.util.ts"
+    ]
+  },
+  {
+    "text": "مكتملة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-labels.util.ts",
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.ts"
+    ]
+  },
+  {
+    "text": "ملاحظات",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html"
+    ]
+  },
+  {
+    "text": "ملاحظة",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Tests/Unit/Email/EmailTemplateServiceTests.cs",
+      "src/frontend/src/app/booking/shared/payment-instructions-panel.component.html"
+    ]
+  },
+  {
+    "text": "ملاحظة (اختياري)",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-refund-panel.component.html"
+    ]
+  },
+  {
+    "text": "ملاحظة الدفع (اختياري)",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.html"
+    ]
+  },
+  {
+    "text": "ملاحظة تجريبية",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Tests/Unit/Email/TransactionEmailTemplatesTests.cs"
+    ]
+  },
+  {
+    "text": "ملاحظة للعميل (اختياري)",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.html",
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.html"
+    ]
+  },
+  {
+    "text": "ملخص الإيرادات حسب موعد الجلسة. الإجمالي يشمل كل الدفعات المقبولة (حتى التي اُستردت لاحقاً)، والصافي = الإجمالي − المبالغ المستردة.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.html"
+    ]
+  },
+  {
+    "text": "ملغاة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-labels.util.ts",
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.ts"
+    ]
+  },
+  {
+    "text": "ملغى",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-labels.util.ts"
+    ]
+  },
+  {
+    "text": "من",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "من (UTC)",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "من أنا",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/about/about-page.component.html"
+    ]
+  },
+  {
+    "text": "من تاريخ",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html",
+      "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-page.component.html"
+    ]
+  },
+  {
+    "text": "من نحن",
+    "category": "other",
+    "sources": [
+      "src/frontend/src/app/shared/layout/shell.component.html"
+    ]
+  },
+  {
+    "text": "منصة شورى",
+    "category": "other",
+    "sources": [
+      "publish/appsettings.json",
+      "src/frontend/src/app/shared/layout/shell.component.html"
+    ]
+  },
+  {
+    "text": "منصة شورى تقدّم جلسات استشارية في العلاقات. الخدمة",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/terms-page.component.html"
+    ]
+  },
+  {
+    "text": "منصة شورى — استشارات علاقات",
+    "category": "public",
+    "sources": [
+      "publish/wwwroot/index.html",
+      "src/backend/Shora.Api/wwwroot/index.html",
+      "src/frontend/src/index.html"
+    ]
+  },
+  {
+    "text": "مهلة القرار: …",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-labels.util.ts"
+    ]
+  },
+  {
+    "text": "مهلة رفض طلب الإلغاء التلقائي (ساعة قبل الجلسة)",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.html"
+    ]
+  },
+  {
+    "text": "مهلة رفض طلب الإلغاء يجب أن تكون صفراً أو أكثر.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-validation.util.ts"
+    ]
+  },
+  {
+    "text": "مهلة رفع الإيصال",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/shared/payment-instructions-panel.component.html"
+    ]
+  },
+  {
+    "text": "مهلة رفع الإيصال (دقيقة)",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.html"
+    ]
+  },
+  {
+    "text": "مهلة رفع الإيصال يجب أن تكون … دقائق على الأقل.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-validation.util.ts"
+    ]
+  },
+  {
+    "text": "موعد الجلسة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-bookings-page.component.html"
+    ]
+  },
+  {
+    "text": "موعد الجلسة:",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/admin-new-booking.content.html",
+      "src/backend/Shora.Application/Email/Templates/Transaction/admin-new-cancellation-request.content.html",
+      "src/backend/Shora.Application/Email/Templates/Transaction/admin-receipt-uploaded.content.html",
+      "src/backend/Shora.Application/Email/Templates/Transaction/client-booking-cancelled.content.html",
+      "src/backend/Shora.Application/Email/Templates/Transaction/client-booking-confirmed.content.html",
+      "src/backend/Shora.Application/Email/Templates/Transaction/client-cancellation-request-declined.content.html"
+    ]
+  },
+  {
+    "text": "موعد الرفض التلقائي",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "موعدك ما زال مؤكداً كما هو.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "نافذة الساعات",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "نبذل جهدنا لتوفير خدمة موثوقة، لكننا لا نضمن نتائج محددة من الجلسات الاستشارية. مسؤوليتنا محدودة بالحد الذي يسمح به القانون المعمول به.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/terms-page.component.html"
+    ]
+  },
+  {
+    "text": "نتطلع إلى جلستك في الموعد المحدد.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/client-cancellation-request-declined.content.html"
+    ]
+  },
+  {
+    "text": "نتطلع إلى جلستك. إذا احتجت مساعدة، راسلنا عبر لوحة العميل.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "نحتفظ ببيانات الحجز والإيصالات للمدة اللازمة لتقديم الخدمة والامتثال للمتطلبات التشغيلية. تُحذف إيصالات الدفع وفق سياسة الاحتفاظ الداخلية بعد انتهاء الغرض منها.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/privacy-page.component.html"
+    ]
+  },
+  {
+    "text": "نحن في منصة شورى نلتزم بحماية خصوصيتك. توضّح هذه السياسة ما نجمعه من بيانات، وكيف نستخدمها، وحقوقك في التحكم بها.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/privacy-page.component.html"
+    ]
+  },
+  {
+    "text": "نساعدك على تحسين طريقة التواصل مع شريكك — من الاستماع الفعّال إلى التعبير عن المشاعر دون تصعيد. مناسب عندما تشعر أن الحوار متكرر أو أن أحدكم لا يُسمَع.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "نستخدم اتصالات مشفّرة (HTTPS) ونخزّن كلمات المرور بشكل آمن. إيصالات الدفع تُحفظ في تخزين خاص غير متاح للعامة.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/privacy-page.component.html"
+    ]
+  },
+  {
+    "text": "نسيت كلمة المرور",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/forgot-password-page.component.html"
+    ]
+  },
+  {
+    "text": "نسيت كلمة المرور؟",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/login-page.component.html"
+    ]
+  },
+  {
+    "text": "نشطة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "نعلم أن طلب المساعدة في موضوعات العلاقات قد يكون صعباً. لذلك صمّمنا المنصة بحيث تحافظ على خصوصيتك — يمكنك استخدام اسم مستعار، وبياناتك محمية.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/about/about-page.component.html"
+    ]
+  },
+  {
+    "text": "نهجي في الجلسة",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/about/about-page.component.html"
+    ]
+  },
+  {
+    "text": "نوافذ التوفر المتكررة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "نوع الرسالة",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-labels.util.ts"
+    ]
+  },
+  {
+    "text": "هذا البريد الإلكتروني مسجل بالفعل.",
+    "category": "auth",
+    "sources": [
+      "src/frontend/src/app/auth/signup-page.component.ts"
+    ]
+  },
+  {
+    "text": "هذا الحقل",
+    "category": "forms",
+    "sources": [
+      "src/frontend/src/app/core/forms/auth-field-error.util.ts"
+    ]
+  },
+  {
+    "text": "هذا الحقل مطلوب.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/availability-window.util.ts",
+      "src/frontend/src/app/admin-dashboard/availability/blocked-date.util.ts",
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-validation.util.ts"
+    ]
+  },
+  {
+    "text": "هذا القسم سيتم تنفيذه في المواصفة التالية.",
+    "category": "other",
+    "sources": [
+      "src/frontend/src/app/shared/components/placeholder-page.component.ts"
+    ]
+  },
+  {
+    "text": "هذا القسم سيتم تنفيذه قريباً.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/admin-section-placeholder.component.ts"
+    ]
+  },
+  {
+    "text": "هذا الموعد لم يعد متاحاً. يرجى اختيار موعد آخر.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.ts"
+    ]
+  },
+  {
+    "text": "هل تريد إلغاء حجز …؟…",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-labels.util.ts"
+    ]
+  },
+  {
+    "text": "هل تريد إلغاء هذا الحجز؟ سيتم تحرير الموعد ويمكنك حجز موعد آخر لاحقاً.",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/pending-approval-card.component.ts",
+      "src/frontend/src/app/client-dashboard/pending-payment-card.component.ts"
+    ]
+  },
+  {
+    "text": "هل تريد التراجع عن تسجيل الاسترداد؟ سيعود الحجز إلى حالة «استرداد مستحق».",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-refund-panel.component.ts"
+    ]
+  },
+  {
+    "text": "هل تريد الموافقة على إلغاء حجز …؟…",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-review-panel.component.ts"
+    ]
+  },
+  {
+    "text": "هل تريد قبول إيصال الدفع وتأكيد حجز …؟",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-receipt-review-panel.component.ts"
+    ]
+  },
+  {
+    "text": "هنا تجد جلساتك القادمة، الحجوزات التي تحتاج إجراءً، وسجلّك السابق.",
+    "category": "client-dashboard",
+    "sources": [
+      "src/frontend/src/app/client-dashboard/client-dashboard.component.html"
+    ]
+  },
+  {
+    "text": "وقت الفاصل بين الجلسات (دقيقة)",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-page.component.html"
+    ]
+  },
+  {
+    "text": "وقت الفاصل يجب أن يكون صفراً أو أكثر.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-validation.util.ts"
+    ]
+  },
+  {
+    "text": "وقت النهاية يجب أن يكون بعد وقت البداية.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/availability-window.util.ts",
+      "src/frontend/src/app/admin-dashboard/availability/blocked-date.util.ts"
+    ]
+  },
+  {
+    "text": "يتواصل معك المستشار في موعدك عبر مكالمة صوتية أو واتساب.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
+    "category": "forms",
+    "sources": [
+      "src/frontend/src/app/core/forms/auth-field-error.util.spec.ts"
+    ]
+  },
+  {
+    "text": "يجب أن تكون … 8 أحرف على الأقل",
+    "category": "forms",
+    "sources": [
+      "src/frontend/src/app/core/forms/auth-field-error.util.ts"
+    ]
+  },
+  {
+    "text": "يجب أن يكون السعر أكبر من صفر.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/settings/admin-settings-validation.util.ts"
+    ]
+  },
+  {
+    "text": "يجب تسجيل الدخول لإتمام الحجز.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/review/review.component.html"
+    ]
+  },
+  {
+    "text": "يجب رفع إيصال الدفع خلال المدة المحددة في خطوة الحجز.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/terms-page.component.html"
+    ]
+  },
+  {
+    "text": "يحجب النطاق الزمني المواعيد المفتوحة المتداخلة. لا يمكن الحجب فوق حجوزات نشطة — ألغِ الحجز أولًا من لوحة الحجوزات.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/availability/admin-availability-page.component.html"
+    ]
+  },
+  {
+    "text": "يراجع المستشار إيصالك ويؤكد حجزك.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/shared/topic.constants.ts"
+    ]
+  },
+  {
+    "text": "يرجى إعادة رفع إيصال الدفع.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "يرجى إعادة رفع الإيصال",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs",
+      "src/backend/Shora.Tests/Unit/Email/TransactionEmailTemplatesTests.cs"
+    ]
+  },
+  {
+    "text": "يرجى اتخاذ قرار قبل موعد الإغلاق التلقائي.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "يرجى اختيار صورة الإيصال.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/shared/payment-instructions-panel.component.ts"
+    ]
+  },
+  {
+    "text": "يرجى اختيار طريقة الدفع المستخدمة.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.spec.ts",
+      "src/frontend/src/app/booking/booking-error.util.ts"
+    ]
+  },
+  {
+    "text": "يرجى تأكيد بريدك الإلكتروني قبل حجز جلسة.",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/booking-error.util.ts",
+      "src/frontend/src/app/booking/review/review.component.html",
+      "src/frontend/src/app/shared/layout/shell.component.html"
+    ]
+  },
+  {
+    "text": "يرجى رفع إيصال جديد قبل انتهاء المهلة.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/client-receipt-declined.content.html"
+    ]
+  },
+  {
+    "text": "يرجى مراجعة الإيصال في أقرب وقت ممكن.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "يرجى مراجعة الإيصال واتخاذ قرار القبول أو الرفض.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/admin-receipt-uploaded.content.html"
+    ]
+  },
+  {
+    "text": "يرجى مراجعة الطلب واتخاذ قرار قبل موعد الإغلاق التلقائي.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/admin-new-cancellation-request.content.html"
+    ]
+  },
+  {
+    "text": "يمكنك حجز موعد جديد في أي وقت.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Outbox/TransactionEmailTemplates.cs"
+    ]
+  },
+  {
+    "text": "يمكنك طلب إلغاء الحجز وفق سياسة الإلغاء المعروضة في لوحة العميل. تُراجع طلبات الاسترداد حسب حالة الحجز وقرار المستشار.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/terms-page.component.html"
+    ]
+  },
+  {
+    "text": "يمكنك طلب تصحيح بياناتك أو حذف حسابك بالتواصل معنا عبر البريد الإلكتروني المسجّل في حسابك. قد نحتفظ بسجلات محدودة عندما يكون ذلك مطلوباً قانونياً أو تشغيلياً.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/legal/privacy-page.component.html"
+    ]
+  },
+  {
+    "text": "يمكنك متابعة تفاصيل الحجز من لوحة العميل.",
+    "category": "email",
+    "sources": [
+      "src/backend/Shora.Application/Email/Templates/Transaction/client-booking-confirmed.content.html"
+    ]
+  },
+  {
+    "text": "يُعاد التقييم تلقائياً كل ~5 دقائق. استخدم «تحديث» لجلب أحدث الحالة.",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-page.component.html"
+    ]
+  },
+  {
+    "text": "— لا توجد علاقة «صح» أو «غلط»؛ هناك ما يناسبك وما لا يناسبك.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/about/about-page.component.html"
+    ]
+  },
+  {
+    "text": "— مكالمة صوتية أو محادثة واتساب، حسب ما يريحك.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/about/about-page.component.html"
+    ]
+  },
+  {
+    "text": "— نخرج من كل جلسة بفهم أوضح وخطوة واحدة يمكنك تجربتها.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/about/about-page.component.html"
+    ]
+  },
+  {
+    "text": "— يمكنك استخدام اسم مستعار؛ ما يُقال في الجلسة يبقى بيننا.",
+    "category": "public",
+    "sources": [
+      "src/frontend/src/app/public/about/about-page.component.html"
+    ]
+  },
+  {
+    "text": "… ث",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-labels.util.ts",
+      "src/frontend/src/app/booking/shared/payment-instructions-panel.component.ts"
+    ]
+  },
+  {
+    "text": "… د",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-labels.util.ts",
+      "src/frontend/src/app/booking/shared/payment-instructions-panel.component.ts"
+    ]
+  },
+  {
+    "text": "… س",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/bookings/admin-cancellation-labels.util.ts",
+      "src/frontend/src/app/booking/shared/payment-instructions-panel.component.ts"
+    ]
+  },
+  {
+    "text": "… مطلوب",
+    "category": "forms",
+    "sources": [
+      "src/frontend/src/app/core/forms/auth-field-error.util.ts"
+    ]
+  },
+  {
+    "text": "…)} جنيه",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/earnings/admin-earnings-labels.util.ts"
+    ]
+  },
+  {
+    "text": "← تعديل التفاصيل",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/review/review.component.html"
+    ]
+  },
+  {
+    "text": "← تغيير الموعد",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/delivery-method/delivery-method.component.html"
+    ]
+  },
+  {
+    "text": "← تغيير طريقة التواصل",
+    "category": "booking",
+    "sources": [
+      "src/frontend/src/app/booking/contact-phone/contact-phone.component.html"
+    ]
+  },
+  {
+    "text": "→ الحجوزات",
+    "category": "admin-dashboard",
+    "sources": [
+      "src/frontend/src/app/admin-dashboard/ops/admin-ops-page.component.html"
+    ]
+  }
+]

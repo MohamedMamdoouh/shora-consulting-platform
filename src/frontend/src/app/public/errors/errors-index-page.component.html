@@ -1,0 +1,30 @@
+<section class="page errors-index">
+  <article class="section">
+    <h1>مرجع أكواد الأخطاء</h1>
+    <p class="errors-index__lead">
+      توثيق أكواد الأخطاء التي يعيدها الـ API في استجابات Problem Details. محتوى التفاصيل
+      بالإنجليزية لاستخدام المطورين.
+    </p>
+
+    @if (loadError) {
+      <p class="errors-index__error">{{ loadError }}</p>
+    } @else {
+      @for (group of groups; track group.category) {
+        <section class="errors-index__group">
+          <h2>{{ group.category }}</h2>
+          <ul class="errors-index__list">
+            @for (item of group.items; track item.code) {
+              <li>
+                <a [routerLink]="['/errors', item.code]">
+                  <span class="errors-index__code">{{ item.code }}</span>
+                  <span class="errors-index__title">{{ item.title }}</span>
+                  <span class="errors-index__status">{{ item.status }}</span>
+                </a>
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    }
+  </article>
+</section>

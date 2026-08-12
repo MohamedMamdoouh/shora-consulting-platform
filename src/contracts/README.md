@@ -22,4 +22,4 @@ This keeps the frontend and backend aligned without code generation for MVP.
 
 **Ops:** `ops.ts` includes `AdminOpsAlertDto`, `AdminOpsAlertsResponse`, `AdminOpsRunbookDto`, and `AdminOpsRunbooksResponse` for `GET /admin/ops/alerts` and `GET /admin/ops/runbooks`.
 
-`ProblemDetails` in `common.ts` documents the RFC 7807 error JSON shape (ASP.NET framework type, not a C# Contracts record). `error-codes.ts` mirrors `Shora.Application.Common.ErrorCodes`.
+`ProblemDetails` in `common.ts` documents the RFC 7807 error JSON shape (ASP.NET framework type, not a C# Contracts record). `error-codes.ts` mirrors `Shora.Application.Common.ErrorCodes`. `error-catalog.ts` mirrors error reference API responses from `GET /api/v1/errors`.

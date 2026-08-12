@@ -1,12 +1,15 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Shora.Contracts.Auth;
 using Shora.Contracts.Common;
+using Shora.Api.Infrastructure;
+using Shora.Application.Common;
 using Shora.Domain.Entities;
 using Shora.Infrastructure.Data;
 using Shora.Infrastructure.Services;
@@ -63,6 +66,11 @@ public class AuthEndpointTests : IDisposable
             null));
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+
+        var problemJson = await response.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal(ApiProblemDetailsMapper.ErrorTypeFor(ErrorCodes.Auth.DuplicateEmail), problemJson.GetProperty("type").GetString());
+        Assert.Equal(ErrorCodes.Auth.DuplicateEmail, problemJson.GetProperty("code").GetString());
+        Assert.Equal(409, problemJson.GetProperty("status").GetInt32());
     }
 
     [Fact]

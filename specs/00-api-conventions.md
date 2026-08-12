@@ -16,6 +16,13 @@ Status: **Implemented** — applies to all specs (01–09) and every new endpoin
 - Model validation failures return `ValidationProblemDetails` with field-level `errors`.
 - Unhandled exceptions are caught by `GlobalExceptionHandler` and returned as Problem Details (500).
 
+**Error reference (human + JSON):**
+
+- Browser navigation to `/errors/{code}` (same origin as the SPA) opens the Angular public error detail page.
+- JSON metadata: `GET /api/v1/errors` (list) and `GET /api/v1/errors/{code}` (single entry, includes computed `type` URI).
+- Catalog entries live in `Shora.Application.Common.ErrorCatalog` — add an entry whenever a new `ErrorCodes` constant is introduced.
+- Canonical `type` host is `shora.dev`; point that custom domain at the Railway service so production URIs match (see deployment docs).
+
 ## 3. API versioning & routes
 
 - URL versioning: `/api/v{version}/...` (default **v1.0**).
@@ -49,6 +56,7 @@ Every action declares:
 3. Controller action: version route, name, summary, `ProducesResponseType`.
 4. Integration test covers success + primary failure path.
 5. Frontend uses contract types and `readApiError()` for Problem Details.
+6. New `ErrorCodes` value → add matching `ErrorCatalog` entry (+ `error-codes.ts` if not already mirrored).
 
 ## 8. Caching
 

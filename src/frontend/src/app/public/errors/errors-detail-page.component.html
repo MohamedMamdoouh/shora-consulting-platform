@@ -1,0 +1,46 @@
+<section class="page errors-detail">
+  <article class="section">
+    <p class="errors-detail__back">
+      <a routerLink="/errors">← مرجع أكواد الأخطاء</a>
+    </p>
+
+    @if (notFound) {
+      <h1>كود خطأ غير موجود</h1>
+      <p class="errors-detail__muted">Error code not found in the catalog.</p>
+    } @else if (loadError) {
+      <p class="errors-detail__error">{{ loadError }}</p>
+    } @else if (entry) {
+      <header class="errors-detail__header">
+        <span class="errors-detail__status">{{ entry.status }}</span>
+        <h1>{{ entry.title }}</h1>
+        <p class="errors-detail__code">{{ entry.code }}</p>
+      </header>
+
+      <dl class="errors-detail__meta">
+        <div>
+          <dt>Summary</dt>
+          <dd>{{ entry.summary }}</dd>
+        </div>
+        @if (entry.whenItOccurs) {
+          <div>
+            <dt>When it occurs</dt>
+            <dd>{{ entry.whenItOccurs }}</dd>
+          </div>
+        }
+        @if (entry.relatedEndpoint) {
+          <div>
+            <dt>Related endpoint</dt>
+            <dd><code>{{ entry.relatedEndpoint }}</code></dd>
+          </div>
+        }
+        <div>
+          <dt>Type URI</dt>
+          <dd class="errors-detail__type-row">
+            <code>{{ entry.type }}</code>
+            <button type="button" class="errors-detail__copy" (click)="copyTypeUri()">Copy</button>
+          </dd>
+        </div>
+      </dl>
+    }
+  </article>
+</section>

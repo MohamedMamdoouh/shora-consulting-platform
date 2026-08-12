@@ -10,10 +10,11 @@ import { BookingService } from '../../core/booking/booking.service';
 import { isSlotUnavailableError, readBookingErrorMessage } from '../booking-error.util';
 import { BookingFlowStateService } from '../booking-flow-state.service';
 import { formatSlotSummary } from '../utils/slot-grouping.util';
+import { BookingStepIndicatorComponent } from '../shared/booking-step-indicator.component';
 
 @Component({
   selector: 'app-booking-review',
-  imports: [RouterLink],
+  imports: [RouterLink, BookingStepIndicatorComponent],
   templateUrl: './review.component.html',
   styleUrl: './review.component.scss',
 })

@@ -1,6 +1,6 @@
 <section class="page dashboard">
   <header class="dashboard__header">
-    <h1>لوحتي</h1>
+    <h1 class="section-heading">لوحتي</h1>
     <p class="dashboard__intro">هنا تجد جلساتك القادمة، الحجوزات التي تحتاج إجراء، وسجلك السابق.</p>
   </header>
 
@@ -18,7 +18,7 @@
   } @else {
     <article class="section dashboard__section">
       <div class="dashboard__section-header">
-        <h2>الجلسات القادمة</h2>
+        <h2 class="section-heading">الجلسات القادمة</h2>
       </div>
 
       @switch (upcomingSection.status) {
@@ -54,7 +54,7 @@
 
     <article class="section dashboard__section">
       <div class="dashboard__section-header">
-        <h2>في انتظار الدفع أو المراجعة</h2>
+        <h2 class="section-heading">في انتظار الدفع أو المراجعة</h2>
       </div>
 
       @switch (pendingSection.status) {
@@ -97,7 +97,7 @@
 
     <article class="section dashboard__section">
       <div class="dashboard__section-header">
-        <h2>السجل السابق</h2>
+        <h2 class="section-heading">السجل السابق</h2>
       </div>
 
       @switch (pastSection.status) {

@@ -3,12 +3,13 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { BookingFlowStateService } from '../booking-flow-state.service';
 import { formatSlotSummary } from '../utils/slot-grouping.util';
+import { BookingStepIndicatorComponent } from '../shared/booking-step-indicator.component';
 
 const EGYPT_MOBILE_PATTERN = /^(\+20|0)?1[0125]\d{8}$/;
 
 @Component({
   selector: 'app-contact-phone',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, BookingStepIndicatorComponent],
   templateUrl: './contact-phone.component.html',
   styleUrl: './contact-phone.component.scss',
 })

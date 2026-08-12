@@ -6,6 +6,7 @@ import { readApiError, readApiErrorCode } from '../../core/api/api-error.util';
 import { BookingService } from '../../core/booking/booking.service';
 import { readBookingErrorMessage } from '../booking-error.util';
 import { PaymentInstructionsPanelComponent } from '../shared/payment-instructions-panel.component';
+import { BookingStepIndicatorComponent } from '../shared/booking-step-indicator.component';
 
 type PaymentInstructionsViewModel =
   | { status: 'loading' }
@@ -15,7 +16,7 @@ type PaymentInstructionsViewModel =
 
 @Component({
   selector: 'app-payment-instructions',
-  imports: [PaymentInstructionsPanelComponent],
+  imports: [PaymentInstructionsPanelComponent, BookingStepIndicatorComponent],
   templateUrl: './payment-instructions.component.html',
   styleUrl: './payment-instructions.component.scss',
 })

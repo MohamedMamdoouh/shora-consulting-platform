@@ -1,6 +1,11 @@
-<section class="page">
+<section class="page booking-flow">
+  <app-booking-step-indicator
+    currentStep="review"
+    [showPhoneStep]="flow.deliveryMethod === 'VoiceCall'"
+  />
+
   <article class="section">
-    <h1>مراجعة الحجز</h1>
+    <h1 class="section-heading">مراجعة الحجز</h1>
     <p class="intro">راجع تفاصيل جلستك وتأكد منها قبل تأكيد الحجز.</p>
 
     <dl class="summary-list">
@@ -31,11 +36,11 @@
       <div class="state-panel state-panel--warn">
         <p>يرجى تأكيد بريدك الإلكتروني قبل حجز جلسة.</p>
         @if (userEmail) {
-          <button type="button" class="btn secondary" [disabled]="isResending" (click)="resendVerification()">
+          <button type="button" class="btn btn--secondary" [disabled]="isResending" (click)="resendVerification()">
             {{ isResending ? 'جاري الإرسال…' : 'إعادة إرسال رابط التحقق' }}
           </button>
         } @else {
-          <a routerLink="/auth/login" [queryParams]="{ returnUrl: '/booking/review' }" class="btn secondary">
+          <a routerLink="/auth/login" [queryParams]="{ returnUrl: '/booking/review' }" class="btn btn--secondary">
             سجل الدخول لإرسال رابط التحقق
           </a>
         }
@@ -49,12 +54,12 @@
         <div class="banner banner--error" role="alert">
           <p>{{ errorMessage }}</p>
           @if (slotUnavailable) {
-            <a routerLink="/booking/start" class="btn secondary">اختيار موعد آخر</a>
+            <a routerLink="/booking/start" class="btn btn--secondary">اختيار موعد آخر</a>
           }
         </div>
       }
 
-      <button type="button" class="btn" [disabled]="isSubmitting" (click)="reserve()">
+      <button type="button" class="btn btn--lg" [disabled]="isSubmitting" (click)="reserve()">
         {{ isSubmitting ? 'جاري الحجز…' : 'تأكيد الحجز' }}
       </button>
     }

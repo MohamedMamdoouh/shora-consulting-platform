@@ -1,6 +1,8 @@
-<section class="page">
+<section class="page booking-flow">
+  <app-booking-step-indicator currentStep="slot" [showPhoneStep]="false" />
+
   <article class="section">
-    <h1>اختر موعدًا</h1>
+    <h1 class="section-heading">اختر موعدًا</h1>
     <p class="intro">
       اختر وقتًا يناسبك — لا حاجة لتسجيل الدخول حتى تصل إلى خطوة تأكيد الحجز.
     </p>
@@ -29,7 +31,8 @@
                   <div class="slot-list">
                     @for (slot of day.slots; track slot.id) {
                       <button type="button" class="slot-btn" (click)="selectSlot(slot)">
-                        {{ formatSlotTime(slot) }}
+                        <span class="slot-btn__time">{{ formatSlotTime(slot) }}</span>
+                        <span class="slot-btn__hint">اختيار</span>
                       </button>
                     }
                   </div>

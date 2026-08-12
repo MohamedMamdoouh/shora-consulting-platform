@@ -3,10 +3,11 @@ import { Router, RouterLink } from '@angular/router';
 import { DeliveryMethod } from '@contracts/booking';
 import { BookingFlowStateService } from '../booking-flow-state.service';
 import { formatSlotSummary } from '../utils/slot-grouping.util';
+import { BookingStepIndicatorComponent } from '../shared/booking-step-indicator.component';
 
 @Component({
   selector: 'app-delivery-method',
-  imports: [RouterLink],
+  imports: [RouterLink, BookingStepIndicatorComponent],
   templateUrl: './delivery-method.component.html',
   styleUrl: './delivery-method.component.scss',
 })

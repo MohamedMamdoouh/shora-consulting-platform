@@ -1,6 +1,8 @@
-<section class="page">
+<section class="page booking-flow">
+  <app-booking-step-indicator currentStep="delivery" [showPhoneStep]="false" />
+
   <article class="section">
-    <h1>طريقة التواصل</h1>
+    <h1 class="section-heading">طريقة التواصل</h1>
     <p class="intro">كيف تفضل إجراء الجلسة؟</p>
 
     <div class="slot-summary">
@@ -9,12 +11,14 @@
     </div>
 
     <div class="choice-list">
-      <button type="button" class="choice-card" (click)="selectDeliveryMethod('VoiceCall')">
+      <button type="button" class="choice-card choice-card--voice" (click)="selectDeliveryMethod('VoiceCall')">
+        <span class="choice-card__icon" aria-hidden="true"></span>
         <span class="choice-card__title">مكالمة صوتية</span>
         <span class="choice-card__detail">سيتصل بك المستشار في الموعد على رقم هاتفك.</span>
       </button>
 
-      <button type="button" class="choice-card" (click)="selectDeliveryMethod('Chat')">
+      <button type="button" class="choice-card choice-card--chat" (click)="selectDeliveryMethod('Chat')">
+        <span class="choice-card__icon" aria-hidden="true"></span>
         <span class="choice-card__title">محادثة واتساب</span>
         <span class="choice-card__detail">ستبدأ المحادثة عبر رابط واتساب في الموعد المحدد.</span>
       </button>

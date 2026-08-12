@@ -1,14 +1,17 @@
 .pending-payment-card {
-  padding: var(--space-md);
-  background: var(--color-background);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .pending-payment-card__header {
   display: grid;
   gap: var(--space-sm);
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .pending-payment-card__main {
@@ -20,40 +23,45 @@
 }
 
 .pending-payment-card__time {
+  font-family: var(--font-display);
   font-weight: 600;
 }
 
 .pending-payment-card__status {
-  padding: 0.2rem 0.65rem;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--color-primary) 10%, var(--color-surface));
-  color: var(--color-primary);
-  font-size: 0.875rem;
+  display: inline-flex;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-full);
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  border: 1px solid var(--color-warning-border);
+  font-size: var(--font-size-xs);
   font-weight: 600;
 }
 
 .pending-payment-card__intro {
   margin: 0;
   color: var(--color-text-muted);
-  font-size: 0.9375rem;
+  font-size: var(--font-size-sm);
 }
 
 .pending-payment-card__success {
-  padding: var(--space-md);
-  margin-bottom: var(--space-md);
-  background: color-mix(in srgb, var(--color-primary) 6%, var(--color-surface));
-  border: 1px solid color-mix(in srgb, var(--color-primary) 35%, var(--color-border));
-  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  background: var(--color-success-bg);
+  border: 1px solid var(--color-success-border);
+  border-radius: var(--radius-lg);
 }
 
 .pending-payment-card__success p {
   margin: 0;
+  color: var(--color-success);
+  font-size: var(--font-size-sm);
 }
 
 .pending-payment-card__fallback {
   display: grid;
   gap: var(--space-md);
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-lg);
 }
 
 .pending-payment-card__fallback p {
@@ -64,32 +72,13 @@
 .pending-payment-card__footer {
   display: grid;
   gap: var(--space-sm);
-  margin-top: var(--space-md);
-  padding-top: var(--space-md);
-  border-top: 1px solid var(--color-border);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border-subtle);
 }
 
 .pending-payment-card__error {
   margin: 0;
-  color: #7a2e2e;
-}
-
-.btn {
-  justify-self: start;
-  padding: var(--space-sm) var(--space-lg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  color: var(--color-text);
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.btn--secondary {
-  background: var(--color-surface);
-}
-
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
 }

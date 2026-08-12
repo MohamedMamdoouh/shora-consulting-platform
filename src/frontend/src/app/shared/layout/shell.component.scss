@@ -5,24 +5,39 @@
 }
 
 .shell__header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(253, 251, 248, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.shell__header-inner {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-md);
+  max-width: var(--content-full);
+  margin: 0 auto;
   padding: var(--space-md) var(--space-xl);
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+  min-height: var(--header-height);
 }
 
 .shell__brand {
   display: inline-flex;
   align-items: center;
   gap: var(--space-sm);
+  font-family: var(--font-display);
   font-weight: 700;
-  font-size: 1.125rem;
+  font-size: var(--font-size-xl);
   color: var(--color-text);
   text-decoration: none;
+  flex-shrink: 0;
+}
+
+.shell__brand:hover {
+  color: var(--color-primary);
 }
 
 .shell__logo {
@@ -33,52 +48,165 @@
   line-height: 1;
 }
 
+.shell__menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.shell__menu-icon,
+.shell__menu-icon::before,
+.shell__menu-icon::after {
+  display: block;
+  width: 1.125rem;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+  position: relative;
+}
+
+.shell__menu-icon::before,
+.shell__menu-icon::after {
+  content: '';
+  position: absolute;
+  left: 0;
+}
+
+.shell__menu-icon::before {
+  top: -6px;
+}
+
+.shell__menu-icon::after {
+  top: 6px;
+}
+
 .shell__nav {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-md);
+  align-items: center;
+  gap: var(--space-sm) var(--space-md);
 }
 
 .shell__nav a {
+  padding: var(--space-xs) var(--space-sm);
   color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
   text-decoration: none;
+  border-radius: var(--radius-sm);
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
 }
 
-.shell__nav a.active,
 .shell__nav a:hover {
   color: var(--color-primary);
+  background: var(--color-primary-muted);
+}
+
+.shell__nav a.active {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.shell__nav-cta {
+  padding: var(--space-xs) var(--space-md) !important;
+  background: var(--color-primary) !important;
+  color: #fff !important;
+  border-radius: var(--radius-md) !important;
+  font-weight: 600 !important;
+}
+
+.shell__nav-cta:hover {
+  background: var(--color-primary-hover) !important;
+  color: #fff !important;
+}
+
+.shell__nav-signup {
+  color: var(--color-accent) !important;
+  font-weight: 600 !important;
+}
+
+.shell__nav-divider {
+  width: 1px;
+  height: 1.25rem;
+  background: var(--color-border);
+  margin-inline: var(--space-xs);
 }
 
 .shell__user {
   align-self: center;
+  padding-inline: var(--space-sm);
   color: var(--color-text);
+  font-size: var(--font-size-sm);
   font-weight: 600;
 }
 
 .shell__banner {
-  max-width: 48rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  max-width: var(--content-max);
   margin: 0 auto var(--space-lg);
-  padding: var(--space-md);
-  background: #fff4e5;
-  border: 1px solid #f0d9b5;
-  border-radius: var(--radius-md);
-  text-align: center;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-warning-bg);
+  border: 1px solid var(--color-warning-border);
+  border-radius: var(--radius-lg);
 }
 
-.shell__nav button.secondary {
-  padding: 0.5rem 1rem;
+.shell__banner p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-warning);
+}
+
+.shell__banner-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: var(--radius-full);
+  background: var(--color-warning);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
 }
 
 .shell__main {
   flex: 1;
+  width: 100%;
+  max-width: var(--content-full);
+  margin: 0 auto;
   padding: var(--space-xl);
 }
 
 .shell__footer {
-  padding: var(--space-lg) var(--space-xl);
-  border-top: 1px solid var(--color-border);
-  color: var(--color-text-muted);
+  margin-top: auto;
+  border-top: 1px solid var(--color-border-subtle);
+  background: var(--color-surface);
+}
+
+.shell__footer-inner {
+  max-width: var(--content-full);
+  margin: 0 auto;
+  padding: var(--space-xl);
   text-align: center;
+}
+
+.shell__footer-tagline {
+  margin: 0 0 var(--space-sm);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
 }
 
 .shell__footer-nav {
@@ -87,11 +215,12 @@
   justify-content: center;
   align-items: center;
   gap: var(--space-sm);
-  margin-top: var(--space-sm);
+  margin-bottom: var(--space-md);
 }
 
 .shell__footer-nav a {
   color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
   text-decoration: none;
 }
 
@@ -99,14 +228,54 @@
   color: var(--color-primary);
 }
 
-@media (max-width: 640px) {
-  .shell__header,
-  .shell__main,
-  .shell__footer {
-    padding-inline: var(--space-md);
+.shell__footer-copy {
+  margin: 0;
+  color: var(--color-text-subtle);
+  font-size: var(--font-size-xs);
+}
+
+@media (max-width: 768px) {
+  .shell__menu-toggle {
+    display: inline-flex;
   }
 
   .shell__nav {
+    display: none;
+    position: absolute;
+    inset-inline: var(--space-md);
+    top: calc(100% + var(--space-xs));
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-xs);
+    padding: var(--space-md);
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .shell__nav--open {
+    display: flex;
+  }
+
+  .shell__nav a {
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .shell__nav-divider {
     width: 100%;
+    height: 1px;
+    margin: var(--space-xs) 0;
+  }
+
+  .shell__header-inner {
+    position: relative;
+    flex-wrap: wrap;
+    padding-inline: var(--space-md);
+  }
+
+  .shell__main,
+  .shell__footer-inner {
+    padding-inline: var(--space-md);
   }
 }

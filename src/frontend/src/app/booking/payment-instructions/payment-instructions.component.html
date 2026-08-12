@@ -1,6 +1,8 @@
-<section class="page">
+<section class="page booking-flow">
+  <app-booking-step-indicator currentStep="payment" [showPhoneStep]="false" />
+
   <article class="section">
-    <h1>تعليمات الدفع</h1>
+    <h1 class="section-heading">تعليمات الدفع</h1>
 
     @switch (viewModel.status) {
       @case ('loading') {

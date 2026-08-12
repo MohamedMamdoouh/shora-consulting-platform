@@ -1,36 +1,39 @@
-<section class="section hero">
-  <h1>مساحة دافئة لفهم علاقتك بشكل أوضح</h1>
-  <p>جلسات استشارية فردية عبر مكالمة صوتية أو محادثة واتساب.</p>
-  <app-booking-cta />
-</section>
+<section class="page home">
+  <section class="section hero">
+    <span class="hero__eyebrow">استشارات علاقات فردية</span>
+    <h1>مساحة دافئة لفهم علاقتك بشكل أوضح</h1>
+    <p>جلسات استشارية فردية عبر مكالمة صوتية أو محادثة واتساب — بخصوصية تامة وبدون أحكام.</p>
+    <app-booking-cta />
+  </section>
 
-<section class="section">
-  <h2>كيف يمكننا مساعدتك؟</h2>
-  <div class="card-grid">
-    @for (topic of topics; track topic.id) {
-      <article class="topic-card">
-        <h3>{{ topic.title }}</h3>
-        <p>{{ topic.shortDescription }}</p>
-      </article>
-    }
-  </div>
-</section>
+  <section class="section">
+    <h2 class="section-heading">كيف يمكننا مساعدتك؟</h2>
+    <div class="card-grid">
+      @for (topic of topics; track topic.id) {
+        <article class="topic-card">
+          <h3>{{ topic.title }}</h3>
+          <p>{{ topic.shortDescription }}</p>
+        </article>
+      }
+    </div>
+  </section>
 
-<section class="section">
-  <h2>كيف تعمل الجلسة؟</h2>
-  <ol class="steps">
-    @for (step of steps; track step.title) {
-      <li class="step">
-        <div class="step__content">
-          <h3>{{ step.title }}</h3>
-          <p>{{ step.description }}</p>
-        </div>
-      </li>
-    }
-  </ol>
-</section>
+  <section class="section">
+    <h2 class="section-heading">كيف تعمل الجلسة؟</h2>
+    <ol class="steps">
+      @for (step of steps; track step.title) {
+        <li class="step">
+          <div class="step__content">
+            <h3>{{ step.title }}</h3>
+            <p>{{ step.description }}</p>
+          </div>
+        </li>
+      }
+    </ol>
+  </section>
 
-<section class="section cta-block">
-  <p>جاهز للبدء؟ اختر موعدًا يناسبك — لا حاجة لتسجيل الدخول الآن.</p>
-  <app-booking-cta />
+  <section class="section cta-block">
+    <p>جاهز للبدء؟ اختر موعدًا يناسبك — لا حاجة لتسجيل الدخول الآن.</p>
+    <app-booking-cta />
+  </section>
 </section>

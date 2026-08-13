@@ -42,7 +42,6 @@ if (!app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseAuthRateLimitEmail();
 app.UseRateLimiter();
 app.UseOutputCache();
 app.MapControllers();

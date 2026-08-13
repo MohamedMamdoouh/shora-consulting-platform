@@ -34,7 +34,6 @@ public sealed class AuthController : ApiControllerBase
 
     [HttpPost("signup")]
     [EnableRateLimiting(RateLimitPolicies.AuthCredential)]
-    [ExtractAuthEmailForRateLimit]
     [EndpointName("Auth.SignUp")]
     [EndpointSummary("Register a new client account")]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
@@ -60,7 +59,6 @@ public sealed class AuthController : ApiControllerBase
 
     [HttpPost("login")]
     [EnableRateLimiting(RateLimitPolicies.AuthCredential)]
-    [ExtractAuthEmailForRateLimit]
     [EndpointName("Auth.Login")]
     [EndpointSummary("Sign in with email and password")]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
@@ -136,7 +134,6 @@ public sealed class AuthController : ApiControllerBase
 
     [HttpPost("verify-email")]
     [EnableRateLimiting(RateLimitPolicies.AuthRecovery)]
-    [ExtractAuthEmailForRateLimit]
     [EndpointName("Auth.VerifyEmail")]
     [EndpointSummary("Confirm email address with verification token")]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status200OK)]
@@ -157,7 +154,6 @@ public sealed class AuthController : ApiControllerBase
 
     [HttpPost("resend-verification")]
     [EnableRateLimiting(RateLimitPolicies.AuthRecovery)]
-    [ExtractAuthEmailForRateLimit]
     [EndpointName("Auth.ResendVerification")]
     [EndpointSummary("Resend email verification link")]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status200OK)]
@@ -170,7 +166,6 @@ public sealed class AuthController : ApiControllerBase
 
     [HttpPost("forgot-password")]
     [EnableRateLimiting(RateLimitPolicies.AuthRecovery)]
-    [ExtractAuthEmailForRateLimit]
     [EndpointName("Auth.ForgotPassword")]
     [EndpointSummary("Request a password reset link")]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status200OK)]
@@ -183,7 +178,6 @@ public sealed class AuthController : ApiControllerBase
 
     [HttpPost("reset-password")]
     [EnableRateLimiting(RateLimitPolicies.AuthRecovery)]
-    [ExtractAuthEmailForRateLimit]
     [EndpointName("Auth.ResetPassword")]
     [EndpointSummary("Reset password using email token")]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status200OK)]

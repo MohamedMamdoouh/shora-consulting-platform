@@ -22,27 +22,26 @@ This spec consolidates operational and cross-cutting requirements referenced by 
 
 ## 1. Rate Limiting (H2)
 
-Uses ASP.NET Core's built-in rate limiting middleware. Limits are per-endpoint and combine a **per-IP** partition and, where an account is identifiable, a **per-account/email** partition. Values are tunable via `RateLimiting` and `ReceiptUpload` configuration.
+Uses ASP.NET Core's built-in rate limiting middleware. Limits are **per-IP** per endpoint. Values are tunable via `RateLimiting` and `ReceiptUpload` configuration.
 
-| Endpoint(s)                                                                                  | Limit (starting point)       | Status   |
-| -------------------------------------------------------------------------------------------- | ---------------------------- | -------- |
-| `POST /api/auth/login`, `/signup`, `/google`                                                 | ~5 / minute / IP + per-email | **Done** |
-| `POST /api/auth/forgot-password`, `/reset-password`, `/verify-email`, `/resend-verification` | ~5 / minute / IP + per-email | **Done** |
-| `POST /api/auth/refresh`                                                                     | ~10 / minute / IP            | **Done** |
-| `GET /api/availability`                                                                      | ~30 / minute / IP            | **Done** |
-| `POST /api/bookings`                                                                         | ~10 / minute / account       | **Done** |
-| `POST /api/payments/{bookingId}/receipt`                                                     | ~5 / minute / account        | **Done** |
-| `POST /api/bookings/{id}/cancellation-requests`                                              | ~5 / minute / account        | **Done** |
+| Endpoint(s)                                                                                  | Limit (starting point) | Status   |
+| -------------------------------------------------------------------------------------------- | ---------------------- | -------- |
+| `POST /api/auth/login`, `/signup`, `/google`                                                 | ~5 / minute / IP       | **Done** |
+| `POST /api/auth/forgot-password`, `/reset-password`, `/verify-email`, `/resend-verification` | ~5 / minute / IP       | **Done** |
+| `POST /api/auth/refresh`                                                                     | ~10 / minute / IP      | **Done** |
+| `GET /api/availability`                                                                      | ~30 / minute / IP      | **Done** |
+| `POST /api/bookings`                                                                         | ~10 / minute / IP      | **Done** |
+| `POST /api/payments/{bookingId}/receipt`                                                     | ~5 / minute / IP       | **Done** |
+| `POST /api/bookings/{id}/cancellation-requests`                                              | ~5 / minute / IP       | **Done** |
 
 - Throttled responses return `429 Too Many Requests` with a `Retry-After` header.
-- Auth email bodies are parsed by `AuthRateLimitEmailMiddleware` for per-email partitions; Google sign-in is IP-only when no email is present in the body.
 - Rate limiting runs **before** output cache so cached availability responses still count toward limits.
 - Admin endpoints sit behind auth + the single admin account; light limiting only (not matrix-listed).
 
-### Client-IP resolution & shared-IP fairness (resolved)
+### Client-IP resolution (resolved)
 
 - **Direct connection:** the app runs on a single server with no load balancer, so per-IP rate-limit partitions key on `HttpContext.Connection.RemoteIpAddress` directly.
-- **CGNAT / shared-IP reality (mobile networks in Egypt):** per-IP limits are deliberately **coarse safety nets**; meaningful per-user fairness comes from **per-account/per-email partitions**. If 429s from shared IPs show up in monitoring, raise per-IP values before touching per-account ones.
+- **CGNAT / shared-IP reality (mobile networks in Egypt):** all throttled endpoints share one counter per IP. If 429s from shared IPs show up in monitoring, raise the relevant per-IP limit values in configuration.
 
 ## 2. Logging, Auditing & Monitoring (H6)
 
@@ -107,8 +106,8 @@ Tunable via `appsettings.json` (see `BackgroundJobOptions`, `OpsMonitoringOption
 | `BackgroundJobs:Enabled` | Master switch (false in integration tests) |
 | `BackgroundJobs:*IntervalSeconds` | Per-job schedule (defaults match table above) |
 | `OpsMonitoring:*` | Alert thresholds (pending approval hours, refund-due hours, heartbeat multipliers, dead-letter burst count/window) |
-| `RateLimiting:*` | Per-endpoint IP/email/account limits |
-| `ReceiptUpload:RateLimitPerMinute` | Receipt upload cap (default 5/min/account) |
+| `RateLimiting:*` | Per-endpoint IP limits |
+| `ReceiptUpload:RateLimitPerMinute` | Receipt upload cap (default 5/min/IP) |
 | `Email:*` | Resend API key, from address (spec 08.4) |
 
 ## 4. Deployment

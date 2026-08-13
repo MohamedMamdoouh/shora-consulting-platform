@@ -133,7 +133,7 @@ Refresh tokens are **not** self-contained JWTs; they are opaque random strings p
 
 Auth endpoints are abuse targets, so they are rate-limited (full policy + shared infrastructure in spec 08 #1). Applied here:
 
-- `POST /api/auth/login`, `/signup`, `/google`, `/forgot-password`, `/reset-password`, `/verify-email`, `/resend-verification`: limited **per IP** and **per account/email** (e.g. a small number of attempts per minute with exponential backoff / temporary lockout on repeated failures).
+- `POST /api/auth/login`, `/signup`, `/google`, `/forgot-password`, `/reset-password`, `/verify-email`, `/resend-verification`: limited **per IP** (e.g. a small number of attempts per minute).
 - `POST /api/auth/refresh`: limited per IP to blunt brute-force of stolen cookies.
 - Responses use HTTP `429 Too Many Requests` with a `Retry-After` header.
 - Generic responses (no account-existence leak) still apply on the throttled paths (`forgot-password`, `resend-verification`).

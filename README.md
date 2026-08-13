@@ -81,7 +81,7 @@ Design specs for maintainers live in [`specs/`](specs/). Operator deployment det
 | **Earnings**               | Gross / refunded / net revenue summary with date filters                                  |
 | **Ops monitoring**         | Background health checks with admin alerts and runbooks at `/admin/ops`                   |
 | **Transactional email**    | Auth emails (direct Resend) + booking/payment emails (outbox with retry)                    |
-| **Rate limiting**          | Per-endpoint limits on auth, availability, booking, receipts, cancellations               |
+| **Rate limiting**          | Per-endpoint per-IP limits on auth, availability, booking, receipts, cancellations        |
 | **CI/CD**                  | Path-filtered CI on PRs; deploy to Railway + GHCR on push to `main`                       |
 
 ---
@@ -193,11 +193,10 @@ There are **no per-entity repository classes** — Application uses `IApplicatio
 6. Static files + SPA fallback (non-Development only)
 7. Authentication (JWT Bearer)
 8. Authorization (roles)
-9. `AuthRateLimitEmail` middleware — extracts email for auth rate limits
-10. Rate limiter
-11. Output cache
-12. Controller → Application service → EF Core / `IFileStorage` / `IEmailSender`
-13. `Result` → Problem Details or 200/201 JSON
+9. Rate limiter
+10. Output cache
+11. Controller → Application service → EF Core / `IFileStorage` / `IEmailSender`
+12. `Result` → Problem Details or 200/201 JSON
 
 ### Key middleware and cross-cutting
 
@@ -839,7 +838,7 @@ Step-by-step guide: [`docs/deployment.md`](docs/deployment.md).
 | **Refresh tokens**   | Opaque, SHA-256 hashed at rest, rotation on refresh      |
 | **Cookies**          | httpOnly, SameSite=Strict, Secure in production          |
 | **CORS**             | Explicit allowed origins with credentials                |
-| **Rate limiting**    | IP and/or user partitions; 429 with `Retry-After`        |
+| **Rate limiting**    | Per-IP partitions; 429 with `Retry-After`                |
 | **Input validation** | FluentValidation + model binding                         |
 | **File upload**      | Size (5 MB), MIME validation, content hash anti-replay   |
 | **SQL injection**    | EF Core parameterized queries                            |

@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -172,6 +173,27 @@ public class BookingEndpointTests : IDisposable
         var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var booking = await context.Bookings.AsNoTracking().SingleAsync(b => b.ClientId == userId, cancellationToken);
         Assert.Equal("+201012345678", booking.ContactPhone);
+    }
+
+    [Fact]
+    public async Task Reserve_accepts_string_delivery_method_from_frontend_payload()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var slotId = await GetOpenSlotIdAsync(cancellationToken);
+        var (client, userId) = await CreateVerifiedClientAsync("reserve-string-enum@example.com", cancellationToken);
+
+        var content = new StringContent(
+            $$"""{"availabilitySlotId":"{{slotId}}","deliveryMethod":"Chat","contactPhone":null}""",
+            Encoding.UTF8,
+            "application/json");
+        var response = await client.PostAsync("/api/v1/bookings", content, cancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        await using var scope = _factory.Services.CreateAsyncScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var booking = await context.Bookings.AsNoTracking().SingleAsync(b => b.ClientId == userId, cancellationToken);
+        Assert.Equal(Domain.Enums.DeliveryMethod.Chat, booking.DeliveryMethod);
     }
 
     [Fact]

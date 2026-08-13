@@ -152,22 +152,25 @@ public sealed class AuthController : ApiControllerBase
             ? "Email already verified."
             : "Email verified.";
 
-        var rawToken = _refreshCookieService.GetRefreshTokenFromRequest(Request);
-        if (!string.IsNullOrWhiteSpace(rawToken))
+        if (result.Value != VerifyEmailOutcome.AlreadyVerified)
         {
-            var user = await _userManager.FindByEmailAsync(request.Email.Trim());
-            if (user is not null)
+            var rawToken = _refreshCookieService.GetRefreshTokenFromRequest(Request);
+            if (!string.IsNullOrWhiteSpace(rawToken))
             {
-                var (rotation, auth) = await _authService.RefreshAsync(
-                    rawToken,
-                    HttpContext.Connection.RemoteIpAddress?.ToString(),
-                    Request.Headers.UserAgent,
-                    cancellationToken);
-
-                if (auth.IsSuccess && rotation.UserId == user.Id)
+                var user = await _userManager.FindByEmailAsync(request.Email.Trim());
+                if (user is not null)
                 {
-                    SetRefreshCookie(auth.Value!, rotation.NewToken!.ExpiresAtUtc);
-                    return Ok(auth.Value!.Response);
+                    var (rotation, auth) = await _authService.RefreshAsync(
+                        rawToken,
+                        HttpContext.Connection.RemoteIpAddress?.ToString(),
+                        Request.Headers.UserAgent,
+                        cancellationToken);
+
+                    if (auth.IsSuccess && rotation.UserId == user.Id)
+                    {
+                        SetRefreshCookie(auth.Value!, rotation.NewToken!.ExpiresAtUtc);
+                        return Ok(auth.Value!.Response);
+                    }
                 }
             }
         }

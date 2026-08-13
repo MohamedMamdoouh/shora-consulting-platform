@@ -27,7 +27,7 @@ describe('cancellation labels', () => {
 
   it('localizes known system details and keeps free-text reasons', () => {
     expect(localizeCancellationDetail('Receipt not uploaded in time')).toBe(
-      'لم يُرفَع الإيصال في الوقت المحدد',
+      'لم يتم رفع الإيصال في الوقت المحدد',
     );
     expect(localizeCancellationDetail('  تعارض في الموعد  ')).toBe('تعارض في الموعد');
   });

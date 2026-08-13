@@ -41,6 +41,22 @@ export class AdminRefundPanelComponent {
     correctionReason: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(1000)]),
   });
 
+  hasCorrectionReason(): boolean {
+    return this.revokeForm.controls.correctionReason.value.trim().length > 0;
+  }
+
+  correctionReasonError(): string | null {
+    if (!this.hasCorrectionReason()) {
+      return this.copy.admin.dialog.revokeRefundReasonRequired;
+    }
+
+    if (this.revokeForm.controls.correctionReason.hasError('maxlength')) {
+      return this.copy.admin.dialog.revokeRefundReasonTooLong;
+    }
+
+    return null;
+  }
+
   close(): void {
     this.closed.emit();
   }
@@ -85,7 +101,7 @@ export class AdminRefundPanelComponent {
       return;
     }
 
-    if (this.revokeForm.invalid) {
+    if (this.revokeForm.invalid || !this.hasCorrectionReason()) {
       this.revokeForm.markAllAsTouched();
       return;
     }
@@ -93,6 +109,7 @@ export class AdminRefundPanelComponent {
     const confirmed = await this.confirmDialog.confirm({
       title: this.copy.admin.dialog.revokeRefundTitle,
       message: this.copy.admin.dialog.revokeRefundMessage,
+      detail: this.copy.admin.customerName(this.item.clientDisplayName),
       confirmLabel: this.copy.admin.dialog.revokeRefundAction,
       variant: 'danger',
     });

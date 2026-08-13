@@ -43,6 +43,11 @@
   font-size: 0.875rem;
 }
 
+.refund-panel__subtitle strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
 .refund-panel__close {
   border: none;
   background: transparent;

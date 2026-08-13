@@ -104,6 +104,7 @@ export class UpcomingBookingCardComponent {
       title: this.copy.client.cancellationConfirmTitle,
       message: this.copy.client.cancellationConfirm,
       confirmLabel: this.copy.client.cancellationConfirmAction,
+      variant: 'danger',
     });
 
     if (!confirmed) {

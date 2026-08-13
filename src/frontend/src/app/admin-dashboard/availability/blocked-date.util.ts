@@ -2,7 +2,7 @@ import { AbstractControl, ValidationErrors, ValidatorFn, Validators } from '@ang
 
 import { BlockedDate } from '@contracts/availability';
 
-import { APP_LOCALE } from '../../core/i18n/app-locale';
+import { formatDateTime } from '../../core/i18n/app-locale';
 
 import { CONSULTANT_TIME_ZONE_LABEL } from './availability-window.util';
 
@@ -122,7 +122,7 @@ export function formatBlockedRangeSummary(blockedDate: BlockedDate): string {
 
 export function formatUtcInstant(isoUtc: string): string {
 
-  return new Intl.DateTimeFormat(APP_LOCALE, {
+  return formatDateTime(isoUtc, {
 
     timeZone: CONSULTANT_TIME_ZONE_LABEL,
 
@@ -130,7 +130,7 @@ export function formatUtcInstant(isoUtc: string): string {
 
     timeStyle: 'short',
 
-  }).format(new Date(isoUtc));
+  });
 
 }
 

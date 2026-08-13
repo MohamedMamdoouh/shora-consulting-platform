@@ -82,11 +82,10 @@ export class AdminCancellationReviewPanelComponent implements OnInit, OnDestroy 
 
     const confirmed = await this.confirmDialog.confirm({
       title: this.copy.admin.dialog.approveCancellationTitle,
-      message: this.copy.admin.dialog.approveCancellationMessage(
-        this.item.clientDisplayName,
-        refundNote,
-      ),
+      message: this.copy.admin.dialog.approveCancellationMessage(refundNote),
+      detail: this.copy.admin.customerName(this.item.clientDisplayName),
       confirmLabel: this.copy.admin.dialog.approveCancellationAction,
+      variant: 'danger',
     });
 
     if (!confirmed) {

@@ -21,12 +21,6 @@
         </p>
       </header>
 
-      @if (successMessage()) {
-        <p class="admin-settings__banner admin-settings__banner--success" role="status">
-          {{ successMessage() }}
-        </p>
-      }
-
       @if (errorMessage()) {
         <p class="admin-settings__banner admin-settings__banner--error" role="alert">
           {{ errorMessage() }}
@@ -103,6 +97,9 @@
               type="tel"
               formControlName="vodafoneCashNumber"
               autocomplete="tel"
+              inputmode="numeric"
+              pattern="[0-9]*"
+              maxlength="11"
               dir="ltr"
               placeholder="01012345678"
               [attr.aria-invalid]="
@@ -177,7 +174,7 @@
           </label>
 
           <label>
-            مهلة رفض طلب الإلغاء التلقائي (ساعة قبل الجلسة)
+            مهلة رفض طلب الإلغاء التلقائي
             <input
               type="number"
               formControlName="cancellationRequestAutoDeclineHours"
@@ -210,6 +207,9 @@
               type="tel"
               formControlName="consultantWhatsAppNumber"
               autocomplete="tel"
+              inputmode="tel"
+              pattern="\+[1-9][0-9]{7,14}"
+              maxlength="16"
               dir="ltr"
               placeholder="+201012345678"
               [attr.aria-invalid]="

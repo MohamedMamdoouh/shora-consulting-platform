@@ -9,7 +9,10 @@
     <header class="cancellation-panel__header">
       <div>
         <h3 id="cancellation-panel-title">مراجعة طلب الإلغاء</h3>
-        <p class="cancellation-panel__subtitle">{{ item.clientDisplayName }}</p>
+        <p class="cancellation-panel__subtitle">
+          {{ copy.admin.customerNameLabel }}:
+          <strong>{{ item.clientDisplayName }}</strong>
+        </p>
       </div>
       <button type="button" class="cancellation-panel__close" (click)="close()" aria-label="إغلاق">
         ×
@@ -47,7 +50,7 @@
 
       @if (!showDeclineForm()) {
         <div class="cancellation-panel__actions">
-          <button type="button" class="btn" [disabled]="isApproving() || isDeclining()" (click)="approveRequest()">
+          <button type="button" class="btn btn--danger" [disabled]="isApproving() || isDeclining()" (click)="approveRequest()">
             {{ isApproving() ? 'جاري الموافقة...' : 'الموافقة على الإلغاء' }}
           </button>
           <button

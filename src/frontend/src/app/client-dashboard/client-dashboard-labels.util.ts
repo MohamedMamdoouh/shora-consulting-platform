@@ -11,7 +11,7 @@ const ADMIN_CANCELLATION_REASON_LABELS: Record<string, string> = {
 };
 
 const CANCELLATION_DETAIL_LABELS: Record<string, string> = {
-  'Receipt not uploaded in time': 'لم يُرفع الإيصال في الوقت المحدد',
+  'Receipt not uploaded in time': 'لم يتم رفع الإيصال في الوقت المحدد',
 };
 
 const REFUND_LABELS: Record<string, string> = {

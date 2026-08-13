@@ -28,10 +28,6 @@
   @extend .admin-alert;
 }
 
-.admin-settings__banner--success {
-  @extend .admin-alert--success;
-}
-
 .admin-settings__banner--error {
   @extend .admin-alert--error;
 }

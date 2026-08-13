@@ -9,13 +9,16 @@ import {
 } from './theme.util';
 
 export type { ResolvedTheme, ThemePreference } from './theme.util';
-export { THEME_STORAGE_KEY } from './theme.util';
+
+const mediaQuery =
+  typeof window.matchMedia === 'function'
+    ? window.matchMedia('(prefers-color-scheme: dark)')
+    : null;
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  private readonly mediaQuery = this.getMediaQuery();
-  private readonly preferenceState = signal<ThemePreference>(this.readStoredPreference());
-  private readonly systemDark = signal(this.mediaQuery?.matches ?? false);
+  private readonly preferenceState = signal<ThemePreference>(readStoredPreference());
+  private readonly systemDark = signal(mediaQuery?.matches ?? false);
 
   readonly preference = this.preferenceState.asReadonly();
   readonly resolved = computed<ResolvedTheme>(() =>
@@ -23,58 +26,39 @@ export class ThemeService {
   );
 
   constructor() {
-    this.mediaQuery?.addEventListener('change', this.onSystemChange);
-    this.apply(this.resolved());
-  }
-
-  initialize(): void {
-    this.apply(this.resolved());
+    mediaQuery?.addEventListener('change', (event) => {
+      this.systemDark.set(event.matches);
+      this.apply();
+    });
+    this.apply();
   }
 
   toggle(): void {
-    this.setPreference(nextThemePreference(this.preferenceState()));
+    const next = nextThemePreference(this.preferenceState(), this.systemDark());
+    this.preferenceState.set(next);
+    persistPreference(next);
+    this.apply();
   }
 
-  setPreference(preference: ThemePreference): void {
-    this.preferenceState.set(preference);
-    this.persist(preference);
-    this.apply(resolveTheme(preference, this.systemDark()));
+  private apply(): void {
+    const theme = this.resolved();
+    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.style.colorScheme = theme;
   }
+}
 
-  private readonly onSystemChange = (event: MediaQueryListEvent): void => {
-    this.systemDark.set(event.matches);
-    if (this.preferenceState() === 'system') {
-      this.apply(this.resolved());
-    }
-  };
-
-  private apply(theme: ResolvedTheme): void {
-    const root = document.documentElement;
-    root.setAttribute('data-theme', theme);
-    root.style.colorScheme = theme;
+function readStoredPreference(): ThemePreference {
+  try {
+    return parseStoredThemePreference(localStorage.getItem(THEME_STORAGE_KEY));
+  } catch {
+    return 'system';
   }
+}
 
-  private readStoredPreference(): ThemePreference {
-    try {
-      return parseStoredThemePreference(localStorage.getItem(THEME_STORAGE_KEY));
-    } catch {
-      return 'system';
-    }
-  }
-
-  private persist(preference: ThemePreference): void {
-    try {
-      localStorage.setItem(THEME_STORAGE_KEY, preference);
-    } catch {
-      // Ignore persistence failures.
-    }
-  }
-
-  private getMediaQuery(): MediaQueryList | null {
-    if (typeof window.matchMedia !== 'function') {
-      return null;
-    }
-
-    return window.matchMedia('(prefers-color-scheme: dark)');
+function persistPreference(preference: ThemePreference): void {
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, preference);
+  } catch {
+    // Private mode or blocked storage.
   }
 }

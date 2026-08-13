@@ -26,9 +26,15 @@ describe('theme utils', () => {
     expect(resolveTheme(parseStoredThemePreference('dark'), false)).toBe('dark');
   });
 
-  it('cycles system → light → dark → system', () => {
-    expect(nextThemePreference('system')).toBe('light');
-    expect(nextThemePreference('light')).toBe('dark');
-    expect(nextThemePreference('dark')).toBe('system');
+  it('pins the opposite of the system theme, then returns to system', () => {
+    expect(nextThemePreference('system', true)).toBe('light');
+    expect(nextThemePreference('light', true)).toBe('system');
+    expect(nextThemePreference('system', false)).toBe('dark');
+    expect(nextThemePreference('dark', false)).toBe('system');
+  });
+
+  it('skips a no-op return to system when the OS already matches the pin', () => {
+    expect(nextThemePreference('dark', true)).toBe('light');
+    expect(nextThemePreference('light', false)).toBe('dark');
   });
 });

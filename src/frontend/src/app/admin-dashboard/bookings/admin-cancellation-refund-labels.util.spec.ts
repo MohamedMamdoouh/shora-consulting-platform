@@ -1,6 +1,7 @@
 import { AdminBookingListItem } from '@contracts/booking';
 import { describe, expect, it } from 'vitest';
 import {
+  buildDirectCancelConfirm,
   canDirectCancelBooking,
   formatCancellationQueueNote,
   formatRemainingTime,
@@ -110,6 +111,19 @@ describe('admin cancellation and refund action labels', () => {
         }),
       ),
     ).toBe(false);
+  });
+
+  it('labels the customer name in the direct-cancel confirmation', () => {
+    const unpaid = buildDirectCancelConfirm(booking({ status: 'PendingPayment' }));
+    expect(unpaid.detail).toBe('اسم العميل: Client One');
+    expect(unpaid.message).toContain('هذا الحجز');
+    expect(unpaid.message).not.toContain('استرداد مستحق');
+
+    const paid = buildDirectCancelConfirm(
+      booking({ status: 'Confirmed', paymentStatus: 'Approved' }),
+    );
+    expect(paid.detail).toBe('اسم العميل: Client One');
+    expect(paid.message).toContain('استرداد مستحق');
   });
 
   it('shows row actions for reviewable, cancellable, and refundable bookings only', () => {

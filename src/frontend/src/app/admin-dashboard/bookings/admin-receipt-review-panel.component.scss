@@ -46,6 +46,11 @@
   font-size: 0.875rem;
 }
 
+.receipt-panel__subtitle strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
 .receipt-panel__close {
   border: none;
   background: transparent;

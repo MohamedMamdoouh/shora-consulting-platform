@@ -7,6 +7,8 @@ import { readApiError, readValidationErrors } from '../../core/api/api-error.uti
 import { settingsPublicRequest } from '../../core/api/cache.config';
 import { ApiCacheService } from '../../core/api/api-cache.service';
 import { AdminSettingsService } from '../../core/admin/admin-settings.service';
+import { APP_COPY } from '../../core/i18n/app-copy.constants';
+import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
 import { environment } from '../../../environments/environment';
 import {
   consultantWhatsAppValidators,
@@ -35,9 +37,11 @@ export class AdminSettingsPageComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly adminSettingsService = inject(AdminSettingsService);
   private readonly apiCache = inject(ApiCacheService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
+
+  private readonly copy = APP_COPY;
 
   readonly pageState = signal<PageState>({ status: 'loading' });
-  readonly successMessage = signal('');
   readonly errorMessage = signal('');
   readonly isSubmitting = signal(false);
 
@@ -61,7 +65,6 @@ export class AdminSettingsPageComponent implements OnInit {
 
   async loadSettings(): Promise<void> {
     this.pageState.set({ status: 'loading' });
-    this.successMessage.set('');
     this.errorMessage.set('');
 
     try {
@@ -86,7 +89,6 @@ export class AdminSettingsPageComponent implements OnInit {
       return;
     }
 
-    this.successMessage.set('');
     this.errorMessage.set('');
     this.isSubmitting.set(true);
 
@@ -96,16 +98,21 @@ export class AdminSettingsPageComponent implements OnInit {
       this.patchForm(updated);
       this.pageState.set({ status: 'ready', receiptRetentionMonths: updated.receiptRetentionMonths });
       this.apiCache.invalidate(settingsPublicRequest(environment.apiBaseUrl).url);
-      this.successMessage.set('تم حفظ الإعدادات بنجاح.');
     } catch (error) {
       if (this.applyServerValidationErrors(error)) {
         return;
       }
 
       this.errorMessage.set(readApiError(error, 'تعذر حفظ الإعدادات. راجع البيانات وحاول مرة أخرى.'));
+      return;
     } finally {
       this.isSubmitting.set(false);
     }
+
+    await this.confirmDialog.alert({
+      title: this.copy.admin.dialog.settingsSavedTitle,
+      message: this.copy.admin.dialog.settingsSavedMessage,
+    });
   }
 
   private patchForm(settings: AdminSettings): void {

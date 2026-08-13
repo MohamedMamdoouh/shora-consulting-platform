@@ -7,7 +7,10 @@ import {
   ViewEncapsulation,
 } from '@angular/core';
 import { APP_COPY } from '../../core/i18n/app-copy.constants';
-import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
+import {
+  ConfirmDialogRequest,
+  ConfirmDialogService,
+} from '../../core/ui/confirm-dialog.service';
 
 @Component({
   selector: 'app-confirm-dialog',
@@ -17,6 +20,7 @@ import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
       #dialogEl
       class="confirm-dialog"
       [attr.closedby]="'any'"
+      [attr.role]="dialog.request()?.mode === 'alert' ? 'alertdialog' : 'dialog'"
       aria-labelledby="confirm-dialog-title"
       aria-describedby="confirm-dialog-message"
       (click)="onDialogClick($event)"
@@ -26,11 +30,52 @@ import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
         <div
           class="confirm-dialog__card"
           [class.confirm-dialog__card--danger]="request.variant === 'danger'"
+          [class.confirm-dialog__card--success]="request.variant === 'success'"
         >
+          <div class="confirm-dialog__icon" aria-hidden="true">
+            @switch (request.variant) {
+              @case ('danger') {
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none">
+                  <path
+                    d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              }
+              @case ('success') {
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none">
+                  <path
+                    d="M20 7 10 17l-6-6"
+                    stroke="currentColor"
+                    stroke-width="2.2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              }
+              @default {
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none">
+                  <circle cx="12" cy="12" r="8.25" stroke="currentColor" stroke-width="1.8" />
+                  <path
+                    d="M12 11v5M12 8h.01"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              }
+            }
+          </div>
           <h2 id="confirm-dialog-title" class="confirm-dialog__title">
-            {{ request.title || copy.dialog.defaultTitle }}
+            {{ titleFor(request) }}
           </h2>
           <p id="confirm-dialog-message" class="confirm-dialog__message">{{ request.message }}</p>
+          @if (request.detail) {
+            <p class="confirm-dialog__detail">{{ request.detail }}</p>
+          }
           <div class="confirm-dialog__actions">
             <button
               type="button"
@@ -39,16 +84,18 @@ import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
               [attr.autofocus]="request.variant === 'danger' ? null : ''"
               (click)="accept()"
             >
-              {{ request.confirmLabel || copy.dialog.confirm }}
+              {{ confirmLabelFor(request) }}
             </button>
-            <button
-              type="button"
-              class="btn btn--secondary"
-              [attr.autofocus]="request.variant === 'danger' ? '' : null"
-              (click)="dismiss()"
-            >
-              {{ request.cancelLabel || copy.dialog.cancel }}
-            </button>
+            @if (request.mode !== 'alert') {
+              <button
+                type="button"
+                class="btn btn--secondary"
+                [attr.autofocus]="request.variant === 'danger' ? '' : null"
+                (click)="dismiss()"
+              >
+                {{ request.cancelLabel || copy.dialog.cancel }}
+              </button>
+            }
           </div>
         </div>
       }
@@ -84,7 +131,8 @@ import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
 
     .confirm-dialog__card {
       display: grid;
-      gap: var(--space-lg);
+      justify-items: start;
+      gap: var(--space-md);
       width: min(100%, 24rem);
       padding: var(--space-xl);
       border: 1px solid var(--color-border);
@@ -94,29 +142,32 @@ import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
       animation: confirm-card-in var(--transition-base) both;
     }
 
+    .confirm-dialog__icon {
+      display: grid;
+      place-items: center;
+      width: 3rem;
+      height: 3rem;
+      border-radius: var(--radius-full);
+      background: var(--color-primary-soft);
+      color: var(--color-primary);
+    }
+
+    .confirm-dialog__card--danger .confirm-dialog__icon {
+      background: var(--color-error-bg);
+      color: var(--color-error);
+    }
+
+    .confirm-dialog__card--success .confirm-dialog__icon {
+      background: var(--color-success-bg);
+      color: var(--color-success);
+    }
+
     .confirm-dialog__title {
-      position: relative;
       margin: 0;
-      padding-inline-start: var(--space-lg);
       font-family: var(--font-display);
       font-size: var(--font-size-lg);
       font-weight: 700;
       line-height: var(--line-height-heading);
-    }
-
-    .confirm-dialog__title::before {
-      content: '';
-      position: absolute;
-      inset-inline-start: 0;
-      top: 0.15em;
-      bottom: 0.15em;
-      width: 4px;
-      border-radius: var(--radius-full);
-      background: var(--color-primary);
-    }
-
-    .confirm-dialog__card--danger .confirm-dialog__title::before {
-      background: var(--color-error);
     }
 
     .confirm-dialog__message {
@@ -126,10 +177,28 @@ import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
       line-height: var(--line-height-body);
     }
 
+    .confirm-dialog__detail {
+      margin: 0;
+      width: 100%;
+      padding: var(--space-sm) var(--space-md);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-linen);
+      color: var(--color-text);
+      font-weight: 600;
+    }
+
+    .confirm-dialog__card--danger .confirm-dialog__detail {
+      border-color: var(--color-error-border);
+      background: var(--color-error-bg);
+    }
+
     .confirm-dialog__actions {
       display: flex;
       flex-wrap: wrap;
       gap: var(--space-sm);
+      width: 100%;
+      margin-top: var(--space-xs);
     }
 
     @keyframes confirm-card-in {
@@ -156,12 +225,33 @@ export class ConfirmDialogComponent {
     afterRenderEffect(() => {
       const request = this.dialog.request();
       const element = this.dialogEl()?.nativeElement;
-      if (!request || !element || element.open || typeof element.showModal !== 'function') {
+      if (!element || typeof element.showModal !== 'function') {
         return;
       }
 
-      element.showModal();
+      if (request && !element.open) {
+        element.showModal();
+        return;
+      }
+
+      if (!request && element.open) {
+        element.close();
+      }
     });
+  }
+
+  protected titleFor(request: ConfirmDialogRequest): string {
+    return (
+      request.title ||
+      (request.mode === 'alert' ? this.copy.dialog.successTitle : this.copy.dialog.defaultTitle)
+    );
+  }
+
+  protected confirmLabelFor(request: ConfirmDialogRequest): string {
+    return (
+      request.confirmLabel ||
+      (request.mode === 'alert' ? this.copy.dialog.acknowledge : this.copy.dialog.confirm)
+    );
   }
 
   protected accept(): void {

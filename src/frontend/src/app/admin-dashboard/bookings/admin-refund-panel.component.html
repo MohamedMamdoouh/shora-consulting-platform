@@ -13,7 +13,10 @@
         } @else {
           <h3 id="refund-revoke-title">تراجع عن تسجيل الاسترداد</h3>
         }
-        <p class="refund-panel__subtitle">{{ item.clientDisplayName }}</p>
+        <p class="refund-panel__subtitle">
+          {{ copy.admin.customerNameLabel }}:
+          <strong>{{ item.clientDisplayName }}</strong>
+        </p>
       </div>
       <button type="button" class="refund-panel__close" (click)="close()" aria-label="إغلاق">
         ×
@@ -59,11 +62,17 @@
         <label>
           سبب التصحيح
           <textarea
+            id="refund-revoke-reason"
             formControlName="correctionReason"
             rows="4"
             maxlength="1000"
             placeholder="اشرح سبب التراجع عن تسجيل الاسترداد"
+            [attr.aria-invalid]="!hasCorrectionReason()"
+            [attr.aria-describedby]="correctionReasonError() ? 'refund-revoke-reason-error' : null"
           ></textarea>
+          @if (correctionReasonError(); as error) {
+            <span id="refund-revoke-reason-error" class="field-error" role="alert">{{ error }}</span>
+          }
         </label>
 
         @if (actionError()) {
@@ -71,11 +80,15 @@
         }
 
         <div class="refund-panel__actions">
-          <button type="submit" class="btn btn--danger" [disabled]="isSubmitting()">
-            {{ isSubmitting() ? 'جاري التراجع...' : 'تأكيد التراجع' }}
+          <button
+            type="submit"
+            class="btn btn--danger"
+            [disabled]="!hasCorrectionReason() || isSubmitting()"
+          >
+            {{ isSubmitting() ? copy.admin.dialog.revokeRefundSubmitting : copy.admin.dialog.revokeRefundAction }}
           </button>
           <button type="button" class="btn btn--secondary" [disabled]="isSubmitting()" (click)="close()">
-            إلغاء
+            {{ copy.dialog.cancel }}
           </button>
         </div>
       </form>

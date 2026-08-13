@@ -45,6 +45,11 @@
   font-size: 0.875rem;
 }
 
+.cancellation-panel__subtitle strong {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
 .cancellation-panel__close {
   border: none;
   background: transparent;

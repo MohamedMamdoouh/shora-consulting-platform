@@ -85,9 +85,15 @@ export function formatCancellationQueueNote(item: AdminBookingListItem): string 
   return parts.join(' · ');
 }
 
-export function buildDirectCancelConfirmMessage(item: AdminBookingListItem): string {
+export function buildDirectCancelConfirm(item: AdminBookingListItem): {
+  message: string;
+  detail: string;
+} {
   const refundNote =
     item.paymentStatus === 'Approved' ? APP_COPY.admin.dialog.refundDueNote : '';
 
-  return APP_COPY.admin.dialog.cancelBookingMessage(item.clientDisplayName, refundNote);
+  return {
+    message: APP_COPY.admin.dialog.cancelBookingMessage(refundNote),
+    detail: APP_COPY.admin.customerName(item.clientDisplayName),
+  };
 }

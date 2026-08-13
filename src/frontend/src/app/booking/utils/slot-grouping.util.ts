@@ -1,17 +1,12 @@
 import { AvailabilitySlot } from '@contracts/availability';
-import { APP_LOCALE } from '../../core/i18n/app-locale';
+import { formatDayOfWeek } from '../../admin-dashboard/availability/availability-window.util';
+import { formatDateTime } from '../../core/i18n/app-locale';
 
 export interface SlotDayGroup {
   dateKey: string;
   label: string;
   slots: AvailabilitySlot[];
 }
-
-const dayLabelFormatter = new Intl.DateTimeFormat(APP_LOCALE, {
-  weekday: 'long',
-  day: 'numeric',
-  month: 'long',
-});
 
 export function groupSlotsByLocalDay(slots: AvailabilitySlot[]): SlotDayGroup[] {
   const groups = new Map<string, SlotDayGroup>();
@@ -28,7 +23,10 @@ export function groupSlotsByLocalDay(slots: AvailabilitySlot[]): SlotDayGroup[] 
 
     groups.set(dateKey, {
       dateKey,
-      label: dayLabelFormatter.format(start),
+      label: `${formatDayOfWeek(start.getDay())} ${formatDateTime(start, {
+        day: 'numeric',
+        month: 'long',
+      })}`,
       slots: [slot],
     });
   }
@@ -45,25 +43,24 @@ export function groupSlotsByLocalDay(slots: AvailabilitySlot[]): SlotDayGroup[] 
 }
 
 export function formatSlotTime(slot: AvailabilitySlot): string {
-  return new Intl.DateTimeFormat(APP_LOCALE, {
+  return formatDateTime(slot.startTimeUtc, {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
-  }).format(new Date(slot.startTimeUtc));
+  });
 }
 
 export function formatSlotSummary(startTimeUtc: string): string {
   const start = new Date(startTimeUtc);
-  const date = new Intl.DateTimeFormat(APP_LOCALE, {
-    weekday: 'long',
+  const date = `${formatDayOfWeek(start.getDay())} ${formatDateTime(start, {
     day: 'numeric',
     month: 'long',
-  }).format(start);
-  const time = new Intl.DateTimeFormat(APP_LOCALE, {
+  })}`;
+  const time = formatDateTime(start, {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
-  }).format(start);
+  });
 
   return `${date} — ${time}`;
 }

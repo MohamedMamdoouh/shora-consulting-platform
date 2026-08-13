@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { APP_COPY } from '../../core/i18n/app-copy.constants';
 import { AuthService } from '../../core/auth/auth.service';
-import { ThemePreference, ThemeService } from '../../core/theme/theme.service';
+import { ThemeService } from '../../core/theme/theme.service';
 import { BrandLogoComponent } from '../components/brand-logo.component';
 
 @Component({
@@ -18,13 +18,9 @@ export class ShellComponent {
   protected navOpen = false;
 
   protected themeLabel(): string {
-    const labels: Record<ThemePreference, string> = {
-      system: this.copy.theme.system,
-      light: this.copy.theme.light,
-      dark: this.copy.theme.dark,
-    };
-
-    return `${this.copy.theme.cycle} — ${labels[this.theme.preference()]}`;
+    const next =
+      this.theme.resolved() === 'dark' ? this.copy.theme.light : this.copy.theme.dark;
+    return `${this.copy.theme.cycle} — ${next}`;
   }
 
   cycleTheme(): void {

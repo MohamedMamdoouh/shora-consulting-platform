@@ -52,7 +52,7 @@ internal static class TransactionEmailLabels
     public static string? FormatCancellationDetail(string? detail) =>
         detail switch
         {
-            MyBookingLabelMapper.ReceiptNotUploadedInTime => "لم يُرفع الإيصال في الوقت المحدد",
+            MyBookingLabelMapper.ReceiptNotUploadedInTime => "لم يتم رفع الإيصال في الوقت المحدد",
             null or "" => null,
             _ => detail.Trim()
         };

@@ -2,6 +2,7 @@ import { BookingStatus, DeliveryMethod } from '@contracts/booking';
 import {
   localizeCancellationDetail,
   localizeCancellationReasonLabel,
+  localizeRefundLabel,
 } from '../../client-dashboard/client-dashboard-labels.util';
 import { formatSlotRange } from '../../client-dashboard/client-dashboard-slot.util';
 
@@ -12,11 +13,32 @@ export const BOOKING_STATUS_OPTIONS: ReadonlyArray<{ value: '' | BookingStatus; 
   { value: 'Confirmed', label: 'مؤكدة' },
   { value: 'CancellationRequested', label: 'طلب إلغاء' },
   { value: 'Completed', label: 'مكتملة' },
-  { value: 'Cancelled', label: 'ملغاة' },
+  { value: 'Cancelled', label: 'تم إلغاؤها' },
 ];
 
-export function formatBookingStatus(status: BookingStatus): string {
+export function isRefundedCancelledBooking(
+  status: BookingStatus,
+  paymentStatus?: string | null,
+): boolean {
+  return status === 'Cancelled' && paymentStatus === 'Refunded';
+}
+
+export function formatBookingStatus(
+  status: BookingStatus,
+  paymentStatus?: string | null,
+): string {
+  if (isRefundedCancelledBooking(status, paymentStatus)) {
+    return 'مستردة';
+  }
+
   return BOOKING_STATUS_OPTIONS.find((option) => option.value === status)?.label ?? status;
+}
+
+export function bookingStatusDataAttr(
+  status: BookingStatus,
+  paymentStatus?: string | null,
+): string {
+  return isRefundedCancelledBooking(status, paymentStatus) ? 'Refunded' : status;
 }
 
 export function formatDeliveryMethod(method: DeliveryMethod): string {
@@ -39,8 +61,10 @@ export function formatCancellationNote(
   cancellationReasonLabel?: string | null,
   refundDue?: boolean,
   cancellationDetail?: string | null,
+  paymentStatus?: string | null,
 ): string | null {
-  if (status !== 'Cancelled' && !refundDue) {
+  const refunded = isRefundedCancelledBooking(status, paymentStatus);
+  if (status !== 'Cancelled' && !refundDue && !refunded) {
     return null;
   }
 
@@ -56,7 +80,12 @@ export function formatCancellationNote(
     parts.push(`السبب: ${localizedDetail}`);
   }
 
-  if (refundDue) {
+  if (refunded) {
+    const refundLabel = localizeRefundLabel('Refunded');
+    if (refundLabel) {
+      parts.push(refundLabel);
+    }
+  } else if (refundDue) {
     parts.push('استرداد مستحق');
   }
 

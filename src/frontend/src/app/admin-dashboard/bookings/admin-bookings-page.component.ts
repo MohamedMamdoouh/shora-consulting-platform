@@ -14,6 +14,7 @@ import { APP_COPY } from '../../core/i18n/app-copy.constants';
 import { readBookingErrorMessage } from '../../booking/booking-error.util';
 import {
   BOOKING_STATUS_OPTIONS,
+  bookingStatusDataAttr,
   formatAdminBookingSlot,
   formatBookingStatus,
   formatCancellationNote,
@@ -23,7 +24,7 @@ import {
   totalPages,
 } from './admin-bookings-labels.util';
 import {
-  buildDirectCancelConfirmMessage,
+  buildDirectCancelConfirm,
   canDirectCancelBooking,
   formatCancellationQueueNote,
   isCancellationRequestPending,
@@ -94,6 +95,7 @@ export class AdminBookingsPageComponent implements OnInit {
   readonly statusOptions = BOOKING_STATUS_OPTIONS;
   readonly pageSize = ADMIN_BOOKINGS_QUERY_LIMITS.defaultPageSize;
   readonly formatBookingStatus = formatBookingStatus;
+  readonly bookingStatusDataAttr = bookingStatusDataAttr;
   readonly formatDeliveryMethod = formatDeliveryMethod;
   readonly formatAdminBookingSlot = formatAdminBookingSlot;
   readonly formatCancellationNote = formatCancellationNote;
@@ -205,7 +207,7 @@ export class AdminBookingsPageComponent implements OnInit {
 
     const confirmed = await this.confirmDialog.confirm({
       title: this.copy.admin.dialog.cancelBookingTitle,
-      message: buildDirectCancelConfirmMessage(item),
+      ...buildDirectCancelConfirm(item),
       confirmLabel: this.copy.admin.dialog.cancelBookingAction,
       variant: 'danger',
     });
@@ -249,6 +251,7 @@ export class AdminBookingsPageComponent implements OnInit {
       item.cancellationReasonLabel,
       item.refundDue,
       item.cancellationDetail,
+      item.paymentStatus,
     );
   }
 

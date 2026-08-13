@@ -102,7 +102,7 @@ export function getAdminSettingsFieldError(
   }
 
   if (control.errors['e164']) {
-    return 'رقم واتساب غير صالح. استخدم صيغة E.164 مثل +201012345678.';
+    return 'رقم واتساب غير صالح. استخدم صيغة مثل +201012345678';
   }
 
   if (control.errors['egyptMobile']) {

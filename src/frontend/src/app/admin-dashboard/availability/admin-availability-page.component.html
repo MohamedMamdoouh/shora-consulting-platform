@@ -16,16 +16,9 @@
       <header class="admin-availability__header">
         <h2>المواعيد والتوفر</h2>
         <p class="admin-availability__note">
-          نوافذ التوفر وفترات الحجب تدخل وتعرض بتوقيتي المحلي ({{ consultantTimeZoneLabel }}).
-          فترات الحجب تخزن على الخادم بتوقيت UTC.
+          نوافذ التوفر وفترات الحجب تُدخل وتُعرض حسب توقيتك المحلي (القاهرة).
         </p>
       </header>
-
-      @if (successMessage()) {
-        <p class="admin-availability__banner admin-availability__banner--success" role="status">
-          {{ successMessage() }}
-        </p>
-      }
 
       @if (errorMessage()) {
         <p class="admin-availability__banner admin-availability__banner--error" role="alert">
@@ -73,11 +66,7 @@
         }
       </article>
 
-      <article class="admin-availability__section">
-        <div class="admin-availability__section-header">
-          <h3>{{ formTitle() }}</h3>
-        </div>
-
+      <ng-template #windowFormTpl>
         <form class="admin-availability__form" [formGroup]="form" (ngSubmit)="submit()">
           <label>
             اليوم
@@ -123,13 +112,33 @@
             }
           </div>
         </form>
-      </article>
+      </ng-template>
 
-      @if (blockedSuccessMessage()) {
-        <p class="admin-availability__banner admin-availability__banner--success" role="status">
-          {{ blockedSuccessMessage() }}
-        </p>
+      @if (!isEditing()) {
+        <article class="admin-availability__section">
+          <div class="admin-availability__section-header">
+            <h3>{{ formTitle() }}</h3>
+          </div>
+
+          <ng-container [ngTemplateOutlet]="windowFormTpl" />
+        </article>
       }
+
+      <dialog
+        #windowDialog
+        class="admin-availability__dialog"
+        [attr.closedby]="'any'"
+        aria-labelledby="availability-window-dialog-title"
+        (click)="onWindowDialogBackdrop($event)"
+        (close)="onWindowDialogClose()"
+      >
+        @if (isEditing()) {
+          <div class="admin-availability__dialog-card">
+            <h3 id="availability-window-dialog-title">{{ formTitle() }}</h3>
+            <ng-container [ngTemplateOutlet]="windowFormTpl" />
+          </div>
+        }
+      </dialog>
 
       @if (blockedErrorMessage()) {
         <div class="admin-availability__banner admin-availability__banner--error" role="alert">
@@ -148,10 +157,10 @@
 
       <article class="admin-availability__section">
         <div class="admin-availability__section-header">
-          <h3>فترات الحجب (إجازات)</h3>
+          <h3>فترات الإجازات</h3>
           <p class="admin-availability__note">
-            يحجب النطاق الزمني المواعيد المفتوحة المتداخلة. لا يمكن الحجب فوق حجوزات نشطة — قم
-            بإلغاء الحجز أولًا من لوحة الحجوزات.
+            مواعيد أنت غير متاح فيها. لا يمكن حجب موعد مرتبط بحجز نشط. يجب إلغاء الحجز أولًا من
+            لوحة الحجوزات.
           </p>
         </div>
 

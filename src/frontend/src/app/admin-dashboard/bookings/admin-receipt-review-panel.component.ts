@@ -103,7 +103,8 @@ export class AdminReceiptReviewPanelComponent implements OnInit {
 
     const confirmed = await this.confirmDialog.confirm({
       title: this.copy.admin.dialog.approveReceiptTitle,
-      message: this.copy.admin.dialog.approveReceiptMessage(this.clientDisplayName),
+      message: this.copy.admin.dialog.approveReceiptMessage,
+      detail: this.copy.admin.customerName(this.clientDisplayName),
       confirmLabel: this.copy.admin.dialog.approveReceiptAction,
     });
 

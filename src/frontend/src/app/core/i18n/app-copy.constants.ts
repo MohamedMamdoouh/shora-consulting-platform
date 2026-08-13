@@ -54,6 +54,8 @@ export const APP_COPY = {
     defaultTitle: 'تأكيد',
     confirm: 'تأكيد',
     cancel: 'إلغاء',
+    acknowledge: 'حسنًا',
+    successTitle: 'تم بنجاح',
   },
   cta: {
     bookSession: 'احجز جلسة',
@@ -153,32 +155,47 @@ export const APP_COPY = {
       `سيتم الاتصال بك في ${time} على الرقم ${phone}.`,
   },
   admin: {
+    customerNameLabel: 'اسم العميل',
+    customerName: (name: string) => `اسم العميل: ${name}`,
     dialog: {
       deleteWindowTitle: 'حذف نافذة التوفر',
-      deleteWindowMessage: (summary: string) =>
-        `حذف "${summary}"؟ سيتم إعادة توليد المواعيد المتاحة.`,
+      deleteWindowMessage: 'سيتم حذف هذه النافذة وإعادة توليد المواعيد المتاحة.',
       deleteWindowAction: 'حذف',
+      windowSavedTitle: 'تم حفظ النافذة',
+      windowAddedMessage: 'ستظهر المواعيد الجديدة حسب نافذة التوفر هذه.',
+      windowUpdatedMessage: 'تم حفظ تعديلات نافذة التوفر.',
+      windowDeletedTitle: 'تم حذف النافذة',
+      windowDeletedMessage: 'ستتم إعادة توليد المواعيد المتاحة بدون هذه النافذة.',
       removeBlockedDateTitle: 'إزالة فترة الحجب',
-      removeBlockedDateMessage: (summary: string) =>
-        `إزالة الحجب "${summary}"؟ ستتم إعادة توليد المواعيد المتاحة خلال هذه الفترة.`,
+      removeBlockedDateMessage:
+        'ستتم إزالة فترة الحجب وإعادة توليد المواعيد المتاحة خلال هذا النطاق.',
       removeBlockedDateAction: 'إزالة',
+      blockedDateAddedTitle: 'تم حجب الفترة',
+      blockedDateAddedMessage: 'لن تظهر مواعيد خلال هذه الفترة في صفحة الحجز.',
+      blockedDateRemovedTitle: 'تمت إزالة الحجب',
+      blockedDateRemovedMessage: 'ستُعاد المواعيد المتاحة خلال هذه الفترة.',
       approveCancellationTitle: 'الموافقة على الإلغاء',
-      approveCancellationMessage: (clientName: string, refundNote: string) =>
-        `هل تريد الموافقة على إلغاء حجز ${clientName}؟${refundNote}`,
+      approveCancellationMessage: (refundNote: string) =>
+        `هل تريد الموافقة على إلغاء هذا الحجز؟${refundNote}`,
       approveCancellationAction: 'موافقة',
       refundDueNote: ' سيتم وضع علامة «استرداد مستحق» لأن الدفع مقبول.',
       approveReceiptTitle: 'قبول الإيصال',
-      approveReceiptMessage: (clientName: string) =>
-        `هل تريد قبول إيصال الدفع وتأكيد حجز ${clientName}؟`,
+      approveReceiptMessage: 'هل تريد قبول إيصال الدفع وتأكيد هذا الحجز؟',
       approveReceiptAction: 'قبول',
       revokeRefundTitle: 'التراجع عن الاسترداد',
       revokeRefundMessage:
         'هل تريد التراجع عن تسجيل الاسترداد؟ سيعود الحجز إلى حالة «استرداد مستحق».',
       revokeRefundAction: 'تأكيد التراجع',
+      revokeRefundSubmitting: 'جاري التراجع...',
+      revokeRefundReasonRequired: 'سبب التصحيح مطلوب. اكتب السبب لتأكيد التراجع.',
+      revokeRefundReasonTooLong: 'سبب التصحيح يجب ألا يتجاوز 1000 حرف.',
       cancelBookingTitle: 'إلغاء الحجز',
-      cancelBookingMessage: (clientName: string, refundNote: string) =>
-        `هل تريد إلغاء حجز ${clientName}؟${refundNote}`,
+      cancelBookingMessage: (refundNote: string) =>
+        `هل تريد إلغاء هذا الحجز؟${refundNote}`,
       cancelBookingAction: 'إلغاء الحجز',
+      settingsSavedTitle: 'تم حفظ الإعدادات',
+      settingsSavedMessage:
+        'تم حفظ الإعدادات بنجاح. التغييرات تنطبق على الحجوزات والمواعيد الجديدة فقط.',
     },
   },
 } as const;

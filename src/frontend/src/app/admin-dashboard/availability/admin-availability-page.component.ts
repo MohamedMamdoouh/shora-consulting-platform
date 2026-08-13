@@ -1,4 +1,14 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import {
+  afterRenderEffect,
+  Component,
+  computed,
+  ElementRef,
+  inject,
+  OnInit,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
@@ -6,7 +16,7 @@ import {
   BlockedDate,
   CreateAvailabilityWindowRequest,
   CreateBlockedDateRequest,
-  DayOfWeek,
+  DayOfWeekName,
   UpdateAvailabilityWindowRequest,
 } from '@contracts/availability';
 import { ErrorCodes } from '@contracts/error-codes';
@@ -32,10 +42,10 @@ import {
   sortBlockedDates,
 } from './blocked-date.util';
 import {
-  CONSULTANT_TIME_ZONE_LABEL,
   DAY_OF_WEEK_OPTIONS,
   formatWindowSummary,
   getWindowFieldError,
+  parseDayOfWeek,
   sortWindows,
   toApiTimeValue,
   toTimeInputValue,
@@ -49,11 +59,12 @@ type PageState =
 
 @Component({
   selector: 'app-admin-availability-page',
-  imports: [ReactiveFormsModule],
+  imports: [NgTemplateOutlet, ReactiveFormsModule],
   templateUrl: './admin-availability-page.component.html',
   styleUrl: './admin-availability-page.component.scss',
 })
 export class AdminAvailabilityPageComponent implements OnInit {
+  private readonly windowDialogEl = viewChild<ElementRef<HTMLDialogElement>>('windowDialog');
   private readonly fb = inject(FormBuilder);
   private readonly adminAvailabilityService = inject(AdminAvailabilityService);
   private readonly adminBlockedDateService = inject(AdminBlockedDateService);
@@ -64,12 +75,10 @@ export class AdminAvailabilityPageComponent implements OnInit {
 
   readonly pageState = signal<PageState>({ status: 'loading' });
   readonly editingWindowId = signal<string | null>(null);
-  readonly successMessage = signal('');
   readonly errorMessage = signal('');
   readonly isSubmitting = signal(false);
   readonly deletingWindowId = signal<string | null>(null);
 
-  readonly blockedSuccessMessage = signal('');
   readonly blockedErrorMessage = signal('');
   readonly conflictingBookingIds = signal<string[]>([]);
   readonly isSubmittingBlocked = signal(false);
@@ -94,14 +103,13 @@ export class AdminAvailabilityPageComponent implements OnInit {
   );
 
   readonly dayOptions = DAY_OF_WEEK_OPTIONS;
-  readonly consultantTimeZoneLabel = CONSULTANT_TIME_ZONE_LABEL;
   readonly formatWindowSummary = formatWindowSummary;
   readonly formatBlockedRangeSummary = formatBlockedRangeSummary;
   readonly getFieldError = getWindowFieldError;
   readonly getBlockedFieldError = getBlockedDateFieldError;
 
   readonly form = this.fb.nonNullable.group({
-    dayOfWeek: this.fb.nonNullable.control<DayOfWeek>(1, windowFormValidators().dayOfWeek),
+    dayOfWeek: this.fb.nonNullable.control<DayOfWeekName>('Monday', windowFormValidators().dayOfWeek),
     startTime: this.fb.nonNullable.control('16:00', windowFormValidators().startTime),
     endTime: this.fb.nonNullable.control('21:00', windowFormValidators().endTime),
     isActive: this.fb.nonNullable.control(true, windowFormValidators().isActive),
@@ -118,6 +126,22 @@ export class AdminAvailabilityPageComponent implements OnInit {
     ),
     reason: this.fb.control<string | null>(null, blockedDateFormValidators().reason),
   });
+
+  constructor() {
+    afterRenderEffect(() => {
+      const editing = this.isEditing();
+      const element = this.windowDialogEl()?.nativeElement;
+      if (!element || typeof element.showModal !== 'function') {
+        return;
+      }
+
+      if (editing && !element.open) {
+        element.showModal();
+      } else if (!editing && element.open) {
+        element.close();
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.form.controls.startTime.valueChanges.subscribe(() => {
@@ -159,7 +183,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
     this.editingWindowId.set(null);
     this.clearWindowMessages();
     this.form.reset({
-      dayOfWeek: 1 as DayOfWeek,
+      dayOfWeek: 'Monday',
       startTime: '16:00',
       endTime: '21:00',
       isActive: true,
@@ -170,7 +194,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
     this.editingWindowId.set(window.id);
     this.clearWindowMessages();
     this.form.reset({
-      dayOfWeek: window.dayOfWeek,
+      dayOfWeek: parseDayOfWeek(window.dayOfWeek),
       startTime: toTimeInputValue(window.startTime),
       endTime: toTimeInputValue(window.endTime),
       isActive: window.isActive,
@@ -179,6 +203,18 @@ export class AdminAvailabilityPageComponent implements OnInit {
 
   cancelEdit(): void {
     this.startCreate();
+  }
+
+  onWindowDialogClose(): void {
+    if (this.editingWindowId()) {
+      this.startCreate();
+    }
+  }
+
+  onWindowDialogBackdrop(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.cancelEdit();
+    }
   }
 
   resetBlockedForm(): void {
@@ -207,18 +243,20 @@ export class AdminAvailabilityPageComponent implements OnInit {
     try {
       const payload = this.buildWindowPayload();
       const editingId = this.editingWindowId();
-
-      if (editingId) {
-        await firstValueFrom(this.adminAvailabilityService.updateWindow(editingId, payload));
-        this.successMessage.set('تم تحديث نافذة التوفر.');
-      } else {
-        await firstValueFrom(this.adminAvailabilityService.createWindow(payload));
-        this.successMessage.set('تمت إضافة نافذة التوفر.');
-      }
+      const saved = editingId
+        ? await firstValueFrom(this.adminAvailabilityService.updateWindow(editingId, payload))
+        : await firstValueFrom(this.adminAvailabilityService.createWindow(payload));
 
       this.invalidateAvailabilityCache();
       this.startCreate();
       await this.refreshWindows();
+      await this.confirmDialog.alert({
+        title: this.copy.admin.dialog.windowSavedTitle,
+        message: editingId
+          ? this.copy.admin.dialog.windowUpdatedMessage
+          : this.copy.admin.dialog.windowAddedMessage,
+        detail: formatWindowSummary(saved),
+      });
     } catch (error) {
       if (this.applyWindowServerValidationErrors(error)) {
         return;
@@ -246,14 +284,18 @@ export class AdminAvailabilityPageComponent implements OnInit {
     this.isSubmittingBlocked.set(true);
 
     try {
-      await firstValueFrom(
+      const created = await firstValueFrom(
         this.adminBlockedDateService.createBlockedDate(this.buildBlockedDatePayload()),
       );
 
       this.invalidateAvailabilityCache();
-      this.blockedSuccessMessage.set('تمت إضافة فترة الحجب.');
       this.resetBlockedForm();
       await this.refreshBlockedDates();
+      await this.confirmDialog.alert({
+        title: this.copy.admin.dialog.blockedDateAddedTitle,
+        message: this.copy.admin.dialog.blockedDateAddedMessage,
+        detail: formatBlockedRangeSummary(created),
+      });
     } catch (error) {
       if (this.applyBlockedServerValidationErrors(error)) {
         return;
@@ -290,7 +332,8 @@ export class AdminAvailabilityPageComponent implements OnInit {
 
     const confirmed = await this.confirmDialog.confirm({
       title: this.copy.admin.dialog.deleteWindowTitle,
-      message: this.copy.admin.dialog.deleteWindowMessage(formatWindowSummary(window)),
+      message: this.copy.admin.dialog.deleteWindowMessage,
+      detail: formatWindowSummary(window),
       confirmLabel: this.copy.admin.dialog.deleteWindowAction,
       variant: 'danger',
     });
@@ -309,8 +352,12 @@ export class AdminAvailabilityPageComponent implements OnInit {
         this.startCreate();
       }
 
-      this.successMessage.set('تم حذف نافذة التوفر.');
       await this.refreshWindows();
+      await this.confirmDialog.alert({
+        title: this.copy.admin.dialog.windowDeletedTitle,
+        message: this.copy.admin.dialog.windowDeletedMessage,
+        detail: formatWindowSummary(window),
+      });
     } catch (error) {
       this.errorMessage.set(readApiError(error, 'تعذر حذف نافذة التوفر. حاول مرة أخرى.'));
     } finally {
@@ -325,9 +372,8 @@ export class AdminAvailabilityPageComponent implements OnInit {
 
     const confirmed = await this.confirmDialog.confirm({
       title: this.copy.admin.dialog.removeBlockedDateTitle,
-      message: this.copy.admin.dialog.removeBlockedDateMessage(
-        formatBlockedRangeSummary(blockedDate),
-      ),
+      message: this.copy.admin.dialog.removeBlockedDateMessage,
+      detail: formatBlockedRangeSummary(blockedDate),
       confirmLabel: this.copy.admin.dialog.removeBlockedDateAction,
       variant: 'danger',
     });
@@ -341,8 +387,12 @@ export class AdminAvailabilityPageComponent implements OnInit {
     try {
       await firstValueFrom(this.adminBlockedDateService.deleteBlockedDate(blockedDate.id));
       this.invalidateAvailabilityCache();
-      this.blockedSuccessMessage.set('تمت إزالة فترة الحجب.');
       await this.refreshBlockedDates();
+      await this.confirmDialog.alert({
+        title: this.copy.admin.dialog.blockedDateRemovedTitle,
+        message: this.copy.admin.dialog.blockedDateRemovedMessage,
+        detail: formatBlockedRangeSummary(blockedDate),
+      });
     } catch (error) {
       this.blockedErrorMessage.set(readApiError(error, 'تعذر إزالة فترة الحجب. حاول مرة أخرى.'));
     } finally {
@@ -387,7 +437,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
     const raw = this.form.getRawValue();
 
     return {
-      dayOfWeek: raw.dayOfWeek,
+      dayOfWeek: parseDayOfWeek(raw.dayOfWeek),
       startTime: toApiTimeValue(raw.startTime),
       endTime: toApiTimeValue(raw.endTime),
       isActive: raw.isActive,
@@ -410,12 +460,10 @@ export class AdminAvailabilityPageComponent implements OnInit {
   }
 
   private clearWindowMessages(): void {
-    this.successMessage.set('');
     this.errorMessage.set('');
   }
 
   private clearBlockedMessages(): void {
-    this.blockedSuccessMessage.set('');
     this.blockedErrorMessage.set('');
     this.conflictingBookingIds.set([]);
   }

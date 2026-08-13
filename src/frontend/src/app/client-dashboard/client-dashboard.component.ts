@@ -22,7 +22,12 @@ type DashboardSectionState =
 
 @Component({
   selector: 'app-client-dashboard',
-  imports: [RouterLink, PendingPaymentCardComponent, PendingApprovalCardComponent, UpcomingBookingCardComponent],
+  imports: [
+    RouterLink,
+    PendingPaymentCardComponent,
+    PendingApprovalCardComponent,
+    UpcomingBookingCardComponent,
+  ],
   templateUrl: './client-dashboard.component.html',
   styleUrl: './client-dashboard.component.scss',
 })
@@ -75,7 +80,7 @@ export class ClientDashboardComponent implements OnInit {
       case 'Completed':
         return 'مكتملة';
       case 'Cancelled':
-        return 'ملغاة';
+        return 'تم إلغاؤها';
       default:
         return status;
     }
@@ -93,11 +98,7 @@ export class ClientDashboardComponent implements OnInit {
   async loadMorePast(): Promise<void> {
     const past = this.pastSection();
 
-    if (
-      this.pastLoadingMore() ||
-      past.status !== 'ready' ||
-      past.items.length >= past.totalCount
-    ) {
+    if (this.pastLoadingMore() || past.status !== 'ready' || past.items.length >= past.totalCount) {
       return;
     }
 
@@ -137,8 +138,7 @@ export class ClientDashboardComponent implements OnInit {
       );
 
       const currentPast = this.pastSection();
-      const existingItems =
-        !reset && currentPast.status === 'ready' ? currentPast.items : [];
+      const existingItems = !reset && currentPast.status === 'ready' ? currentPast.items : [];
 
       this.pastSection.set({
         status: 'ready',

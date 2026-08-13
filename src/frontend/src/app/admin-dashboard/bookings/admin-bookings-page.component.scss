@@ -86,6 +86,12 @@
   border-color: var(--color-error-border);
 }
 
+.admin-bookings__status[data-status='Refunded'] {
+  background: var(--color-primary-muted);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
 .admin-bookings__status[data-status='PendingPayment'],
 .admin-bookings__status[data-status='PendingApproval'],
 .admin-bookings__status[data-status='CancellationRequested'] {

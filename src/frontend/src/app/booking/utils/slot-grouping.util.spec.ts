@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { groupSlotsByLocalDay } from './slot-grouping.util';
+import { formatSlotSummary, groupSlotsByLocalDay } from './slot-grouping.util';
 
 describe('groupSlotsByLocalDay', () => {
   it('groups slots by local calendar day and sorts times within each day', () => {
@@ -24,5 +24,20 @@ describe('groupSlotsByLocalDay', () => {
     expect(groups).toHaveLength(2);
     expect(groups[0]?.slots.map((slot) => slot.id)).toEqual(['1', '2']);
     expect(groups[1]?.slots.map((slot) => slot.id)).toEqual(['3']);
+  });
+
+  it('labels Monday groups as الإثنين', () => {
+    const mondayNoon = new Date(2026, 7, 10, 12, 0, 0).toISOString();
+    const groups = groupSlotsByLocalDay([
+      {
+        id: 'mon',
+        startTimeUtc: mondayNoon,
+        endTimeUtc: new Date(2026, 7, 10, 13, 0, 0).toISOString(),
+      },
+    ]);
+
+    expect(groups[0]?.label).toContain('الإثنين');
+    expect(groups[0]?.label).not.toContain('الاثنين');
+    expect(formatSlotSummary(mondayNoon)).toContain('الإثنين');
   });
 });

@@ -1,14 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, finalize, firstValueFrom, shareReplay, tap, throwError, timeout } from 'rxjs';
+import { Observable, finalize, firstValueFrom, shareReplay, tap, throwError } from 'rxjs';
 import { AuthResponse, AuthUser } from '@contracts/auth';
 import { MessageResponse } from '@contracts/common';
 import { environment } from '../../../environments/environment';
 import { resolvePostLoginRedirect, sanitizeAuthReturnUrl } from './auth-redirect.util';
 
 const USER_EMAIL_STORAGE_KEY = 'shora.auth.email';
-const AUTH_EMAIL_REQUEST_TIMEOUT_MS = 30_000;
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -56,10 +55,7 @@ export class AuthService {
         { email, password, displayName: displayName || null },
         { withCredentials: true },
       )
-      .pipe(
-        timeout(AUTH_EMAIL_REQUEST_TIMEOUT_MS),
-        tap((response) => this.setSession(response, email)),
-      );
+      .pipe(tap((response) => this.setSession(response, email)));
   }
 
   login(email: string, password: string): Observable<AuthResponse> {
@@ -119,19 +115,15 @@ export class AuthService {
   }
 
   resendVerification(email: string): Observable<MessageResponse> {
-    return this.http
-      .post<MessageResponse>(`${environment.apiBaseUrl}/auth/resend-verification`, {
-        email,
-      })
-      .pipe(timeout(AUTH_EMAIL_REQUEST_TIMEOUT_MS));
+    return this.http.post<MessageResponse>(`${environment.apiBaseUrl}/auth/resend-verification`, {
+      email,
+    });
   }
 
   forgotPassword(email: string): Observable<MessageResponse> {
-    return this.http
-      .post<MessageResponse>(`${environment.apiBaseUrl}/auth/forgot-password`, {
-        email,
-      })
-      .pipe(timeout(AUTH_EMAIL_REQUEST_TIMEOUT_MS));
+    return this.http.post<MessageResponse>(`${environment.apiBaseUrl}/auth/forgot-password`, {
+      email,
+    });
   }
 
   resetPassword(email: string, token: string, newPassword: string): Observable<MessageResponse> {

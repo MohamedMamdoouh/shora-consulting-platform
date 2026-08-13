@@ -188,6 +188,36 @@ public class AuthEndpointTests : IDisposable
     }
 
     [Fact]
+    public async Task Verify_email_accepts_token_with_spaces_instead_of_plus()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var client = CreateClient();
+
+        await client.PostAsJsonAsync("/api/v1/auth/signup", new SignUpRequest(
+            "verify-space-token@example.com",
+            "Password123!",
+            null), cancellationToken);
+
+        using var scope = _factory.Services.CreateScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var user = await userManager.FindByEmailAsync("verify-space-token@example.com");
+        Assert.NotNull(user);
+
+        var token = await userManager.GenerateEmailConfirmationTokenAsync(user!);
+        var corruptedToken = token.Replace('+', ' ');
+        var verifyResponse = await client.PostAsJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(
+            "verify-space-token@example.com",
+            corruptedToken), cancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, verifyResponse.StatusCode);
+
+        using var verifyScope = _factory.Services.CreateScope();
+        var refreshedUserManager = verifyScope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        user = await refreshedUserManager.FindByEmailAsync("verify-space-token@example.com");
+        Assert.True(user!.EmailConfirmed);
+    }
+
+    [Fact]
     public async Task Verify_email_already_confirmed_refreshes_session_with_email_confirmed()
     {
         var cancellationToken = TestContext.Current.CancellationToken;

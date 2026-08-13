@@ -163,7 +163,7 @@ public sealed class AuthService
             return VerifyEmailOutcome.AlreadyVerified;
         }
 
-        var result = await _userManager.ConfirmEmailAsync(user, request.Token);
+        var result = await _userManager.ConfirmEmailAsync(user, NormalizeIdentityToken(request.Token));
         if (!result.Succeeded)
         {
             return Error.Validation(
@@ -233,7 +233,10 @@ public sealed class AuthService
                 "Invalid reset request.");
         }
 
-        var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
+        var result = await _userManager.ResetPasswordAsync(
+            user,
+            NormalizeIdentityToken(request.Token),
+            request.NewPassword);
         if (!result.Succeeded)
         {
             return Error.Validation(
@@ -372,5 +375,21 @@ public sealed class AuthService
 
         var kind = code == ErrorCodes.Auth.DuplicateEmail ? ErrorKind.Conflict : ErrorKind.Validation;
         return new Error(code, message, kind);
+    }
+
+    private static string NormalizeIdentityToken(string token)
+    {
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            return token;
+        }
+
+        var normalized = token.Trim();
+        if (normalized.Contains(' ', StringComparison.Ordinal))
+        {
+            normalized = normalized.Replace(' ', '+');
+        }
+
+        return normalized;
     }
 }

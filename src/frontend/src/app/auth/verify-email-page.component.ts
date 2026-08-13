@@ -18,17 +18,12 @@ export class VerifyEmailPageComponent implements OnInit {
 
   readonly status = signal<'loading' | 'success' | 'error'>('loading');
   readonly message = signal('');
-  private isVerifying = false;
 
   ngOnInit(): void {
     void this.verifyFromQueryParams();
   }
 
   private async verifyFromQueryParams(): Promise<void> {
-    if (this.isVerifying || this.status() !== 'loading') {
-      return;
-    }
-
     const email = this.route.snapshot.queryParamMap.get('email');
     const token = this.route.snapshot.queryParamMap.get('token');
 
@@ -37,8 +32,6 @@ export class VerifyEmailPageComponent implements OnInit {
       this.message.set('رابط التحقق غير صالح.');
       return;
     }
-
-    this.isVerifying = true;
 
     try {
       const response = await firstValueFrom(this.auth.verifyEmail(email, token));
@@ -69,8 +62,6 @@ export class VerifyEmailPageComponent implements OnInit {
           ? 'رابط التحقق منتهي أو غير صالح.'
           : readApiError(err, 'تعذر تأكيد البريد الإلكتروني. حاول مرة أخرى.'),
       );
-    } finally {
-      this.isVerifying = false;
     }
   }
 

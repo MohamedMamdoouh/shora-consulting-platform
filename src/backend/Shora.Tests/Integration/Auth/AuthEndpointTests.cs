@@ -188,7 +188,7 @@ public class AuthEndpointTests : IDisposable
     }
 
     [Fact]
-    public async Task Verify_email_already_confirmed_returns_ok()
+    public async Task Verify_email_already_confirmed_refreshes_session_with_email_confirmed()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var client = CreateClient();
@@ -214,8 +214,10 @@ public class AuthEndpointTests : IDisposable
             token), cancellationToken);
         Assert.Equal(HttpStatusCode.OK, secondVerify.StatusCode);
 
-        var body = await secondVerify.Content.ReadFromJsonAsync<MessageResponse>(cancellationToken);
-        Assert.Equal("Email already verified.", body!.Message);
+        var authBody = await secondVerify.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        Assert.NotNull(authBody);
+        Assert.True(authBody!.EmailConfirmed);
+        Assert.NotEmpty(authBody.AccessToken);
     }
 
     [Fact]

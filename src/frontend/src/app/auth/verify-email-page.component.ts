@@ -51,12 +51,16 @@ export class VerifyEmailPageComponent implements OnInit {
         }
       }
 
+      if (this.auth.isAuthenticated()) {
+        await this.auth.syncCurrentUser();
+      }
+
       const alreadyVerified =
         'message' in response && response.message.toLowerCase().includes('already');
       this.completeSuccess(
         alreadyVerified
-          ? 'حسابك مؤكد بالفعل. سيتم تحويلك لتسجيل الدخول.'
-          : 'تم تأكيد بريدك الإلكتروني بنجاح. سيتم تحويلك لتسجيل الدخول.',
+          ? 'حسابك مؤكد بالفعل. جاري تحويلك…'
+          : 'تم تأكيد بريدك الإلكتروني بنجاح. جاري تحويلك…',
       );
     } catch (err) {
       this.status.set('error');
@@ -75,7 +79,28 @@ export class VerifyEmailPageComponent implements OnInit {
     this.message.set(message);
 
     setTimeout(() => {
-      void this.router.navigate(['/auth/login']);
+      void this.redirectAfterSuccess();
     }, 2000);
+  }
+
+  private async redirectAfterSuccess(): Promise<void> {
+    const returnUrl = this.auth.sanitizeReturnUrl(
+      this.route.snapshot.queryParamMap.get('returnUrl'),
+    );
+    const user = this.auth.getCurrentUser();
+
+    if (this.auth.isAuthenticated() && user?.emailConfirmed) {
+      if (returnUrl) {
+        await this.router.navigateByUrl(returnUrl);
+        return;
+      }
+
+      await this.auth.redirectAfterLogin(user.role);
+      return;
+    }
+
+    await this.router.navigate(['/auth/login'], {
+      queryParams: returnUrl ? { returnUrl } : undefined,
+    });
   }
 }

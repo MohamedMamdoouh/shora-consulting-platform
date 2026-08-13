@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, finalize, firstValueFrom, shareReplay, tap, throwError } from 'rxjs';
-import { AuthResponse, AuthUser } from '@contracts/auth';
+import { AuthResponse, AuthUser, MeResponse } from '@contracts/auth';
 import { MessageResponse } from '@contracts/common';
 import { environment } from '../../../environments/environment';
 import { resolvePostLoginRedirect, sanitizeAuthReturnUrl } from './auth-redirect.util';
@@ -43,8 +43,24 @@ export class AuthService {
   async initialize(): Promise<void> {
     try {
       await firstValueFrom(this.refresh());
+      await this.syncCurrentUser();
     } catch {
       this.clearSession();
+    }
+  }
+
+  async syncCurrentUser(): Promise<void> {
+    if (!this.isAuthenticated()) {
+      return;
+    }
+
+    try {
+      const profile = await firstValueFrom(
+        this.http.get<MeResponse>(`${environment.apiBaseUrl}/auth/me`),
+      );
+      this.patchCurrentUser(profile);
+    } catch {
+      // Session may have expired; leave state unchanged and let guards/interceptor handle it.
     }
   }
 
@@ -202,6 +218,24 @@ export class AuthService {
     });
 
     return this.loginRedirectPromise;
+  }
+
+  private patchCurrentUser(profile: MeResponse): void {
+    const current = this.currentUserState();
+    if (!current) {
+      return;
+    }
+
+    this.currentUserState.set({
+      displayName: profile.displayName,
+      role: profile.role,
+      emailConfirmed: profile.emailConfirmed,
+      email: profile.email || current.email,
+    });
+
+    if (profile.email) {
+      sessionStorage.setItem(USER_EMAIL_STORAGE_KEY, profile.email);
+    }
   }
 
   private setSession(response: AuthResponse, email?: string): void {

@@ -152,27 +152,10 @@ public sealed class AuthController : ApiControllerBase
             ? "Email already verified."
             : "Email verified.";
 
-        if (result.Value != VerifyEmailOutcome.AlreadyVerified)
+        var refreshed = await TryRefreshVerifiedUserSessionAsync(request.Email, cancellationToken);
+        if (refreshed is not null)
         {
-            var rawToken = _refreshCookieService.GetRefreshTokenFromRequest(Request);
-            if (!string.IsNullOrWhiteSpace(rawToken))
-            {
-                var user = await _userManager.FindByEmailAsync(request.Email.Trim());
-                if (user is not null)
-                {
-                    var (rotation, auth) = await _authService.RefreshAsync(
-                        rawToken,
-                        HttpContext.Connection.RemoteIpAddress?.ToString(),
-                        Request.Headers.UserAgent,
-                        cancellationToken);
-
-                    if (auth.IsSuccess && rotation.UserId == user.Id)
-                    {
-                        SetRefreshCookie(auth.Value!, rotation.NewToken!.ExpiresAtUtc);
-                        return Ok(auth.Value!.Response);
-                    }
-                }
-            }
+            return Ok(refreshed);
         }
 
         return Ok(new MessageResponse(message));
@@ -286,5 +269,36 @@ public sealed class AuthController : ApiControllerBase
     {
         var expires = expiresAtUtc ?? result.RefreshTokenExpiresAtUtc;
         _refreshCookieService.SetRefreshTokenCookie(Response, result.RefreshTokenRaw, expires);
+    }
+
+    private async Task<AuthResponse?> TryRefreshVerifiedUserSessionAsync(
+        string email,
+        CancellationToken cancellationToken)
+    {
+        var rawToken = _refreshCookieService.GetRefreshTokenFromRequest(Request);
+        if (string.IsNullOrWhiteSpace(rawToken))
+        {
+            return null;
+        }
+
+        var user = await _userManager.FindByEmailAsync(email.Trim());
+        if (user is null)
+        {
+            return null;
+        }
+
+        var (rotation, auth) = await _authService.RefreshAsync(
+            rawToken,
+            HttpContext.Connection.RemoteIpAddress?.ToString(),
+            Request.Headers.UserAgent,
+            cancellationToken);
+
+        if (!auth.IsSuccess || rotation.UserId != user.Id)
+        {
+            return null;
+        }
+
+        SetRefreshCookie(auth.Value!, rotation.NewToken!.ExpiresAtUtc);
+        return auth.Value!.Response;
     }
 }

@@ -40,7 +40,10 @@ export class ReviewComponent implements OnInit {
       void this.router.navigate(['/auth/login'], {
         queryParams: { returnUrl: '/booking/review' },
       });
+      return;
     }
+
+    void this.auth.syncCurrentUser();
   }
 
   get isLoggedIn(): boolean {

@@ -10,13 +10,13 @@ Use double-underscore nesting for nested JSON (e.g. `Jwt__SigningKey` → `Jwt:S
 
 ## Overview
 
-| Component | Provider |
-| --- | --- |
-| Compute (API + SPA) | Railway |
-| Database | Neon PostgreSQL |
-| Receipt blobs | Azure Blob Storage (private container) |
-| Email | Brevo (HTTPS API) |
-| Container registry | GitHub Container Registry (GHCR) |
+| Component           | Provider                               |
+| ------------------- | -------------------------------------- |
+| Compute (API + SPA) | Railway                                |
+| Database            | Neon PostgreSQL                        |
+| Receipt blobs       | Azure Blob Storage (private container) |
+| Email               | Brevo (HTTPS API)                      |
+| Container registry  | GitHub Container Registry (GHCR)       |
 
 One process hosts the API, Angular static files (`wwwroot`), in-process background jobs, and in-memory cache. There is no load balancer, horizontal scaling, or distributed cache.
 
@@ -87,13 +87,13 @@ Railway must be able to pull from GitHub Container Registry. Run the **Deploy** 
 
 ### Troubleshooting
 
-| Symptom | Likely cause |
-| --- | --- |
-| `pull access denied` / `unauthorized` | Package private without Railway registry creds |
-| `manifest unknown` / `not found` | Deploy workflow has not pushed the image yet |
-| `invalid tag` / uppercase in image name | Use lowercase GHCR path |
-| Deployment FAILED, no app logs | Image pull failed before container start |
-| Health returns 404 | No healthy container behind Railway edge |
+| Symptom                                 | Likely cause                                   |
+| --------------------------------------- | ---------------------------------------------- |
+| `pull access denied` / `unauthorized`   | Package private without Railway registry creds |
+| `manifest unknown` / `not found`        | Deploy workflow has not pushed the image yet   |
+| `invalid tag` / uppercase in image name | Use lowercase GHCR path                        |
+| Deployment FAILED, no app logs          | Image pull failed before container start       |
+| Health returns 404                      | No healthy container behind Railway edge       |
 
 ## 4. Environment variables
 
@@ -101,17 +101,17 @@ Set in Railway → service → **Variables**. Use `__` (double underscore) for n
 
 ### Required (startup fails without these)
 
-| Setting | Variable name | Notes |
-| --- | --- | --- |
-| Environment | `ASPNETCORE_ENVIRONMENT` | `Production` |
-| Database | `ConnectionStrings__DefaultConnection` | Neon pooled connection string |
-| JWT signing key | `Jwt__SigningKey` | Min 32 chars; strong random |
-| Production URL | `Frontend__BaseUrl` | e.g. `https://<your-production-url>` — no trailing slash |
-| CORS origin | `Cors__AllowedOrigins__0` | **Same URL** as `Frontend__BaseUrl` (same-site auth) |
-| Blob storage | `Storage__ConnectionString` | Azure Storage connection string |
-| Receipt container | `Storage__ReceiptContainer` | Private container name (default `receipts`) |
-| Brevo API key | `Email__ApiKey` | From [Brevo dashboard](https://app.brevo.com) → SMTP & API → API keys |
-| From address | `Email__FromAddress` | Verified sender in Brevo (e.g. your Gmail) |
+| Setting           | Variable name                          | Notes                                                                 |
+| ----------------- | -------------------------------------- | --------------------------------------------------------------------- |
+| Environment       | `ASPNETCORE_ENVIRONMENT`               | `Production`                                                          |
+| Database          | `ConnectionStrings__DefaultConnection` | Neon pooled connection string                                         |
+| JWT signing key   | `Jwt__SigningKey`                      | Min 32 chars; strong random                                           |
+| Production URL    | `Frontend__BaseUrl`                    | e.g. `https://<your-production-url>` — no trailing slash              |
+| CORS origin       | `Cors__AllowedOrigins__0`              | **Same URL** as `Frontend__BaseUrl` (same-site auth)                  |
+| Blob storage      | `Storage__ConnectionString`            | Azure Storage connection string                                       |
+| Receipt container | `Storage__ReceiptContainer`            | Private container name (default `receipts`)                           |
+| Brevo API key     | `Email__ApiKey`                        | From [Brevo dashboard](https://app.brevo.com) → SMTP & API → API keys |
+| From address      | `Email__FromAddress`                   | Verified sender in Brevo (e.g. your Gmail)                            |
 
 Also set `AllowedHosts` to the hostname only (e.g. `<your-app>.up.railway.app` — no `https://`). Include `healthcheck.railway.app` as well — Railway sends deploy healthchecks from that hostname, and omitting it causes HTTP 400 responses and failed deploys.
 
@@ -119,20 +119,20 @@ Also set `AllowedHosts` to the hostname only (e.g. `<your-app>.up.railway.app` �
 
 ### Secrets (Railway only — never in git)
 
-| Variable | Source |
-| --- | --- |
-| `ConnectionStrings__DefaultConnection` | Neon pooled connection string |
-| `Jwt__SigningKey` | Random string, 32+ characters |
-| `Storage__ConnectionString` | Azure CLI or Portal |
-| `Email__ApiKey` | Brevo API key (`xkeysib-...`) |
-| `Email__FromAddress` | Brevo verified sender (must match dashboard exactly) |
+| Variable                                   | Source                                                  |
+| ------------------------------------------ | ------------------------------------------------------- |
+| `ConnectionStrings__DefaultConnection`     | Neon pooled connection string                           |
+| `Jwt__SigningKey`                          | Random string, 32+ characters                           |
+| `Storage__ConnectionString`                | Azure CLI or Portal                                     |
+| `Email__ApiKey`                            | Brevo API key (`xkeysib-...`)                           |
+| `Email__FromAddress`                       | Brevo verified sender (must match dashboard exactly)    |
 | `AdminSeed__Email` / `AdminSeed__Password` | One-time admin bootstrap — **remove after first login** |
-| `Google__ClientId` | Optional |
+| `Google__ClientId`                         | Optional                                                |
 
 ### Common non-secret values
 
-| Variable | Example |
-| --- | --- |
+| Variable          | Example |
+| ----------------- | ------- |
 | `Email__FromName` | `Shora` |
 
 ### CORS pitfall
@@ -150,11 +150,11 @@ Shora sends auth and transactional emails via the **Brevo HTTPS API** (works on 
 3. **SMTP & API → API keys** — create a key (`xkeysib-...`).
 4. Set on Railway:
 
-| Setting | Variable name | Notes |
-| --- | --- | --- |
-| API key | `Email__ApiKey` | Brevo API key — **secret** |
-| From address | `Email__FromAddress` | Must match the verified sender exactly (e.g. your Gmail) |
-| From display name | `Email__FromName` | Optional |
+| Setting           | Variable name        | Notes                                                    |
+| ----------------- | -------------------- | -------------------------------------------------------- |
+| API key           | `Email__ApiKey`      | Brevo API key — **secret**                               |
+| From address      | `Email__FromAddress` | Must match the verified sender exactly (e.g. your Gmail) |
+| From display name | `Email__FromName`    | Optional                                                 |
 
 Deliverability from `@gmail.com` is weaker than a custom domain; check spam on first send. You can later authenticate your own domain in Brevo for better deliverability.
 
@@ -175,12 +175,12 @@ If `AdminSeed` is omitted, the app starts but **no admin exists** — receipt ap
 
 On first startup, the singleton `Settings` row is seeded from `Seed:*` in [`appsettings.json`](../src/backend/Shora.Api/appsettings.json) if no row exists yet. Defaults are **placeholder test values** — update via `/admin/settings` after first login, or set `Seed__*` env vars **before the first app startup**:
 
-| Setting | Variable name |
-| --- | --- |
-| WhatsApp | `Seed__ConsultantWhatsAppNumber` |
-| Vodafone Cash | `Seed__VodafoneCashNumber` |
-| InstaPay | `Seed__InstaPayHandle` |
-| Optional payment note | `Seed__PaymentInstructions` |
+| Setting               | Variable name                    |
+| --------------------- | -------------------------------- |
+| WhatsApp              | `Seed__ConsultantWhatsAppNumber` |
+| Vodafone Cash         | `Seed__VodafoneCashNumber`       |
+| InstaPay              | `Seed__InstaPayHandle`           |
+| Optional payment note | `Seed__PaymentInstructions`      |
 
 ### Optional tuning
 
@@ -191,10 +191,10 @@ Inherits from base `appsettings.json` unless overridden:
 
 ### Frontend (build-time, not Railway)
 
-| File | Purpose |
-| --- | --- |
+| File                                                                                      | Purpose                                                                                     |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | [`environment.production.ts`](../src/frontend/src/environments/environment.production.ts) | `googleClientId` for Google button; `apiBaseUrl: '/api/v1'` is correct for same-site deploy |
-| [`angular.json`](../src/frontend/angular.json) | Production build uses `fileReplacements` to swap in `environment.production.ts` |
+| [`angular.json`](../src/frontend/angular.json)                                            | Production build uses `fileReplacements` to swap in `environment.production.ts`             |
 
 Set `googleClientId` in `environment.production.ts` **before merge to `main`** so the Deploy workflow bakes it into the SPA bundle.
 
@@ -202,11 +202,11 @@ Set `googleClientId` in `environment.production.ts` **before merge to `main`** s
 
 Configure in your GitHub repo → **Settings**.
 
-| Item | Where | Value |
-| --- | --- | --- |
-| `RAILWAY_SERVICE_ID` | Repository **variable** (not secret) | Railway service ID from dashboard |
-| `PRODUCTION_URL` | Repository **variable** | e.g. `https://<your-production-url>` |
-| `RAILWAY_TOKEN` | Environment **secret** on `production` | **Project token** for the production environment — Railway project → **Settings** → **Tokens**. Do **not** use an account token. |
+| Item                 | Where                                  | Value                                                                                                                            |
+| -------------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `RAILWAY_SERVICE_ID` | Repository **variable** (not secret)   | Railway service ID from dashboard                                                                                                |
+| `PRODUCTION_URL`     | Repository **variable**                | e.g. `https://<your-production-url>`                                                                                             |
+| `RAILWAY_TOKEN`      | Environment **secret** on `production` | **Project token** for the production environment — Railway project → **Settings** → **Tokens**. Do **not** use an account token. |
 
 Optional repository variable: `DEPLOY_ENVIRONMENT` (defaults to `production`).
 
@@ -214,12 +214,12 @@ The Deploy job fails explicitly if any of `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`
 
 ### Troubleshooting `RAILWAY_TOKEN`
 
-| Symptom | Fix |
-| --- | --- |
-| `Invalid RAILWAY_TOKEN` | Secret is an **account** token or expired. Create a **project token** and update the GitHub secret. |
-| `No linked project found` | Account tokens need `railway link`; this workflow uses **project tokens** with `RAILWAY_TOKEN` only. |
-| Token set but still invalid | Must be an **environment secret** on GitHub Environment **`production`**, not a repository secret — `deploy.yml` uses `environment: production` |
-| Deploy skipped / empty token | Confirm Environment `production` exists under **Settings → Environments** |
+| Symptom                      | Fix                                                                                                                                             |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Invalid RAILWAY_TOKEN`      | Secret is an **account** token or expired. Create a **project token** and update the GitHub secret.                                             |
+| `No linked project found`    | Account tokens need `railway link`; this workflow uses **project tokens** with `RAILWAY_TOKEN` only.                                            |
+| Token set but still invalid  | Must be an **environment secret** on GitHub Environment **`production`**, not a repository secret — `deploy.yml` uses `environment: production` |
+| Deploy skipped / empty token | Confirm Environment `production` exists under **Settings → Environments**                                                                       |
 
 Enable **branch protection** on `main` so CI passes before merge (recommended).
 

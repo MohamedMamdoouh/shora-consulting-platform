@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import {
   AdminBookingReceiptsResponse,
@@ -43,12 +43,12 @@ export class AdminReceiptReviewPanelComponent implements OnInit {
   @Output() readonly closed = new EventEmitter<void>();
   @Output() readonly changed = new EventEmitter<void>();
 
-  panelState: PanelState = { status: 'loading' };
-  actionError = '';
-  successMessage = '';
-  isApproving = false;
-  isDeclining = false;
-  showDeclineForm = false;
+  readonly panelState = signal<PanelState>({ status: 'loading' });
+  readonly actionError = signal('');
+  readonly successMessage = signal('');
+  readonly isApproving = signal(false);
+  readonly isDeclining = signal(false);
+  readonly showDeclineForm = signal(false);
 
   readonly declineReasonOptions = RECEIPT_DECLINE_REASON_OPTIONS;
   readonly formatPaymentMethod = formatPaymentMethod;
@@ -74,25 +74,25 @@ export class AdminReceiptReviewPanelComponent implements OnInit {
   }
 
   async loadReceipts(): Promise<void> {
-    this.panelState = { status: 'loading' };
-    this.actionError = '';
+    this.panelState.set({ status: 'loading' });
+    this.actionError.set('');
 
     try {
       const data = await firstValueFrom(this.adminBookingsService.getReceipts(this.bookingId));
       const pendingReceipt = findPendingReceipt(data.receipts);
 
-      this.panelState = { status: 'ready', data, pendingReceipt };
-      this.showDeclineForm = false;
+      this.panelState.set({ status: 'ready', data, pendingReceipt });
+      this.showDeclineForm.set(false);
     } catch (error) {
-      this.panelState = {
+      this.panelState.set({
         status: 'error',
         message: readApiError(error, 'تعذر تحميل الإيصالات. حاول مرة أخرى.'),
-      };
+      });
     }
   }
 
   async approveReceipt(): Promise<void> {
-    if (this.isApproving || this.isDeclining) {
+    if (this.isApproving() || this.isDeclining()) {
       return;
     }
 
@@ -104,28 +104,30 @@ export class AdminReceiptReviewPanelComponent implements OnInit {
       return;
     }
 
-    this.isApproving = true;
-    this.actionError = '';
-    this.successMessage = '';
+    this.isApproving.set(true);
+    this.actionError.set('');
+    this.successMessage.set('');
 
     try {
       await firstValueFrom(this.adminBookingsService.approveReceipt(this.bookingId));
-      this.successMessage = 'تم قبول الإيصال وتأكيد الحجز.';
+      this.successMessage.set('تم قبول الإيصال وتأكيد الحجز.');
       this.changed.emit();
       this.close();
     } catch (error) {
-      this.actionError = readBookingErrorMessage(
-        readApiErrorCode(error),
-        readApiError(error, 'تعذر قبول الإيصال. حاول مرة أخرى.'),
+      this.actionError.set(
+        readBookingErrorMessage(
+          readApiErrorCode(error),
+          readApiError(error, 'تعذر قبول الإيصال. حاول مرة أخرى.'),
+        ),
       );
     } finally {
-      this.isApproving = false;
+      this.isApproving.set(false);
     }
   }
 
   openDeclineForm(): void {
-    this.showDeclineForm = true;
-    this.actionError = '';
+    this.showDeclineForm.set(true);
+    this.actionError.set('');
     this.declineForm.reset({
       reasonCode: 'UnreadableImage',
       reasonNote: null,
@@ -133,19 +135,19 @@ export class AdminReceiptReviewPanelComponent implements OnInit {
   }
 
   cancelDeclineForm(): void {
-    this.showDeclineForm = false;
-    this.actionError = '';
+    this.showDeclineForm.set(false);
+    this.actionError.set('');
   }
 
   async submitDecline(): Promise<void> {
-    if (this.isApproving || this.isDeclining) {
+    if (this.isApproving() || this.isDeclining()) {
       return;
     }
 
     const values = this.declineForm.getRawValue();
-    this.isDeclining = true;
-    this.actionError = '';
-    this.successMessage = '';
+    this.isDeclining.set(true);
+    this.actionError.set('');
+    this.successMessage.set('');
 
     try {
       await firstValueFrom(
@@ -154,16 +156,18 @@ export class AdminReceiptReviewPanelComponent implements OnInit {
           reasonNote: values.reasonNote?.trim() || null,
         }),
       );
-      this.successMessage = 'تم رفض الإيصال وإعادة فتح مهلة الرفع للعميل.';
+      this.successMessage.set('تم رفض الإيصال وإعادة فتح مهلة الرفع للعميل.');
       this.changed.emit();
       this.close();
     } catch (error) {
-      this.actionError = readBookingErrorMessage(
-        readApiErrorCode(error),
-        readApiError(error, 'تعذر رفض الإيصال. حاول مرة أخرى.'),
+      this.actionError.set(
+        readBookingErrorMessage(
+          readApiErrorCode(error),
+          readApiError(error, 'تعذر رفض الإيصال. حاول مرة أخرى.'),
+        ),
       );
     } finally {
-      this.isDeclining = false;
+      this.isDeclining.set(false);
     }
   }
 }

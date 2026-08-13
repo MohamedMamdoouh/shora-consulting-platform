@@ -37,15 +37,15 @@
           <textarea formControlName="note" rows="3" placeholder="مثال: استرداد عبر فودافون كاش"></textarea>
         </label>
 
-        @if (actionError) {
-          <p class="refund-panel__message refund-panel__message--error" role="alert">{{ actionError }}</p>
+        @if (actionError()) {
+          <p class="refund-panel__message refund-panel__message--error" role="alert">{{ actionError() }}</p>
         }
 
         <div class="refund-panel__actions">
-          <button type="submit" class="btn" [disabled]="isSubmitting">
-            {{ isSubmitting ? 'جاري التسجيل...' : 'تسجيل الاسترداد' }}
+          <button type="submit" class="btn" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'جاري التسجيل...' : 'تسجيل الاسترداد' }}
           </button>
-          <button type="button" class="btn btn--secondary" [disabled]="isSubmitting" (click)="close()">
+          <button type="button" class="btn btn--secondary" [disabled]="isSubmitting()" (click)="close()">
             إلغاء
           </button>
         </div>
@@ -66,15 +66,15 @@
           ></textarea>
         </label>
 
-        @if (actionError) {
-          <p class="refund-panel__message refund-panel__message--error" role="alert">{{ actionError }}</p>
+        @if (actionError()) {
+          <p class="refund-panel__message refund-panel__message--error" role="alert">{{ actionError() }}</p>
         }
 
         <div class="refund-panel__actions">
-          <button type="submit" class="btn btn--danger" [disabled]="isSubmitting">
-            {{ isSubmitting ? 'جاري التراجع...' : 'تأكيد التراجع' }}
+          <button type="submit" class="btn btn--danger" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'جاري التراجع...' : 'تأكيد التراجع' }}
           </button>
-          <button type="button" class="btn btn--secondary" [disabled]="isSubmitting" (click)="close()">
+          <button type="button" class="btn btn--secondary" [disabled]="isSubmitting()" (click)="close()">
             إلغاء
           </button>
         </div>

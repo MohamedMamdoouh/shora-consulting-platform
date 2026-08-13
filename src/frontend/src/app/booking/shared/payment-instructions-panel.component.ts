@@ -7,6 +7,7 @@ import {
   Output,
   SimpleChanges,
   inject,
+  signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PaymentInstructionsResponse, PaymentMethod } from '@contracts/payments';
@@ -31,13 +32,13 @@ export class PaymentInstructionsPanelComponent implements OnChanges, OnDestroy {
 
   @Output() readonly receiptSubmitted = new EventEmitter<void>();
 
-  countdownLabel = '';
-  deadlineExpired = false;
+  readonly countdownLabel = signal('');
+  readonly deadlineExpired = signal(false);
   uploadMethod: PaymentMethod = 'VodafoneCash';
   senderReference = '';
   selectedFile: File | null = null;
-  uploadError = '';
-  uploading = false;
+  readonly uploadError = signal('');
+  readonly uploading = signal(false);
 
   private countdownTimer: ReturnType<typeof setInterval> | null = null;
 
@@ -56,21 +57,21 @@ export class PaymentInstructionsPanelComponent implements OnChanges, OnDestroy {
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     this.selectedFile = input.files?.[0] ?? null;
-    this.uploadError = '';
+    this.uploadError.set('');
   }
 
   async submitReceipt(): Promise<void> {
-    if (this.uploading || this.deadlineExpired) {
+    if (this.uploading() || this.deadlineExpired()) {
       return;
     }
 
     if (!this.selectedFile) {
-      this.uploadError = 'يرجى اختيار صورة الإيصال.';
+      this.uploadError.set('يرجى اختيار صورة الإيصال.');
       return;
     }
 
-    this.uploading = true;
-    this.uploadError = '';
+    this.uploading.set(true);
+    this.uploadError.set('');
 
     try {
       await firstValueFrom(
@@ -86,18 +87,20 @@ export class PaymentInstructionsPanelComponent implements OnChanges, OnDestroy {
       this.receiptSubmitted.emit();
     } catch (err) {
       const code = readApiErrorCode(err);
-      this.uploadError = readBookingErrorMessage(
-        code,
-        readApiError(err, 'تعذر رفع الإيصال. حاول مرة أخرى.'),
+      this.uploadError.set(
+        readBookingErrorMessage(
+          code,
+          readApiError(err, 'تعذر رفع الإيصال. حاول مرة أخرى.'),
+        ),
       );
     } finally {
-      this.uploading = false;
+      this.uploading.set(false);
     }
   }
 
   private restartCountdown(): void {
     this.clearCountdown();
-    this.deadlineExpired = false;
+    this.deadlineExpired.set(false);
     this.updateCountdown();
     this.countdownTimer = setInterval(() => this.updateCountdown(), 1000);
   }
@@ -106,13 +109,13 @@ export class PaymentInstructionsPanelComponent implements OnChanges, OnDestroy {
     const remainingMs = new Date(this.instructions.receiptUploadDeadlineUtc).getTime() - Date.now();
 
     if (remainingMs <= 0) {
-      this.countdownLabel = 'انتهت مهلة رفع الإيصال';
-      this.deadlineExpired = true;
+      this.countdownLabel.set('انتهت مهلة رفع الإيصال');
+      this.deadlineExpired.set(true);
       this.clearCountdown();
       return;
     }
 
-    this.deadlineExpired = false;
+    this.deadlineExpired.set(false);
     const totalSeconds = Math.floor(remainingMs / 1000);
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -127,7 +130,7 @@ export class PaymentInstructionsPanelComponent implements OnChanges, OnDestroy {
     parts.push(`${formatNumber(minutes)} دقيقة`);
     parts.push(`${formatNumber(seconds)} ثانية`);
 
-    this.countdownLabel = parts.join(' ');
+    this.countdownLabel.set(parts.join(' '));
   }
 
   private clearCountdown(): void {

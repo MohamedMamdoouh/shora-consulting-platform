@@ -12,20 +12,21 @@
     </div>
   </header>
 
-  @switch (pageState.status) {
+  @let state = pageState();
+  @switch (state.status) {
     @case ('loading') {
       <p class="admin-ops__state" aria-live="polite">جاري تحميل التنبيهات...</p>
     }
 
     @case ('error') {
       <div class="admin-ops__panel admin-ops__panel--error">
-        <p>{{ pageState.message }}</p>
+        <p>{{ state.message }}</p>
         <button type="button" class="btn" (click)="loadOpsData()">إعادة المحاولة</button>
       </div>
     }
 
     @case ('ready') {
-      @if (pageState.alerts.length === 0) {
+      @if (state.alerts.length === 0) {
         <div class="admin-ops__panel admin-ops__panel--empty">
           <p>لا توجد تنبيهات نشطة حاليًا.</p>
           <p class="admin-ops__note">يعاد التقييم تلقائيًا كل ~5 دقائق. استخدم «تحديث» لجلب أحدث الحالة.</p>
@@ -33,15 +34,15 @@
       } @else {
         <div class="admin-ops__summary" aria-live="polite">
           <span class="admin-ops__count admin-ops__count--critical">
-            {{ pageState.counts.critical }} حرج
+            {{ state.counts.critical }} حرج
           </span>
           <span class="admin-ops__count admin-ops__count--warning">
-            {{ pageState.counts.warning }} تحذير
+            {{ state.counts.warning }} تحذير
           </span>
         </div>
 
         <ul class="admin-ops__list">
-          @for (alert of pageState.alerts; track alert.message + alert.runbookId + alert.severity) {
+          @for (alert of state.alerts; track alert.message + alert.runbookId + alert.severity) {
             <li
               class="admin-ops__card admin-ops__card--{{ severityCssModifier(alert.severity) }}"
             >

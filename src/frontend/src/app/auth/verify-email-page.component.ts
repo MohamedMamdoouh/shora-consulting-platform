@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { ErrorCodes } from '@contracts/error-codes';
@@ -16,8 +16,8 @@ export class VerifyEmailPageComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly auth = inject(AuthService);
 
-  status: 'loading' | 'success' | 'error' = 'loading';
-  message = '';
+  readonly status = signal<'loading' | 'success' | 'error'>('loading');
+  readonly message = signal('');
   private isVerifying = false;
 
   ngOnInit(): void {
@@ -25,7 +25,7 @@ export class VerifyEmailPageComponent implements OnInit {
   }
 
   private async verifyFromQueryParams(): Promise<void> {
-    if (this.isVerifying || this.status !== 'loading') {
+    if (this.isVerifying || this.status() !== 'loading') {
       return;
     }
 
@@ -33,8 +33,8 @@ export class VerifyEmailPageComponent implements OnInit {
     const token = this.route.snapshot.queryParamMap.get('token');
 
     if (!email || !token) {
-      this.status = 'error';
-      this.message = 'رابط التحقق غير صالح.';
+      this.status.set('error');
+      this.message.set('رابط التحقق غير صالح.');
       return;
     }
 
@@ -49,19 +49,20 @@ export class VerifyEmailPageComponent implements OnInit {
           : 'تم تأكيد بريدك الإلكتروني بنجاح. سيتم تحويلك لتسجيل الدخول.',
       );
     } catch (err) {
-      this.status = 'error';
-      this.message =
+      this.status.set('error');
+      this.message.set(
         readApiErrorCode(err) === ErrorCodes.Auth.VerificationFailed
           ? 'رابط التحقق منتهي أو غير صالح.'
-          : readApiError(err, 'تعذر تأكيد البريد الإلكتروني. حاول مرة أخرى.');
+          : readApiError(err, 'تعذر تأكيد البريد الإلكتروني. حاول مرة أخرى.'),
+      );
     } finally {
       this.isVerifying = false;
     }
   }
 
   private completeSuccess(message: string): void {
-    this.status = 'success';
-    this.message = message;
+    this.status.set('success');
+    this.message.set(message);
 
     setTimeout(() => {
       void this.router.navigate(['/auth/login']);

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ErrorCatalogEntry } from '@contracts/error-catalog';
@@ -15,36 +15,37 @@ export class ErrorsDetailPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly errorReference = inject(ErrorReferenceService);
 
-  entry: ErrorCatalogEntry | null = null;
-  notFound = false;
-  loadError = '';
+  readonly entry = signal<ErrorCatalogEntry | null>(null);
+  readonly notFound = signal(false);
+  readonly loadError = signal('');
 
   async ngOnInit(): Promise<void> {
     const code = this.route.snapshot.paramMap.get('code');
     if (!code) {
-      this.notFound = true;
+      this.notFound.set(true);
       return;
     }
 
     try {
-      this.entry = await firstValueFrom(this.errorReference.get(code));
+      this.entry.set(await firstValueFrom(this.errorReference.get(code)));
     } catch (err) {
       if (err instanceof HttpErrorResponse && err.status === 404) {
-        this.notFound = true;
+        this.notFound.set(true);
         return;
       }
 
-      this.loadError = 'تعذر تحميل تفاصيل كود الخطأ.';
+      this.loadError.set('تعذر تحميل تفاصيل كود الخطأ.');
     }
   }
 
   async copyTypeUri(): Promise<void> {
-    if (!this.entry?.type) {
+    const currentEntry = this.entry();
+    if (!currentEntry?.type) {
       return;
     }
 
     try {
-      await navigator.clipboard.writeText(this.entry.type);
+      await navigator.clipboard.writeText(currentEntry.type);
     } catch {
       // clipboard unavailable — ignore
     }

@@ -182,7 +182,7 @@ Set secrets via environment variables (double-underscore nesting). Never commit 
 | `Storage__ConnectionString` | Blob account — private Azure Storage container (spec 05) |
 | `Storage__ReceiptContainer` | Private container name (`receipts`) |
 | `Google__ClientId` | Google OAuth client ID (optional; spec 02) — `ClientSecret` unused by ID-token flow |
-| `Email__*` | Resend settings (spec 02, outbox) — `ApiKey` + `FromAddress` required at startup |
+| `Email__*` | Brevo settings (spec 02, outbox) — `ApiKey` + `FromAddress` required at startup |
 | `Frontend__BaseUrl` | Production HTTPS URL (e.g. `https://<your-app>.up.railway.app`) |
 | `Cors__AllowedOrigins__0` | Same production HTTPS URL (same-site + `AllowCredentials`) |
 | `AllowedHosts` | Hostname only (no `https://`) |

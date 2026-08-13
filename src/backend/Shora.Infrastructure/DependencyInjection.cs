@@ -78,14 +78,14 @@ public static class DependencyInjection
         var emailOptions = configuration.GetSection(EmailOptions.SectionName).Get<EmailOptions>()
             ?? new EmailOptions();
 
-        if (hostEnvironment?.IsDevelopment() == true)
+        if (emailOptions.IsConfigured)
+        {
+            services.AddHttpClient<BrevoEmailSender>();
+            services.AddScoped<IEmailSender, BrevoEmailSender>();
+        }
+        else if (hostEnvironment?.IsDevelopment() == true)
         {
             services.AddScoped<IEmailSender, DevLoggingEmailSender>();
-        }
-        else if (emailOptions.IsConfigured)
-        {
-            services.AddHttpClient<ResendEmailSender>();
-            services.AddScoped<IEmailSender, ResendEmailSender>();
         }
         else
         {

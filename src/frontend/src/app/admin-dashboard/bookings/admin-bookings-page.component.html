@@ -1,222 +1,225 @@
-<section class="admin-bookings">
-  <header class="admin-bookings__header">
-    <h2>الحجوزات</h2>
-    <p class="admin-bookings__note">
-      جميع حجوزات العملاء — الأوقات معروضة بتوقيت متصفحك المحلي. استخدم تصفية «ملغاة» لمعالجة
-      الاستردادات المستحقة.
-    </p>
-  </header>
-
-  @if (actionMessage) {
-    <p class="admin-bookings__banner admin-bookings__banner--success" role="status">
-      {{ actionMessage }}
-    </p>
-  }
-
-  @if (actionError) {
-    <p class="admin-bookings__banner admin-bookings__banner--error" role="alert">
-      {{ actionError }}
-    </p>
-  }
-
-  <form class="admin-bookings__filters" [formGroup]="filtersForm" (ngSubmit)="applyFilters()">
-    <label>
-      الحالة
-      <select formControlName="status">
-        @for (option of statusOptions; track option.value) {
-          <option [value]="option.value">{{ option.label }}</option>
-        }
-      </select>
-    </label>
-
-    <label>
-      من تاريخ
-      <input type="date" formControlName="fromDate" />
-    </label>
-
-    <label>
-      إلى تاريخ
-      <input type="date" formControlName="toDate" />
-    </label>
-
-    <div class="admin-bookings__filter-actions">
-      <button type="submit" class="btn">تطبيق التصفية</button>
-    </div>
-  </form>
-
-  @switch (pageState.status) {
-    @case ('loading') {
-      <p class="admin-bookings__state" aria-live="polite">جاري تحميل الحجوزات...</p>
-    }
-
-    @case ('error') {
-      <div class="admin-bookings__panel admin-bookings__panel--error">
-        <p>{{ pageState.message }}</p>
-        <button type="button" class="btn" (click)="loadBookings(currentPage)">
-          إعادة المحاولة
-        </button>
-      </div>
-    }
-
-    @case ('ready') {
-      @if (pageState.items.length === 0) {
-        <p class="admin-bookings__state">لا توجد حجوزات مطابقة للتصفية.</p>
-      } @else {
-        <div class="admin-bookings__table-wrap">
-          <table class="admin-bookings__table">
-            <thead>
-              <tr>
-                <th scope="col">العميل</th>
-                <th scope="col">موعد الجلسة</th>
-                <th scope="col">طريقة التواصل</th>
-                <th scope="col">الهاتف</th>
-                <th scope="col">الحالة</th>
-                <th scope="col">ملاحظات</th>
-                <th scope="col">إجراءات</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (item of pageState.items; track item.bookingId) {
-                <tr
-                  [class.admin-bookings__row--queue]="isCancellationRequestPending(item)"
-                  [class.admin-bookings__row--refund-due]="isRefundDueRow(item)"
-                >
-                  <td>{{ item.clientDisplayName }}</td>
-                  <td>{{ formatAdminBookingSlot(item) }}</td>
-                  <td>{{ formatDeliveryMethod(item.deliveryMethod) }}</td>
-                  <td>{{ item.contactPhone ?? '—' }}</td>
-                  <td>
-                    <span class="admin-bookings__status">{{
-                      formatBookingStatus(item.status)
-                    }}</span>
-                  </td>
-                  <td>
-                    @if (formatRowNote(item); as note) {
-                      <span class="admin-bookings__note-cell">{{ note }}</span>
-                    } @else {
-                      —
-                    }
-                  </td>
-                  <td>
-                    <div class="admin-bookings__actions">
-                      @if (item.status === 'PendingApproval') {
-                        <button
-                          type="button"
-                          class="btn btn--secondary btn--compact"
-                          (click)="openReceiptReview(item)"
-                        >
-                          مراجعة الإيصال
-                        </button>
-                      }
-
-                      @if (isCancellationRequestPending(item)) {
-                        <button
-                          type="button"
-                          class="btn btn--secondary btn--compact"
-                          (click)="openCancellationReview(item)"
-                        >
-                          مراجعة طلب الإلغاء
-                        </button>
-                      }
-
-                      @if (canDirectCancelBooking(item) && !isCancellationRequestPending(item)) {
-                        <button
-                          type="button"
-                          class="btn btn--danger btn--compact"
-                          [disabled]="cancellingBookingId === item.bookingId"
-                          (click)="directCancelBooking(item)"
-                        >
-                          {{
-                            cancellingBookingId === item.bookingId
-                              ? 'جاري الإلغاء...'
-                              : 'إلغاء الحجز'
-                          }}
-                        </button>
-                      }
-
-                      @if (canRecordRefund(item)) {
-                        <button
-                          type="button"
-                          class="btn btn--secondary btn--compact"
-                          (click)="openRecordRefund(item)"
-                        >
-                          تسجيل الاسترداد
-                        </button>
-                      }
-
-                      @if (canRevokeRefund(item)) {
-                        <button
-                          type="button"
-                          class="btn btn--danger btn--compact"
-                          (click)="openRevokeRefund(item)"
-                        >
-                          تراجع عن الاسترداد
-                        </button>
-                      }
-
-                      @if (!hasBookingRowActions(item)) {
-                        —
-                      }
-                    </div>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      }
-
-      <nav class="admin-bookings__pagination" aria-label="صفحات الحجوزات">
-        <button
-          type="button"
-          class="btn btn--secondary"
-          [disabled]="!canGoPrevious"
-          (click)="goToPreviousPage()"
-        >
-          السابق
-        </button>
-        <span>
-          صفحة {{ pageState.page }} من
-          {{ totalPages(pageState.totalCount, pageState.pageSize) }} ({{
-            pageState.totalCount
-          }}
-          حجز)
-        </span>
-        <button
-          type="button"
-          class="btn btn--secondary"
-          [disabled]="!canGoNext"
-          (click)="goToNextPage()"
-        >
-          التالي
-        </button>
-      </nav>
-    }
-  }
-</section>
-
-@if (receiptReviewItem) {
-  <app-admin-receipt-review-panel
-    [bookingId]="receiptReviewItem.bookingId"
-    [clientDisplayName]="receiptReviewItem.clientDisplayName"
-    (closed)="closeReceiptReview()"
-    (changed)="onReceiptReviewChanged()"
-  />
-}
-
-@if (cancellationReviewItem) {
-  <app-admin-cancellation-review-panel
-    [item]="cancellationReviewItem"
-    (closed)="closeCancellationReview()"
-    (changed)="onCancellationReviewChanged()"
-  />
-}
-
-@if (refundPanelItem && refundPanelMode) {
-  <app-admin-refund-panel
-    [item]="refundPanelItem"
-    [mode]="refundPanelMode"
-    (closed)="closeRefundPanel()"
-    (changed)="onRefundChanged()"
-  />
-}
+<section class="admin-bookings">
+  <header class="admin-bookings__header">
+    <h2>الحجوزات</h2>
+    <p class="admin-bookings__note">
+      جميع حجوزات العملاء — الأوقات معروضة بتوقيت متصفحك المحلي. استخدم تصفية «ملغاة» لمعالجة
+      الاستردادات المستحقة.
+    </p>
+  </header>
+
+  @if (actionMessage()) {
+    <p class="admin-bookings__banner admin-bookings__banner--success" role="status">
+      {{ actionMessage() }}
+    </p>
+  }
+
+  @if (actionError()) {
+    <p class="admin-bookings__banner admin-bookings__banner--error" role="alert">
+      {{ actionError() }}
+    </p>
+  }
+
+  <form class="admin-bookings__filters" [formGroup]="filtersForm" (ngSubmit)="applyFilters()">
+    <label>
+      الحالة
+      <select formControlName="status">
+        @for (option of statusOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      من تاريخ
+      <input type="date" formControlName="fromDate" />
+    </label>
+
+    <label>
+      إلى تاريخ
+      <input type="date" formControlName="toDate" />
+    </label>
+
+    <div class="admin-bookings__filter-actions">
+      <button type="submit" class="btn">تطبيق التصفية</button>
+    </div>
+  </form>
+
+  @let state = pageState();
+  @switch (state.status) {
+    @case ('loading') {
+      <p class="admin-bookings__state" aria-live="polite">جاري تحميل الحجوزات...</p>
+    }
+
+    @case ('error') {
+      <div class="admin-bookings__panel admin-bookings__panel--error">
+        <p>{{ state.message }}</p>
+        <button type="button" class="btn" (click)="loadBookings(currentPage())">
+          إعادة المحاولة
+        </button>
+      </div>
+    }
+
+    @case ('ready') {
+      @if (state.items.length === 0) {
+        <p class="admin-bookings__state">لا توجد حجوزات مطابقة للتصفية.</p>
+      } @else {
+        <div class="admin-bookings__table-wrap">
+          <table class="admin-bookings__table">
+            <thead>
+              <tr>
+                <th scope="col">العميل</th>
+                <th scope="col">موعد الجلسة</th>
+                <th scope="col">طريقة التواصل</th>
+                <th scope="col">الهاتف</th>
+                <th scope="col">الحالة</th>
+                <th scope="col">ملاحظات</th>
+                <th scope="col">إجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of state.items; track item.bookingId) {
+                <tr
+                  [class.admin-bookings__row--queue]="isCancellationRequestPending(item)"
+                  [class.admin-bookings__row--refund-due]="isRefundDueRow(item)"
+                >
+                  <td>{{ item.clientDisplayName }}</td>
+                  <td>{{ formatAdminBookingSlot(item) }}</td>
+                  <td>{{ formatDeliveryMethod(item.deliveryMethod) }}</td>
+                  <td>{{ item.contactPhone ?? '—' }}</td>
+                  <td>
+                    <span class="admin-bookings__status">{{
+                      formatBookingStatus(item.status)
+                    }}</span>
+                  </td>
+                  <td>
+                    @if (formatRowNote(item); as note) {
+                      <span class="admin-bookings__note-cell">{{ note }}</span>
+                    } @else {
+                      —
+                    }
+                  </td>
+                  <td>
+                    <div class="admin-bookings__actions">
+                      @if (item.status === 'PendingApproval') {
+                        <button
+                          type="button"
+                          class="btn btn--secondary btn--compact"
+                          (click)="openReceiptReview(item)"
+                        >
+                          مراجعة الإيصال
+                        </button>
+                      }
+
+                      @if (isCancellationRequestPending(item)) {
+                        <button
+                          type="button"
+                          class="btn btn--secondary btn--compact"
+                          (click)="openCancellationReview(item)"
+                        >
+                          مراجعة طلب الإلغاء
+                        </button>
+                      }
+
+                      @if (canDirectCancelBooking(item) && !isCancellationRequestPending(item)) {
+                        <button
+                          type="button"
+                          class="btn btn--danger btn--compact"
+                          [disabled]="cancellingBookingId() === item.bookingId"
+                          (click)="directCancelBooking(item)"
+                        >
+                          {{
+                            cancellingBookingId() === item.bookingId
+                              ? 'جاري الإلغاء...'
+                              : 'إلغاء الحجز'
+                          }}
+                        </button>
+                      }
+
+                      @if (canRecordRefund(item)) {
+                        <button
+                          type="button"
+                          class="btn btn--secondary btn--compact"
+                          (click)="openRecordRefund(item)"
+                        >
+                          تسجيل الاسترداد
+                        </button>
+                      }
+
+                      @if (canRevokeRefund(item)) {
+                        <button
+                          type="button"
+                          class="btn btn--danger btn--compact"
+                          (click)="openRevokeRefund(item)"
+                        >
+                          تراجع عن الاسترداد
+                        </button>
+                      }
+
+                      @if (!hasBookingRowActions(item)) {
+                        —
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <nav class="pagination" aria-label="صفحات الحجوزات">
+        <button
+          type="button"
+          class="btn btn--secondary btn--sm"
+          [disabled]="!canGoPrevious()"
+          (click)="goToPreviousPage()"
+        >
+          السابق
+        </button>
+        <p class="pagination__info">
+          صفحة {{ state.page }} من
+          {{ totalPages(state.totalCount, state.pageSize) }} ({{
+            state.totalCount
+          }}
+          حجز)
+        </p>
+        <button
+          type="button"
+          class="btn btn--secondary btn--sm"
+          [disabled]="!canGoNext()"
+          (click)="goToNextPage()"
+        >
+          التالي
+        </button>
+      </nav>
+    }
+  }
+</section>
+
+@if (receiptReviewItem(); as receiptItem) {
+  <app-admin-receipt-review-panel
+    [bookingId]="receiptItem.bookingId"
+    [clientDisplayName]="receiptItem.clientDisplayName"
+    (closed)="closeReceiptReview()"
+    (changed)="onReceiptReviewChanged()"
+  />
+}
+
+@if (cancellationReviewItem(); as cancellationItem) {
+  <app-admin-cancellation-review-panel
+    [item]="cancellationItem"
+    (closed)="closeCancellationReview()"
+    (changed)="onCancellationReviewChanged()"
+  />
+}
+
+@if (refundPanelItem(); as refundItem) {
+  @if (refundPanelMode(); as refundMode) {
+    <app-admin-refund-panel
+      [item]="refundItem"
+      [mode]="refundMode"
+      (closed)="closeRefundPanel()"
+      (changed)="onRefundChanged()"
+    />
+  }
+}

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AdminEarningsResponse } from '@contracts/earnings';
@@ -26,7 +26,7 @@ export class AdminEarningsPageComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly adminEarningsService = inject(AdminEarningsService);
 
-  pageState: PageState = { status: 'loading' };
+  readonly pageState = signal<PageState>({ status: 'loading' });
 
   readonly formatEarningsAmount = formatEarningsAmount;
   readonly formatEarningsCount = formatEarningsCount;
@@ -45,7 +45,7 @@ export class AdminEarningsPageComponent implements OnInit {
   }
 
   async loadEarnings(): Promise<void> {
-    this.pageState = { status: 'loading' };
+    this.pageState.set({ status: 'loading' });
 
     const values = this.filtersForm.getRawValue();
 
@@ -56,12 +56,12 @@ export class AdminEarningsPageComponent implements OnInit {
           to: values.toDate ? localDateEndExclusiveToUtcIso(values.toDate) : undefined,
         }),
       );
-      this.pageState = { status: 'ready', earnings };
+      this.pageState.set({ status: 'ready', earnings });
     } catch (error) {
-      this.pageState = {
+      this.pageState.set({
         status: 'error',
         message: readApiError(error, 'تعذر تحميل ملخص الأرباح. حاول مرة أخرى.'),
-      };
+      });
     }
   }
 }

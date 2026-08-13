@@ -24,7 +24,7 @@
         </div>
         <div>
           <dt>الموعد النهائي للقرار</dt>
-          <dd class="cancellation-panel__countdown" aria-live="polite">{{ countdownLabel }}</dd>
+          <dd class="cancellation-panel__countdown" aria-live="polite">{{ countdownLabel() }}</dd>
         </div>
       </dl>
 
@@ -39,21 +39,21 @@
         </p>
       }
 
-      @if (actionError) {
+      @if (actionError()) {
         <p class="cancellation-panel__message cancellation-panel__message--error" role="alert">
-          {{ actionError }}
+          {{ actionError() }}
         </p>
       }
 
-      @if (!showDeclineForm) {
+      @if (!showDeclineForm()) {
         <div class="cancellation-panel__actions">
-          <button type="button" class="btn" [disabled]="isApproving || isDeclining" (click)="approveRequest()">
-            {{ isApproving ? 'جاري الموافقة...' : 'الموافقة على الإلغاء' }}
+          <button type="button" class="btn" [disabled]="isApproving() || isDeclining()" (click)="approveRequest()">
+            {{ isApproving() ? 'جاري الموافقة...' : 'الموافقة على الإلغاء' }}
           </button>
           <button
             type="button"
             class="btn btn--danger"
-            [disabled]="isApproving || isDeclining"
+            [disabled]="isApproving() || isDeclining()"
             (click)="openDeclineForm()"
           >
             رفض الطلب
@@ -82,13 +82,13 @@
           </label>
 
           <div class="cancellation-panel__actions">
-            <button type="submit" class="btn btn--danger" [disabled]="isApproving || isDeclining">
-              {{ isDeclining ? 'جاري الرفض...' : 'تأكيد الرفض' }}
+            <button type="submit" class="btn btn--danger" [disabled]="isApproving() || isDeclining()">
+              {{ isDeclining() ? 'جاري الرفض...' : 'تأكيد الرفض' }}
             </button>
             <button
               type="button"
               class="btn btn--secondary"
-              [disabled]="isApproving || isDeclining"
+              [disabled]="isApproving() || isDeclining()"
               (click)="cancelDeclineForm()"
             >
               إلغاء

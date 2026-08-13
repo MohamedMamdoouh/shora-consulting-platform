@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
@@ -57,18 +57,36 @@ export class AdminAvailabilityPageComponent implements OnInit {
   private readonly adminBlockedDateService = inject(AdminBlockedDateService);
   private readonly apiCache = inject(ApiCacheService);
 
-  pageState: PageState = { status: 'loading' };
-  editingWindowId: string | null = null;
-  successMessage = '';
-  errorMessage = '';
-  isSubmitting = false;
-  deletingWindowId: string | null = null;
+  readonly pageState = signal<PageState>({ status: 'loading' });
+  readonly editingWindowId = signal<string | null>(null);
+  readonly successMessage = signal('');
+  readonly errorMessage = signal('');
+  readonly isSubmitting = signal(false);
+  readonly deletingWindowId = signal<string | null>(null);
 
-  blockedSuccessMessage = '';
-  blockedErrorMessage = '';
-  conflictingBookingIds: string[] = [];
-  isSubmittingBlocked = false;
-  deletingBlockedDateId: string | null = null;
+  readonly blockedSuccessMessage = signal('');
+  readonly blockedErrorMessage = signal('');
+  readonly conflictingBookingIds = signal<string[]>([]);
+  readonly isSubmittingBlocked = signal(false);
+  readonly deletingBlockedDateId = signal<string | null>(null);
+
+  readonly isEditing = computed(() => this.editingWindowId() !== null);
+
+  readonly formTitle = computed(() =>
+    this.isEditing() ? 'تعديل نافذة التوفر' : 'إضافة نافذة توفر',
+  );
+
+  readonly submitLabel = computed(() => {
+    if (this.isSubmitting()) {
+      return this.isEditing() ? 'جاري الحفظ...' : 'جاري الإضافة...';
+    }
+
+    return this.isEditing() ? 'حفظ التعديلات' : 'إضافة النافذة';
+  });
+
+  readonly blockedSubmitLabel = computed(() =>
+    this.isSubmittingBlocked() ? 'جاري الإضافة...' : 'إضافة الحجب',
+  );
 
   readonly dayOptions = DAY_OF_WEEK_OPTIONS;
   readonly consultantTimeZoneLabel = CONSULTANT_TIME_ZONE_LABEL;
@@ -108,28 +126,8 @@ export class AdminAvailabilityPageComponent implements OnInit {
     void this.loadPage();
   }
 
-  get isEditing(): boolean {
-    return this.editingWindowId !== null;
-  }
-
-  get formTitle(): string {
-    return this.isEditing ? 'تعديل نافذة التوفر' : 'إضافة نافذة توفر';
-  }
-
-  get submitLabel(): string {
-    if (this.isSubmitting) {
-      return this.isEditing ? 'جاري الحفظ...' : 'جاري الإضافة...';
-    }
-
-    return this.isEditing ? 'حفظ التعديلات' : 'إضافة النافذة';
-  }
-
-  get blockedSubmitLabel(): string {
-    return this.isSubmittingBlocked ? 'جاري الإضافة...' : 'إضافة الحجب';
-  }
-
   async loadPage(): Promise<void> {
-    this.pageState = { status: 'loading' };
+    this.pageState.set({ status: 'loading' });
     this.clearWindowMessages();
     this.clearBlockedMessages();
 
@@ -139,21 +137,21 @@ export class AdminAvailabilityPageComponent implements OnInit {
         firstValueFrom(this.adminBlockedDateService.listBlockedDates()),
       ]);
 
-      this.pageState = {
+      this.pageState.set({
         status: 'ready',
         windows: sortWindows(windows),
         blockedDates: sortBlockedDates(blockedDates),
-      };
+      });
     } catch (error) {
-      this.pageState = {
+      this.pageState.set({
         status: 'error',
         message: readApiError(error, 'تعذر تحميل صفحة المواعيد. حاول مرة أخرى.'),
-      };
+      });
     }
   }
 
   startCreate(): void {
-    this.editingWindowId = null;
+    this.editingWindowId.set(null);
     this.clearWindowMessages();
     this.form.reset({
       dayOfWeek: 1 as DayOfWeek,
@@ -164,7 +162,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
   }
 
   startEdit(window: AvailabilityWindow): void {
-    this.editingWindowId = window.id;
+    this.editingWindowId.set(window.id);
     this.clearWindowMessages();
     this.form.reset({
       dayOfWeek: window.dayOfWeek,
@@ -189,7 +187,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
   }
 
   async submit(): Promise<void> {
-    if (this.isSubmitting || this.pageState.status !== 'ready') {
+    if (this.isSubmitting() || this.pageState().status !== 'ready') {
       return;
     }
 
@@ -199,19 +197,18 @@ export class AdminAvailabilityPageComponent implements OnInit {
     }
 
     this.clearWindowMessages();
-    this.isSubmitting = true;
+    this.isSubmitting.set(true);
 
     try {
       const payload = this.buildWindowPayload();
+      const editingId = this.editingWindowId();
 
-      if (this.editingWindowId) {
-        await firstValueFrom(
-          this.adminAvailabilityService.updateWindow(this.editingWindowId, payload),
-        );
-        this.successMessage = 'تم تحديث نافذة التوفر.';
+      if (editingId) {
+        await firstValueFrom(this.adminAvailabilityService.updateWindow(editingId, payload));
+        this.successMessage.set('تم تحديث نافذة التوفر.');
       } else {
         await firstValueFrom(this.adminAvailabilityService.createWindow(payload));
-        this.successMessage = 'تمت إضافة نافذة التوفر.';
+        this.successMessage.set('تمت إضافة نافذة التوفر.');
       }
 
       this.invalidateAvailabilityCache();
@@ -222,14 +219,16 @@ export class AdminAvailabilityPageComponent implements OnInit {
         return;
       }
 
-      this.errorMessage = readApiError(error, 'تعذر حفظ نافذة التوفر. راجع البيانات وحاول مرة أخرى.');
+      this.errorMessage.set(
+        readApiError(error, 'تعذر حفظ نافذة التوفر. راجع البيانات وحاول مرة أخرى.'),
+      );
     } finally {
-      this.isSubmitting = false;
+      this.isSubmitting.set(false);
     }
   }
 
   async submitBlockedDate(): Promise<void> {
-    if (this.isSubmittingBlocked || this.pageState.status !== 'ready') {
+    if (this.isSubmittingBlocked() || this.pageState().status !== 'ready') {
       return;
     }
 
@@ -239,7 +238,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
     }
 
     this.clearBlockedMessages();
-    this.isSubmittingBlocked = true;
+    this.isSubmittingBlocked.set(true);
 
     try {
       await firstValueFrom(
@@ -247,7 +246,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
       );
 
       this.invalidateAvailabilityCache();
-      this.blockedSuccessMessage = 'تمت إضافة فترة الحجب.';
+      this.blockedSuccessMessage.set('تمت إضافة فترة الحجب.');
       this.resetBlockedForm();
       await this.refreshBlockedDates();
     } catch (error) {
@@ -257,56 +256,62 @@ export class AdminAvailabilityPageComponent implements OnInit {
 
       const conflictingIds = readConflictingBookingIds(error);
       if (conflictingIds?.length) {
-        this.conflictingBookingIds = conflictingIds;
-        this.blockedErrorMessage =
-          'تتعارض فترة الحجب مع حجوزات قائمة. ألغ هذه الحجوزات أولًا ثم حاول مرة أخرى.';
+        this.conflictingBookingIds.set(conflictingIds);
+        this.blockedErrorMessage.set(
+          'تتعارض فترة الحجب مع حجوزات قائمة. قم بإلغاءهذه الحجوزات أولًا ثم حاول مرة أخرى.',
+        );
         return;
       }
 
       if (readApiErrorCode(error) === ErrorCodes.Availability.BlockedRangeConflictsWithBookings) {
-        this.blockedErrorMessage =
-          'تتعارض فترة الحجب مع حجوزات قائمة. ألغ الحجوزات المتعارضة أولًا ثم حاول مرة أخرى.';
+        this.blockedErrorMessage.set(
+          'تتعارض فترة الحجب مع حجوزات قائمة. قم بإلغاءالحجوزات المتعارضة أولًا ثم حاول مرة أخرى.',
+        );
         return;
       }
 
-      this.blockedErrorMessage = readApiError(error, 'تعذر إضافة فترة الحجب. تحقق من البيانات وحاول مرة أخرى.');
+      this.blockedErrorMessage.set(
+        readApiError(error, 'تعذر إضافة فترة الحجب. تحقق من البيانات وحاول مرة أخرى.'),
+      );
     } finally {
-      this.isSubmittingBlocked = false;
+      this.isSubmittingBlocked.set(false);
     }
   }
 
   async deleteWindow(window: AvailabilityWindow): Promise<void> {
-    if (this.pageState.status !== 'ready' || this.deletingWindowId) {
+    if (this.pageState().status !== 'ready' || this.deletingWindowId()) {
       return;
     }
 
-    const confirmed = confirm(`حذف "${formatWindowSummary(window)}"؟ سيتم إعادة توليد المواعيد المتاحة.`);
+    const confirmed = confirm(
+      `حذف "${formatWindowSummary(window)}"؟ سيتم إعادة توليد المواعيد المتاحة.`,
+    );
     if (!confirmed) {
       return;
     }
 
     this.clearWindowMessages();
-    this.deletingWindowId = window.id;
+    this.deletingWindowId.set(window.id);
 
     try {
       await firstValueFrom(this.adminAvailabilityService.deleteWindow(window.id));
       this.invalidateAvailabilityCache();
 
-      if (this.editingWindowId === window.id) {
+      if (this.editingWindowId() === window.id) {
         this.startCreate();
       }
 
-      this.successMessage = 'تم حذف نافذة التوفر.';
+      this.successMessage.set('تم حذف نافذة التوفر.');
       await this.refreshWindows();
     } catch (error) {
-      this.errorMessage = readApiError(error, 'تعذر حذف نافذة التوفر. حاول مرة أخرى.');
+      this.errorMessage.set(readApiError(error, 'تعذر حذف نافذة التوفر. حاول مرة أخرى.'));
     } finally {
-      this.deletingWindowId = null;
+      this.deletingWindowId.set(null);
     }
   }
 
   async deleteBlockedDate(blockedDate: BlockedDate): Promise<void> {
-    if (this.pageState.status !== 'ready' || this.deletingBlockedDateId) {
+    if (this.pageState().status !== 'ready' || this.deletingBlockedDateId()) {
       return;
     }
 
@@ -318,48 +323,50 @@ export class AdminAvailabilityPageComponent implements OnInit {
     }
 
     this.clearBlockedMessages();
-    this.deletingBlockedDateId = blockedDate.id;
+    this.deletingBlockedDateId.set(blockedDate.id);
 
     try {
       await firstValueFrom(this.adminBlockedDateService.deleteBlockedDate(blockedDate.id));
       this.invalidateAvailabilityCache();
-      this.blockedSuccessMessage = 'تمت إزالة فترة الحجب.';
+      this.blockedSuccessMessage.set('تمت إزالة فترة الحجب.');
       await this.refreshBlockedDates();
     } catch (error) {
-      this.blockedErrorMessage = readApiError(error, 'تعذر إزالة فترة الحجب. حاول مرة أخرى.');
+      this.blockedErrorMessage.set(readApiError(error, 'تعذر إزالة فترة الحجب. حاول مرة أخرى.'));
     } finally {
-      this.deletingBlockedDateId = null;
+      this.deletingBlockedDateId.set(null);
     }
   }
 
   private async refreshWindows(): Promise<void> {
-    if (this.pageState.status !== 'ready') {
+    const current = this.pageState();
+    if (current.status !== 'ready') {
       await this.loadPage();
       return;
     }
 
     try {
       const windows = await firstValueFrom(this.adminAvailabilityService.listWindows());
-      this.pageState = { ...this.pageState, windows: sortWindows(windows) };
+      this.pageState.set({ ...current, windows: sortWindows(windows) });
     } catch (error) {
-      this.pageState = {
+      this.pageState.set({
         status: 'error',
         message: readApiError(error, 'تعذر تحميل نوافذ التوفر. حاول مرة أخرى.'),
-      };
+      });
     }
   }
 
   private async refreshBlockedDates(): Promise<void> {
-    if (this.pageState.status !== 'ready') {
+    const current = this.pageState();
+    if (current.status !== 'ready') {
       await this.loadPage();
       return;
     }
 
     try {
       const blockedDates = await firstValueFrom(this.adminBlockedDateService.listBlockedDates());
-      this.pageState = { ...this.pageState, blockedDates: sortBlockedDates(blockedDates) };
+      this.pageState.set({ ...current, blockedDates: sortBlockedDates(blockedDates) });
     } catch (error) {
-      this.blockedErrorMessage = readApiError(error, 'تعذر تحديث قائمة فترات الحجب.');
+      this.blockedErrorMessage.set(readApiError(error, 'تعذر تحديث قائمة فترات الحجب.'));
     }
   }
 
@@ -390,25 +397,25 @@ export class AdminAvailabilityPageComponent implements OnInit {
   }
 
   private clearWindowMessages(): void {
-    this.successMessage = '';
-    this.errorMessage = '';
+    this.successMessage.set('');
+    this.errorMessage.set('');
   }
 
   private clearBlockedMessages(): void {
-    this.blockedSuccessMessage = '';
-    this.blockedErrorMessage = '';
-    this.conflictingBookingIds = [];
+    this.blockedSuccessMessage.set('');
+    this.blockedErrorMessage.set('');
+    this.conflictingBookingIds.set([]);
   }
 
   private applyWindowServerValidationErrors(error: unknown): boolean {
     return this.applyServerValidationErrors(error, this.form, (message) => {
-      this.errorMessage = message;
+      this.errorMessage.set(message);
     });
   }
 
   private applyBlockedServerValidationErrors(error: unknown): boolean {
     return this.applyServerValidationErrors(error, this.blockedForm, (message) => {
-      this.blockedErrorMessage = message;
+      this.blockedErrorMessage.set(message);
     });
   }
 

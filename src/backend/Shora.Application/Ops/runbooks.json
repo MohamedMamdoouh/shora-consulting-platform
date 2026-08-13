@@ -6,7 +6,7 @@
       "responseSla": "Warning: 4 h · Critical: 1 h",
       "trigger": "Booking in PendingApproval longer than 6 h (warning) or 24 h (critical).",
       "steps": [
-        "Confirm admin notification email delivery (outbox + Resend logs).",
+        "Confirm admin notification email delivery (outbox + Brevo logs).",
         "Open admin bookings queue filtered to PendingApproval.",
         "Prioritize review of flagged booking(s); approve or decline with reason.",
         "If queue is empty but alert persists, check BookingStatusAudit vs current status for stale data."
@@ -74,7 +74,7 @@
       "responseSla": "15 min",
       "trigger": "≥ 5 messages dead-lettered within 1 hour (systemic failure).",
       "steps": [
-        "Treat as provider outage (Resend API, DNS, credentials).",
+        "Treat as provider outage (Brevo API, DNS, credentials).",
         "Pause non-essential deploys; verify Email:* configuration and provider status.",
         "Clear backlog incrementally after provider recovery; monitor for recurrence."
       ]

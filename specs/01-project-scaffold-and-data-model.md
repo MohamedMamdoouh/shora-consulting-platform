@@ -33,7 +33,7 @@ Shora/
 │       ├── Shora.Domain/           # Entities, enums, domain rules. No external dependencies.
 │       ├── Shora.Application/      # Use-case services, abstraction interfaces, options, email templates
 │       ├── Shora.Contracts/        # Shared request/response records (no dependencies)
-│       ├── Shora.Infrastructure/   # EF Core DbContext + migrations, seed, Azure Blob, Resend email
+│       ├── Shora.Infrastructure/   # EF Core DbContext + migrations, seed, Azure Blob, Brevo email
 │       ├── Shora.Api/              # ASP.NET Core Web API: controllers, jobs, rate limiting, middleware
 │       └── Shora.Tests/            # xUnit integration + unit tests
 ├── .github/workflows/              # CI + Deploy workflows (spec 09)
@@ -63,7 +63,7 @@ Rationale: this keeps external, swappable concerns (payments, email) behind inte
 - **Infrastructure** — concrete implementations:
   - `ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>` implementing `IApplicationDbContext`; fluent entity configurations in `Data/Configurations/`; consolidated PostgreSQL migration `20260811142250_InitialCreate` (see #5).
   - `SystemDateTimeProvider : IDateTimeProvider` — live UTC clock.
-  - `ResendEmailSender : IEmailSender` — production email via Resend HTTPS API (spec 08.4); dev falls back to logging.
+  - `BrevoEmailSender : IEmailSender` — production email via Brevo HTTPS API (spec 08.4); dev falls back to logging.
   - `AzureBlobFileStorage : IFileStorage` — receipt blob storage (spec 05a); `NotImplementedFileStorage` when `Storage:ConnectionString` is unset.
   - `PassThroughMalwareScanner : IMalwareScanner` — dev stub; replace in production (spec 05f).
   - `HttpContextCurrentUser : ICurrentUser` — resolves authenticated user id/role (spec 02).
@@ -78,7 +78,7 @@ Rationale: this keeps external, swappable concerns (payments, email) behind inte
   - `Jwt:Issuer`, `Jwt:Audience`, `Jwt:SigningKey` — JWT auth (see spec 02); issuer/audience default to `Shora` / `Shora.Web`
   - `Storage:ConnectionString`, `Storage:ReceiptContainer` — Azure Blob Storage for receipt images (private container); used in spec 05
   - `Google:ClientId`, `Google:ClientSecret` — Google sign-in (see spec 02)
-  - `Email:*` — Resend API key and from address for `EmailSender` (password reset + all client/admin notifications). Email is the only notification channel; no SMS.
+  - `Email:*` — Brevo API key and from address for `EmailSender` (password reset + all client/admin notifications). Email is the only notification channel; no SMS.
   - `AdminSeed:Email`, `AdminSeed:Password` — seeded admin user (dev via `appsettings.Development.json`; production via secrets)
   - `Seed:ConsultantWhatsAppNumber`, `Seed:VodafoneCashNumber`, `Seed:InstaPayHandle`, `Seed:PaymentInstructions` — defaults for the singleton `Settings` row on first run
   - `BackgroundJobs:*` — enable/disable in-process jobs and per-job intervals (spec 08; set `Enabled = false` in tests)

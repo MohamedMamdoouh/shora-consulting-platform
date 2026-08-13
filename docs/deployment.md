@@ -15,7 +15,7 @@ Use double-underscore nesting for nested JSON (e.g. `Jwt__SigningKey` → `Jwt:S
 | Compute (API + SPA) | Railway |
 | Database | Neon PostgreSQL |
 | Receipt blobs | Azure Blob Storage (private container) |
-| Email | Resend (HTTPS API) |
+| Email | Brevo (HTTPS API) |
 | Container registry | GitHub Container Registry (GHCR) |
 
 One process hosts the API, Angular static files (`wwwroot`), in-process background jobs, and in-memory cache. There is no load balancer, horizontal scaling, or distributed cache.
@@ -110,8 +110,8 @@ Set in Railway → service → **Variables**. Use `__` (double underscore) for n
 | CORS origin | `Cors__AllowedOrigins__0` | **Same URL** as `Frontend__BaseUrl` (same-site auth) |
 | Blob storage | `Storage__ConnectionString` | Azure Storage connection string |
 | Receipt container | `Storage__ReceiptContainer` | Private container name (default `receipts`) |
-| Resend API key | `Email__ApiKey` | From [Resend dashboard](https://resend.com/api-keys) |
-| From address | `Email__FromAddress` | Verified sender at Resend |
+| Brevo API key | `Email__ApiKey` | From [Brevo dashboard](https://app.brevo.com) → SMTP & API → API keys |
+| From address | `Email__FromAddress` | Verified sender in Brevo (e.g. your Gmail) |
 
 Also set `AllowedHosts` to the hostname only (e.g. `<your-app>.up.railway.app` — no `https://`). Include `healthcheck.railway.app` as well — Railway sends deploy healthchecks from that hostname, and omitting it causes HTTP 400 responses and failed deploys.
 
@@ -124,8 +124,8 @@ Also set `AllowedHosts` to the hostname only (e.g. `<your-app>.up.railway.app` �
 | `ConnectionStrings__DefaultConnection` | Neon pooled connection string |
 | `Jwt__SigningKey` | Random string, 32+ characters |
 | `Storage__ConnectionString` | Azure CLI or Portal |
-| `Email__ApiKey` | Resend API key (`re_...`) |
-| `Email__FromAddress` | Resend verified sender domain |
+| `Email__ApiKey` | Brevo API key (`xkeysib-...`) |
+| `Email__FromAddress` | Brevo verified sender (must match dashboard exactly) |
 | `AdminSeed__Email` / `AdminSeed__Password` | One-time admin bootstrap — **remove after first login** |
 | `Google__ClientId` | Optional |
 
@@ -143,15 +143,20 @@ Refresh cookies use `Secure=true` and `SameSite=Strict` outside Development.
 
 ### Email (required for sending mail)
 
-Shora uses the **Resend HTTPS API** for all production email (auth + transactional outbox). This works on all Railway plans.
+Shora sends auth and transactional emails via the **Brevo HTTPS API** (works on all Railway plans, including Hobby). Gmail SMTP is blocked on Railway Hobby (port 587).
 
-Set on Railway:
+1. Sign up at [brevo.com](https://www.brevo.com) (free tier: 300 emails/day, no credit card).
+2. **Senders, Domains & Dedicated IPs → Senders → Add sender** — use your Gmail address and complete Brevo’s verification email/code.
+3. **SMTP & API → API keys** — create a key (`xkeysib-...`).
+4. Set on Railway:
 
 | Setting | Variable name | Notes |
 | --- | --- | --- |
-| API key | `Email__ApiKey` | From Resend dashboard — **secret** |
-| From address | `Email__FromAddress` | Must use a domain verified in Resend |
-| From display name | `Email__FromName` | Optional; defaults to `Shora` |
+| API key | `Email__ApiKey` | Brevo API key — **secret** |
+| From address | `Email__FromAddress` | Must match the verified sender exactly (e.g. your Gmail) |
+| From display name | `Email__FromName` | Optional |
+
+Deliverability from `@gmail.com` is weaker than a custom domain; check spam on first send. You can later authenticate your own domain in Brevo for better deliverability.
 
 After changing email variables, **redeploy** the service.
 

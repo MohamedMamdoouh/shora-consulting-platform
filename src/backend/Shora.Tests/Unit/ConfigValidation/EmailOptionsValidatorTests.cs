@@ -20,10 +20,23 @@ public class EmailOptionsValidatorTests
     {
         var result = _validator.Validate(null, new EmailOptions
         {
-            ApiKey = "re_test",
-            FromAddress = "noreply@example.com"
+            ApiKey = "xkeysib-test",
+            FromAddress = "you@gmail.com"
         });
 
         Assert.True(result.Succeeded);
+    }
+
+    [Fact]
+    public void Validate_fails_when_from_address_is_invalid()
+    {
+        var result = _validator.Validate(null, new EmailOptions
+        {
+            ApiKey = "xkeysib-test",
+            FromAddress = "not-an-email"
+        });
+
+        Assert.False(result.Succeeded);
+        Assert.Contains("valid email address", result.FailureMessage, StringComparison.OrdinalIgnoreCase);
     }
 }

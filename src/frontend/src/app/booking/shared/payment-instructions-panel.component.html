@@ -29,9 +29,9 @@
   </div>
 }
 
-<div class="countdown-block" [class.countdown-block--expired]="deadlineExpired">
+<div class="countdown-block" [class.countdown-block--expired]="deadlineExpired()">
   <h3>مهلة رفع الإيصال</h3>
-  <p class="countdown-value" aria-live="polite">{{ countdownLabel }}</p>
+  <p class="countdown-value" aria-live="polite">{{ countdownLabel() }}</p>
 </div>
 
 <form class="upload-form" (submit)="$event.preventDefault(); submitReceipt()">
@@ -39,7 +39,7 @@
 
   <label class="field">
     <span>طريقة الدفع المستخدمة</span>
-    <select [(ngModel)]="uploadMethod" name="method" [disabled]="uploading || deadlineExpired">
+    <select [(ngModel)]="uploadMethod" name="method" [disabled]="uploading() || deadlineExpired()">
       <option value="VodafoneCash">فودافون كاش</option>
       <option value="InstaPay">إنستا باي</option>
     </select>
@@ -53,7 +53,7 @@
       name="senderReference"
       maxlength="200"
       placeholder="رقم العملية أو رقم المحفظة"
-      [disabled]="uploading || deadlineExpired"
+      [disabled]="uploading() || deadlineExpired()"
     />
   </label>
 
@@ -63,15 +63,15 @@
       type="file"
       accept="image/jpeg,image/png,image/webp,application/pdf"
       (change)="onFileSelected($event)"
-      [disabled]="uploading || deadlineExpired"
+      [disabled]="uploading() || deadlineExpired()"
     />
   </label>
 
-  @if (uploadError) {
-    <p class="upload-error" aria-live="polite">{{ uploadError }}</p>
+  @if (uploadError()) {
+    <p class="upload-error" aria-live="polite">{{ uploadError() }}</p>
   }
 
-  <button type="submit" class="btn btn--primary" [disabled]="uploading || deadlineExpired">
-    {{ uploading ? 'جاري الرفع...' : 'رفع الإيصال' }}
+  <button type="submit" class="btn btn--primary" [disabled]="uploading() || deadlineExpired()">
+    {{ uploading() ? 'جاري الرفع...' : 'رفع الإيصال' }}
   </button>
 </form>

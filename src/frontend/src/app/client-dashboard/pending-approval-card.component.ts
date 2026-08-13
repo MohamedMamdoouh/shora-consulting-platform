@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
 import { MyBookingListItem } from '@contracts/booking';
 import { firstValueFrom } from 'rxjs';
 import { readApiError, readApiErrorCode } from '../core/api/api-error.util';
@@ -21,11 +21,11 @@ export class PendingApprovalCardComponent {
 
   @Output() readonly changed = new EventEmitter<void>();
 
-  cancelError = '';
-  cancelling = false;
+  readonly cancelError = signal('');
+  readonly cancelling = signal(false);
 
   async cancelHold(): Promise<void> {
-    if (this.cancelling) {
+    if (this.cancelling()) {
       return;
     }
 
@@ -37,20 +37,22 @@ export class PendingApprovalCardComponent {
       return;
     }
 
-    this.cancelling = true;
-    this.cancelError = '';
+    this.cancelling.set(true);
+    this.cancelError.set('');
 
     try {
       await firstValueFrom(this.bookingService.cancelHold(this.item.bookingId));
       this.changed.emit();
     } catch (err) {
       const code = readApiErrorCode(err);
-      this.cancelError = readBookingErrorMessage(
-        code,
-        readApiError(err, 'تعذر إلغاء الحجز. حاول مرة أخرى.'),
+      this.cancelError.set(
+        readBookingErrorMessage(
+          code,
+          readApiError(err, 'تعذر إلغاء الحجز. حاول مرة أخرى.'),
+        ),
       );
     } finally {
-      this.cancelling = false;
+      this.cancelling.set(false);
     }
   }
 }

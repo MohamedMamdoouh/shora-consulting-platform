@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BookingStatus, MyBookingListItem } from '@contracts/booking';
 import { firstValueFrom } from 'rxjs';
@@ -38,11 +38,11 @@ export class UpcomingBookingCardComponent {
 
   readonly formatDeliveryMethodLabel = formatDeliveryMethodLabel;
 
-  cancellationReason = '';
+  readonly cancellationReason = signal('');
   cancellationError = '';
-  cancellationActionError = '';
-  requestingCancellation = false;
-  acknowledgingDecision = false;
+  readonly cancellationActionError = signal('');
+  readonly requestingCancellation = signal(false);
+  readonly acknowledgingDecision = signal(false);
 
   get voiceCallInstruction(): string | null {
     return formatVoiceCallInstruction(this.item.contactPhone, this.item.slotStartUtc);
@@ -94,7 +94,7 @@ export class UpcomingBookingCardComponent {
   }
 
   async submitCancellationRequest(): Promise<void> {
-    if (this.requestingCancellation || !this.showRequestCancellation) {
+    if (this.requestingCancellation() || !this.showRequestCancellation) {
       return;
     }
 
@@ -104,37 +104,39 @@ export class UpcomingBookingCardComponent {
       return;
     }
 
-    this.requestingCancellation = true;
-    this.cancellationActionError = '';
+    this.requestingCancellation.set(true);
+    this.cancellationActionError.set('');
 
     try {
-      const reason = this.cancellationReason.trim();
+      const reason = this.cancellationReason().trim();
       await firstValueFrom(
         this.bookingService.requestCancellation(this.item.bookingId, {
           reason: reason || null,
         }),
       );
 
-      this.cancellationReason = '';
+      this.cancellationReason.set('');
       this.changed.emit();
     } catch (err) {
       const code = readApiErrorCode(err);
-      this.cancellationActionError = readBookingErrorMessage(
-        code,
-        readApiError(err, 'تعذر إرسال طلب الإلغاء. حاول مرة أخرى.'),
+      this.cancellationActionError.set(
+        readBookingErrorMessage(
+          code,
+          readApiError(err, 'تعذر إرسال طلب الإلغاء. حاول مرة أخرى.'),
+        ),
       );
     } finally {
-      this.requestingCancellation = false;
+      this.requestingCancellation.set(false);
     }
   }
 
   async acknowledgeDecision(): Promise<void> {
-    if (this.acknowledgingDecision || !this.showDeclinedBanner) {
+    if (this.acknowledgingDecision() || !this.showDeclinedBanner) {
       return;
     }
 
-    this.acknowledgingDecision = true;
-    this.cancellationActionError = '';
+    this.acknowledgingDecision.set(true);
+    this.cancellationActionError.set('');
 
     try {
       await firstValueFrom(
@@ -143,12 +145,14 @@ export class UpcomingBookingCardComponent {
       this.changed.emit();
     } catch (err) {
       const code = readApiErrorCode(err);
-      this.cancellationActionError = readBookingErrorMessage(
-        code,
-        readApiError(err, 'تعذر تسجيل الإقرار. حاول مرة أخرى.'),
+      this.cancellationActionError.set(
+        readBookingErrorMessage(
+          code,
+          readApiError(err, 'تعذر تسجيل الإقرار. حاول مرة أخرى.'),
+        ),
       );
     } finally {
-      this.acknowledgingDecision = false;
+      this.acknowledgingDecision.set(false);
     }
   }
 }

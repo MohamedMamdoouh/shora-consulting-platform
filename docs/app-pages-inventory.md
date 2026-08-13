@@ -706,7 +706,7 @@ These appear on multiple pages and are relevant to system design:
 | **Vodafone Cash / InstaPay** (manual, no API) | Payment instructions, dashboard pending cards |
 | **WhatsApp deep links** | Dashboard upcoming cards (chat delivery) |
 | **Azure Blob Storage** (receipt upload) | Payment page, dashboard, admin receipt review |
-| **Resend email** (backend) | Triggered by auth, booking, payment workflows — no dedicated email pages |
+| **Brevo email** (backend) | Triggered by auth, booking, payment workflows — no dedicated email pages |
 
 ---
 

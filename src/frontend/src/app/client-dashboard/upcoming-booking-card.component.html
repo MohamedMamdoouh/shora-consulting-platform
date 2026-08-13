@@ -52,10 +52,10 @@
       <button
         type="button"
         class="btn btn--secondary"
-        [disabled]="acknowledgingDecision"
+        [disabled]="acknowledgingDecision()"
         (click)="acknowledgeDecision()"
       >
-        {{ acknowledgingDecision ? 'جاري التسجيل...' : 'حسنًا' }}
+        {{ acknowledgingDecision() ? 'جاري التسجيل...' : 'حسنًا' }}
       </button>
     </div>
   }
@@ -65,26 +65,27 @@
       <label class="field">
         <span>سبب الإلغاء (اختياري)</span>
         <textarea
-          [(ngModel)]="cancellationReason"
+          [ngModel]="cancellationReason()"
+          (ngModelChange)="cancellationReason.set($event)"
           name="cancellationReason"
           rows="2"
           maxlength="500"
           placeholder="مثال: تعارض في الموعد"
-          [disabled]="requestingCancellation"
+          [disabled]="requestingCancellation()"
         ></textarea>
       </label>
 
-      @if (cancellationActionError) {
-        <p class="upcoming-booking-card__error" aria-live="polite">{{ cancellationActionError }}</p>
+      @if (cancellationActionError()) {
+        <p class="upcoming-booking-card__error" aria-live="polite">{{ cancellationActionError() }}</p>
       }
 
       <button
         type="button"
         class="btn btn--danger"
-        [disabled]="requestingCancellation"
+        [disabled]="requestingCancellation()"
         (click)="submitCancellationRequest()"
       >
-        {{ requestingCancellation ? 'جاري الإرسال...' : 'طلب إلغاء الجلسة' }}
+        {{ requestingCancellation() ? 'جاري الإرسال...' : 'طلب إلغاء الجلسة' }}
       </button>
     </div>
   }

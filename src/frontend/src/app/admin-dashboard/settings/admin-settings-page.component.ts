@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { AdminSettings, UpdateAdminSettingsRequest } from '@contracts/settings';
@@ -36,10 +36,10 @@ export class AdminSettingsPageComponent implements OnInit {
   private readonly adminSettingsService = inject(AdminSettingsService);
   private readonly apiCache = inject(ApiCacheService);
 
-  pageState: PageState = { status: 'loading' };
-  successMessage = '';
-  errorMessage = '';
-  isSubmitting = false;
+  readonly pageState = signal<PageState>({ status: 'loading' });
+  readonly successMessage = signal('');
+  readonly errorMessage = signal('');
+  readonly isSubmitting = signal(false);
 
   readonly getFieldError = getAdminSettingsFieldError;
 
@@ -60,24 +60,24 @@ export class AdminSettingsPageComponent implements OnInit {
   }
 
   async loadSettings(): Promise<void> {
-    this.pageState = { status: 'loading' };
-    this.successMessage = '';
-    this.errorMessage = '';
+    this.pageState.set({ status: 'loading' });
+    this.successMessage.set('');
+    this.errorMessage.set('');
 
     try {
       const settings = await firstValueFrom(this.adminSettingsService.getSettings());
       this.patchForm(settings);
-      this.pageState = { status: 'ready', receiptRetentionMonths: settings.receiptRetentionMonths };
+      this.pageState.set({ status: 'ready', receiptRetentionMonths: settings.receiptRetentionMonths });
     } catch (error) {
-      this.pageState = {
+      this.pageState.set({
         status: 'error',
         message: readApiError(error, 'تعذر تحميل الإعدادات. حاول مرة أخرى.'),
-      };
+      });
     }
   }
 
   async submit(): Promise<void> {
-    if (this.isSubmitting || this.pageState.status !== 'ready') {
+    if (this.isSubmitting() || this.pageState().status !== 'ready') {
       return;
     }
 
@@ -86,25 +86,25 @@ export class AdminSettingsPageComponent implements OnInit {
       return;
     }
 
-    this.successMessage = '';
-    this.errorMessage = '';
-    this.isSubmitting = true;
+    this.successMessage.set('');
+    this.errorMessage.set('');
+    this.isSubmitting.set(true);
 
     try {
       const payload = this.buildUpdateRequest();
       const updated = await firstValueFrom(this.adminSettingsService.updateSettings(payload));
       this.patchForm(updated);
-      this.pageState = { status: 'ready', receiptRetentionMonths: updated.receiptRetentionMonths };
+      this.pageState.set({ status: 'ready', receiptRetentionMonths: updated.receiptRetentionMonths });
       this.apiCache.invalidate(settingsPublicRequest(environment.apiBaseUrl).url);
-      this.successMessage = 'تم حفظ الإعدادات بنجاح.';
+      this.successMessage.set('تم حفظ الإعدادات بنجاح.');
     } catch (error) {
       if (this.applyServerValidationErrors(error)) {
         return;
       }
 
-      this.errorMessage = readApiError(error, 'تعذر حفظ الإعدادات. راجع البيانات وحاول مرة أخرى.');
+      this.errorMessage.set(readApiError(error, 'تعذر حفظ الإعدادات. راجع البيانات وحاول مرة أخرى.'));
     } finally {
-      this.isSubmitting = false;
+      this.isSubmitting.set(false);
     }
   }
 
@@ -156,7 +156,7 @@ export class AdminSettingsPageComponent implements OnInit {
     }
 
     if (error instanceof HttpErrorResponse) {
-      this.errorMessage = readApiError(error, 'تحقق من الحقول المظللة.');
+      this.errorMessage.set(readApiError(error, 'تحقق من الحقول المظللة.'));
     }
 
     return true;

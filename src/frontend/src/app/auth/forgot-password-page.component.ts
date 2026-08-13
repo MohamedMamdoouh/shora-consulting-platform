@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -16,9 +16,9 @@ export class ForgotPasswordPageComponent {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
 
-  submitted = false;
-  isSubmitting = false;
-  errorMessage = '';
+  readonly submitted = signal(false);
+  readonly isSubmitting = signal(false);
+  readonly errorMessage = signal('');
 
   readonly getFieldError = getAuthFieldError;
 
@@ -27,7 +27,7 @@ export class ForgotPasswordPageComponent {
   });
 
   async submit(): Promise<void> {
-    if (this.isSubmitting) {
+    if (this.isSubmitting()) {
       return;
     }
 
@@ -36,16 +36,16 @@ export class ForgotPasswordPageComponent {
       return;
     }
 
-    this.errorMessage = '';
-    this.isSubmitting = true;
+    this.errorMessage.set('');
+    this.isSubmitting.set(true);
 
     try {
       await firstValueFrom(this.auth.forgotPassword(this.form.controls.email.value));
-      this.submitted = true;
+      this.submitted.set(true);
     } catch (err) {
-      this.errorMessage = readApiError(err, 'تعذر إرسال رابط إعادة التعيين. حاول مرة أخرى.');
+      this.errorMessage.set(readApiError(err, 'تعذر إرسال رابط إعادة التعيين. حاول مرة أخرى.'));
     } finally {
-      this.isSubmitting = false;
+      this.isSubmitting.set(false);
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminBookingListItem } from '@contracts/booking';
 import { firstValueFrom } from 'rxjs';
@@ -24,8 +24,8 @@ export class AdminRefundPanelComponent {
   @Output() readonly closed = new EventEmitter<void>();
   @Output() readonly changed = new EventEmitter<void>();
 
-  actionError = '';
-  isSubmitting = false;
+  readonly actionError = signal('');
+  readonly isSubmitting = signal(false);
 
   readonly recordForm = this.fb.nonNullable.group({
     reference: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(500)]),
@@ -41,7 +41,7 @@ export class AdminRefundPanelComponent {
   }
 
   async submitRecord(): Promise<void> {
-    if (this.isSubmitting || !this.item.paymentId) {
+    if (this.isSubmitting() || !this.item.paymentId) {
       return;
     }
 
@@ -51,8 +51,8 @@ export class AdminRefundPanelComponent {
     }
 
     const values = this.recordForm.getRawValue();
-    this.isSubmitting = true;
-    this.actionError = '';
+    this.isSubmitting.set(true);
+    this.actionError.set('');
 
     try {
       await firstValueFrom(
@@ -64,17 +64,19 @@ export class AdminRefundPanelComponent {
       this.changed.emit();
       this.close();
     } catch (error) {
-      this.actionError = readBookingErrorMessage(
-        readApiErrorCode(error),
-        readApiError(error, 'تعذر تسجيل الاسترداد. حاول مرة أخرى.'),
+      this.actionError.set(
+        readBookingErrorMessage(
+          readApiErrorCode(error),
+          readApiError(error, 'تعذر تسجيل الاسترداد. حاول مرة أخرى.'),
+        ),
       );
     } finally {
-      this.isSubmitting = false;
+      this.isSubmitting.set(false);
     }
   }
 
   async submitRevoke(): Promise<void> {
-    if (this.isSubmitting || !this.item.paymentId) {
+    if (this.isSubmitting() || !this.item.paymentId) {
       return;
     }
 
@@ -92,8 +94,8 @@ export class AdminRefundPanelComponent {
     }
 
     const values = this.revokeForm.getRawValue();
-    this.isSubmitting = true;
-    this.actionError = '';
+    this.isSubmitting.set(true);
+    this.actionError.set('');
 
     try {
       await firstValueFrom(
@@ -104,12 +106,14 @@ export class AdminRefundPanelComponent {
       this.changed.emit();
       this.close();
     } catch (error) {
-      this.actionError = readBookingErrorMessage(
-        readApiErrorCode(error),
-        readApiError(error, 'تعذر التراجع عن تسجيل الاسترداد. حاول مرة أخرى.'),
+      this.actionError.set(
+        readBookingErrorMessage(
+          readApiErrorCode(error),
+          readApiError(error, 'تعذر التراجع عن تسجيل الاسترداد. حاول مرة أخرى.'),
+        ),
       );
     } finally {
-      this.isSubmitting = false;
+      this.isSubmitting.set(false);
     }
   }
 }

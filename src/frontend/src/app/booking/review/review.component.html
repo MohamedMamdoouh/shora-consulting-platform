@@ -36,17 +36,17 @@
       <div class="state-panel state-panel--warn">
         <p>يرجى تأكيد بريدك الإلكتروني قبل حجز جلسة.</p>
 
-        @if (infoMessage) {
-          <div class="banner banner--info" role="status">{{ infoMessage }}</div>
+        @if (infoMessage()) {
+          <div class="banner banner--info" role="status">{{ infoMessage() }}</div>
         }
 
-        @if (errorMessage) {
-          <div class="banner banner--error" role="alert">{{ errorMessage }}</div>
+        @if (errorMessage()) {
+          <div class="banner banner--error" role="alert">{{ errorMessage() }}</div>
         }
 
         @if (userEmail) {
-          <button type="button" class="btn btn--secondary" [disabled]="isResending" (click)="resendVerification()">
-            {{ isResending ? 'جاري الإرسال…' : 'إعادة إرسال رابط التحقق' }}
+          <button type="button" class="btn btn--secondary" [disabled]="isResending()" (click)="resendVerification()">
+            {{ isResending() ? 'جاري الإرسال…' : 'إعادة إرسال رابط التحقق' }}
           </button>
         } @else {
           <a routerLink="/auth/login" [queryParams]="{ returnUrl: '/booking/review' }" class="btn btn--secondary">
@@ -55,21 +55,21 @@
         }
       </div>
     } @else {
-      @if (infoMessage) {
-        <div class="banner banner--info" role="status">{{ infoMessage }}</div>
+      @if (infoMessage()) {
+        <div class="banner banner--info" role="status">{{ infoMessage() }}</div>
       }
 
-      @if (errorMessage) {
+      @if (errorMessage()) {
         <div class="banner banner--error" role="alert">
-          <p>{{ errorMessage }}</p>
-          @if (slotUnavailable) {
+          <p>{{ errorMessage() }}</p>
+          @if (slotUnavailable()) {
             <a routerLink="/booking/start" class="btn btn--secondary">اختيار موعد آخر</a>
           }
         </div>
       }
 
-      <button type="button" class="btn btn--lg" [disabled]="isSubmitting" (click)="reserve()">
-        {{ isSubmitting ? 'جاري الحجز…' : 'تأكيد الحجز' }}
+      <button type="button" class="btn btn--lg" [disabled]="isSubmitting()" (click)="reserve()">
+        {{ isSubmitting() ? 'جاري الحجز…' : 'تأكيد الحجز' }}
       </button>
     }
 

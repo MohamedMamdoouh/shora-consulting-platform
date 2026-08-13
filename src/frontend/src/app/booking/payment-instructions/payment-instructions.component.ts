@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { PaymentInstructionsResponse } from '@contracts/payments';
 import { firstValueFrom } from 'rxjs';
@@ -27,8 +27,8 @@ export class PaymentInstructionsComponent implements OnInit {
   private readonly bookingService = inject(BookingService);
 
   protected readonly copy = APP_COPY;
-  viewModel: PaymentInstructionsViewModel = { status: 'loading' };
-  bookingId: string | null = null;
+  readonly viewModel = signal<PaymentInstructionsViewModel>({ status: 'loading' });
+  readonly bookingId = signal<string | null>(null);
 
   ngOnInit(): void {
     void this.loadInstructions();
@@ -43,36 +43,36 @@ export class PaymentInstructionsComponent implements OnInit {
   }
 
   onReceiptSubmitted(): void {
-    this.viewModel = { status: 'submitted' };
+    this.viewModel.set({ status: 'submitted' });
   }
 
   private async loadInstructions(): Promise<void> {
     const bookingId = this.route.snapshot.paramMap.get('id');
     if (!bookingId) {
-      this.viewModel = {
+      this.viewModel.set({
         status: 'error',
         message: 'معرف الحجز غير صالح.',
-      };
+      });
       return;
     }
 
-    this.bookingId = bookingId;
-    this.viewModel = { status: 'loading' };
+    this.bookingId.set(bookingId);
+    this.viewModel.set({ status: 'loading' });
 
     try {
       const instructions = await firstValueFrom(
         this.bookingService.getPaymentInstructions(bookingId),
       );
-      this.viewModel = { status: 'ready', instructions };
+      this.viewModel.set({ status: 'ready', instructions });
     } catch (err) {
       const code = readApiErrorCode(err);
-      this.viewModel = {
+      this.viewModel.set({
         status: 'error',
         message: readBookingErrorMessage(
           code,
           readApiError(err, 'تعذر تحميل تعليمات الدفع. حاول مرة أخرى.'),
         ),
-      };
+      });
     }
   }
 }

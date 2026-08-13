@@ -4,39 +4,39 @@
       <a routerLink="/errors">← مرجع أكواد الأخطاء</a>
     </p>
 
-    @if (notFound) {
+    @if (notFound()) {
       <h1>كود خطأ غير موجود</h1>
       <p class="errors-detail__muted">Error code not found in the catalog.</p>
-    } @else if (loadError) {
-      <p class="errors-detail__error">{{ loadError }}</p>
-    } @else if (entry) {
+    } @else if (loadError()) {
+      <p class="errors-detail__error">{{ loadError() }}</p>
+    } @else if (entry(); as currentEntry) {
       <header class="errors-detail__header">
-        <span class="errors-detail__status">{{ entry.status }}</span>
-        <h1>{{ entry.title }}</h1>
-        <p class="errors-detail__code">{{ entry.code }}</p>
+        <span class="errors-detail__status">{{ currentEntry.status }}</span>
+        <h1>{{ currentEntry.title }}</h1>
+        <p class="errors-detail__code">{{ currentEntry.code }}</p>
       </header>
 
       <dl class="errors-detail__meta">
         <div>
           <dt>Summary</dt>
-          <dd>{{ entry.summary }}</dd>
+          <dd>{{ currentEntry.summary }}</dd>
         </div>
-        @if (entry.whenItOccurs) {
+        @if (currentEntry.whenItOccurs) {
           <div>
             <dt>When it occurs</dt>
-            <dd>{{ entry.whenItOccurs }}</dd>
+            <dd>{{ currentEntry.whenItOccurs }}</dd>
           </div>
         }
-        @if (entry.relatedEndpoint) {
+        @if (currentEntry.relatedEndpoint) {
           <div>
             <dt>Related endpoint</dt>
-            <dd><code>{{ entry.relatedEndpoint }}</code></dd>
+            <dd><code>{{ currentEntry.relatedEndpoint }}</code></dd>
           </div>
         }
         <div>
           <dt>Type URI</dt>
           <dd class="errors-detail__type-row">
-            <code>{{ entry.type }}</code>
+            <code>{{ currentEntry.type }}</code>
             <button type="button" class="errors-detail__copy" (click)="copyTypeUri()">Copy</button>
           </dd>
         </div>

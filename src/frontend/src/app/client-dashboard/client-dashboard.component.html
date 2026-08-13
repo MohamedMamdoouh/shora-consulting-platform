@@ -1,150 +1,153 @@
-<section class="page dashboard">
-  <header class="dashboard__header">
-    <h1 class="section-heading">لوحتي</h1>
-    <p class="dashboard__intro">هنا تجد جلساتك القادمة، الحجوزات التي تحتاج إجراء، وسجلك السابق.</p>
-  </header>
-
-  <article class="section section--card dashboard__section">
-    <div class="dashboard__section-header">
-      <h2 class="section-heading">الجلسات القادمة</h2>
-    </div>
-
-    @switch (upcomingSection.status) {
-        @case ('loading') {
-          <p class="state-message" aria-live="polite">جاري تحميل الجلسات القادمة...</p>
-        }
-        @case ('error') {
-          <div class="state-panel state-panel--error">
-            <p>{{ upcomingSection.message }}</p>
-            <button type="button" class="btn" (click)="reloadSection('Upcoming')">إعادة المحاولة</button>
-          </div>
-        }
-        @case ('ready') {
-          @if (upcomingSection.items.length === 0) {
-            <p class="state-message">لا توجد جلسات قادمة حاليًا.</p>
-            @if (showFirstBookingPrompt) {
-              <div class="dashboard__empty-actions">
-                <a routerLink="/booking/start" class="btn">احجز جلسة</a>
-                <a routerLink="/services" class="btn btn--secondary">تعرف على الخدمات</a>
-              </div>
-            }
-          } @else {
-            <ul class="booking-list">
-              @for (item of upcomingSection.items; track item.bookingId) {
-                <li>
-                  <app-upcoming-booking-card
-                    [item]="item"
-                    [slotLabel]="formatSlotRange(item)"
-                    [statusLabel]="formatStatus(item.status)"
-                    (changed)="reloadSection('Upcoming')"
-                  />
-                </li>
-              }
-            </ul>
-          }
-        }
-      }
-    </article>
-
-    <article class="section section--card dashboard__section">
-      <div class="dashboard__section-header">
-        <h2 class="section-heading">في انتظار الدفع أو المراجعة</h2>
-      </div>
-
-      @switch (pendingSection.status) {
-        @case ('loading') {
-          <p class="state-message" aria-live="polite">جاري تحميل الحجوزات المعلقة...</p>
-        }
-        @case ('error') {
-          <div class="state-panel state-panel--error">
-            <p>{{ pendingSection.message }}</p>
-            <button type="button" class="btn" (click)="reloadSection('Pending')">إعادة المحاولة</button>
-          </div>
-        }
-        @case ('ready') {
-          @if (pendingSection.items.length === 0) {
-            <p class="state-message">لا توجد حجوزات تحتاج إجراء الآن.</p>
-          } @else {
-            <ul class="booking-list">
-              @for (item of pendingSection.items; track item.bookingId) {
-                <li>
-                  @if (item.status === 'PendingPayment') {
-                    <app-pending-payment-card
-                      [item]="item"
-                      [slotLabel]="formatSlotRange(item)"
-                      (changed)="reloadSection('Pending')"
-                    />
-                  } @else if (item.status === 'PendingApproval') {
-                    <app-pending-approval-card
-                      [item]="item"
-                      [slotLabel]="formatSlotRange(item)"
-                      (changed)="reloadSection('Pending')"
-                    />
-                  }
-                </li>
-              }
-            </ul>
-          }
-        }
-      }
-    </article>
-
-    <article class="section section--card dashboard__section">
-      <div class="dashboard__section-header">
-        <h2 class="section-heading">السجل السابق</h2>
-      </div>
-
-      @switch (pastSection.status) {
-        @case ('loading') {
-          <p class="state-message" aria-live="polite">جاري تحميل السجل...</p>
-        }
-        @case ('error') {
-          <div class="state-panel state-panel--error">
-            <p>{{ pastSection.message }}</p>
-            <button type="button" class="btn" (click)="reloadSection('Past')">إعادة المحاولة</button>
-          </div>
-        }
-        @case ('ready') {
-          @if (pastSection.items.length === 0) {
-            <p class="state-message">لا توجد جلسات سابقة بعد.</p>
-          } @else {
-            <ul class="booking-list">
-              @for (item of pastSection.items; track item.bookingId) {
-                <li class="booking-row booking-row--past">
-                  <div class="booking-row__main">
-                    <span class="booking-row__time">{{ formatSlotRange(item) }}</span>
-                    <span
-                      class="booking-row__status"
-                      [class.booking-row__status--cancelled]="item.status === 'Cancelled'"
-                      [class.booking-row__status--completed]="item.status === 'Completed'"
-                    >
-                      {{ formatStatus(item.status) }}
-                    </span>
-                  </div>
-                  @if (formatPastBookingNotes(item.status, item.cancellationReasonLabel, item.refundLabel); as notes) {
-                    <p class="booking-row__notes">{{ notes }}</p>
-                  }
-                </li>
-              }
-            </ul>
-
-            @if (hasMorePast) {
-              <div class="dashboard__load-more">
-                <button
-                  type="button"
-                  class="btn btn--secondary"
-                  [disabled]="pastLoadingMore"
-                  (click)="loadMorePast()"
-                >
-                  {{ pastLoadingMore ? 'جاري التحميل...' : 'عرض المزيد' }}
-                </button>
-                <p class="dashboard__load-more-meta">
-                  {{ pastSection.items.length }} من {{ pastSection.totalCount }}
-                </p>
-              </div>
-            }
-          }
-      }
-    }
-  </article>
-</section>
+<section class="page dashboard">
+  <header class="dashboard__header">
+    <h1 class="section-heading">لوحتي</h1>
+    <p class="dashboard__intro">هنا تجد جلساتك القادمة، الحجوزات التي تحتاج إجراء، وسجلك السابق.</p>
+  </header>
+
+  <article class="section section--card dashboard__section">
+    <div class="dashboard__section-header">
+      <h2 class="section-heading">الجلسات القادمة</h2>
+    </div>
+
+    @let upcoming = upcomingSection();
+    @switch (upcoming.status) {
+        @case ('loading') {
+          <p class="state-message" aria-live="polite">جاري تحميل الجلسات القادمة...</p>
+        }
+        @case ('error') {
+          <div class="state-panel state-panel--error">
+            <p>{{ upcoming.message }}</p>
+            <button type="button" class="btn" (click)="reloadSection('Upcoming')">إعادة المحاولة</button>
+          </div>
+        }
+        @case ('ready') {
+          @if (upcoming.items.length === 0) {
+            <p class="state-message">لا توجد جلسات قادمة حاليًا.</p>
+            @if (showFirstBookingPrompt()) {
+              <div class="dashboard__empty-actions">
+                <a routerLink="/booking/start" class="btn">احجز جلسة</a>
+                <a routerLink="/services" class="btn btn--secondary">تعرف على الخدمات</a>
+              </div>
+            }
+          } @else {
+            <ul class="booking-list">
+              @for (item of upcoming.items; track item.bookingId) {
+                <li>
+                  <app-upcoming-booking-card
+                    [item]="item"
+                    [slotLabel]="formatSlotRange(item)"
+                    [statusLabel]="formatStatus(item.status)"
+                    (changed)="reloadSection('Upcoming')"
+                  />
+                </li>
+              }
+            </ul>
+          }
+        }
+      }
+    </article>
+
+    <article class="section section--card dashboard__section">
+      <div class="dashboard__section-header">
+        <h2 class="section-heading">في انتظار الدفع أو المراجعة</h2>
+      </div>
+
+      @let pending = pendingSection();
+      @switch (pending.status) {
+        @case ('loading') {
+          <p class="state-message" aria-live="polite">جاري تحميل الحجوزات المعلقة...</p>
+        }
+        @case ('error') {
+          <div class="state-panel state-panel--error">
+            <p>{{ pending.message }}</p>
+            <button type="button" class="btn" (click)="reloadSection('Pending')">إعادة المحاولة</button>
+          </div>
+        }
+        @case ('ready') {
+          @if (pending.items.length === 0) {
+            <p class="state-message">لا توجد حجوزات تحتاج إجراء الآن.</p>
+          } @else {
+            <ul class="booking-list">
+              @for (item of pending.items; track item.bookingId) {
+                <li>
+                  @if (item.status === 'PendingPayment') {
+                    <app-pending-payment-card
+                      [item]="item"
+                      [slotLabel]="formatSlotRange(item)"
+                      (changed)="reloadSection('Pending')"
+                    />
+                  } @else if (item.status === 'PendingApproval') {
+                    <app-pending-approval-card
+                      [item]="item"
+                      [slotLabel]="formatSlotRange(item)"
+                      (changed)="reloadSection('Pending')"
+                    />
+                  }
+                </li>
+              }
+            </ul>
+          }
+        }
+      }
+    </article>
+
+    <article class="section section--card dashboard__section">
+      <div class="dashboard__section-header">
+        <h2 class="section-heading">السجل السابق</h2>
+      </div>
+
+      @let past = pastSection();
+      @switch (past.status) {
+        @case ('loading') {
+          <p class="state-message" aria-live="polite">جاري تحميل السجل...</p>
+        }
+        @case ('error') {
+          <div class="state-panel state-panel--error">
+            <p>{{ past.message }}</p>
+            <button type="button" class="btn" (click)="reloadSection('Past')">إعادة المحاولة</button>
+          </div>
+        }
+        @case ('ready') {
+          @if (past.items.length === 0) {
+            <p class="state-message">لا توجد جلسات سابقة بعد.</p>
+          } @else {
+            <ul class="booking-list">
+              @for (item of past.items; track item.bookingId) {
+                <li class="booking-row booking-row--past">
+                  <div class="booking-row__main">
+                    <span class="booking-row__time">{{ formatSlotRange(item) }}</span>
+                    <span
+                      class="booking-row__status"
+                      [class.booking-row__status--cancelled]="item.status === 'Cancelled'"
+                      [class.booking-row__status--completed]="item.status === 'Completed'"
+                    >
+                      {{ formatStatus(item.status) }}
+                    </span>
+                  </div>
+                  @if (formatPastBookingNotes(item.status, item.cancellationReasonLabel, item.refundLabel); as notes) {
+                    <p class="booking-row__notes">{{ notes }}</p>
+                  }
+                </li>
+              }
+            </ul>
+
+            @if (hasMorePast()) {
+              <div class="pagination pagination--load-more">
+                <button
+                  type="button"
+                  class="btn btn--secondary btn--sm"
+                  [disabled]="pastLoadingMore()"
+                  (click)="loadMorePast()"
+                >
+                  {{ pastLoadingMore() ? 'جاري التحميل...' : 'عرض المزيد' }}
+                </button>
+                <p class="pagination__info">
+                  {{ past.items.length }} من {{ past.totalCount }}
+                </p>
+              </div>
+            }
+          }
+      }
+    }
+  </article>
+</section>

@@ -11,7 +11,7 @@ This spec consolidates operational and cross-cutting requirements referenced by 
 | 08.1      | Correlation ID, `JobRunHistory`, job heartbeat, `BackgroundJobHost`, payment log scopes | **Done** |
 | 08.2      | Transaction HTML email templates + `IOutboxEmailRenderer`                               | **Done** |
 | 08.3      | Outbox dispatcher (retry/backoff, dead-letter after 8 attempts)                         | **Done** |
-| 08.4      | Production Resend sender (`ResendEmailSender`)                                          | **Done** |
+| 08.4      | Production Brevo sender (`BrevoEmailSender`)                                            | **Done** |
 | 08.5      | Cancellation auto-decline + booking auto-complete jobs                                  | **Done** |
 | 08.6      | Refresh-token purge + receipt blob reconciliation (05h)                                 | **Done** |
 | 08.7      | Availability horizon top-up (nightly)                                                   | **Done** |
@@ -108,13 +108,13 @@ Tunable via `appsettings.json` (see `BackgroundJobOptions`, `OpsMonitoringOption
 | `OpsMonitoring:*` | Alert thresholds (pending approval hours, refund-due hours, heartbeat multipliers, dead-letter burst count/window) |
 | `RateLimiting:*` | Per-endpoint IP limits |
 | `ReceiptUpload:RateLimitPerMinute` | Receipt upload cap (default 5/min/IP) |
-| `Email:*` | Resend API key, from address (spec 08.4) |
+| `Email:*` | Brevo API key, from address (spec 08.4) |
 
 ## 4. Deployment
 
 - **CI/CD:** see [spec 09](09-ci-cd-pipeline.md) — CI on push/PR; production **Deploy** on push to `main` after hosting setup ([docs/deployment.md](../docs/deployment.md)).
 - **Receipt storage:** private Azure Blob container (`Storage:ReceiptContainer`); short-lived SAS read URLs for admin.
-- **Email:** configure `Email:ApiKey` and `Email:FromAddress` for production Resend; dev uses log sender.
+- **Email:** configure `Email:ApiKey` and `Email:FromAddress` for production Brevo; dev uses log sender.
 - **Migrations + seed:** applied on startup, idempotent.
 - **Secrets:** environment variables / user-secrets — never committed.
 - **Same-site deployment:** frontend + API under one registrable domain (required for `SameSite=Strict` refresh cookies).

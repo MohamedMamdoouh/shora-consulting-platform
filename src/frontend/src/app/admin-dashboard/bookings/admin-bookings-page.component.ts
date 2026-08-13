@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import {
   AdminBookingListItem,
@@ -65,15 +65,26 @@ export class AdminBookingsPageComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly adminBookingsService = inject(AdminBookingsService);
 
-  pageState: PageState = { status: 'loading' };
-  currentPage: number = ADMIN_BOOKINGS_QUERY_LIMITS.defaultPage;
-  receiptReviewItem: AdminBookingListItem | null = null;
-  cancellationReviewItem: AdminBookingListItem | null = null;
-  refundPanelItem: AdminBookingListItem | null = null;
-  refundPanelMode: AdminRefundPanelMode | null = null;
-  actionMessage = '';
-  actionError = '';
-  cancellingBookingId: string | null = null;
+  readonly pageState = signal<PageState>({ status: 'loading' });
+  readonly currentPage = signal<number>(ADMIN_BOOKINGS_QUERY_LIMITS.defaultPage);
+  readonly receiptReviewItem = signal<AdminBookingListItem | null>(null);
+  readonly cancellationReviewItem = signal<AdminBookingListItem | null>(null);
+  readonly refundPanelItem = signal<AdminBookingListItem | null>(null);
+  readonly refundPanelMode = signal<AdminRefundPanelMode | null>(null);
+  readonly actionMessage = signal('');
+  readonly actionError = signal('');
+  readonly cancellingBookingId = signal<string | null>(null);
+
+  readonly canGoPrevious = computed(() => this.currentPage() > 1);
+
+  readonly canGoNext = computed(() => {
+    const state = this.pageState();
+    if (state.status !== 'ready') {
+      return false;
+    }
+
+    return this.currentPage() < totalPages(state.totalCount, state.pageSize);
+  });
 
   readonly statusOptions = BOOKING_STATUS_OPTIONS;
   readonly pageSize = ADMIN_BOOKINGS_QUERY_LIMITS.defaultPageSize;
@@ -97,104 +108,93 @@ export class AdminBookingsPageComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    void this.loadBookings(this.currentPage);
-  }
-
-  get canGoPrevious(): boolean {
-    return this.currentPage > 1;
-  }
-
-  get canGoNext(): boolean {
-    if (this.pageState.status !== 'ready') {
-      return false;
-    }
-
-    return this.currentPage < totalPages(this.pageState.totalCount, this.pageState.pageSize);
+    void this.loadBookings(this.currentPage());
   }
 
   async applyFilters(): Promise<void> {
-    this.currentPage = ADMIN_BOOKINGS_QUERY_LIMITS.defaultPage;
-    await this.loadBookings(this.currentPage);
+    this.currentPage.set(ADMIN_BOOKINGS_QUERY_LIMITS.defaultPage);
+    await this.loadBookings(this.currentPage());
   }
 
   async goToPreviousPage(): Promise<void> {
-    if (!this.canGoPrevious) {
+    if (!this.canGoPrevious()) {
       return;
     }
 
-    await this.loadBookings(this.currentPage - 1);
+    await this.loadBookings(this.currentPage() - 1);
   }
 
   async goToNextPage(): Promise<void> {
-    if (!this.canGoNext) {
+    if (!this.canGoNext()) {
       return;
     }
 
-    await this.loadBookings(this.currentPage + 1);
+    await this.loadBookings(this.currentPage() + 1);
   }
 
   openReceiptReview(item: AdminBookingListItem): void {
-    this.receiptReviewItem = item;
-    this.actionMessage = '';
-    this.actionError = '';
+    this.receiptReviewItem.set(item);
+    this.actionMessage.set('');
+    this.actionError.set('');
   }
 
   closeReceiptReview(): void {
-    this.receiptReviewItem = null;
+    this.receiptReviewItem.set(null);
   }
 
   openCancellationReview(item: AdminBookingListItem): void {
-    this.cancellationReviewItem = item;
-    this.actionMessage = '';
-    this.actionError = '';
+    this.cancellationReviewItem.set(item);
+    this.actionMessage.set('');
+    this.actionError.set('');
   }
 
   closeCancellationReview(): void {
-    this.cancellationReviewItem = null;
+    this.cancellationReviewItem.set(null);
   }
 
   openRecordRefund(item: AdminBookingListItem): void {
-    this.refundPanelItem = item;
-    this.refundPanelMode = 'record';
-    this.actionMessage = '';
-    this.actionError = '';
+    this.refundPanelItem.set(item);
+    this.refundPanelMode.set('record');
+    this.actionMessage.set('');
+    this.actionError.set('');
   }
 
   openRevokeRefund(item: AdminBookingListItem): void {
-    this.refundPanelItem = item;
-    this.refundPanelMode = 'revoke';
-    this.actionMessage = '';
-    this.actionError = '';
+    this.refundPanelItem.set(item);
+    this.refundPanelMode.set('revoke');
+    this.actionMessage.set('');
+    this.actionError.set('');
   }
 
   closeRefundPanel(): void {
-    this.refundPanelItem = null;
-    this.refundPanelMode = null;
+    this.refundPanelItem.set(null);
+    this.refundPanelMode.set(null);
   }
 
   async onReceiptReviewChanged(): Promise<void> {
-    this.actionMessage = 'تم تحديث حالة الحجز.';
-    this.receiptReviewItem = null;
-    await this.loadBookings(this.currentPage);
+    this.actionMessage.set('تم تحديث حالة الحجز.');
+    this.receiptReviewItem.set(null);
+    await this.loadBookings(this.currentPage());
   }
 
   async onCancellationReviewChanged(): Promise<void> {
-    this.actionMessage = 'تم تحديث حالة طلب الإلغاء.';
-    this.cancellationReviewItem = null;
-    await this.loadBookings(this.currentPage);
+    this.actionMessage.set('تم تحديث حالة طلب الإلغاء.');
+    this.cancellationReviewItem.set(null);
+    await this.loadBookings(this.currentPage());
   }
 
   async onRefundChanged(): Promise<void> {
-    this.actionMessage =
-      this.refundPanelMode === 'revoke'
+    this.actionMessage.set(
+      this.refundPanelMode() === 'revoke'
         ? 'تم التراجع عن تسجيل الاسترداد.'
-        : 'تم تسجيل الاسترداد وإرسال تأكيد للعميل.';
+        : 'تم تسجيل الاسترداد وإرسال تأكيد للعميل.',
+    );
     this.closeRefundPanel();
-    await this.loadBookings(this.currentPage);
+    await this.loadBookings(this.currentPage());
   }
 
   async directCancelBooking(item: AdminBookingListItem): Promise<void> {
-    if (this.cancellingBookingId) {
+    if (this.cancellingBookingId()) {
       return;
     }
 
@@ -204,24 +204,27 @@ export class AdminBookingsPageComponent implements OnInit {
       return;
     }
 
-    this.cancellingBookingId = item.bookingId;
-    this.actionError = '';
-    this.actionMessage = '';
+    this.cancellingBookingId.set(item.bookingId);
+    this.actionError.set('');
+    this.actionMessage.set('');
 
     try {
       await firstValueFrom(this.adminBookingsService.cancelBooking(item.bookingId));
-      this.actionMessage =
+      this.actionMessage.set(
         item.paymentStatus === 'Approved'
           ? 'تم إلغاء الحجز — استرداد مستحق.'
-          : 'تم إلغاء الحجز.';
-      await this.loadBookings(this.currentPage);
+          : 'تم إلغاء الحجز.',
+      );
+      await this.loadBookings(this.currentPage());
     } catch (error) {
-      this.actionError = readBookingErrorMessage(
-        readApiErrorCode(error),
-        readApiError(error, 'تعذر إلغاء الحجز. حاول مرة أخرى.'),
+      this.actionError.set(
+        readBookingErrorMessage(
+          readApiErrorCode(error),
+          readApiError(error, 'تعذر إلغاء الحجز. حاول مرة أخرى.'),
+        ),
       );
     } finally {
-      this.cancellingBookingId = null;
+      this.cancellingBookingId.set(null);
     }
   }
 
@@ -235,7 +238,7 @@ export class AdminBookingsPageComponent implements OnInit {
   }
 
   async loadBookings(page: number): Promise<void> {
-    this.pageState = { status: 'loading' };
+    this.pageState.set({ status: 'loading' });
 
     try {
       const filters = this.filtersForm.getRawValue();
@@ -249,19 +252,19 @@ export class AdminBookingsPageComponent implements OnInit {
         }),
       );
 
-      this.currentPage = response.page;
-      this.pageState = {
+      this.currentPage.set(response.page);
+      this.pageState.set({
         status: 'ready',
         items: response.items,
         page: response.page,
         pageSize: response.pageSize,
         totalCount: response.totalCount,
-      };
+      });
     } catch (error) {
-      this.pageState = {
+      this.pageState.set({
         status: 'error',
         message: readApiError(error, 'تعذر تحميل الحجوزات. حاول مرة أخرى.'),
-      };
+      });
     }
   }
 }

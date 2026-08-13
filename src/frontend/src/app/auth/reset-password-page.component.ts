@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -20,9 +20,9 @@ export class ResetPasswordPageComponent implements OnInit {
 
   email = '';
   token = '';
-  errorMessage = '';
-  success = false;
-  isSubmitting = false;
+  readonly errorMessage = signal('');
+  readonly success = signal(false);
+  readonly isSubmitting = signal(false);
 
   readonly getFieldError = getAuthFieldError;
 
@@ -36,7 +36,7 @@ export class ResetPasswordPageComponent implements OnInit {
   }
 
   async submit(): Promise<void> {
-    if (this.isSubmitting) {
+    if (this.isSubmitting()) {
       return;
     }
 
@@ -45,19 +45,19 @@ export class ResetPasswordPageComponent implements OnInit {
       return;
     }
 
-    this.errorMessage = '';
-    this.isSubmitting = true;
+    this.errorMessage.set('');
+    this.isSubmitting.set(true);
 
     try {
       await firstValueFrom(
         this.auth.resetPassword(this.email, this.token, this.form.controls.newPassword.value),
       );
-      this.success = true;
+      this.success.set(true);
       await this.router.navigate(['/auth/login']);
     } catch (err) {
-      this.errorMessage = readApiError(err, 'تعذر إعادة تعيين كلمة المرور. قد تكون صلاحية الرابط انتهت.');
+      this.errorMessage.set(readApiError(err, 'تعذر إعادة تعيين كلمة المرور. قد تكون صلاحية الرابط انتهت.'));
     } finally {
-      this.isSubmitting = false;
+      this.isSubmitting.set(false);
     }
   }
 }

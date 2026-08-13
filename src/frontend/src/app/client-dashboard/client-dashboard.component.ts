@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { PendingApprovalCardComponent } from './pending-approval-card.component';
 import { PendingPaymentCardComponent } from './pending-payment-card.component';
@@ -29,28 +29,37 @@ type DashboardSectionState =
 export class ClientDashboardComponent implements OnInit {
   private readonly bookingService = inject(BookingService);
 
-  upcomingSection: DashboardSectionState = { status: 'loading' };
-  pendingSection: DashboardSectionState = { status: 'loading' };
-  pastSection: DashboardSectionState = { status: 'loading' };
+  readonly upcomingSection = signal<DashboardSectionState>({ status: 'loading' });
+  readonly pendingSection = signal<DashboardSectionState>({ status: 'loading' });
+  readonly pastSection = signal<DashboardSectionState>({ status: 'loading' });
   pastPage = MY_BOOKINGS_QUERY_LIMITS.defaultPage;
-  pastLoadingMore = false;
+  readonly pastLoadingMore = signal(false);
+
+  readonly showFirstBookingPrompt = computed(() => {
+    const upcoming = this.upcomingSection();
+    const pending = this.pendingSection();
+    const past = this.pastSection();
+
+    return (
+      upcoming.status === 'ready' &&
+      pending.status === 'ready' &&
+      past.status === 'ready' &&
+      upcoming.totalCount === 0 &&
+      pending.totalCount === 0 &&
+      past.totalCount === 0
+    );
+  });
+
+  readonly hasMorePast = computed(() => {
+    const past = this.pastSection();
+    return past.status === 'ready' && past.items.length < past.totalCount;
+  });
 
   readonly formatPastBookingNotes = formatPastBookingNotes;
   readonly formatSlotRange = formatSlotRange;
 
   ngOnInit(): void {
     void this.loadAllSections();
-  }
-
-  get showFirstBookingPrompt(): boolean {
-    return (
-      this.upcomingSection.status === 'ready' &&
-      this.pendingSection.status === 'ready' &&
-      this.pastSection.status === 'ready' &&
-      this.upcomingSection.totalCount === 0 &&
-      this.pendingSection.totalCount === 0 &&
-      this.pastSection.totalCount === 0
-    );
   }
 
   formatStatus(status: BookingStatus): string {
@@ -82,10 +91,12 @@ export class ClientDashboardComponent implements OnInit {
   }
 
   async loadMorePast(): Promise<void> {
+    const past = this.pastSection();
+
     if (
-      this.pastLoadingMore ||
-      this.pastSection.status !== 'ready' ||
-      this.pastSection.items.length >= this.pastSection.totalCount
+      this.pastLoadingMore() ||
+      past.status !== 'ready' ||
+      past.items.length >= past.totalCount
     ) {
       return;
     }
@@ -94,19 +105,12 @@ export class ClientDashboardComponent implements OnInit {
     await this.loadPastSection(false);
   }
 
-  get hasMorePast(): boolean {
-    return (
-      this.pastSection.status === 'ready' &&
-      this.pastSection.items.length < this.pastSection.totalCount
-    );
-  }
-
   private async loadAllSections(): Promise<void> {
-    this.upcomingSection = { status: 'loading' };
-    this.pendingSection = { status: 'loading' };
-    this.pastSection = { status: 'loading' };
+    this.upcomingSection.set({ status: 'loading' });
+    this.pendingSection.set({ status: 'loading' });
+    this.pastSection.set({ status: 'loading' });
     this.pastPage = MY_BOOKINGS_QUERY_LIMITS.defaultPage;
-    this.pastLoadingMore = false;
+    this.pastLoadingMore.set(false);
 
     await Promise.all([
       this.loadSection('Upcoming'),
@@ -118,9 +122,9 @@ export class ClientDashboardComponent implements OnInit {
   private async loadPastSection(reset: boolean): Promise<void> {
     if (reset) {
       this.pastPage = MY_BOOKINGS_QUERY_LIMITS.defaultPage;
-      this.pastSection = { status: 'loading' };
+      this.pastSection.set({ status: 'loading' });
     } else {
-      this.pastLoadingMore = true;
+      this.pastLoadingMore.set(true);
     }
 
     try {
@@ -132,23 +136,24 @@ export class ClientDashboardComponent implements OnInit {
         }),
       );
 
+      const currentPast = this.pastSection();
       const existingItems =
-        !reset && this.pastSection.status === 'ready' ? this.pastSection.items : [];
+        !reset && currentPast.status === 'ready' ? currentPast.items : [];
 
-      this.pastSection = {
+      this.pastSection.set({
         status: 'ready',
         items: [...existingItems, ...response.items],
         totalCount: response.totalCount,
-      };
+      });
     } catch (error) {
       if (reset) {
-        this.pastSection = {
+        this.pastSection.set({
           status: 'error',
           message: readApiError(error, 'تعذر تحميل السجل. حاول مرة أخرى.'),
-        };
+        });
       }
     } finally {
-      this.pastLoadingMore = false;
+      this.pastLoadingMore.set(false);
     }
   }
 
@@ -182,13 +187,13 @@ export class ClientDashboardComponent implements OnInit {
   private assignSection(filter: MyBookingsStatusFilter, state: DashboardSectionState): void {
     switch (filter) {
       case 'Upcoming':
-        this.upcomingSection = state;
+        this.upcomingSection.set(state);
         break;
       case 'Pending':
-        this.pendingSection = state;
+        this.pendingSection.set(state);
         break;
       case 'Past':
-        this.pastSection = state;
+        this.pastSection.set(state);
         break;
     }
   }

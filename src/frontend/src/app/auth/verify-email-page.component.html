@@ -4,13 +4,13 @@
 
   <div
     class="auth-banner"
-    [class.auth-banner--success]="status === 'success'"
-    [class.auth-banner--error]="status === 'error'"
+    [class.auth-banner--success]="status() === 'success'"
+    [class.auth-banner--error]="status() === 'error'"
   >
-    @if (status === 'loading') {
+    @if (status() === 'loading') {
       <p>جاري التحقق...</p>
     } @else {
-      <p>{{ message }}</p>
+      <p>{{ message() }}</p>
     }
   </div>
 

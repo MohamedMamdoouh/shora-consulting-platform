@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -18,8 +18,8 @@ export class SignupPageComponent {
   private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
 
-  errorMessage = '';
-  isSubmitting = false;
+  readonly errorMessage = signal('');
+  readonly isSubmitting = signal(false);
   readonly returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
   readonly authQueryParams = this.returnUrl ? { returnUrl: this.returnUrl } : {};
 
@@ -32,7 +32,7 @@ export class SignupPageComponent {
   });
 
   async submit(): Promise<void> {
-    if (this.isSubmitting) {
+    if (this.isSubmitting()) {
       return;
     }
 
@@ -42,8 +42,8 @@ export class SignupPageComponent {
     }
 
     const { email, password, displayName } = this.form.getRawValue();
-    this.errorMessage = '';
-    this.isSubmitting = true;
+    this.errorMessage.set('');
+    this.isSubmitting.set(true);
 
     try {
       const response = await firstValueFrom(
@@ -52,13 +52,13 @@ export class SignupPageComponent {
       await this.auth.redirectAfterLogin(response.role, this.returnUrl);
     } catch (err) {
       if (readApiErrorCode(err) === ErrorCodes.Auth.DuplicateEmail) {
-        this.errorMessage = 'هذا البريد الإلكتروني مسجل بالفعل.';
+        this.errorMessage.set('هذا البريد الإلكتروني مسجل بالفعل.');
         return;
       }
 
-      this.errorMessage = readApiError(err, 'تعذر إنشاء الحساب. راجع البيانات وحاول مرة أخرى.');
+      this.errorMessage.set(readApiError(err, 'تعذر إنشاء الحساب. راجع البيانات وحاول مرة أخرى.'));
     } finally {
-      this.isSubmitting = false;
+      this.isSubmitting.set(false);
     }
   }
 }

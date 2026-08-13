@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ErrorCatalogEntry } from '@contracts/error-catalog';
 import { firstValueFrom } from 'rxjs';
@@ -18,15 +18,15 @@ interface ErrorCategoryGroup {
 export class ErrorsIndexPageComponent implements OnInit {
   private readonly errorReference = inject(ErrorReferenceService);
 
-  groups: ErrorCategoryGroup[] = [];
-  loadError = '';
+  readonly groups = signal<ErrorCategoryGroup[]>([]);
+  readonly loadError = signal('');
 
   async ngOnInit(): Promise<void> {
     try {
       const response = await firstValueFrom(this.errorReference.list());
-      this.groups = groupByCategory(response.items);
+      this.groups.set(groupByCategory(response.items));
     } catch {
-      this.loadError = 'تعذر تحميل مرجع أكواد الأخطاء.';
+      this.loadError.set('تعذر تحميل مرجع أكواد الأخطاء.');
     }
   }
 }

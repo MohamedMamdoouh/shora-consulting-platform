@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AdminOpsAlertDto, AdminOpsRunbookDto } from '@contracts/ops';
 import { forkJoin, firstValueFrom } from 'rxjs';
@@ -33,7 +33,7 @@ type PageState =
 export class AdminOpsPageComponent implements OnInit {
   private readonly adminOpsService = inject(AdminOpsService);
 
-  pageState: PageState = { status: 'loading' };
+  readonly pageState = signal<PageState>({ status: 'loading' });
 
   readonly formatAlertKind = formatAlertKind;
   readonly formatAlertSeverity = formatAlertSeverity;
@@ -46,7 +46,7 @@ export class AdminOpsPageComponent implements OnInit {
   }
 
   async loadOpsData(): Promise<void> {
-    this.pageState = { status: 'loading' };
+    this.pageState.set({ status: 'loading' });
 
     try {
       const { alerts, runbooks } = await firstValueFrom(
@@ -59,25 +59,26 @@ export class AdminOpsPageComponent implements OnInit {
       const runbooksById = new Map(runbooks.runbooks.map((runbook) => [runbook.id, runbook]));
       const sortedAlerts = [...alerts.alerts].sort(compareAlertsBySeverity);
 
-      this.pageState = {
+      this.pageState.set({
         status: 'ready',
         alerts: sortedAlerts,
         runbooksById,
         counts: countAlertsBySeverity(sortedAlerts),
-      };
+      });
     } catch (error) {
-      this.pageState = {
+      this.pageState.set({
         status: 'error',
         message: readApiError(error, 'تعذر تحميل تنبيهات التشغيل. حاول مرة أخرى.'),
-      };
+      });
     }
   }
 
   getRunbook(runbookId: string): AdminOpsRunbookDto | undefined {
-    if (this.pageState.status !== 'ready') {
+    const state = this.pageState();
+    if (state.status !== 'ready') {
       return undefined;
     }
 
-    return this.pageState.runbooksById.get(runbookId);
+    return state.runbooksById.get(runbookId);
   }
 }

@@ -9,7 +9,7 @@
     </p>
   </header>
 
-  @if (uploadSuccess) {
+  @if (uploadSuccess()) {
     <div class="pending-payment-card__success" role="status">
       <p>{{ copy.client.receiptUploaded }}</p>
     </div>
@@ -28,17 +28,17 @@
   }
 
   <footer class="pending-payment-card__footer">
-    @if (cancelError) {
-      <p class="pending-payment-card__error" aria-live="polite">{{ cancelError }}</p>
+    @if (cancelError()) {
+      <p class="pending-payment-card__error" aria-live="polite">{{ cancelError() }}</p>
     }
 
     <button
       type="button"
       class="btn btn--secondary"
-      [disabled]="cancelling"
+      [disabled]="cancelling()"
       (click)="cancelHold()"
     >
-      {{ cancelling ? 'جاري الإلغاء...' : 'إلغاء الحجز' }}
+      {{ cancelling() ? 'جاري الإلغاء...' : 'إلغاء الحجز' }}
     </button>
   </footer>
 </article>

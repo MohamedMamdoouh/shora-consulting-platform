@@ -16,14 +16,15 @@
       </button>
     </header>
 
-    @switch (panelState.status) {
+    @let state = panelState();
+    @switch (state.status) {
       @case ('loading') {
         <p class="receipt-panel__state" aria-live="polite">جاري تحميل الإيصالات...</p>
       }
 
       @case ('error') {
         <div class="receipt-panel__message receipt-panel__message--error">
-          <p>{{ panelState.message }}</p>
+          <p>{{ state.message }}</p>
           <button type="button" class="btn btn--secondary" (click)="loadReceipts()">
             إعادة المحاولة
           </button>
@@ -35,20 +36,20 @@
           <dl>
             <div>
               <dt>المبلغ</dt>
-              <dd>{{ formatMoney(panelState.data.amount, panelState.data.currency) }}</dd>
+              <dd>{{ formatMoney(state.data.amount, state.data.currency) }}</dd>
             </div>
             <div>
               <dt>طريقة الدفع</dt>
-              <dd>{{ formatPaymentMethod(panelState.data.method) }}</dd>
+              <dd>{{ formatPaymentMethod(state.data.method) }}</dd>
             </div>
             <div>
               <dt>حالة الدفع</dt>
-              <dd>{{ formatPaymentStatus(panelState.data.paymentStatus) }}</dd>
+              <dd>{{ formatPaymentStatus(state.data.paymentStatus) }}</dd>
             </div>
           </dl>
         </div>
 
-        @if (panelState.pendingReceipt; as pendingReceipt) {
+        @if (state.pendingReceipt; as pendingReceipt) {
           <article class="receipt-panel__current">
             <h4>الإيصال الحالي (محاولة {{ pendingReceipt.attemptNumber }})</h4>
 
@@ -107,26 +108,26 @@
               </p>
             }
 
-            @if (actionError) {
+            @if (actionError()) {
               <p class="receipt-panel__message receipt-panel__message--error" role="alert">
-                {{ actionError }}
+                {{ actionError() }}
               </p>
             }
 
-            @if (!showDeclineForm) {
+            @if (!showDeclineForm()) {
               <div class="receipt-panel__actions">
                 <button
                   type="button"
                   class="btn"
-                  [disabled]="isApproving || isDeclining"
+                  [disabled]="isApproving() || isDeclining()"
                   (click)="approveReceipt()"
                 >
-                  {{ isApproving ? 'جاري القبول...' : 'قبول الإيصال' }}
+                  {{ isApproving() ? 'جاري القبول...' : 'قبول الإيصال' }}
                 </button>
                 <button
                   type="button"
                   class="btn btn--danger"
-                  [disabled]="isApproving || isDeclining"
+                  [disabled]="isApproving() || isDeclining()"
                   (click)="openDeclineForm()"
                 >
                   رفض الإيصال
@@ -162,14 +163,14 @@
                   <button
                     type="submit"
                     class="btn btn--danger"
-                    [disabled]="isApproving || isDeclining"
+                    [disabled]="isApproving() || isDeclining()"
                   >
-                    {{ isDeclining ? 'جاري الرفض...' : 'تأكيد الرفض' }}
+                    {{ isDeclining() ? 'جاري الرفض...' : 'تأكيد الرفض' }}
                   </button>
                   <button
                     type="button"
                     class="btn btn--secondary"
-                    [disabled]="isApproving || isDeclining"
+                    [disabled]="isApproving() || isDeclining()"
                     (click)="cancelDeclineForm()"
                   >
                     إلغاء
@@ -180,11 +181,11 @@
           </article>
         }
 
-        @if (panelState.data.receipts.length > 0) {
+        @if (state.data.receipts.length > 0) {
           <section class="receipt-panel__history">
             <h4>سجل المحاولات</h4>
             <ul>
-              @for (receipt of panelState.data.receipts; track receipt.receiptId) {
+              @for (receipt of state.data.receipts; track receipt.receiptId) {
                 <li>
                   <span class="receipt-panel__history-title">
                     محاولة {{ receipt.attemptNumber }} —

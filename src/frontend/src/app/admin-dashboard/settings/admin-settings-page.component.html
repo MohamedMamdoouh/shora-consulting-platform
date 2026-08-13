@@ -1,12 +1,13 @@
 <section class="admin-settings">
-  @switch (pageState.status) {
+  @let state = pageState();
+  @switch (state.status) {
     @case ('loading') {
       <p class="admin-settings__state" aria-live="polite">جاري تحميل الإعدادات...</p>
     }
 
     @case ('error') {
       <div class="admin-settings__panel admin-settings__panel--error">
-        <p>{{ pageState.message }}</p>
+        <p>{{ state.message }}</p>
         <button type="button" class="btn" (click)="loadSettings()">إعادة المحاولة</button>
       </div>
     }
@@ -15,20 +16,20 @@
       <header class="admin-settings__header">
         <h2>إعدادات الجلسة والدفع</h2>
         <p class="admin-settings__note">
-          هذه التغييرات تنطبق على الحجوزات والمواعيد الجديدة فقط. الحجوزات الحالية تحتفظ بسعرها وموعدها
-          المسجل.
+          هذه التغييرات تنطبق على الحجوزات والمواعيد الجديدة فقط. الحجوزات الحالية تحتفظ بسعرها
+          وموعدها المسجل.
         </p>
       </header>
 
-      @if (successMessage) {
+      @if (successMessage()) {
         <p class="admin-settings__banner admin-settings__banner--success" role="status">
-          {{ successMessage }}
+          {{ successMessage() }}
         </p>
       }
 
-      @if (errorMessage) {
+      @if (errorMessage()) {
         <p class="admin-settings__banner admin-settings__banner--error" role="alert">
-          {{ errorMessage }}
+          {{ errorMessage() }}
         </p>
       }
 
@@ -44,7 +45,9 @@
               min="0.01"
               step="0.01"
               inputmode="decimal"
-              [attr.aria-invalid]="form.controls.sessionPrice.touched && form.controls.sessionPrice.invalid"
+              [attr.aria-invalid]="
+                form.controls.sessionPrice.touched && form.controls.sessionPrice.invalid
+              "
             />
             @if (getFieldError(form.controls.sessionPrice, 'sessionPrice'); as fieldError) {
               <span class="admin-settings__field-error" role="alert">{{ fieldError }}</span>
@@ -61,10 +64,14 @@
               step="1"
               inputmode="numeric"
               [attr.aria-invalid]="
-                form.controls.sessionDurationMinutes.touched && form.controls.sessionDurationMinutes.invalid
+                form.controls.sessionDurationMinutes.touched &&
+                form.controls.sessionDurationMinutes.invalid
               "
             />
-            @if (getFieldError(form.controls.sessionDurationMinutes, 'sessionDurationMinutes'); as fieldError) {
+            @if (
+              getFieldError(form.controls.sessionDurationMinutes, 'sessionDurationMinutes');
+              as fieldError
+            ) {
               <span class="admin-settings__field-error" role="alert">{{ fieldError }}</span>
             }
           </label>
@@ -77,7 +84,9 @@
               min="0"
               step="1"
               inputmode="numeric"
-              [attr.aria-invalid]="form.controls.bufferMinutes.touched && form.controls.bufferMinutes.invalid"
+              [attr.aria-invalid]="
+                form.controls.bufferMinutes.touched && form.controls.bufferMinutes.invalid
+              "
             />
             @if (getFieldError(form.controls.bufferMinutes, 'bufferMinutes'); as fieldError) {
               <span class="admin-settings__field-error" role="alert">{{ fieldError }}</span>
@@ -100,7 +109,10 @@
                 form.controls.vodafoneCashNumber.touched && form.controls.vodafoneCashNumber.invalid
               "
             />
-            @if (getFieldError(form.controls.vodafoneCashNumber, 'vodafoneCashNumber'); as fieldError) {
+            @if (
+              getFieldError(form.controls.vodafoneCashNumber, 'vodafoneCashNumber');
+              as fieldError
+            ) {
               <span class="admin-settings__field-error" role="alert">{{ fieldError }}</span>
             }
           </label>
@@ -112,7 +124,9 @@
               formControlName="instaPayHandle"
               dir="ltr"
               placeholder="consultant@instapay"
-              [attr.aria-invalid]="form.controls.instaPayHandle.touched && form.controls.instaPayHandle.invalid"
+              [attr.aria-invalid]="
+                form.controls.instaPayHandle.touched && form.controls.instaPayHandle.invalid
+              "
             />
             @if (getFieldError(form.controls.instaPayHandle, 'instaPayHandle'); as fieldError) {
               <span class="admin-settings__field-error" role="alert">{{ fieldError }}</span>
@@ -125,10 +139,14 @@
               formControlName="paymentInstructions"
               rows="3"
               [attr.aria-invalid]="
-                form.controls.paymentInstructions.touched && form.controls.paymentInstructions.invalid
+                form.controls.paymentInstructions.touched &&
+                form.controls.paymentInstructions.invalid
               "
             ></textarea>
-            @if (getFieldError(form.controls.paymentInstructions, 'paymentInstructions'); as fieldError) {
+            @if (
+              getFieldError(form.controls.paymentInstructions, 'paymentInstructions');
+              as fieldError
+            ) {
               <span class="admin-settings__field-error" role="alert">{{ fieldError }}</span>
             }
           </label>
@@ -187,7 +205,7 @@
           <legend>التواصل</legend>
 
           <label>
-            رقم واتسابي (E.164)
+            رقم الواتساب الخاص بي
             <input
               type="tel"
               formControlName="consultantWhatsAppNumber"
@@ -209,12 +227,12 @@
         </fieldset>
 
         <p class="admin-settings__meta">
-          مدة الاحتفاظ بالإيصالات (للقراءة فقط): {{ pageState.receiptRetentionMonths }} شهر
+          مدة الاحتفاظ بالإيصالات (للقراءة فقط): {{ state.receiptRetentionMonths }} شهر
         </p>
 
         <div class="admin-settings__actions">
-          <button type="submit" class="btn" [disabled]="form.invalid || isSubmitting">
-            {{ isSubmitting ? 'جاري الحفظ...' : 'حفظ الإعدادات' }}
+          <button type="submit" class="btn" [disabled]="form.invalid || isSubmitting()">
+            {{ isSubmitting() ? 'جاري الحفظ...' : 'حفظ الإعدادات' }}
           </button>
         </div>
       </form>

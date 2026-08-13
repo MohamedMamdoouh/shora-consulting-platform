@@ -1,12 +1,13 @@
 <section class="admin-availability">
-  @switch (pageState.status) {
+  @let state = pageState();
+  @switch (state.status) {
     @case ('loading') {
       <p class="admin-availability__state" aria-live="polite">جاري تحميل المواعيد...</p>
     }
 
     @case ('error') {
       <div class="admin-availability__panel admin-availability__panel--error">
-        <p>{{ pageState.message }}</p>
+        <p>{{ state.message }}</p>
         <button type="button" class="btn" (click)="loadPage()">إعادة المحاولة</button>
       </div>
     }
@@ -15,20 +16,20 @@
       <header class="admin-availability__header">
         <h2>المواعيد والتوفر</h2>
         <p class="admin-availability__note">
-          نوافذ التوفر المتكررة بتوقيتي المحلي ({{ consultantTimeZoneLabel }}). فترات الحجب
-          تُدخل بتوقيت UTC وتُعرض محليًا للقراءة.
+          نوافذ التوفر وفترات الحجب تُدخل وتُعرض بتوقيتي المحلي ({{ consultantTimeZoneLabel }}).
+          فترات الحجب تُخزَّن على الخادم بتوقيت UTC.
         </p>
       </header>
 
-      @if (successMessage) {
+      @if (successMessage()) {
         <p class="admin-availability__banner admin-availability__banner--success" role="status">
-          {{ successMessage }}
+          {{ successMessage() }}
         </p>
       }
 
-      @if (errorMessage) {
+      @if (errorMessage()) {
         <p class="admin-availability__banner admin-availability__banner--error" role="alert">
-          {{ errorMessage }}
+          {{ errorMessage() }}
         </p>
       }
 
@@ -37,12 +38,12 @@
           <h3>نوافذ التوفر المتكررة</h3>
         </div>
 
-        @if (pageState.windows.length === 0) {
+        @if (state.windows.length === 0) {
           <p class="admin-availability__state">لا توجد نوافذ توفر بعد.</p>
         } @else {
           <ul class="admin-availability__list">
-            @for (window of pageState.windows; track window.id) {
-              <li class="admin-availability__row" [class.admin-availability__row--editing]="editingWindowId === window.id">
+            @for (window of state.windows; track window.id) {
+              <li class="admin-availability__row" [class.admin-availability__row--editing]="editingWindowId() === window.id">
                 <div class="admin-availability__row-main">
                   <span class="admin-availability__row-title">{{ formatWindowSummary(window) }}</span>
                   <span
@@ -60,10 +61,10 @@
                   <button
                     type="button"
                     class="btn btn--danger"
-                    [disabled]="deletingWindowId === window.id"
+                    [disabled]="deletingWindowId() === window.id"
                     (click)="deleteWindow(window)"
                   >
-                    {{ deletingWindowId === window.id ? 'جاري الحذف...' : 'حذف' }}
+                    {{ deletingWindowId() === window.id ? 'جاري الحذف...' : 'حذف' }}
                   </button>
                 </div>
               </li>
@@ -74,7 +75,7 @@
 
       <article class="admin-availability__section">
         <div class="admin-availability__section-header">
-          <h3>{{ formTitle }}</h3>
+          <h3>{{ formTitle() }}</h3>
         </div>
 
         <form class="admin-availability__form" [formGroup]="form" (ngSubmit)="submit()">
@@ -114,28 +115,28 @@
           </label>
 
           <div class="admin-availability__actions">
-            <button type="submit" class="btn" [disabled]="form.invalid || isSubmitting">
-              {{ submitLabel }}
+            <button type="submit" class="btn" [disabled]="form.invalid || isSubmitting()">
+              {{ submitLabel() }}
             </button>
-            @if (isEditing) {
+            @if (isEditing()) {
               <button type="button" class="btn btn--secondary" (click)="cancelEdit()">إلغاء</button>
             }
           </div>
         </form>
       </article>
 
-      @if (blockedSuccessMessage) {
+      @if (blockedSuccessMessage()) {
         <p class="admin-availability__banner admin-availability__banner--success" role="status">
-          {{ blockedSuccessMessage }}
+          {{ blockedSuccessMessage() }}
         </p>
       }
 
-      @if (blockedErrorMessage) {
+      @if (blockedErrorMessage()) {
         <div class="admin-availability__banner admin-availability__banner--error" role="alert">
-          <p>{{ blockedErrorMessage }}</p>
-          @if (conflictingBookingIds.length > 0) {
+          <p>{{ blockedErrorMessage() }}</p>
+          @if (conflictingBookingIds().length > 0) {
             <ul class="admin-availability__conflicts">
-              @for (bookingId of conflictingBookingIds; track bookingId) {
+              @for (bookingId of conflictingBookingIds(); track bookingId) {
                 <li>
                   <code>{{ bookingId }}</code>
                 </li>
@@ -154,11 +155,11 @@
           </p>
         </div>
 
-        @if (pageState.blockedDates.length === 0) {
+        @if (state.blockedDates.length === 0) {
           <p class="admin-availability__state">لا توجد فترات حجب بعد.</p>
         } @else {
           <ul class="admin-availability__list">
-            @for (blockedDate of pageState.blockedDates; track blockedDate.id) {
+            @for (blockedDate of state.blockedDates; track blockedDate.id) {
               <li class="admin-availability__row">
                 <div class="admin-availability__row-main">
                   <span class="admin-availability__row-title">{{ formatBlockedRangeSummary(blockedDate) }}</span>
@@ -168,10 +169,10 @@
                   <button
                     type="button"
                     class="btn btn--danger"
-                    [disabled]="deletingBlockedDateId === blockedDate.id"
+                    [disabled]="deletingBlockedDateId() === blockedDate.id"
                     (click)="deleteBlockedDate(blockedDate)"
                   >
-                    {{ deletingBlockedDateId === blockedDate.id ? 'جاري الإزالة...' : 'إزالة' }}
+                    {{ deletingBlockedDateId() === blockedDate.id ? 'جاري الإزالة...' : 'إزالة' }}
                   </button>
                 </div>
               </li>
@@ -188,7 +189,7 @@
         <form class="admin-availability__form" [formGroup]="blockedForm" (ngSubmit)="submitBlockedDate()">
           <div class="admin-availability__time-row">
             <label>
-              من (UTC)
+              من
               <input type="datetime-local" formControlName="startUtc" step="60" />
               @if (getBlockedFieldError(blockedForm.controls.startUtc); as fieldError) {
                 <span class="admin-availability__field-error" role="alert">{{ fieldError }}</span>
@@ -196,7 +197,7 @@
             </label>
 
             <label>
-              إلى (UTC)
+              إلى
               <input type="datetime-local" formControlName="endUtc" step="60" />
               @if (getBlockedFieldError(blockedForm.controls.endUtc); as fieldError) {
                 <span class="admin-availability__field-error" role="alert">{{ fieldError }}</span>
@@ -213,8 +214,8 @@
           </label>
 
           <div class="admin-availability__actions">
-            <button type="submit" class="btn" [disabled]="blockedForm.invalid || isSubmittingBlocked">
-              {{ blockedSubmitLabel }}
+            <button type="submit" class="btn" [disabled]="blockedForm.invalid || isSubmittingBlocked()">
+              {{ blockedSubmitLabel() }}
             </button>
           </div>
         </form>

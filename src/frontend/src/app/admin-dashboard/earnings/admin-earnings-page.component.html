@@ -23,14 +23,15 @@
     </div>
   </form>
 
-  @switch (pageState.status) {
+  @let state = pageState();
+  @switch (state.status) {
     @case ('loading') {
       <p class="admin-earnings__state" aria-live="polite">جاري تحميل ملخص الأرباح...</p>
     }
 
     @case ('error') {
       <div class="admin-earnings__panel admin-earnings__panel--error">
-        <p>{{ pageState.message }}</p>
+        <p>{{ state.message }}</p>
         <button type="button" class="btn" (click)="loadEarnings()">إعادة المحاولة</button>
       </div>
     }
@@ -39,29 +40,29 @@
       <div class="admin-earnings__summary">
         <article class="admin-earnings__card admin-earnings__card--primary">
           <h3>إجمالي الإيرادات</h3>
-          <p class="admin-earnings__amount">{{ formatEarningsAmount(pageState.earnings.grossRevenue) }}</p>
+          <p class="admin-earnings__amount">{{ formatEarningsAmount(state.earnings.grossRevenue) }}</p>
           <p class="admin-earnings__meta">
-            {{ formatEarningsCount(pageState.earnings.approvedCount, 'دفعة مقبولة', 'دفعات مقبولة') }}
+            {{ formatEarningsCount(state.earnings.approvedCount, 'دفعة مقبولة', 'دفعات مقبولة') }}
           </p>
         </article>
 
         <article class="admin-earnings__card">
           <h3>المبالغ المستردة</h3>
-          <p class="admin-earnings__amount">{{ formatEarningsAmount(pageState.earnings.refundedAmount) }}</p>
+          <p class="admin-earnings__amount">{{ formatEarningsAmount(state.earnings.refundedAmount) }}</p>
           <p class="admin-earnings__meta">
-            {{ formatEarningsCount(pageState.earnings.refundedCount, 'استرداد مسجل', 'استردادات مسجلة') }}
+            {{ formatEarningsCount(state.earnings.refundedCount, 'استرداد مسجل', 'استردادات مسجلة') }}
           </p>
         </article>
 
         <article class="admin-earnings__card admin-earnings__card--highlight">
           <h3>صافي الإيرادات</h3>
-          <p class="admin-earnings__amount">{{ formatEarningsAmount(pageState.earnings.netRevenue) }}</p>
+          <p class="admin-earnings__amount">{{ formatEarningsAmount(state.earnings.netRevenue) }}</p>
           <p class="admin-earnings__meta">بعد خصم الاستردادات المسجلة</p>
         </article>
 
         <article class="admin-earnings__card admin-earnings__card--warning">
           <h3>استردادات مستحقة</h3>
-          <p class="admin-earnings__amount">{{ pageState.earnings.refundDueCount }}</p>
+          <p class="admin-earnings__amount">{{ state.earnings.refundDueCount }}</p>
           <p class="admin-earnings__meta">
             حجوزات ملغاة بانتظار تسجيل الاسترداد — راجع
             <a routerLink="/admin/bookings">الحجوزات</a>

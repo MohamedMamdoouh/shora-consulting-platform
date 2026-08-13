@@ -6,6 +6,7 @@ import {
   OnInit,
   Output,
   inject,
+  signal,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { AdminBookingListItem, CancellationDecisionReasonCode } from '@contracts/booking';
@@ -34,11 +35,11 @@ export class AdminCancellationReviewPanelComponent implements OnInit, OnDestroy 
   @Output() readonly closed = new EventEmitter<void>();
   @Output() readonly changed = new EventEmitter<void>();
 
-  actionError = '';
-  isApproving = false;
-  isDeclining = false;
-  showDeclineForm = false;
-  countdownLabel = '';
+  readonly actionError = signal('');
+  readonly isApproving = signal(false);
+  readonly isDeclining = signal(false);
+  readonly showDeclineForm = signal(false);
+  readonly countdownLabel = signal('');
 
   readonly declineReasonOptions = CANCELLATION_DECISION_REASON_OPTIONS;
   readonly formatRequestedAt = formatRequestedAt;
@@ -67,7 +68,7 @@ export class AdminCancellationReviewPanelComponent implements OnInit, OnDestroy 
   }
 
   async approveRequest(): Promise<void> {
-    if (this.isApproving || this.isDeclining) {
+    if (this.isApproving() || this.isDeclining()) {
       return;
     }
 
@@ -84,26 +85,28 @@ export class AdminCancellationReviewPanelComponent implements OnInit, OnDestroy 
       return;
     }
 
-    this.isApproving = true;
-    this.actionError = '';
+    this.isApproving.set(true);
+    this.actionError.set('');
 
     try {
       await firstValueFrom(this.adminBookingsService.approveCancellationRequest(this.item.bookingId));
       this.changed.emit();
       this.close();
     } catch (error) {
-      this.actionError = readBookingErrorMessage(
-        readApiErrorCode(error),
-        readApiError(error, 'تعذر الموافقة على طلب الإلغاء. حاول مرة أخرى.'),
+      this.actionError.set(
+        readBookingErrorMessage(
+          readApiErrorCode(error),
+          readApiError(error, 'تعذر الموافقة على طلب الإلغاء. حاول مرة أخرى.'),
+        ),
       );
     } finally {
-      this.isApproving = false;
+      this.isApproving.set(false);
     }
   }
 
   openDeclineForm(): void {
-    this.showDeclineForm = true;
-    this.actionError = '';
+    this.showDeclineForm.set(true);
+    this.actionError.set('');
     this.declineForm.reset({
       reasonCode: 'Policy',
       reasonNote: null,
@@ -111,18 +114,18 @@ export class AdminCancellationReviewPanelComponent implements OnInit, OnDestroy 
   }
 
   cancelDeclineForm(): void {
-    this.showDeclineForm = false;
-    this.actionError = '';
+    this.showDeclineForm.set(false);
+    this.actionError.set('');
   }
 
   async submitDecline(): Promise<void> {
-    if (this.isApproving || this.isDeclining) {
+    if (this.isApproving() || this.isDeclining()) {
       return;
     }
 
     const values = this.declineForm.getRawValue();
-    this.isDeclining = true;
-    this.actionError = '';
+    this.isDeclining.set(true);
+    this.actionError.set('');
 
     try {
       await firstValueFrom(
@@ -134,12 +137,14 @@ export class AdminCancellationReviewPanelComponent implements OnInit, OnDestroy 
       this.changed.emit();
       this.close();
     } catch (error) {
-      this.actionError = readBookingErrorMessage(
-        readApiErrorCode(error),
-        readApiError(error, 'تعذر رفض طلب الإلغاء. حاول مرة أخرى.'),
+      this.actionError.set(
+        readBookingErrorMessage(
+          readApiErrorCode(error),
+          readApiError(error, 'تعذر رفض طلب الإلغاء. حاول مرة أخرى.'),
+        ),
       );
     } finally {
-      this.isDeclining = false;
+      this.isDeclining.set(false);
     }
   }
 
@@ -147,10 +152,10 @@ export class AdminCancellationReviewPanelComponent implements OnInit, OnDestroy 
     const deadline = this.item.cancellationRequest?.autoDeclineAtUtc;
 
     if (!deadline) {
-      this.countdownLabel = '—';
+      this.countdownLabel.set('—');
       return;
     }
 
-    this.countdownLabel = formatRemainingTime(deadline);
+    this.countdownLabel.set(formatRemainingTime(deadline));
   }
 }

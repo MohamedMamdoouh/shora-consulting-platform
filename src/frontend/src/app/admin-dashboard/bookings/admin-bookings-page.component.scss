@@ -88,19 +88,6 @@
   gap: var(--space-xs);
 }
 
-.admin-bookings__pagination {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-md);
-}
-
-.admin-bookings__pagination span {
-  color: var(--color-text-muted);
-  font-size: var(--admin-font-size-base);
-}
-
 @media (max-width: 640px) {
   .admin-bookings__filters {
     padding: var(--admin-space-md);

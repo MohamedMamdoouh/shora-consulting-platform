@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, OnInit } from '@angular/core';
+import { AfterViewInit, Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -37,9 +37,9 @@ export class LoginPageComponent implements OnInit, AfterViewInit {
   private readonly auth = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
 
-  errorMessage = '';
-  infoMessage = '';
-  isSubmitting = false;
+  readonly errorMessage = signal('');
+  readonly infoMessage = signal('');
+  readonly isSubmitting = signal(false);
   readonly returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
   readonly authQueryParams = this.returnUrl ? { returnUrl: this.returnUrl } : {};
 
@@ -52,7 +52,7 @@ export class LoginPageComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     if (this.route.snapshot.queryParamMap.get('reason') === 'sessionExpired') {
-      this.infoMessage = 'انتهت جلستك. يرجى تسجيل الدخول مرة أخرى.';
+      this.infoMessage.set('انتهت جلستك. يرجى تسجيل الدخول مرة أخرى.');
     }
   }
 
@@ -61,7 +61,7 @@ export class LoginPageComponent implements OnInit, AfterViewInit {
   }
 
   async submit(): Promise<void> {
-    if (this.isSubmitting) {
+    if (this.isSubmitting()) {
       return;
     }
 
@@ -71,16 +71,16 @@ export class LoginPageComponent implements OnInit, AfterViewInit {
     }
 
     const { email, password } = this.form.getRawValue();
-    this.errorMessage = '';
-    this.isSubmitting = true;
+    this.errorMessage.set('');
+    this.isSubmitting.set(true);
 
     try {
       const response = await firstValueFrom(this.auth.login(email, password));
       await this.auth.redirectAfterLogin(response.role, this.returnUrl);
     } catch (err) {
-      this.errorMessage = readApiError(err, 'البريد الإلكتروني أو كلمة المرور غير صحيحة.');
+      this.errorMessage.set(readApiError(err, 'البريد الإلكتروني أو كلمة المرور غير صحيحة.'));
     } finally {
-      this.isSubmitting = false;
+      this.isSubmitting.set(false);
     }
   }
 
@@ -113,7 +113,7 @@ export class LoginPageComponent implements OnInit, AfterViewInit {
       const authResponse = await firstValueFrom(this.auth.googleSignIn(credential));
       await this.auth.redirectAfterLogin(authResponse.role, this.returnUrl);
     } catch (err) {
-      this.errorMessage = readApiError(err, 'تعذر تسجيل الدخول عبر جوجل.');
+      this.errorMessage.set(readApiError(err, 'تعذر تسجيل الدخول عبر جوجل.'));
     }
   }
 }

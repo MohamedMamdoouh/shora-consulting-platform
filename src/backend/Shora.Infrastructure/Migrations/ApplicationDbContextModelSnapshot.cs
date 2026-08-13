@@ -583,16 +583,6 @@ namespace Shora.Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.Property<string>("RefundRevocationReason")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<DateTime?>("RefundRevokedAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("RefundRevokedByAdminId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime?>("RefundedAtUtc")
                         .HasColumnType("timestamp with time zone");
 
@@ -611,8 +601,6 @@ namespace Shora.Infrastructure.Migrations
 
                     b.HasIndex("BookingId")
                         .IsUnique();
-
-                    b.HasIndex("RefundRevokedByAdminId");
 
                     b.HasIndex("RefundedByAdminId");
 
@@ -928,19 +916,12 @@ namespace Shora.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Shora.Domain.Entities.ApplicationUser", "RefundRevokedByAdmin")
-                        .WithMany()
-                        .HasForeignKey("RefundRevokedByAdminId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("Shora.Domain.Entities.ApplicationUser", "RefundedByAdmin")
                         .WithMany()
                         .HasForeignKey("RefundedByAdminId")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Booking");
-
-                    b.Navigation("RefundRevokedByAdmin");
 
                     b.Navigation("RefundedByAdmin");
                 });

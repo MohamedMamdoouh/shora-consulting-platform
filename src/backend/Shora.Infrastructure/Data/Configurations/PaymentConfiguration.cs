@@ -29,17 +29,9 @@ public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
         builder.Property(p => p.RefundReference)
             .HasMaxLength(500);
 
-        builder.Property(p => p.RefundRevocationReason)
-            .HasMaxLength(1000);
-
         builder.HasOne(p => p.RefundedByAdmin)
             .WithMany()
             .HasForeignKey(p => p.RefundedByAdminId)
-            .OnDelete(DeleteBehavior.NoAction);
-
-        builder.HasOne(p => p.RefundRevokedByAdmin)
-            .WithMany()
-            .HasForeignKey(p => p.RefundRevokedByAdminId)
             .OnDelete(DeleteBehavior.NoAction);
     }
 }

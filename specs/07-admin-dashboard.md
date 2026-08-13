@@ -1,6 +1,6 @@
 # 07 — Admin / Consultant Dashboard
 
-Status: **Done** (sub-phases 07a–07o). Payment receipt review, approve/decline, manual refund record/revoke, and ops alerts API are implemented (specs 05, 08). Admin shell and routing landed in 07a; all admin pages are phased below.
+Status: **Done** (sub-phases 07a–07o). Payment receipt review, approve/decline, manual refund record, and ops alerts API are implemented (specs 05, 08). Admin shell and routing landed in 07a; all admin pages are phased below.
 
 ### Implementation status
 
@@ -110,10 +110,10 @@ Status: **Done** (sub-phases 07a–07o). Payment receipt review, approve/decline
 
 **Frontend (07m):**
 
-- `bookings/admin-refund-panel.component.*` — record manual refund (reference + note) and revoke mistaken refund.
+- `bookings/admin-refund-panel.component.*` — record manual refund (reference + note).
 - `bookings/admin-refund-labels.util.ts` — refund-due / refunded row guards and action visibility.
-- `core/admin/admin-payments.service.ts` — `POST /admin/payments/{id}/refunds/record` and `refunds/revoke`.
-- `admin-bookings-page.*` — refund-due row highlight, Record refund / Revoke refund actions.
+- `core/admin/admin-payments.service.ts` — `POST /admin/payments/{id}/refunds/record`.
+- `admin-bookings-page.*` — refund-due row highlight, Record refund action.
 
 **Backend (07n):**
 
@@ -177,7 +177,7 @@ The single practitioner's personal admin panel: manage availability, edit the se
 - Bookings **auto-complete**: `BookingAutoCompleteService` (spec 08, ~every 5 min) transitions `Confirmed` bookings to `Completed` once `SlotEndUtc` passes. The client past section (spec 06) displays `Completed` rows after this job runs. There is no manual "mark completed" action.
 - **Direct cancel** action: `POST /api/admin/bookings/{id}/cancel` — allowed **any time before the session start**, from `Confirmed`, `CancellationRequested`, or an unpaid hold. Sets `Booking.Status = Cancelled` (writing a `BookingStatusAudit` row), frees the `AvailabilitySlot`. If the payment is `Approved`, this creates a **refund-due** (see below); otherwise the payment is set `Void`. A booking that has already started/completed cannot be cancelled (`now < StartUtc` guard, spec 04 #4).
 - **Cancellation-request decisions:** for `CancellationRequested` bookings the admin approves or declines the client's request (see #4.1). Approval is equivalent to a direct cancel (refund-due if paid); decline returns the booking to `Confirmed`.
-- **Manual refunds (`refunds/record`):** because refunds are out-of-band (spec 05 #6), a cancelled booking whose payment is still `Approved` shows a **"refund due"** indicator. The admin sends the money back via Vodafone Cash/InstaPay, then records it with `POST /api/admin/payments/{id}/refunds/record` (body `{ reference, note }`), which sets `Payment.Status = Refunded` and enqueues the client refund email. If recorded by mistake, `POST /api/admin/payments/{id}/refunds/revoke` appends correction audit and reopens refund-due.
+- **Manual refunds (`refunds/record`):** because refunds are out-of-band (spec 05 #6), a cancelled booking whose payment is still `Approved` shows a **"refund due"** indicator. The admin sends the money back via Vodafone Cash/InstaPay, then records it with `POST /api/admin/payments/{id}/refunds/record` (body `{ reference, note }`), which sets `Payment.Status = Refunded` and enqueues the client refund email.
 
 ### 4.1 Cancellation-request queue
 
@@ -213,7 +213,7 @@ The single practitioner's personal admin panel: manage availability, edit the se
 ## 7. Auditing, Monitoring & Background Jobs (H6, M6)
 
 - **Status-change audit trail:** every booking transition is recorded in `BookingStatusAudit` (spec 01) with actor (Client/Admin/System), reason, and UTC timestamp. This backs the cancelled-reason labels (spec 06) and gives the admin an authoritative history, including cancellation-request decisions.
-- **Payment/refund logging:** every payment action (receipt upload, admin approve/decline, manual `refunds/record`/`refunds/revoke`) is logged with a correlation id tied to the booking/payment (details in spec 08). Receipt image access (SAS URL minting) is logged too.
+- **Payment/refund logging:** every payment action (receipt upload, admin approve/decline, manual `refunds/record`) is logged with a correlation id tied to the booking/payment (details in spec 08). Receipt image access (SAS URL minting) is logged too.
 - **Alerts:** `OpsMonitoringService` (spec 08) evaluates operational alerts every ~5 min and logs warnings/criticals. `GET /api/v1/admin/ops/alerts` exposes active alerts for the admin dashboard; `/admin/ops` shows runbook steps from [`runbooks.json`](../src/backend/Shora.Application/Ops/runbooks.json). Thresholds: `PendingApproval > 6 h` warning / `> 24 h` critical; cancellation request within `< 30 min` of auto-decline; refund-due > 24 h warning / > 72 h critical; job heartbeat stale; outbox dead-letters.
 - **Background-job intervals (M6):** the receipt-upload-deadline cleanup job runs ~**every 1 minute**, the cancellation-request auto-decline job ~**every 1 minute**, the auto-complete job ~**every 5 minutes**, and the availability top-up job **nightly**. All jobs run as in-process `BackgroundService` workers on the single app instance (spec 08).
 

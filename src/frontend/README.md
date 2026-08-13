@@ -37,7 +37,7 @@ Open `http://localhost:4200/`. The dev server proxies `/api` to the backend (`pr
 
 - **Settings** — session pricing, duration, payment numbers
 - **Availability** — recurring windows + blocked date ranges
-- **Bookings** — filters, pagination, receipt review, cancellation queue, direct cancel, refund record/revoke
+- **Bookings** — filters, pagination, receipt review, cancellation queue, direct cancel, record refund
 - **Earnings** — gross / refunded / net summary with date filters
 - **Ops alerts** — active operational alerts with expandable runbook steps (`GET /admin/ops/alerts`, `GET /admin/ops/runbooks`)
 

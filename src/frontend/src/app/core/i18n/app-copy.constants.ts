@@ -183,13 +183,6 @@ export const APP_COPY = {
       approveReceiptTitle: 'قبول الإيصال',
       approveReceiptMessage: 'هل تريد قبول إيصال الدفع وتأكيد هذا الحجز؟',
       approveReceiptAction: 'قبول',
-      revokeRefundTitle: 'التراجع عن الاسترداد',
-      revokeRefundMessage:
-        'هل تريد التراجع عن تسجيل الاسترداد؟ سيعود الحجز إلى حالة «استرداد مستحق».',
-      revokeRefundAction: 'تأكيد التراجع',
-      revokeRefundSubmitting: 'جاري التراجع...',
-      revokeRefundReasonRequired: 'سبب التصحيح مطلوب. اكتب السبب لتأكيد التراجع.',
-      revokeRefundReasonTooLong: 'سبب التصحيح يجب ألا يتجاوز 1000 حرف.',
       refundReferenceRequired: 'مرجع التحويل مطلوب.',
       cancelBookingTitle: 'إلغاء الحجز',
       cancelBookingMessage: (refundNote: string) =>

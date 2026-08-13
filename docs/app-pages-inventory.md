@@ -569,17 +569,16 @@ All admin pages require **Admin role** (`adminGuard`). Wrapped in `AdminShellCom
   - Open cancellation review panel
   - Direct cancel booking
   - Record refund
-  - Revoke refund
 
 **Modal/side panels:**
 
 - **Receipt review panel:** View receipt image (SAS URL), approve or decline with reason
 - **Cancellation review panel:** Approve/decline client cancellation requests
-- **Refund panel:** Record manual refund with reference, or revoke recorded refund
+- **Refund panel:** Record manual refund with reference
 
-**Key actions:** Filter, paginate, approve/decline receipts, manage cancellations, cancel bookings, record/revoke refunds
+**Key actions:** Filter, paginate, approve/decline receipts, manage cancellations, cancel bookings, record refunds
 
-**API:** `GET /admin/bookings`, receipt approve/decline, cancel, cancellation approve/decline, refund record/revoke
+**API:** `GET /admin/bookings`, receipt approve/decline, cancel, cancellation approve/decline, refund record
 
 ---
 

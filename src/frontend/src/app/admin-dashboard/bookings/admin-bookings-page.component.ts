@@ -31,13 +31,9 @@ import {
 } from './admin-cancellation-labels.util';
 import { AdminCancellationReviewPanelComponent } from './admin-cancellation-review-panel.component';
 import { AdminReceiptReviewPanelComponent } from './admin-receipt-review-panel.component';
-import {
-  AdminRefundPanelComponent,
-  AdminRefundPanelMode,
-} from './admin-refund-panel.component';
+import { AdminRefundPanelComponent } from './admin-refund-panel.component';
 import {
   canRecordRefund,
-  canRevokeRefund,
   hasBookingRowActions,
   isRefundDueRow,
 } from './admin-refund-labels.util';
@@ -76,7 +72,6 @@ export class AdminBookingsPageComponent implements OnInit {
   readonly receiptReviewItem = signal<AdminBookingListItem | null>(null);
   readonly cancellationReviewItem = signal<AdminBookingListItem | null>(null);
   readonly refundPanelItem = signal<AdminBookingListItem | null>(null);
-  readonly refundPanelMode = signal<AdminRefundPanelMode | null>(null);
   readonly actionMessage = signal('');
   readonly actionError = signal('');
   readonly cancellingBookingId = signal<string | null>(null);
@@ -103,7 +98,6 @@ export class AdminBookingsPageComponent implements OnInit {
   readonly canDirectCancelBooking = canDirectCancelBooking;
   readonly isCancellationRequestPending = isCancellationRequestPending;
   readonly canRecordRefund = canRecordRefund;
-  readonly canRevokeRefund = canRevokeRefund;
   readonly hasBookingRowActions = hasBookingRowActions;
   readonly isRefundDueRow = isRefundDueRow;
   readonly totalPages = totalPages;
@@ -161,21 +155,12 @@ export class AdminBookingsPageComponent implements OnInit {
 
   openRecordRefund(item: AdminBookingListItem): void {
     this.refundPanelItem.set(item);
-    this.refundPanelMode.set('record');
-    this.actionMessage.set('');
-    this.actionError.set('');
-  }
-
-  openRevokeRefund(item: AdminBookingListItem): void {
-    this.refundPanelItem.set(item);
-    this.refundPanelMode.set('revoke');
     this.actionMessage.set('');
     this.actionError.set('');
   }
 
   closeRefundPanel(): void {
     this.refundPanelItem.set(null);
-    this.refundPanelMode.set(null);
   }
 
   async onReceiptReviewChanged(): Promise<void> {
@@ -202,10 +187,7 @@ export class AdminBookingsPageComponent implements OnInit {
 
   async onRefundChanged(): Promise<void> {
     const name = this.refundPanelItem()?.clientDisplayName;
-    const message =
-      this.refundPanelMode() === 'revoke'
-        ? 'تم التراجع عن تسجيل الاسترداد.'
-        : 'تم تسجيل الاسترداد وإرسال تأكيد للعميل.';
+    const message = 'تم تسجيل الاسترداد وإرسال تأكيد للعميل.';
     this.actionMessage.set(
       name ? this.copy.admin.customerAction(name, message) : message,
     );

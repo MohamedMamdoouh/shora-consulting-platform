@@ -38,29 +38,4 @@ public sealed class AdminPaymentsController(
         var result = await adminRefundService.RecordRefundAsync(adminId, id, request, cancellationToken);
         return FromResult(result);
     }
-
-    [HttpPost("{id:guid}/refunds/revoke")]
-    [EndpointName("AdminPayments.RevokeRefund")]
-    [EndpointSummary("Revoke a mistakenly recorded refund and reopen refund-due state")]
-    [ProducesResponseType(typeof(PaymentRefundResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> RevokeRefund(
-        Guid id,
-        [FromBody] RevokeRefundRequest request,
-        CancellationToken cancellationToken)
-    {
-        if (currentUser.UserId is not { } adminId)
-        {
-            return ToProblem(Error.Unauthorized(
-                ErrorCodes.Auth.UserNotFound,
-                "User is not authenticated."));
-        }
-
-        var result = await adminRefundService.RevokeRefundAsync(adminId, id, request, cancellationToken);
-        return FromResult(result);
-    }
 }

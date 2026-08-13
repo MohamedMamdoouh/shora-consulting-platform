@@ -64,16 +64,3 @@ internal sealed class ClientRefundConfirmationPayload
 
     public string Currency { get; set; } = string.Empty;
 }
-
-internal sealed class AdminRefundRevocationPayload
-{
-    public Guid PaymentId { get; set; }
-
-    public Guid BookingId { get; set; }
-
-    public string? PreviousReference { get; set; }
-
-    public string? CorrectionReason { get; set; }
-
-    public DateTime RevokedAtUtc { get; set; }
-}

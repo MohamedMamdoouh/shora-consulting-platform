@@ -72,9 +72,6 @@ public sealed class OutboxEmailRenderer(
             OutboxMessageTypes.ClientRefundConfirmationEmail =>
                 await BuildClientRefundConfirmationContextAsync(message, cancellationToken),
 
-            OutboxMessageTypes.AdminRefundRevocationEmail =>
-                await BuildAdminRefundRevocationContextAsync(message, cancellationToken),
-
             _ => Error.Validation(
                 ErrorCodes.General.Unexpected,
                 $"Unsupported outbox message type '{message.MessageType}'.")
@@ -353,50 +350,6 @@ public sealed class OutboxEmailRenderer(
             RefundNote = payload.Note,
             RefundAmount = payload.Amount,
             RefundCurrency = payload.Currency
-        };
-    }
-
-    private async Task<Result<TransactionEmailContext>> BuildAdminRefundRevocationContextAsync(
-        OutboxMessage message,
-        CancellationToken cancellationToken)
-    {
-        var payload = Deserialize<AdminRefundRevocationPayload>(message.PayloadJson);
-        if (payload is null)
-        {
-            return InvalidPayload(message.MessageType);
-        }
-
-        var booking = await LoadBookingAsync(payload.BookingId, cancellationToken);
-        if (booking is null)
-        {
-            return BookingNotFound(payload.BookingId);
-        }
-
-        var settings = await LoadSettingsAsync(cancellationToken);
-        if (settings is null)
-        {
-            return SettingsNotFound();
-        }
-
-        var recipientResult = await LoadAdminRecipientAsync(cancellationToken);
-        if (recipientResult.IsFailure)
-        {
-            return recipientResult.Error!;
-        }
-
-        var payment = booking.Payment
-            ?? await dbContext.Payments.AsNoTracking()
-                .FirstOrDefaultAsync(p => p.Id == payload.PaymentId, cancellationToken);
-
-        return new TransactionEmailContext
-        {
-            MessageType = message.MessageType,
-            Recipient = recipientResult.Value!,
-            Booking = booking,
-            Settings = settings,
-            Payment = payment,
-            PreviousRefundReference = payload.PreviousReference,
-            CorrectionReason = payload.CorrectionReason
         };
     }
 

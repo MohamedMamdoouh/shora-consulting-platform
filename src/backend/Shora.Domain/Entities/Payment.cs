@@ -27,14 +27,6 @@ public class Payment
 
     public ApplicationUser? RefundedByAdmin { get; set; }
 
-    public DateTime? RefundRevokedAtUtc { get; set; }
-
-    public Guid? RefundRevokedByAdminId { get; set; }
-
-    public ApplicationUser? RefundRevokedByAdmin { get; set; }
-
-    public string? RefundRevocationReason { get; set; }
-
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }

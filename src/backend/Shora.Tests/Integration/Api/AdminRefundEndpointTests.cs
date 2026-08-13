@@ -96,52 +96,6 @@ public class AdminRefundEndpointTests : IDisposable
     }
 
     [Fact]
-    public async Task Revoke_refund_reopens_refund_due_and_enqueues_operations_email()
-    {
-        var cancellationToken = TestContext.Current.CancellationToken;
-        var (paymentId, bookingId) = await CreateRefundDuePaymentAsync("refund-revoke@example.com", cancellationToken);
-
-        var adminClient = await CreateAdminClientAsync(cancellationToken);
-        var recordResponse = await adminClient.PostApiJsonAsync(
-            $"/api/v1/admin/payments/{paymentId}/refunds/record",
-            new RecordRefundRequest("VC-555555", null),
-            cancellationToken);
-        Assert.Equal(HttpStatusCode.OK, recordResponse.StatusCode);
-
-        var revokeResponse = await adminClient.PostApiJsonAsync(
-            $"/api/v1/admin/payments/{paymentId}/refunds/revoke",
-            new RevokeRefundRequest("Recorded against the wrong booking"),
-            cancellationToken);
-        Assert.Equal(HttpStatusCode.OK, revokeResponse.StatusCode);
-
-        var body = await revokeResponse.Content.ReadApiJsonAsync<PaymentRefundResponse>(cancellationToken);
-        Assert.NotNull(body);
-        Assert.Equal(paymentId, body!.PaymentId);
-        Assert.Equal(bookingId, body.BookingId);
-        Assert.Equal(nameof(PaymentStatus.Approved), body.PaymentStatus);
-        Assert.Null(body.RefundReference);
-        Assert.Null(body.RefundedAtUtc);
-        Assert.NotNull(body.RefundRevokedAtUtc);
-        Assert.Equal("Recorded against the wrong booking", body.RefundRevocationReason);
-
-        await using var scope = _factory.Services.CreateAsyncScope();
-        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
-        var payment = await context.Payments.AsNoTracking().SingleAsync(p => p.Id == paymentId, cancellationToken);
-        Assert.Equal(PaymentStatus.Approved, payment.Status);
-        Assert.Null(payment.RefundedAtUtc);
-        Assert.Null(payment.RefundReference);
-        Assert.Null(payment.RefundedByAdminId);
-        Assert.NotNull(payment.RefundRevokedAtUtc);
-        Assert.Equal("Recorded against the wrong booking", payment.RefundRevocationReason);
-
-        var outbox = await context.OutboxMessages.AsNoTracking().SingleAsync(
-            m => m.AggregateId == paymentId && m.MessageType == OutboxMessageTypes.AdminRefundRevocationEmail,
-            cancellationToken);
-        Assert.Equal(OutboxMessageStatus.Pending, outbox.Status);
-    }
-
-    [Fact]
     public async Task Record_refund_rejects_non_refund_due_payment()
     {
         var cancellationToken = TestContext.Current.CancellationToken;

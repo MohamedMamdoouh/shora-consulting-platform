@@ -67,11 +67,6 @@
   font-size: var(--admin-font-size-sm);
 }
 
-.refund-panel__hint--warning {
-  background: var(--color-warning-bg);
-  color: var(--color-warning);
-}
-
 .refund-panel__form {
   display: grid;
   gap: var(--space-md);

@@ -394,7 +394,7 @@ Configured in EF entity configurations (Infrastructure). Notable rules:
 | **No self-service reschedule**  | Client must cancel and rebook                                                                              |
 | **Delivery**                    | Voice call (requires phone) or chat (WhatsApp link at session time)                                        |
 | **Privacy**                     | Clients may use pseudonym display names                                                                    |
-| **Admin-only refunds**          | Manual record/revoke; no automated payout integration                                                      |
+| **Admin-only refunds**          | Manual record only; no automated payout integration                                                      |
 
 ---
 
@@ -553,7 +553,7 @@ Full conventions: [`specs/00-api-conventions.md`](specs/00-api-conventions.md).
 | POST            | `/admin/bookings/{id}/receipts/approve\|decline`              | Receipt review         |
 | POST            | `/admin/bookings/{id}/cancel`                                 | Direct cancel          |
 | POST            | `/admin/bookings/{id}/cancellation-requests/approve\|decline` | Cancellation decisions |
-| POST            | `/admin/payments/{id}/refunds/record\|revoke`                 | Manual refunds         |
+| POST            | `/admin/payments/{id}/refunds/record`                         | Manual refunds         |
 | GET             | `/admin/earnings?from=&to=`                                   | Revenue summary        |
 | GET             | `/admin/ops/alerts`, `/admin/ops/runbooks`                    | Ops monitoring         |
 

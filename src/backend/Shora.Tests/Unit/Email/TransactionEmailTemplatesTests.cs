@@ -20,7 +20,6 @@ public class TransactionEmailTemplatesTests
     [InlineData(OutboxMessageTypes.AdminNewCancellationRequestEmail, "طلب إلغاء جديد")]
     [InlineData(OutboxMessageTypes.ClientCancellationRequestDeclinedEmail, "تم رفض طلب الإلغاء")]
     [InlineData(OutboxMessageTypes.ClientRefundConfirmationEmail, "تأكيد الاسترداد")]
-    [InlineData(OutboxMessageTypes.AdminRefundRevocationEmail, "تصحيح تسجيل استرداد")]
     public void Render_transaction_templates_without_unreplaced_tokens(
         string messageType,
         string expectedHeading)
@@ -47,7 +46,6 @@ public class TransactionEmailTemplatesTests
     [InlineData(OutboxMessageTypes.AdminNewCancellationRequestEmail)]
     [InlineData(OutboxMessageTypes.ClientCancellationRequestDeclinedEmail)]
     [InlineData(OutboxMessageTypes.ClientRefundConfirmationEmail)]
-    [InlineData(OutboxMessageTypes.AdminRefundRevocationEmail)]
     public void GetSubject_returns_branded_subject_for_each_message_type(string messageType)
     {
         var subject = TransactionEmailTemplates.GetSubject(messageType, "Shora");
@@ -122,7 +120,6 @@ public class TransactionEmailTemplatesTests
             Recipient = messageType is OutboxMessageTypes.AdminNewBookingEmail
                 or OutboxMessageTypes.AdminReceiptUploadedEmail
                 or OutboxMessageTypes.AdminNewCancellationRequestEmail
-                or OutboxMessageTypes.AdminRefundRevocationEmail
                 ? new ApplicationUser
                 {
                     Id = Guid.NewGuid(),
@@ -141,8 +138,6 @@ public class TransactionEmailTemplatesTests
             RefundNote = "تم التحويل",
             RefundAmount = 500m,
             RefundCurrency = "EGP",
-            PreviousRefundReference = "REF-OLD",
-            CorrectionReason = "تصحيح",
             AutoDeclineAtUtc = now.AddHours(12),
             ClientReason = "لا أستطيع الحضور",
             CancellationReasonLabel = MyBookingLabelMapper.CancelledBySystem,

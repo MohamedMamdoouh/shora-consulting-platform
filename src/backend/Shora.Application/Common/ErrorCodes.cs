@@ -63,9 +63,7 @@ public static class ErrorCodes
         public const string ReceiptNotReviewable = "payment.receipt_not_reviewable";
         public const string InvalidDeclineReason = "payment.invalid_decline_reason";
         public const string RefundNotDue = "payment.refund_not_due";
-        public const string NotRefunded = "payment.not_refunded";
         public const string InvalidRefundReference = "payment.invalid_refund_reference";
-        public const string InvalidRefundRevocationReason = "payment.invalid_refund_revocation_reason";
     }
 
     public static class General

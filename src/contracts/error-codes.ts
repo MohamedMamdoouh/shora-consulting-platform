@@ -49,9 +49,7 @@ export const ErrorCodes = {
     NoPendingReceipt: 'payment.no_pending_receipt',
     InvalidDeclineReason: 'payment.invalid_decline_reason',
     RefundNotDue: 'payment.refund_not_due',
-    NotRefunded: 'payment.not_refunded',
     InvalidRefundReference: 'payment.invalid_refund_reference',
-    InvalidRefundRevocationReason: 'payment.invalid_refund_revocation_reason',
   },
   Errors: {
     NotFound: 'errors.not_found',

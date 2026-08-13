@@ -3,16 +3,12 @@
     class="refund-panel"
     role="dialog"
     aria-modal="true"
-    [attr.aria-labelledby]="mode === 'record' ? 'refund-record-title' : 'refund-revoke-title'"
+    aria-labelledby="refund-record-title"
     (click)="$event.stopPropagation()"
   >
     <header class="refund-panel__header">
       <div>
-        @if (mode === 'record') {
-          <h3 id="refund-record-title">تسجيل استرداد يدوي</h3>
-        } @else {
-          <h3 id="refund-revoke-title">تراجع عن تسجيل الاسترداد</h3>
-        }
+        <h3 id="refund-record-title">تسجيل استرداد يدوي</h3>
         <p class="refund-panel__subtitle">
           {{ copy.admin.customerName(item.clientDisplayName) }}
         </p>
@@ -22,89 +18,46 @@
       </button>
     </header>
 
-    @if (mode === 'record') {
-      <p class="refund-panel__hint">
-        {{ copy.admin.customerName(item.clientDisplayName) }} — أرسل المبلغ للعميل عبر فودافون
-        كاش أو إنستا باي خارج النظام، ثم سجل مرجع التحويل هنا. سيصله بريد إلكتروني لتأكيد
-        الاسترداد.
-      </p>
+    <p class="refund-panel__hint">
+      {{ copy.admin.customerName(item.clientDisplayName) }} — أرسل المبلغ للعميل عبر فودافون
+      كاش أو إنستا باي خارج النظام، ثم سجل مرجع التحويل هنا. سيصله بريد إلكتروني لتأكيد
+      الاسترداد.
+    </p>
 
-      <form class="refund-panel__form" [formGroup]="recordForm" (ngSubmit)="submitRecord()">
-        <label>
-          مرجع التحويل
-          <input
-            type="text"
-            formControlName="reference"
-            maxlength="500"
-            autocomplete="off"
-            [class.field-invalid]="!!referenceError()"
-            [attr.aria-invalid]="!hasReference()"
-            [attr.aria-describedby]="referenceError() ? 'refund-reference-error' : null"
-          />
-          @if (referenceError(); as error) {
-            <span id="refund-reference-error" class="field-error" role="alert">{{ error }}</span>
-          }
-        </label>
-
-        <label>
-          ملاحظة (اختياري)
-          <textarea formControlName="note" rows="3" placeholder="مثال: استرداد عبر فودافون كاش"></textarea>
-        </label>
-
-        @if (actionError()) {
-          <p class="refund-panel__message refund-panel__message--error" role="alert">{{ actionError() }}</p>
+    <form class="refund-panel__form" [formGroup]="recordForm" (ngSubmit)="submitRecord()">
+      <label>
+        مرجع التحويل
+        <input
+          type="text"
+          formControlName="reference"
+          maxlength="500"
+          autocomplete="off"
+          [class.field-invalid]="!!referenceError()"
+          [attr.aria-invalid]="!hasReference()"
+          [attr.aria-describedby]="referenceError() ? 'refund-reference-error' : null"
+        />
+        @if (referenceError(); as error) {
+          <span id="refund-reference-error" class="field-error" role="alert">{{ error }}</span>
         }
+      </label>
 
-        <div class="refund-panel__actions">
-          <button type="submit" class="btn" [disabled]="!hasReference() || isSubmitting()">
-            {{ isSubmitting() ? 'جاري التسجيل...' : 'تسجيل الاسترداد' }}
-          </button>
-          <button type="button" class="btn btn--secondary" [disabled]="isSubmitting()" (click)="close()">
-            إلغاء
-          </button>
-        </div>
-      </form>
-    } @else {
-      <p class="refund-panel__hint refund-panel__hint--warning">
-        {{ copy.admin.customerName(item.clientDisplayName) }} — استخدم هذا فقط إذا سجلت الاسترداد
-        بالخطأ. سيعود الدفع إلى «مقبول» ويظهر «استرداد مستحق» مجددًا.
-      </p>
+      <label>
+        ملاحظة (اختياري)
+        <textarea formControlName="note" rows="3" placeholder="مثال: استرداد عبر فودافون كاش"></textarea>
+      </label>
 
-      <form class="refund-panel__form" [formGroup]="revokeForm" (ngSubmit)="submitRevoke()">
-        <label>
-          سبب التصحيح
-          <textarea
-            id="refund-revoke-reason"
-            formControlName="correctionReason"
-            rows="4"
-            maxlength="1000"
-            placeholder="اشرح سبب التراجع عن تسجيل الاسترداد"
-            [class.field-invalid]="!!correctionReasonError()"
-            [attr.aria-invalid]="!hasCorrectionReason()"
-            [attr.aria-describedby]="correctionReasonError() ? 'refund-revoke-reason-error' : null"
-          ></textarea>
-          @if (correctionReasonError(); as error) {
-            <span id="refund-revoke-reason-error" class="field-error" role="alert">{{ error }}</span>
-          }
-        </label>
+      @if (actionError()) {
+        <p class="refund-panel__message refund-panel__message--error" role="alert">{{ actionError() }}</p>
+      }
 
-        @if (actionError()) {
-          <p class="refund-panel__message refund-panel__message--error" role="alert">{{ actionError() }}</p>
-        }
-
-        <div class="refund-panel__actions">
-          <button
-            type="submit"
-            class="btn btn--danger"
-            [disabled]="!hasCorrectionReason() || isSubmitting()"
-          >
-            {{ isSubmitting() ? copy.admin.dialog.revokeRefundSubmitting : copy.admin.dialog.revokeRefundAction }}
-          </button>
-          <button type="button" class="btn btn--secondary" [disabled]="isSubmitting()" (click)="close()">
-            {{ copy.dialog.cancel }}
-          </button>
-        </div>
-      </form>
-    }
+      <div class="refund-panel__actions">
+        <button type="submit" class="btn" [disabled]="!hasReference() || isSubmitting()">
+          {{ isSubmitting() ? 'جاري التسجيل...' : 'تسجيل الاسترداد' }}
+        </button>
+        <button type="button" class="btn btn--secondary" [disabled]="isSubmitting()" (click)="close()">
+          إلغاء
+        </button>
+      </div>
+    </form>
   </section>
 </div>

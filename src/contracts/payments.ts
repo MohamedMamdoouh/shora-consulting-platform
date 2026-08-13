@@ -71,16 +71,10 @@ export interface RecordRefundRequest {
   note?: string | null;
 }
 
-export interface RevokeRefundRequest {
-  correctionReason: string;
-}
-
 export interface PaymentRefundResponse {
   paymentId: string;
   bookingId: string;
   paymentStatus: string;
   refundReference?: string | null;
   refundedAtUtc?: string | null;
-  refundRevokedAtUtc?: string | null;
-  refundRevocationReason?: string | null;
 }

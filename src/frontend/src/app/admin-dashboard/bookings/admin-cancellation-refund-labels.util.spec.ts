@@ -7,7 +7,7 @@ import {
   formatRemainingTime,
   isCancellationRequestPending,
 } from './admin-cancellation-labels.util';
-import { canRecordRefund, canRevokeRefund, hasBookingRowActions } from './admin-refund-labels.util';
+import { canRecordRefund, hasBookingRowActions } from './admin-refund-labels.util';
 
 const NOW_MS = Date.parse('2026-08-06T10:00:00.000Z');
 
@@ -91,27 +91,9 @@ describe('admin cancellation and refund action labels', () => {
     expect(formatCancellationQueueNote(booking())).toBeNull();
   });
 
-  it('requires a persisted payment before recording or revoking refunds', () => {
+  it('requires a persisted payment before recording a refund', () => {
     expect(canRecordRefund(booking({ refundDue: true, paymentId: 'payment-1' }))).toBe(true);
     expect(canRecordRefund(booking({ refundDue: true, paymentId: null }))).toBe(false);
-    expect(
-      canRevokeRefund(
-        booking({
-          status: 'Cancelled',
-          paymentStatus: 'Refunded',
-          paymentId: 'payment-1',
-        }),
-      ),
-    ).toBe(true);
-    expect(
-      canRevokeRefund(
-        booking({
-          status: 'Confirmed',
-          paymentStatus: 'Refunded',
-          paymentId: 'payment-1',
-        }),
-      ),
-    ).toBe(false);
   });
 
   it('labels the customer name in the direct-cancel confirmation', () => {

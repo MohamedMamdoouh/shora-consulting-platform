@@ -146,16 +146,6 @@
                         </button>
                       }
 
-                      @if (canRevokeRefund(item)) {
-                        <button
-                          type="button"
-                          class="btn btn--danger btn--compact"
-                          (click)="openRevokeRefund(item)"
-                        >
-                          تراجع عن الاسترداد
-                        </button>
-                      }
-
                       @if (!hasBookingRowActions(item)) {
                         —
                       }
@@ -214,12 +204,9 @@
 }
 
 @if (refundPanelItem(); as refundItem) {
-  @if (refundPanelMode(); as refundMode) {
-    <app-admin-refund-panel
-      [item]="refundItem"
-      [mode]="refundMode"
-      (closed)="closeRefundPanel()"
-      (changed)="onRefundChanged()"
-    />
-  }
+  <app-admin-refund-panel
+    [item]="refundItem"
+    (closed)="closeRefundPanel()"
+    (changed)="onRefundChanged()"
+  />
 }

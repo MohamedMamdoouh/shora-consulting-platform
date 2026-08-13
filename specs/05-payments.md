@@ -12,14 +12,14 @@ Status: **Done (backend 05a–05h; client UI in spec 06; admin UI in spec 07).**
 | 05d | Admin approve/decline receipts, `RowVersion` guards, outbox emails | **Done** |
 | 05e | SHA-256 duplicate-hash warnings, receipt upload rate limit (5/min/IP) | **Done** |
 | 05f | `IMalwareScanner` stub; admin SAS URLs only when scan `Clean` | **Done** |
-| 05g | `POST …/refunds/record` and `…/refunds/revoke` (idempotent record) | **Done** |
+| 05g | `POST …/refunds/record` (idempotent record) | **Done** |
 | 05h | Blob reconciliation job (`BlobFinalizePending`, orphan temps) | **Done** (spec 08.6) |
 
-**Implemented endpoints:** `GET /api/v1/bookings/{id}/payment-instructions`, `POST /api/v1/payments/{bookingId}/receipt`, `GET /api/v1/admin/bookings/{id}/receipts`, `POST /api/v1/admin/bookings/{id}/receipts/approve`, `POST /api/v1/admin/bookings/{id}/receipts/decline`, `POST /api/v1/admin/payments/{id}/refunds/record`, `POST /api/v1/admin/payments/{id}/refunds/revoke`.
+**Implemented endpoints:** `GET /api/v1/bookings/{id}/payment-instructions`, `POST /api/v1/payments/{bookingId}/receipt`, `GET /api/v1/admin/bookings/{id}/receipts`, `POST /api/v1/admin/bookings/{id}/receipts/approve`, `POST /api/v1/admin/bookings/{id}/receipts/decline`, `POST /api/v1/admin/payments/{id}/refunds/record`.
 
 **Client UI (spec 06):** `PaymentInstructionsPanelComponent` powers receipt upload on `/booking/payment/:id` and on the dashboard `PendingPayment` card (`paymentSummary` from `GET /bookings/mine` avoids a second instructions fetch).
 
-**Admin UI (spec 07):** receipt review modal on `/admin/bookings`, manual refund record/revoke, earnings summary on `/admin/earnings`.
+**Admin UI (spec 07):** receipt review modal on `/admin/bookings`, manual refund record, earnings summary on `/admin/earnings`.
 
 ---
 
@@ -57,7 +57,6 @@ All state changes are guarded by `Booking.RowVersion` (spec 01), so concurrent a
 | `POST /api/admin/bookings/{id}/receipts/approve` | Admin          | Approves the pending receipt → booking `Confirmed`.                                                                                                                                                                             |
 | `POST /api/admin/bookings/{id}/receipts/decline` | Admin          | Body `{ reasonCode, reasonNote? }`. Declines pending receipt → booking back to `PendingPayment` with a new upload window.                                                                                                       |
 | `POST /api/admin/payments/{id}/refunds/record`   | Admin          | Body `{ reference, note }`. Records a manual out-of-band refund on a cancelled booking's payment (#6).                                                                                                                          |
-| `POST /api/admin/payments/{id}/refunds/revoke`   | Admin          | Body `{ correctionReason }`. Admin correction path for an accidentally recorded refund; appends audit and reopens refund-due state.                                                                                             |
 
 ## 4. File Upload & Storage (security)
 
@@ -90,7 +89,6 @@ Refunds are **only** triggered by a cancellation and are handled **entirely out-
   - The admin performs the transfer, then calls `POST /api/admin/payments/{id}/refunds/record` with a **required** `reference` and optional note.
   - Endpoint is idempotent: if already `Refunded`, it returns success with current state and does not duplicate outbox effects.
   - Recording sets `Payment.Status = Refunded`, `RefundedAtUtc`, `RefundReference`, `RefundedByAdminId`, and enqueues the client refund confirmation email.
-  - **Correction path:** if recorded by mistake, admin uses `POST /api/admin/payments/{id}/refunds/revoke` (with mandatory reason). This appends an audit record, reopens refund-due state, and notifies operations. No silent edits/deletes.
 - **No approved payment**: cancelling a booking that was never approved (`AwaitingReceipt`/`UnderReview`) just sets `Payment.Status = Void` and emails a plain cancellation notice — nothing to refund.
 - **Partial refunds** are out of scope; refunds are always the full session amount.
 

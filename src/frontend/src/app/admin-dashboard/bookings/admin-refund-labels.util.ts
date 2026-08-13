@@ -5,10 +5,6 @@ export function canRecordRefund(item: AdminBookingListItem): boolean {
   return item.refundDue && !!item.paymentId;
 }
 
-export function canRevokeRefund(item: AdminBookingListItem): boolean {
-  return item.status === 'Cancelled' && item.paymentStatus === 'Refunded' && !!item.paymentId;
-}
-
 export function isRefundDueRow(item: AdminBookingListItem): boolean {
   return canRecordRefund(item);
 }
@@ -18,7 +14,6 @@ export function hasBookingRowActions(item: AdminBookingListItem): boolean {
     item.status === 'PendingApproval' ||
     isCancellationRequestPending(item) ||
     (canDirectCancelBooking(item) && !isCancellationRequestPending(item)) ||
-    canRecordRefund(item) ||
-    canRevokeRefund(item)
+    canRecordRefund(item)
   );
 }

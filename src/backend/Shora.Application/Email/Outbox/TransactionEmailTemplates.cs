@@ -30,10 +30,6 @@ internal sealed class TransactionEmailContext
 
     public string? RefundCurrency { get; init; }
 
-    public string? PreviousRefundReference { get; init; }
-
-    public string? CorrectionReason { get; init; }
-
     public DateTime? AutoDeclineAtUtc { get; init; }
 
     public string? ClientReason { get; init; }
@@ -71,8 +67,6 @@ internal static class TransactionEmailTemplates
                 BuildClientCancellationRequestDeclined(context, links),
             Common.OutboxMessageTypes.ClientRefundConfirmationEmail =>
                 BuildClientRefundConfirmation(context, links),
-            Common.OutboxMessageTypes.AdminRefundRevocationEmail =>
-                BuildAdminRefundRevocation(context, links),
             _ => throw new InvalidOperationException(
                 $"Unsupported outbox message type '{context.MessageType}'.")
         };
@@ -97,8 +91,6 @@ internal static class TransactionEmailTemplates
                 $"تم رفض طلب الإلغاء — {brandName}",
             Common.OutboxMessageTypes.ClientRefundConfirmationEmail =>
                 $"تأكيد استرداد المبلغ — {brandName}",
-            Common.OutboxMessageTypes.AdminRefundRevocationEmail =>
-                $"تصحيح تسجيل استرداد — {brandName}",
             _ => throw new InvalidOperationException(
                 $"Unsupported outbox message type '{messageType}'.")
         };
@@ -313,31 +305,6 @@ internal static class TransactionEmailTemplates
                     TransactionEmailLabels.FormatMoney(amount, currency))),
                 ("RefundReference", TransactionEmailLabels.HtmlEncode(reference)),
                 ("RefundNoteHtml", note)));
-    }
-
-    private static EmailTemplateRequest BuildAdminRefundRevocation(
-        TransactionEmailContext context,
-        TransactionEmailLinks links)
-    {
-        var previousReference = string.IsNullOrWhiteSpace(context.PreviousRefundReference)
-            ? "—"
-            : context.PreviousRefundReference;
-        var correctionReason = string.IsNullOrWhiteSpace(context.CorrectionReason)
-            ? "—"
-            : context.CorrectionReason;
-
-        return new EmailTemplateRequest(
-            ContentTemplate: "Transaction/admin-refund-revocation.content.html",
-            PreviewText: "تم إلغاء تسجيل استرداد سابق.",
-            Heading: "تصحيح تسجيل استرداد",
-            ActionUrl: links.AdminBookings(),
-            ActionLabel: "مراجعة الحجوزات",
-            RecipientName: context.Recipient.DisplayName,
-            FooterNote: "راجع حالة الاسترداد في لوحة الإدارة.",
-            AdditionalTokens: BuildDetailTokens(
-                ("PreviousReference", TransactionEmailLabels.HtmlEncode(previousReference)),
-                ("CorrectionReason", TransactionEmailLabels.HtmlEncode(correctionReason)),
-                ("BookingId", TransactionEmailLabels.HtmlEncode(context.Booking.Id.ToString("D")))));
     }
 
     private static Dictionary<string, string> BuildDetailTokens(

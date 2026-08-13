@@ -24,9 +24,7 @@ const BOOKING_ERROR_MESSAGES: Record<string, string> = {
   [ErrorCodes.Cancellation.InvalidDecisionReason]: 'سبب رفض طلب الإلغاء غير صالح.',
   [ErrorCodes.Payment.NotFound]: 'لم يتم العثور على الدفع.',
   [ErrorCodes.Payment.RefundNotDue]: 'لا يوجد استرداد مستحق لهذا الحجز.',
-  [ErrorCodes.Payment.NotRefunded]: 'لم يسجل استرداد يمكن التراجع عنه.',
   [ErrorCodes.Payment.InvalidRefundReference]: 'مرجع الاسترداد مطلوب.',
-  [ErrorCodes.Payment.InvalidRefundRevocationReason]: 'سبب التصحيح مطلوب.',
 };
 
 export function readBookingErrorMessage(code: string | undefined, fallback: string): string {

@@ -16,7 +16,5 @@ public static class OutboxMessageTypes
 
     public const string ClientRefundConfirmationEmail = "ClientRefundConfirmationEmail";
 
-    public const string AdminRefundRevocationEmail = "AdminRefundRevocationEmail";
-
     public const string ClientCancellationRequestDeclinedEmail = "ClientCancellationRequestDeclinedEmail";
 }

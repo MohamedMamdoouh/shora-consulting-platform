@@ -12,7 +12,7 @@ This keeps the frontend and backend aligned without code generation for MVP.
 
 **Booking:** `booking.ts` includes reserve/create types, `MyBookingListItem`, `MyBookingsResponse`, cancellation-request DTOs, admin bookings list types (`AdminBookingListItem`, `AdminBookingsResponse`), admin cancellation DTOs, and query limits for `GET /bookings/mine` and `GET /admin/bookings`.
 
-**Payments:** `payments.ts` includes receipt upload/review, admin refund record/revoke types, and receipt decline reason codes.
+**Payments:** `payments.ts` includes receipt upload/review, admin refund record types, and receipt decline reason codes.
 
 **Earnings:** `earnings.ts` includes `AdminEarningsResponse` and query types for `GET /admin/earnings`.
 

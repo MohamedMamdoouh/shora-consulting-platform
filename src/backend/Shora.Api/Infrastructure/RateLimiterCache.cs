@@ -7,8 +7,9 @@ internal sealed class RateLimiterCache
 {
     private readonly ConcurrentDictionary<string, RateLimiter> _limiters = new();
 
-    public RateLimiter GetFixedWindow(string key, int permitLimit, TimeSpan window) =>
-        _limiters.GetOrAdd(
+    public RateLimiter GetFixedWindow(string key, int permitLimit, TimeSpan window)
+    {
+        var inner = _limiters.GetOrAdd(
             key,
             _ => new FixedWindowRateLimiter(new FixedWindowRateLimiterOptions
             {
@@ -16,4 +17,7 @@ internal sealed class RateLimiterCache
                 Window = window,
                 QueueLimit = 0
             }));
+
+        return new SharedRateLimiter(inner);
+    }
 }

@@ -54,8 +54,18 @@ public static class DatabaseSeeder
             var result = await roleManager.CreateAsync(role);
             if (!result.Succeeded)
             {
-                logger.LogWarning("Failed to create role {Role}: {Errors}",
-                    roleName, string.Join(", ", result.Errors.Select(e => e.Description)));
+                throw new InvalidOperationException(
+                    $"Failed to create role '{roleName}': {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            }
+
+            logger.LogInformation("Seeded role {Role}.", roleName);
+        }
+
+        foreach (var roleName in new[] { ClientRole, AdminRole })
+        {
+            if (!await roleManager.RoleExistsAsync(roleName))
+            {
+                throw new InvalidOperationException($"Required role '{roleName}' is missing after seeding.");
             }
         }
     }

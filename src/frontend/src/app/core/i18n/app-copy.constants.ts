@@ -25,6 +25,12 @@ export const APP_COPY = {
     privacy: 'سياسة الخصوصية',
     terms: 'شروط الاستخدام',
   },
+  theme: {
+    cycle: 'تغيير المظهر',
+    system: 'مطابقة إعدادات الجهاز',
+    light: 'الوضع الفاتح',
+    dark: 'الوضع الداكن',
+  },
   footer: {
     aboutLink: 'عني',
     socialNavLabel: 'حسابات التواصل',
@@ -43,6 +49,11 @@ export const APP_COPY = {
   },
   banner: {
     confirmEmail: 'يرجى تأكيد بريدك الإلكتروني قبل حجز جلسة.',
+  },
+  dialog: {
+    defaultTitle: 'تأكيد',
+    confirm: 'تأكيد',
+    cancel: 'إلغاء',
   },
   cta: {
     bookSession: 'احجز جلسة',
@@ -80,7 +91,7 @@ export const APP_COPY = {
       'لا يوجد دفع إلكتروني بالبطاقة. بعد حجز موعدك، حول الرسوم عبر فودافون كاش أو إنستا باي ثم ارفع إيصال التحويل. ستتم مراجعة الإيصال وتأكيد حجزك.',
     privacyHeading: 'الخصوصية',
     privacyBody:
-      'يمكنك استخدام اسم مستعار بدلًا من اسمك الحقيقي. جميع معلوماتك ومحادثاتك تُعامل بسرية تامة — أدرك حساسية موضوعات العلاقات.',
+      'يمكنك استخدام اسم مستعار بدلًا من اسمك الحقيقي. جميع معلوماتك ومحادثاتك تعامل بسرية تامة — أدرك حساسية موضوعات العلاقات.',
     ctaLead: 'اختر موعدًا الآن — لا حاجة لتسجيل الدخول حتى تصل لخطوة الحجز.',
     footerCtaTitle: 'جاهز لخطوة أوضح في علاقتك؟',
     footerCtaSubtitle: 'احجز موعدًا مباشرة — جلسة واحدة قد تغير تفكيرك.',
@@ -125,14 +136,49 @@ export const APP_COPY = {
     receiptUploaded:
       'تم رفع الإيصال. ستتم المراجعة وستصلك رسالة تأكيد بالبريد الإلكتروني بعد الموافقة.',
     cancellationPending: 'طلب الإلغاء قيد المراجعة — انتظر الرد.',
-    noPhoneOnFile: 'لم يُسجَّل رقم للمكالمة. تواصل معنا إذا احتجت مساعدة.',
+    noPhoneOnFile: 'لم يسجل رقم للمكالمة. تواصل معنا إذا احتجت مساعدة.',
     whatsAppSessionHint: 'عند موعد الجلسة، اضغط على الرابط لبدء المحادثة عبر واتساب.',
     whatsAppLinkError: 'تعذر تحميل رابط واتساب. تواصل معنا إذا احتجت مساعدة.',
     cancelNearSessionPrefix: 'لإلغاء الحجز قرب موعد الجلسة، تواصل معنا على واتساب',
     whatsAppContact: 'تواصل عبر واتساب',
+    cancellationConfirmTitle: 'طلب الإلغاء',
     cancellationConfirm:
-      'طلب الإلغاء يحتاج موافقة. إذا تمت الموافقة، سيُسترد المبلغ يدويًا. هل تريد المتابعة؟',
+      'طلب الإلغاء يحتاج موافقة. إذا تمت الموافقة، سيسترد المبلغ يدويًا. هل تريد المتابعة؟',
+    cancellationConfirmAction: 'متابعة',
+    cancelHoldTitle: 'إلغاء الحجز',
+    cancelHoldConfirm:
+      'هل تريد إلغاء هذا الحجز؟ سيتم تحرير الموعد ويمكنك حجز موعد آخر لاحقًا.',
+    cancelHoldAction: 'إلغاء الحجز',
     voiceCallInstruction: (time: string, phone: string) =>
       `سيتم الاتصال بك في ${time} على الرقم ${phone}.`,
+  },
+  admin: {
+    dialog: {
+      deleteWindowTitle: 'حذف نافذة التوفر',
+      deleteWindowMessage: (summary: string) =>
+        `حذف "${summary}"؟ سيتم إعادة توليد المواعيد المتاحة.`,
+      deleteWindowAction: 'حذف',
+      removeBlockedDateTitle: 'إزالة فترة الحجب',
+      removeBlockedDateMessage: (summary: string) =>
+        `إزالة الحجب "${summary}"؟ ستتم إعادة توليد المواعيد المتاحة خلال هذه الفترة.`,
+      removeBlockedDateAction: 'إزالة',
+      approveCancellationTitle: 'الموافقة على الإلغاء',
+      approveCancellationMessage: (clientName: string, refundNote: string) =>
+        `هل تريد الموافقة على إلغاء حجز ${clientName}؟${refundNote}`,
+      approveCancellationAction: 'موافقة',
+      refundDueNote: ' سيتم وضع علامة «استرداد مستحق» لأن الدفع مقبول.',
+      approveReceiptTitle: 'قبول الإيصال',
+      approveReceiptMessage: (clientName: string) =>
+        `هل تريد قبول إيصال الدفع وتأكيد حجز ${clientName}؟`,
+      approveReceiptAction: 'قبول',
+      revokeRefundTitle: 'التراجع عن الاسترداد',
+      revokeRefundMessage:
+        'هل تريد التراجع عن تسجيل الاسترداد؟ سيعود الحجز إلى حالة «استرداد مستحق».',
+      revokeRefundAction: 'تأكيد التراجع',
+      cancelBookingTitle: 'إلغاء الحجز',
+      cancelBookingMessage: (clientName: string, refundNote: string) =>
+        `هل تريد إلغاء حجز ${clientName}؟${refundNote}`,
+      cancelBookingAction: 'إلغاء الحجز',
+    },
   },
 } as const;

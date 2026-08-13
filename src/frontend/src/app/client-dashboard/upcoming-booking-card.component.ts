@@ -18,6 +18,7 @@ import {
   formatVoiceCallInstruction,
 } from './upcoming-booking.util';
 import { APP_COPY } from '../core/i18n/app-copy.constants';
+import { ConfirmDialogService } from '../core/ui/confirm-dialog.service';
 
 @Component({
   selector: 'app-upcoming-booking-card',
@@ -27,6 +28,7 @@ import { APP_COPY } from '../core/i18n/app-copy.constants';
 })
 export class UpcomingBookingCardComponent {
   private readonly bookingService = inject(BookingService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   protected readonly copy = APP_COPY;
 
@@ -81,7 +83,7 @@ export class UpcomingBookingCardComponent {
   }
 
   get declinedReason(): string {
-    return this.item.cancellationRequest?.declineReason ?? 'لم يُذكر سبب.';
+    return this.item.cancellationRequest?.declineReason ?? 'لم يذكر سبب.';
   }
 
   get statusModifier(): string | null {
@@ -98,7 +100,11 @@ export class UpcomingBookingCardComponent {
       return;
     }
 
-    const confirmed = window.confirm(this.copy.client.cancellationConfirm);
+    const confirmed = await this.confirmDialog.confirm({
+      title: this.copy.client.cancellationConfirmTitle,
+      message: this.copy.client.cancellationConfirm,
+      confirmLabel: this.copy.client.cancellationConfirmAction,
+    });
 
     if (!confirmed) {
       return;

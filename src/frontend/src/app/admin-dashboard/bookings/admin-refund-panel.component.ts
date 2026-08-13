@@ -4,6 +4,8 @@ import { AdminBookingListItem } from '@contracts/booking';
 import { firstValueFrom } from 'rxjs';
 import { readApiError, readApiErrorCode } from '../../core/api/api-error.util';
 import { AdminPaymentsService } from '../../core/admin/admin-payments.service';
+import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
+import { APP_COPY } from '../../core/i18n/app-copy.constants';
 import { readBookingErrorMessage } from '../../booking/booking-error.util';
 
 export type AdminRefundPanelMode = 'record' | 'revoke';
@@ -17,6 +19,9 @@ export type AdminRefundPanelMode = 'record' | 'revoke';
 export class AdminRefundPanelComponent {
   private readonly fb = inject(FormBuilder);
   private readonly adminPaymentsService = inject(AdminPaymentsService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
+
+  protected readonly copy = APP_COPY;
 
   @Input({ required: true }) item!: AdminBookingListItem;
   @Input({ required: true }) mode!: AdminRefundPanelMode;
@@ -85,9 +90,12 @@ export class AdminRefundPanelComponent {
       return;
     }
 
-    const confirmed = window.confirm(
-      'هل تريد التراجع عن تسجيل الاسترداد؟ سيعود الحجز إلى حالة «استرداد مستحق».',
-    );
+    const confirmed = await this.confirmDialog.confirm({
+      title: this.copy.admin.dialog.revokeRefundTitle,
+      message: this.copy.admin.dialog.revokeRefundMessage,
+      confirmLabel: this.copy.admin.dialog.revokeRefundAction,
+      variant: 'danger',
+    });
 
     if (!confirmed) {
       return;

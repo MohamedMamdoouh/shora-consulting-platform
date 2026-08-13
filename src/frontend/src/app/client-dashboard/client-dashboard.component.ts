@@ -11,7 +11,7 @@ import {
 import { firstValueFrom } from 'rxjs';
 import { readApiError } from '../core/api/api-error.util';
 import { BookingService } from '../core/booking/booking.service';
-import { formatPastBookingNotes } from './client-dashboard-labels.util';
+import { formatPastBookingCancellation } from './client-dashboard-labels.util';
 import { formatSlotRange } from './client-dashboard-slot.util';
 import { UpcomingBookingCardComponent } from './upcoming-booking-card.component';
 
@@ -55,7 +55,7 @@ export class ClientDashboardComponent implements OnInit {
     return past.status === 'ready' && past.items.length < past.totalCount;
   });
 
-  readonly formatPastBookingNotes = formatPastBookingNotes;
+  readonly formatPastBookingCancellation = formatPastBookingCancellation;
   readonly formatSlotRange = formatSlotRange;
 
   ngOnInit(): void {

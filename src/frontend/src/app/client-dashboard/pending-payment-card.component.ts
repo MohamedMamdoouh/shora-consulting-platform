@@ -8,6 +8,7 @@ import { BookingService } from '../core/booking/booking.service';
 import { readBookingErrorMessage } from '../booking/booking-error.util';
 import { getPendingPaymentInstructions } from './pending-payment.util';
 import { APP_COPY } from '../core/i18n/app-copy.constants';
+import { ConfirmDialogService } from '../core/ui/confirm-dialog.service';
 
 @Component({
   selector: 'app-pending-payment-card',
@@ -17,6 +18,7 @@ import { APP_COPY } from '../core/i18n/app-copy.constants';
 })
 export class PendingPaymentCardComponent {
   private readonly bookingService = inject(BookingService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   protected readonly copy = APP_COPY;
 
@@ -38,9 +40,12 @@ export class PendingPaymentCardComponent {
       return;
     }
 
-    const confirmed = window.confirm(
-      'هل تريد إلغاء هذا الحجز؟ سيتم تحرير الموعد ويمكنك حجز موعد آخر لاحقًا.',
-    );
+    const confirmed = await this.confirmDialog.confirm({
+      title: this.copy.client.cancelHoldTitle,
+      message: this.copy.client.cancelHoldConfirm,
+      confirmLabel: this.copy.client.cancelHoldAction,
+      variant: 'danger',
+    });
 
     if (!confirmed) {
       return;

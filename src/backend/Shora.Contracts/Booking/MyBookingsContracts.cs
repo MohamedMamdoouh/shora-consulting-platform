@@ -43,6 +43,7 @@ public sealed record MyBookingListItem(
     string? ContactPhone,
     string Status,
     string? CancellationReasonLabel,
+    string? CancellationDetail,
     string? RefundLabel,
     MyBookingCancellationRequestMetadata? CancellationRequest,
     MyBookingPaymentSummary? PaymentSummary,

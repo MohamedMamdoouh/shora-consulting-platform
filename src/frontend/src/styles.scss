@@ -737,14 +737,20 @@ label.field > span:first-child {
   line-height: var(--line-height-admin);
 }
 
+table th,
+table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
 .admin-table th,
 .admin-table td,
 .admin-bookings__table th,
 .admin-bookings__table td {
   padding: var(--admin-space-md) var(--space-md);
-  text-align: start;
+  text-align: center;
   border-bottom: 1px solid var(--color-border-subtle);
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 .admin-table th,

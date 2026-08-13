@@ -2,6 +2,7 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Shora.Application.Abstractions;
+using Shora.Application.Bookings;
 using Shora.Application.Common;
 using Shora.Application.Common.Results;
 using Shora.Application.Email;
@@ -179,7 +180,12 @@ public sealed class OutboxEmailRenderer(
             return InvalidPayload(message.MessageType);
         }
 
-        var booking = await LoadBookingAsync(payload.BookingId, cancellationToken);
+        var booking = await dbContext.Bookings
+            .AsNoTracking()
+            .Include(b => b.Client)
+            .Include(b => b.Payment)
+            .Include(b => b.CancellationRequest)
+            .FirstOrDefaultAsync(b => b.Id == payload.BookingId, cancellationToken);
         if (booking is null)
         {
             return BookingNotFound(payload.BookingId);
@@ -197,13 +203,25 @@ public sealed class OutboxEmailRenderer(
             return recipientResult.Error!;
         }
 
+        var cancelAudit = await dbContext.BookingStatusAudits
+            .AsNoTracking()
+            .Where(audit => audit.BookingId == booking.Id && audit.ToStatus == BookingStatus.Cancelled)
+            .OrderByDescending(audit => audit.AtUtc)
+            .FirstOrDefaultAsync(cancellationToken);
+
         return new TransactionEmailContext
         {
             MessageType = message.MessageType,
             Recipient = recipientResult.Value!,
             Booking = booking,
             Settings = settings,
-            Payment = booking.Payment
+            Payment = booking.Payment,
+            CancellationReasonLabel = MyBookingLabelMapper.MapCancellationReasonLabel(
+                cancelAudit,
+                booking.CancellationRequest),
+            CancellationDetail = MyBookingLabelMapper.MapCancellationDetail(
+                cancelAudit,
+                booking.CancellationRequest)
         };
     }
 

@@ -18,6 +18,8 @@ import {
   readValidationErrors,
 } from '../../core/api/api-error.util';
 import { ApiCacheService } from '../../core/api/api-cache.service';
+import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
+import { APP_COPY } from '../../core/i18n/app-copy.constants';
 import { AdminAvailabilityService } from '../../core/admin/admin-availability.service';
 import { AdminBlockedDateService } from '../../core/admin/admin-blocked-date.service';
 import { environment } from '../../../environments/environment';
@@ -56,6 +58,9 @@ export class AdminAvailabilityPageComponent implements OnInit {
   private readonly adminAvailabilityService = inject(AdminAvailabilityService);
   private readonly adminBlockedDateService = inject(AdminBlockedDateService);
   private readonly apiCache = inject(ApiCacheService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
+
+  protected readonly copy = APP_COPY;
 
   readonly pageState = signal<PageState>({ status: 'loading' });
   readonly editingWindowId = signal<string | null>(null);
@@ -283,9 +288,12 @@ export class AdminAvailabilityPageComponent implements OnInit {
       return;
     }
 
-    const confirmed = confirm(
-      `حذف "${formatWindowSummary(window)}"؟ سيتم إعادة توليد المواعيد المتاحة.`,
-    );
+    const confirmed = await this.confirmDialog.confirm({
+      title: this.copy.admin.dialog.deleteWindowTitle,
+      message: this.copy.admin.dialog.deleteWindowMessage(formatWindowSummary(window)),
+      confirmLabel: this.copy.admin.dialog.deleteWindowAction,
+      variant: 'danger',
+    });
     if (!confirmed) {
       return;
     }
@@ -315,9 +323,14 @@ export class AdminAvailabilityPageComponent implements OnInit {
       return;
     }
 
-    const confirmed = confirm(
-      `إزالة الحجب "${formatBlockedRangeSummary(blockedDate)}"؟ ستتم إعادة توليد المواعيد المتاحة خلال هذه الفترة.`,
-    );
+    const confirmed = await this.confirmDialog.confirm({
+      title: this.copy.admin.dialog.removeBlockedDateTitle,
+      message: this.copy.admin.dialog.removeBlockedDateMessage(
+        formatBlockedRangeSummary(blockedDate),
+      ),
+      confirmLabel: this.copy.admin.dialog.removeBlockedDateAction,
+      variant: 'danger',
+    });
     if (!confirmed) {
       return;
     }

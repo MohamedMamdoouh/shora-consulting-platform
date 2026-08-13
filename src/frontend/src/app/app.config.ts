@@ -11,6 +11,7 @@ import { routes } from './app.routes';
 import { apiTimeoutInterceptor } from './core/api/api-timeout.interceptor';
 import { authInterceptor } from './core/auth/auth.interceptor';
 import { AuthService } from './core/auth/auth.service';
+import { ThemeService } from './core/theme/theme.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -18,6 +19,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor, apiTimeoutInterceptor])),
+    provideAppInitializer(() => inject(ThemeService).initialize()),
     provideAppInitializer(() => inject(AuthService).initialize()),
   ],
 };

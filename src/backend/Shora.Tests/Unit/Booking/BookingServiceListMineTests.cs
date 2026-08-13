@@ -300,6 +300,7 @@ public class BookingServiceListMineTests
         Assert.True(result.IsSuccess);
         var item = Assert.Single(result.Value!.Items);
         Assert.Equal(MyBookingLabelMapper.CancelledByYou, item.CancellationReasonLabel);
+        Assert.Null(item.CancellationDetail);
         Assert.Equal(MyBookingLabelMapper.RefundBeingProcessed, item.RefundLabel);
     }
 
@@ -325,8 +326,70 @@ public class BookingServiceListMineTests
 
         Assert.True(result.IsSuccess);
         var item = Assert.Single(result.Value!.Items);
-        Assert.Equal(MyBookingLabelMapper.CancelledByConsultant, item.CancellationReasonLabel);
+        Assert.Equal(MyBookingLabelMapper.CancelledByInstructor, item.CancellationReasonLabel);
+        Assert.Null(item.CancellationDetail);
         Assert.Equal(MyBookingLabelMapper.Refunded, item.RefundLabel);
+    }
+
+    [Fact]
+    public async Task ListMine_attributes_approved_cancellation_request_to_the_client_with_reason()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var context = CreateContext();
+        var clientId = Guid.NewGuid();
+        SeedClient(context, clientId);
+
+        var booking = SeedBooking(context, clientId, BookingStatus.Cancelled, FixedNow.AddDays(-1));
+        SeedCancelAudit(context, booking.Id, AuditActor.Admin, FixedNow.AddDays(-1));
+        context.CancellationRequests.Add(new CancellationRequest
+        {
+            Id = Guid.NewGuid(),
+            BookingId = booking.Id,
+            RequestedByClientId = clientId,
+            RequestedAtUtc = FixedNow.AddDays(-2),
+            ClientReason = "  Schedule conflict  ",
+            AutoDeclineAtUtc = FixedNow.AddDays(-1).AddHours(-1),
+            Status = Domain.Enums.CancellationRequestStatus.Approved,
+            ReopenCount = 0
+        });
+
+        await context.SaveChangesAsync(cancellationToken);
+
+        var service = CreateService(context);
+        var result = await service.ListMineAsync(
+            clientId,
+            new MyBookingsQuery(MyBookingsStatusFilter.Past),
+            cancellationToken);
+
+        Assert.True(result.IsSuccess);
+        var item = Assert.Single(result.Value!.Items);
+        Assert.Equal(MyBookingLabelMapper.CancelledByYou, item.CancellationReasonLabel);
+        Assert.Equal("Schedule conflict", item.CancellationDetail);
+    }
+
+    [Fact]
+    public async Task ListMine_enriches_system_cancelled_booking_with_system_label_and_receipt_detail()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var context = CreateContext();
+        var clientId = Guid.NewGuid();
+        SeedClient(context, clientId);
+
+        var booking = SeedBooking(context, clientId, BookingStatus.Cancelled, FixedNow.AddDays(-1));
+        SeedCancelAudit(context, booking.Id, AuditActor.System, FixedNow.AddDays(-1));
+
+        await context.SaveChangesAsync(cancellationToken);
+
+        var service = CreateService(context);
+        var result = await service.ListMineAsync(
+            clientId,
+            new MyBookingsQuery(MyBookingsStatusFilter.Past),
+            cancellationToken);
+
+        Assert.True(result.IsSuccess);
+        var item = Assert.Single(result.Value!.Items);
+        Assert.Equal(MyBookingLabelMapper.CancelledBySystem, item.CancellationReasonLabel);
+        Assert.Equal(MyBookingLabelMapper.ReceiptNotUploadedInTime, item.CancellationDetail);
     }
 
     [Fact]

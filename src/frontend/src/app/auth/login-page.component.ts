@@ -1,9 +1,10 @@
-import { AfterViewInit, Component, inject, OnInit, signal } from '@angular/core';
+import { AfterViewInit, Component, effect, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from '../core/auth/auth.service';
+import { ThemeService } from '../core/theme/theme.service';
 import { readApiError } from '../core/api/api-error.util';
 import { getAuthFieldError } from '../core/forms/auth-field-error.util';
 
@@ -35,7 +36,9 @@ declare global {
 export class LoginPageComponent implements OnInit, AfterViewInit {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
+  private readonly theme = inject(ThemeService);
   private readonly route = inject(ActivatedRoute);
+  private googleButtonReady = false;
 
   readonly errorMessage = signal('');
   readonly infoMessage = signal('');
@@ -50,6 +53,15 @@ export class LoginPageComponent implements OnInit, AfterViewInit {
     password: ['', [Validators.required]],
   });
 
+  constructor() {
+    effect(() => {
+      this.theme.resolved();
+      if (this.googleButtonReady) {
+        this.renderGoogleButton();
+      }
+    });
+  }
+
   ngOnInit(): void {
     if (this.route.snapshot.queryParamMap.get('reason') === 'sessionExpired') {
       this.infoMessage.set('انتهت جلستك. يرجى تسجيل الدخول مرة أخرى.');
@@ -57,6 +69,7 @@ export class LoginPageComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    this.googleButtonReady = true;
     this.renderGoogleButton();
   }
 
@@ -94,6 +107,8 @@ export class LoginPageComponent implements OnInit, AfterViewInit {
       return;
     }
 
+    container.replaceChildren();
+
     window.google.accounts.id.initialize({
       client_id: environment.googleClientId,
       callback: (response) => {
@@ -102,7 +117,7 @@ export class LoginPageComponent implements OnInit, AfterViewInit {
     });
 
     window.google.accounts.id.renderButton(container, {
-      theme: 'outline',
+      theme: this.theme.resolved() === 'dark' ? 'filled_black' : 'outline',
       size: 'large',
       width: 280,
     });

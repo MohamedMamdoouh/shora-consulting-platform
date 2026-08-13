@@ -124,8 +124,16 @@
                       {{ formatStatus(item.status) }}
                     </span>
                   </div>
-                  @if (formatPastBookingNotes(item.status, item.cancellationReasonLabel, item.refundLabel); as notes) {
-                    <p class="booking-row__notes">{{ notes }}</p>
+                  @if (formatPastBookingCancellation(item); as cancellation) {
+                    <div class="booking-row__notes">
+                      <p>{{ cancellation.cancelledBy }}</p>
+                      @if (cancellation.detail) {
+                        <p>السبب: {{ cancellation.detail }}</p>
+                      }
+                      @if (cancellation.refund) {
+                        <p>{{ cancellation.refund }}</p>
+                      }
+                    </div>
                   }
                 </li>
               }

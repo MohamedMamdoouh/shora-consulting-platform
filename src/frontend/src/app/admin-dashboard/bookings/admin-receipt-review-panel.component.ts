@@ -8,6 +8,8 @@ import {
 import { firstValueFrom } from 'rxjs';
 import { readApiError, readApiErrorCode } from '../../core/api/api-error.util';
 import { AdminBookingsService } from '../../core/admin/admin-bookings.service';
+import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
+import { APP_COPY } from '../../core/i18n/app-copy.constants';
 import { readBookingErrorMessage } from '../../booking/booking-error.util';
 import {
   RECEIPT_DECLINE_REASON_OPTIONS,
@@ -36,6 +38,9 @@ type PanelState =
 export class AdminReceiptReviewPanelComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly adminBookingsService = inject(AdminBookingsService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
+
+  protected readonly copy = APP_COPY;
 
   @Input({ required: true }) bookingId!: string;
   @Input({ required: true }) clientDisplayName!: string;
@@ -96,9 +101,11 @@ export class AdminReceiptReviewPanelComponent implements OnInit {
       return;
     }
 
-    const confirmed = window.confirm(
-      `هل تريد قبول إيصال الدفع وتأكيد حجز ${this.clientDisplayName}؟`,
-    );
+    const confirmed = await this.confirmDialog.confirm({
+      title: this.copy.admin.dialog.approveReceiptTitle,
+      message: this.copy.admin.dialog.approveReceiptMessage(this.clientDisplayName),
+      confirmLabel: this.copy.admin.dialog.approveReceiptAction,
+    });
 
     if (!confirmed) {
       return;

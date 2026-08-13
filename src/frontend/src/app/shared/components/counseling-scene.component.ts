@@ -38,7 +38,7 @@ import { Component } from '@angular/core';
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
         <path
           d="M4 6a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H9l-4 3v-3H6a2 2 0 01-2-2V6z"
-          fill="#1A3A3A"
+          fill="var(--color-primary)"
         />
       </svg>
     </div>
@@ -46,7 +46,7 @@ import { Component } from '@angular/core';
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
         <path
           d="M12 20.5l-1.2-1.1C5.4 14.4 2 11.4 2 7.8 2 5 4.2 2.8 7 2.8c1.7 0 3.3.8 4.3 2.1C12.3 3.6 13.9 2.8 15.6 2.8 18.4 2.8 20.6 5 20.6 7.8c0 3.6-3.4 6.6-8.8 11.6L12 20.5z"
-          fill="#7A9E8E"
+          fill="var(--color-accent)"
         />
       </svg>
     </div>

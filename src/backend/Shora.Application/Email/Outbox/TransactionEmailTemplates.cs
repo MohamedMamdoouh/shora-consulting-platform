@@ -37,6 +37,10 @@ internal sealed class TransactionEmailContext
     public DateTime? AutoDeclineAtUtc { get; init; }
 
     public string? ClientReason { get; init; }
+
+    public string? CancellationReasonLabel { get; init; }
+
+    public string? CancellationDetail { get; init; }
 }
 
 internal static class TransactionEmailTemplates
@@ -212,6 +216,8 @@ internal static class TransactionEmailTemplates
             context.Booking.SlotStartUtc,
             context.Booking.SlotEndUtc,
             ConsultantTimeZone);
+        var cancelledBy = TransactionEmailLabels.FormatCancelledBy(context.CancellationReasonLabel);
+        var cancellationDetail = TransactionEmailLabels.FormatCancellationDetail(context.CancellationDetail);
 
         return new EmailTemplateRequest(
             ContentTemplate: "Transaction/client-booking-cancelled.content.html",
@@ -222,7 +228,10 @@ internal static class TransactionEmailTemplates
             RecipientName: context.Recipient.DisplayName,
             FooterNote: "يمكنك حجز موعد جديد في أي وقت.",
             AdditionalTokens: BuildDetailTokens(
-                ("SlotTime", TransactionEmailLabels.HtmlEncode(slotText))));
+                ("SlotTime", TransactionEmailLabels.HtmlEncode(slotText)),
+                ("CancelledBy", TransactionEmailLabels.HtmlEncode(cancelledBy)),
+                ("CancellationDetailItemHtml",
+                    TransactionEmailLabels.OptionalListItem("السبب", cancellationDetail))));
     }
 
     private static EmailTemplateRequest BuildAdminNewCancellationRequest(

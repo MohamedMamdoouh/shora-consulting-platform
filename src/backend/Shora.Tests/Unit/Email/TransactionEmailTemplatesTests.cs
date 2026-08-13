@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Options;
+using Shora.Application.Bookings;
 using Shora.Application.Common;
 using Shora.Application.Email;
 using Shora.Application.Email.Outbox;
@@ -53,6 +54,19 @@ public class TransactionEmailTemplatesTests
 
         Assert.Contains("Shora", subject);
         Assert.False(string.IsNullOrWhiteSpace(subject));
+    }
+
+    [Fact]
+    public void Cancelled_email_includes_who_cancelled_and_system_detail()
+    {
+        var context = CreateContext(OutboxMessageTypes.ClientBookingCancelledEmail);
+        var html = CreateTemplateService().Render(
+            TransactionEmailTemplates.BuildRequest(context, CreateLinks(), "Shora"));
+
+        Assert.Contains("من قام بالإلغاء", html);
+        Assert.Contains("النظام (تلقائيًا)", html);
+        Assert.Contains("لم يُرفَع الإيصال في الوقت المحدد", html);
+        Assert.DoesNotContain("{{", html);
     }
 
     private static TransactionEmailContext CreateContext(string messageType)
@@ -130,7 +144,9 @@ public class TransactionEmailTemplatesTests
             PreviousRefundReference = "REF-OLD",
             CorrectionReason = "تصحيح",
             AutoDeclineAtUtc = now.AddHours(12),
-            ClientReason = "لا أستطيع الحضور"
+            ClientReason = "لا أستطيع الحضور",
+            CancellationReasonLabel = MyBookingLabelMapper.CancelledBySystem,
+            CancellationDetail = MyBookingLabelMapper.ReceiptNotUploadedInTime
         };
     }
 

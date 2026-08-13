@@ -9,6 +9,8 @@ import {
 import { firstValueFrom } from 'rxjs';
 import { readApiError, readApiErrorCode } from '../../core/api/api-error.util';
 import { AdminBookingsService } from '../../core/admin/admin-bookings.service';
+import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
+import { APP_COPY } from '../../core/i18n/app-copy.constants';
 import { readBookingErrorMessage } from '../../booking/booking-error.util';
 import {
   BOOKING_STATUS_OPTIONS,
@@ -64,6 +66,9 @@ type PageState =
 export class AdminBookingsPageComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly adminBookingsService = inject(AdminBookingsService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
+
+  protected readonly copy = APP_COPY;
 
   readonly pageState = signal<PageState>({ status: 'loading' });
   readonly currentPage = signal<number>(ADMIN_BOOKINGS_QUERY_LIMITS.defaultPage);
@@ -198,7 +203,12 @@ export class AdminBookingsPageComponent implements OnInit {
       return;
     }
 
-    const confirmed = window.confirm(buildDirectCancelConfirmMessage(item));
+    const confirmed = await this.confirmDialog.confirm({
+      title: this.copy.admin.dialog.cancelBookingTitle,
+      message: buildDirectCancelConfirmMessage(item),
+      confirmLabel: this.copy.admin.dialog.cancelBookingAction,
+      variant: 'danger',
+    });
 
     if (!confirmed) {
       return;
@@ -234,7 +244,12 @@ export class AdminBookingsPageComponent implements OnInit {
       return queueNote;
     }
 
-    return this.formatCancellationNote(item.status, item.cancellationReasonLabel, item.refundDue);
+    return this.formatCancellationNote(
+      item.status,
+      item.cancellationReasonLabel,
+      item.refundDue,
+      item.cancellationDetail,
+    );
   }
 
   async loadBookings(page: number): Promise<void> {

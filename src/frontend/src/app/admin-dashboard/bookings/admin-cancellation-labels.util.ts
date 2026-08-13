@@ -2,6 +2,7 @@ import {
   AdminBookingListItem,
   CancellationDecisionReasonCode,
 } from '@contracts/booking';
+import { APP_COPY } from '../../core/i18n/app-copy.constants';
 import { formatDateTime } from '../../core/i18n/app-locale';
 
 export const CANCELLATION_DECISION_REASON_OPTIONS: ReadonlyArray<{
@@ -86,9 +87,7 @@ export function formatCancellationQueueNote(item: AdminBookingListItem): string 
 
 export function buildDirectCancelConfirmMessage(item: AdminBookingListItem): string {
   const refundNote =
-    item.paymentStatus === 'Approved'
-      ? ' سيتم وضع علامة «استرداد مستحق» لأن الدفع مقبول.'
-      : '';
+    item.paymentStatus === 'Approved' ? APP_COPY.admin.dialog.refundDueNote : '';
 
-  return `هل تريد إلغاء حجز ${item.clientDisplayName}؟${refundNote}`;
+  return APP_COPY.admin.dialog.cancelBookingMessage(item.clientDisplayName, refundNote);
 }

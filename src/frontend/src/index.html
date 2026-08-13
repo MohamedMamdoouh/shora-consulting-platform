@@ -9,6 +9,7 @@
       name="description"
       content="موقع دكتور محمود البنا لحجز جلسات استشارية فردية في العلاقات — مباشرة معي، بخصوصية تامة."
     />
+    <meta name="color-scheme" content="light dark" />
     <link rel="icon" href="logo.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="logo.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -17,6 +18,21 @@
       href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('shora.theme');
+          var theme =
+            stored === 'light' || stored === 'dark'
+              ? stored
+              : window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light';
+          document.documentElement.setAttribute('data-theme', theme);
+          document.documentElement.style.colorScheme = theme;
+        } catch (e) {}
+      })();
+    </script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
   </head>
 

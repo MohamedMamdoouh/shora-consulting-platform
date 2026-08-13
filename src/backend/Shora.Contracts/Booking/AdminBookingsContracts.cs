@@ -39,6 +39,7 @@ public sealed record AdminBookingListItem(
     DateTime SlotEndUtc,
     string Status,
     string? CancellationReasonLabel,
+    string? CancellationDetail,
     Guid? PaymentId,
     string? PaymentStatus,
     bool RefundDue,

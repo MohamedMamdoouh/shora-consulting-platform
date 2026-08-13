@@ -6,16 +6,55 @@
         <span class="shell__brand-name">{{ copy.brand.name }}</span>
       </a>
 
-      <button
-        type="button"
-        class="shell__menu-toggle"
-        [attr.aria-expanded]="navOpen"
-        aria-controls="shell-nav"
-        (click)="toggleNav()"
-      >
-        <span class="sr-only">{{ navOpen ? copy.nav.closeMenu : copy.nav.openMenu }}</span>
-        <span class="shell__menu-icon" aria-hidden="true"></span>
-      </button>
+      <div class="shell__actions">
+        <button
+          type="button"
+          class="shell__theme-toggle"
+          [attr.aria-label]="themeLabel()"
+          (click)="cycleTheme()"
+        >
+          @switch (theme.preference()) {
+            @case ('light') {
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.75" />
+                <path
+                  d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M5.6 5.6l1.1 1.1M17.3 17.3l1.1 1.1M5.6 18.4l1.1-1.1M17.3 6.7l1.1-1.1"
+                  stroke="currentColor"
+                  stroke-width="1.75"
+                  stroke-linecap="round"
+                />
+              </svg>
+            }
+            @case ('dark') {
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+                <path
+                  d="M15.5 3.5A8.5 8.5 0 105 16.8 7 7 0 0115.5 3.5z"
+                  stroke="currentColor"
+                  stroke-width="1.75"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            }
+            @default {
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.75" />
+                <path d="M12 4a8 8 0 000 16V4z" fill="currentColor" />
+              </svg>
+            }
+          }
+        </button>
+
+        <button
+          type="button"
+          class="shell__menu-toggle"
+          [attr.aria-expanded]="navOpen"
+          aria-controls="shell-nav"
+          (click)="toggleNav()"
+        >
+          <span class="sr-only">{{ navOpen ? copy.nav.closeMenu : copy.nav.openMenu }}</span>
+          <span class="shell__menu-icon" aria-hidden="true"></span>
+        </button>
+      </div>
 
       <nav id="shell-nav" class="shell__nav" [class.shell__nav--open]="navOpen">
         <a

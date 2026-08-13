@@ -81,6 +81,7 @@ export interface MyBookingListItem {
   contactPhone?: string | null;
   status: BookingStatus;
   cancellationReasonLabel?: string | null;
+  cancellationDetail?: string | null;
   refundLabel?: string | null;
   cancellationRequest?: MyBookingCancellationRequestMetadata | null;
   paymentSummary?: MyBookingPaymentSummary | null;
@@ -120,6 +121,7 @@ export interface AdminBookingListItem {
   slotEndUtc: string;
   status: BookingStatus;
   cancellationReasonLabel?: string | null;
+  cancellationDetail?: string | null;
   paymentId?: string | null;
   paymentStatus?: string | null;
   refundDue: boolean;

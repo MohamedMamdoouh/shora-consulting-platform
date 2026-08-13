@@ -1,5 +1,8 @@
 import { BookingStatus, DeliveryMethod } from '@contracts/booking';
-import { localizeCancellationReasonLabel } from '../../client-dashboard/client-dashboard-labels.util';
+import {
+  localizeCancellationDetail,
+  localizeCancellationReasonLabel,
+} from '../../client-dashboard/client-dashboard-labels.util';
 import { formatSlotRange } from '../../client-dashboard/client-dashboard-slot.util';
 
 export const BOOKING_STATUS_OPTIONS: ReadonlyArray<{ value: '' | BookingStatus; label: string }> = [
@@ -35,6 +38,7 @@ export function formatCancellationNote(
   status: BookingStatus,
   cancellationReasonLabel?: string | null,
   refundDue?: boolean,
+  cancellationDetail?: string | null,
 ): string | null {
   if (status !== 'Cancelled' && !refundDue) {
     return null;
@@ -42,9 +46,14 @@ export function formatCancellationNote(
 
   const parts: string[] = [];
 
-  const localizedReason = localizeCancellationReasonLabel(cancellationReasonLabel);
+  const localizedReason = localizeCancellationReasonLabel(cancellationReasonLabel, 'admin');
   if (localizedReason) {
     parts.push(localizedReason);
+  }
+
+  const localizedDetail = localizeCancellationDetail(cancellationDetail);
+  if (localizedDetail) {
+    parts.push(`السبب: ${localizedDetail}`);
   }
 
   if (refundDue) {

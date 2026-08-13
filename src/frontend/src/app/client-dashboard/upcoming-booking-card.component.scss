@@ -78,8 +78,8 @@
   margin-top: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
   border-radius: var(--radius-md);
-  background: #128c7e;
-  color: #fff;
+  background: var(--color-whatsapp);
+  color: var(--color-on-whatsapp);
   font-size: var(--font-size-sm);
   font-weight: 600;
   text-decoration: none;
@@ -88,7 +88,7 @@
 
 .upcoming-booking-card__chat-link:hover {
   filter: brightness(0.95);
-  color: #fff;
+  color: var(--color-on-whatsapp);
 }
 
 .upcoming-booking-card__cancellation {

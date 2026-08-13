@@ -1,4 +1,5 @@
 using System.Net;
+using Shora.Application.Bookings;
 using Shora.Domain.Constants;
 using Shora.Domain.Entities;
 using Shora.Domain.Enums;
@@ -37,6 +38,34 @@ internal static class TransactionEmailLabels
             null or "" => "—",
             _ => reasonCode
         };
+
+    public static string FormatCancelledBy(string? label) =>
+        label switch
+        {
+            MyBookingLabelMapper.CancelledByYou => "أنت",
+            MyBookingLabelMapper.CancelledByInstructor => "المستشار",
+            MyBookingLabelMapper.CancelledBySystem => "النظام (تلقائيًا)",
+            null or "" => "—",
+            _ => label
+        };
+
+    public static string? FormatCancellationDetail(string? detail) =>
+        detail switch
+        {
+            MyBookingLabelMapper.ReceiptNotUploadedInTime => "لم يُرفع الإيصال في الوقت المحدد",
+            null or "" => null,
+            _ => detail.Trim()
+        };
+
+    public static string OptionalListItem(string label, string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return string.Empty;
+        }
+
+        return $"<li><strong>{HtmlEncode(label)}:</strong> {HtmlEncode(value)}</li>";
+    }
 
     public static string FormatSlotRange(DateTime slotStartUtc, DateTime slotEndUtc, TimeZoneInfo timeZone)
     {

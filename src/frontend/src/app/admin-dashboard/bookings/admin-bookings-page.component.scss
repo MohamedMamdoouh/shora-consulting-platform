@@ -61,12 +61,37 @@
 }
 
 .admin-bookings__status {
-  display: inline-block;
-  padding: 0.125rem var(--space-sm);
-  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.625rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
   background: var(--color-primary-muted);
+  color: var(--color-text);
   font-size: var(--admin-font-size-sm);
   font-weight: 600;
+  white-space: nowrap;
+}
+
+.admin-bookings__status[data-status='Confirmed'],
+.admin-bookings__status[data-status='Completed'] {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border-color: var(--color-success-border);
+}
+
+.admin-bookings__status[data-status='Cancelled'] {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+  border-color: var(--color-error-border);
+}
+
+.admin-bookings__status[data-status='PendingPayment'],
+.admin-bookings__status[data-status='PendingApproval'],
+.admin-bookings__status[data-status='CancellationRequested'] {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  border-color: var(--color-warning-border);
 }
 
 .admin-bookings__note-cell {
@@ -95,6 +120,8 @@
 .admin-bookings__actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
   gap: var(--space-xs);
 }
 

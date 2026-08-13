@@ -13,6 +13,8 @@ import { AdminBookingListItem, CancellationDecisionReasonCode } from '@contracts
 import { firstValueFrom } from 'rxjs';
 import { readApiError, readApiErrorCode } from '../../core/api/api-error.util';
 import { AdminBookingsService } from '../../core/admin/admin-bookings.service';
+import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
+import { APP_COPY } from '../../core/i18n/app-copy.constants';
 import { readBookingErrorMessage } from '../../booking/booking-error.util';
 import {
   CANCELLATION_DECISION_REASON_OPTIONS,
@@ -29,6 +31,9 @@ import {
 export class AdminCancellationReviewPanelComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly adminBookingsService = inject(AdminBookingsService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
+
+  protected readonly copy = APP_COPY;
 
   @Input({ required: true }) item!: AdminBookingListItem;
 
@@ -73,13 +78,16 @@ export class AdminCancellationReviewPanelComponent implements OnInit, OnDestroy 
     }
 
     const refundNote =
-      this.item.paymentStatus === 'Approved'
-        ? ' سيتم وضع علامة «استرداد مستحق» لأن الدفع مقبول.'
-        : '';
+      this.item.paymentStatus === 'Approved' ? this.copy.admin.dialog.refundDueNote : '';
 
-    const confirmed = window.confirm(
-      `هل تريد الموافقة على إلغاء حجز ${this.item.clientDisplayName}؟${refundNote}`,
-    );
+    const confirmed = await this.confirmDialog.confirm({
+      title: this.copy.admin.dialog.approveCancellationTitle,
+      message: this.copy.admin.dialog.approveCancellationMessage(
+        this.item.clientDisplayName,
+        refundNote,
+      ),
+      confirmLabel: this.copy.admin.dialog.approveCancellationAction,
+    });
 
     if (!confirmed) {
       return;

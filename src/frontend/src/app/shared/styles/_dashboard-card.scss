@@ -83,9 +83,9 @@
 }
 
 .dashboard-card__link--whatsapp {
-  color: #128c7e;
+  color: var(--color-whatsapp);
 
   &:hover {
-    color: #0d6b60;
+    color: var(--color-whatsapp-hover);
   }
 }

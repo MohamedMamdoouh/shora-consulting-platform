@@ -19,11 +19,11 @@ import { BookingCtaComponent } from '../../public/shared/booking-cta.component';
       <div class="footer-cta__visual" aria-hidden="true">
         <div class="footer-cta__icon footer-cta__icon--calendar">
           <svg viewBox="0 0 48 48" width="40" height="40" fill="none">
-            <rect x="8" y="12" width="32" height="28" rx="6" fill="#1A3A3A" opacity="0.12" />
-            <rect x="8" y="12" width="32" height="28" rx="6" stroke="#1A3A3A" stroke-width="2" />
-            <path d="M8 20h32" stroke="#1A3A3A" stroke-width="2" />
-            <path d="M18 8v8M30 8v8" stroke="#1A3A3A" stroke-width="2" stroke-linecap="round" />
-            <rect x="16" y="26" width="6" height="6" rx="1.5" fill="#1A3A3A" />
+            <rect x="8" y="12" width="32" height="28" rx="6" fill="currentColor" opacity="0.12" />
+            <rect x="8" y="12" width="32" height="28" rx="6" stroke="currentColor" stroke-width="2" />
+            <path d="M8 20h32" stroke="currentColor" stroke-width="2" />
+            <path d="M18 8v8M30 8v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            <rect x="16" y="26" width="6" height="6" rx="1.5" fill="currentColor" />
           </svg>
         </div>
       </div>
@@ -85,6 +85,7 @@ import { BookingCtaComponent } from '../../public/shared/booking-cta.component';
       top: 50%;
       transform: translateY(-50%);
       padding: var(--space-sm);
+      color: var(--color-primary);
     }
 
     @media (min-width: 768px) {

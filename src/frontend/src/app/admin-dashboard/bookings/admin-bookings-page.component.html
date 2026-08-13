@@ -2,7 +2,7 @@
   <header class="admin-bookings__header">
     <h2>الحجوزات</h2>
     <p class="admin-bookings__note">
-      جميع حجوزات العملاء — الأوقات معروضة بتوقيت متصفحك المحلي. استخدم تصفية «ملغاة» لمعالجة
+      جميع حجوزات العملاء — الأوقات معروضة بتوقيت متصفحك المحلي. استخدم فلتر «ملغاة» لمعالجة
       الاستردادات المستحقة.
     </p>
   </header>
@@ -40,7 +40,7 @@
     </label>
 
     <div class="admin-bookings__filter-actions">
-      <button type="submit" class="btn">تطبيق التصفية</button>
+      <button type="submit" class="btn">تطبيق الفلتر</button>
     </div>
   </form>
 
@@ -61,7 +61,7 @@
 
     @case ('ready') {
       @if (state.items.length === 0) {
-        <p class="admin-bookings__state">لا توجد حجوزات مطابقة للتصفية.</p>
+        <p class="admin-bookings__state">لا توجد حجوزات مطابقة للفلتر.</p>
       } @else {
         <div class="admin-bookings__table-wrap">
           <table class="admin-bookings__table">
@@ -87,13 +87,11 @@
                   <td>{{ formatDeliveryMethod(item.deliveryMethod) }}</td>
                   <td>{{ item.contactPhone ?? '—' }}</td>
                   <td>
-                    <span class="admin-bookings__status">{{
+                    <span class="admin-bookings__status" [attr.data-status]="item.status">{{
                       formatBookingStatus(item.status)
                     }}</span>
                   </td>
-                  <td
-                    [class.admin-bookings__cell--placeholder]="!formatRowNote(item)"
-                  >
+                  <td [class.admin-bookings__cell--placeholder]="!formatRowNote(item)">
                     @if (formatRowNote(item); as note) {
                       <span class="admin-bookings__note-cell">{{ note }}</span>
                     } @else {
@@ -179,8 +177,7 @@
           السابق
         </button>
         <p class="pagination__info">
-          صفحة {{ state.page }} من
-          {{ totalPages(state.totalCount, state.pageSize) }} ({{
+          صفحة {{ state.page }} من {{ totalPages(state.totalCount, state.pageSize) }} ({{
             state.totalCount
           }}
           حجز)

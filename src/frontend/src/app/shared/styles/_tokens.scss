@@ -1,6 +1,8 @@
 /* Shora Design System — Forest Sanctuary (reference-aligned) */
 
 :root {
+  color-scheme: light;
+
   /* Palette */
   --color-background: #fdfbf7;
   --color-paper: #ffffff;
@@ -44,6 +46,10 @@
   --color-border: rgba(26, 46, 42, 0.1);
   --color-border-subtle: rgba(26, 46, 42, 0.05);
   --color-header: rgba(253, 251, 247, 0.94);
+  --color-overlay: rgb(0 0 0 / 45%);
+  --color-whatsapp: #128c7e;
+  --color-whatsapp-hover: #0d6b60;
+  --color-on-whatsapp: #ffffff;
 
   /* Gradients */
   --gradient-brand: linear-gradient(135deg, #1a3a3a 0%, #234848 100%);
@@ -156,4 +162,93 @@
   --transition-fast: 150ms ease;
   --transition-base: 280ms cubic-bezier(0.22, 1, 0.36, 1);
   --transition-arch: 680ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-background: #0e1715;
+  --color-paper: #16211e;
+  --color-linen: #121c19;
+  --color-surface: #16211e;
+  --color-surface-elevated: #1c2a26;
+  --color-ink: #e6efe9;
+  --color-text: var(--color-ink);
+  --color-text-muted: #9bb0a6;
+  --color-text-subtle: #7a9088;
+
+  --color-primary: #8fb9ab;
+  --color-primary-hover: #a3c9bc;
+  --color-primary-light: #6d9a8c;
+  --color-primary-muted: rgba(143, 185, 171, 0.16);
+  --color-primary-subtle: rgba(143, 185, 171, 0.08);
+  --color-primary-soft: #1a2e2a;
+  --color-on-primary: #0e1715;
+
+  --color-accent: #8fb9ab;
+  --color-accent-hover: #a3c9bc;
+  --color-accent-muted: rgba(143, 185, 171, 0.18);
+  --color-sage: #6d9a8c;
+  --color-sage-muted: rgba(143, 185, 171, 0.16);
+  --color-sand: #24332e;
+  --color-sand-muted: rgba(36, 51, 46, 0.85);
+  --color-beige: #1c2a26;
+  --color-coral: #c4a67a;
+
+  --color-glow: var(--color-sage);
+  --color-glow-muted: rgba(143, 185, 171, 0.12);
+
+  --color-border: rgba(230, 239, 233, 0.12);
+  --color-border-subtle: rgba(230, 239, 233, 0.06);
+  --color-header: rgba(14, 23, 21, 0.92);
+  --color-overlay: rgb(0 0 0 / 60%);
+
+  --gradient-brand: linear-gradient(135deg, #6d9a8c 0%, #8fb9ab 100%);
+  --gradient-brand-hover: linear-gradient(135deg, #8fb9ab 0%, #a3c9bc 100%);
+  --gradient-text: linear-gradient(135deg, #c5ddd4 0%, #8fb9ab 100%);
+  --gradient-bg-soft: linear-gradient(180deg, #0e1715 0%, #121c19 100%);
+  --gradient-hero-glow: radial-gradient(
+    ellipse 80% 60% at 30% 40%,
+    rgba(143, 185, 171, 0.14) 0%,
+    transparent 70%
+  );
+  --gradient-cta-banner: linear-gradient(135deg, #1a2e2a 0%, #16211e 100%);
+
+  --color-success: #7dba9a;
+  --color-success-bg: rgba(45, 106, 79, 0.28);
+  --color-success-border: rgba(125, 186, 154, 0.35);
+  --color-warning: #d4b07a;
+  --color-warning-bg: rgba(154, 107, 46, 0.22);
+  --color-warning-border: rgba(212, 176, 122, 0.35);
+  --color-error: #e07a70;
+  --color-error-hover: #ec938b;
+  --color-error-bg: rgba(192, 57, 43, 0.22);
+  --color-error-border: rgba(224, 122, 112, 0.35);
+  --color-info: #8fb3bd;
+  --color-info-bg: rgba(74, 102, 112, 0.28);
+  --color-info-border: rgba(143, 179, 189, 0.35);
+
+  --color-topic-purple: #8fb9ab;
+  --color-topic-purple-bg: rgba(143, 185, 171, 0.16);
+  --color-topic-green: #7dba9a;
+  --color-topic-green-bg: rgba(125, 186, 154, 0.16);
+  --color-topic-orange: #c4a67a;
+  --color-topic-orange-bg: rgba(196, 166, 122, 0.16);
+  --color-topic-pink: #a3b392;
+  --color-topic-pink-bg: rgba(163, 179, 146, 0.16);
+  --color-topic-sky: #7aa8b6;
+  --color-topic-sky-bg: rgba(122, 168, 182, 0.16);
+
+  --color-card-purple: var(--color-surface);
+  --color-card-green: var(--color-surface);
+  --color-card-peach: var(--color-surface);
+  --color-card-lavender: var(--color-surface);
+  --color-card-sky: var(--color-surface);
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.28);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.36);
+  --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.44);
+  --shadow-header: 0 2px 16px rgba(0, 0, 0, 0.28);
+  --shadow-card: 0 2px 16px rgba(0, 0, 0, 0.32);
+  --shadow-card-hover: 0 8px 28px rgba(0, 0, 0, 0.4);
 }

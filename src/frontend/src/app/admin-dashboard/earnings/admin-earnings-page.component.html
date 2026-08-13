@@ -19,7 +19,7 @@
     </label>
 
     <div class="admin-earnings__filter-actions">
-      <button type="submit" class="btn">تطبيق التصفية</button>
+      <button type="submit" class="btn">تطبيق الفلتر</button>
     </div>
   </form>
 
@@ -40,7 +40,9 @@
       <div class="admin-earnings__summary">
         <article class="admin-earnings__card admin-earnings__card--primary">
           <h3>إجمالي الإيرادات</h3>
-          <p class="admin-earnings__amount">{{ formatEarningsAmount(state.earnings.grossRevenue) }}</p>
+          <p class="admin-earnings__amount">
+            {{ formatEarningsAmount(state.earnings.grossRevenue) }}
+          </p>
           <p class="admin-earnings__meta">
             {{ formatEarningsCount(state.earnings.approvedCount, 'دفعة مقبولة', 'دفعات مقبولة') }}
           </p>
@@ -48,15 +50,21 @@
 
         <article class="admin-earnings__card">
           <h3>المبالغ المستردة</h3>
-          <p class="admin-earnings__amount">{{ formatEarningsAmount(state.earnings.refundedAmount) }}</p>
+          <p class="admin-earnings__amount">
+            {{ formatEarningsAmount(state.earnings.refundedAmount) }}
+          </p>
           <p class="admin-earnings__meta">
-            {{ formatEarningsCount(state.earnings.refundedCount, 'استرداد مسجل', 'استردادات مسجلة') }}
+            {{
+              formatEarningsCount(state.earnings.refundedCount, 'استرداد مسجل', 'استردادات مسجلة')
+            }}
           </p>
         </article>
 
         <article class="admin-earnings__card admin-earnings__card--highlight">
           <h3>صافي الإيرادات</h3>
-          <p class="admin-earnings__amount">{{ formatEarningsAmount(state.earnings.netRevenue) }}</p>
+          <p class="admin-earnings__amount">
+            {{ formatEarningsAmount(state.earnings.netRevenue) }}
+          </p>
           <p class="admin-earnings__meta">بعد خصم الاستردادات المسجلة</p>
         </article>
 

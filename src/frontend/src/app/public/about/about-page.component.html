@@ -10,24 +10,18 @@
   <article class="section">
     <h2 class="section-heading">{{ copy.about.whoHeading }}</h2>
     <p>{{ copy.about.whoParagraph1 }}</p>
-    <p>{{ copy.about.whoParagraph2 }}</p>
   </article>
 
-  <article class="section">
+  <article class="section about__approach">
     <h2 class="section-heading">{{ copy.about.approachHeading }}</h2>
-    <ul class="about__list">
+    <ul class="about__approach-list">
       @for (item of copy.about.approachItems; track item.title) {
-        <li><strong>{{ item.title }}</strong> — {{ item.body }}</li>
+        <li class="about__approach-item">
+          <h3 class="about__approach-item-title">{{ item.title }}</h3>
+          <p class="about__approach-item-body">{{ item.body }}</p>
+        </li>
       }
     </ul>
-  </article>
-
-  <article class="section about__privacy">
-    <h2 class="section-heading">{{ copy.about.privacyHeading }}</h2>
-    <p>
-      {{ copy.about.privacyBodyPrefix }}
-      <a routerLink="/privacy">{{ copy.about.privacyLink }}</a>.
-    </p>
   </article>
 
   <app-footer-cta-banner />

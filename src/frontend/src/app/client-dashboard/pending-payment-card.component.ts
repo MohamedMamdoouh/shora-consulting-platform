@@ -7,6 +7,7 @@ import { readApiError, readApiErrorCode } from '../core/api/api-error.util';
 import { BookingService } from '../core/booking/booking.service';
 import { readBookingErrorMessage } from '../booking/booking-error.util';
 import { getPendingPaymentInstructions } from './pending-payment.util';
+import { APP_COPY } from '../core/i18n/app-copy.constants';
 
 @Component({
   selector: 'app-pending-payment-card',
@@ -16,6 +17,8 @@ import { getPendingPaymentInstructions } from './pending-payment.util';
 })
 export class PendingPaymentCardComponent {
   private readonly bookingService = inject(BookingService);
+
+  protected readonly copy = APP_COPY;
 
   @Input({ required: true }) item!: MyBookingListItem;
   @Input({ required: true }) slotLabel!: string;
@@ -53,7 +56,7 @@ export class PendingPaymentCardComponent {
       const code = readApiErrorCode(err);
       this.cancelError = readBookingErrorMessage(
         code,
-        readApiError(err, 'تعذّر إلغاء الحجز. حاول مرة أخرى.'),
+        readApiError(err, 'تعذر إلغاء الحجز. حاول مرة أخرى.'),
       );
     } finally {
       this.cancelling = false;

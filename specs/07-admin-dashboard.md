@@ -137,7 +137,7 @@ Status: **Done** (sub-phases 07a–07o). Payment receipt review, approve/decline
 
 ## 1. Purpose
 
-The single consultant's control panel: manage availability, edit the session price/duration, view and manage bookings, and see a basic earnings overview. Accessible only to the seeded `Admin` account (per spec 02).
+The single practitioner's personal admin panel: manage availability, edit the session price/duration, view and manage bookings, and see a basic earnings overview. Accessible only to the seeded `Admin` account (per spec 02).
 
 ## 2. Page: `/admin/availability`
 

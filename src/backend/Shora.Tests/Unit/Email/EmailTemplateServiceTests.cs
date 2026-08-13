@@ -22,7 +22,7 @@ public class EmailTemplateServiceTests
         Assert.Contains("lang=\"ar\"", html);
         Assert.Contains("dir=\"rtl\"", html);
         Assert.Contains("#4a5748", html);
-        Assert.Contains("شورى", html);
+        Assert.Contains("محمود البنا", html);
         Assert.Contains("Alex", html);
         Assert.Contains("https://example.com/action", html);
         Assert.DoesNotContain("{{", html);

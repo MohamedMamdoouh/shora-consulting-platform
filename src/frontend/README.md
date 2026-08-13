@@ -1,6 +1,6 @@
 # Shora Web (Angular 21)
 
-RTL frontend for the Shora booking platform. API contracts live in `src/contracts/`; HTTP calls use `@contracts/*` types aligned with `Shora.Contracts`.
+RTL frontend for the Shora personal practice booking site. API contracts live in `src/contracts/`; HTTP calls use `@contracts/*` types aligned with `Shora.Contracts`.
 
 ## Development server
 
@@ -35,7 +35,7 @@ Open `http://localhost:4200/`. The dev server proxies `/api` to the backend (`pr
 
 ### Admin dashboard
 
-- **Settings** — consultant pricing, session duration, payment numbers
+- **Settings** — session pricing, duration, payment numbers
 - **Availability** — recurring windows + blocked date ranges
 - **Bookings** — filters, pagination, receipt review, cancellation queue, direct cancel, refund record/revoke
 - **Earnings** — gross / refunded / net summary with date filters

@@ -6,42 +6,35 @@
 
 .services {
   display: grid;
-  gap: var(--space-2xl);
+  gap: var(--space-md);
 }
 
 .section--topics {
-  padding-top: var(--space-xl);
+  padding-top: var(--space-md);
 }
 
 .section__centered-header {
   display: grid;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-2xl);
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
   text-align: center;
 }
 
 .section__title {
   margin: 0;
-  font-size: var(--font-size-2xl);
+  font-size: var(--font-size-xl);
   font-weight: 800;
-}
-
-.section__subtitle {
-  margin: 0 auto;
-  max-width: 42ch;
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
 }
 
 .topics-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-lg);
+  gap: var(--space-md);
 }
 
 .section--info .section-heading {
   text-align: start;
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-md);
 }
 
 @media (max-width: 640px) {

@@ -174,7 +174,7 @@ export class ClientDashboardComponent implements OnInit {
     } catch (error) {
       this.assignSection(filter, {
         status: 'error',
-        message: readApiError(error, 'تعذّر تحميل الحجوزات. حاول مرة أخرى.'),
+        message: readApiError(error, 'تعذر تحميل الحجوزات. حاول مرة أخرى.'),
       });
     }
   }

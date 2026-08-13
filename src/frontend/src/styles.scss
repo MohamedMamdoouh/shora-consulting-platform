@@ -1,4 +1,4 @@
-/* Shora Design System — Soft Lavender */
+/* Shora Design System — Forest Sanctuary */
 
 @use './app/shared/styles/tokens';
 @use './app/shared/styles/icons';
@@ -192,14 +192,15 @@ button.secondary:hover,
 }
 
 .btn--glow {
-  background: var(--color-glow);
-  border-color: var(--color-glow);
-  color: var(--color-ink);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-primary);
 }
 
 .btn--glow:hover {
-  filter: brightness(0.95);
-  color: var(--color-ink);
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+  color: var(--color-on-primary);
 }
 
 .btn--sm {
@@ -221,7 +222,7 @@ textarea {
   width: 100%;
   padding: 0.75rem 1rem;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   background: var(--color-surface);
   color: var(--color-text);
   font: inherit;
@@ -421,8 +422,8 @@ label.field > span:first-child {
 .section-heading {
   position: relative;
   text-align: start;
-  padding-inline-start: var(--space-lg);
-  margin: 0 0 var(--space-xl);
+  padding-inline-start: var(--space-md);
+  margin: 0 0 var(--space-md);
   font-size: var(--font-size-xl);
   font-weight: 800;
 }
@@ -461,7 +462,7 @@ label.field > span:first-child {
   gap: var(--space-xs);
   padding: var(--space-md) var(--space-lg);
   margin-bottom: var(--space-lg);
-  background: var(--color-lavender-muted);
+  background: var(--color-sage-muted);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
 }
@@ -481,7 +482,7 @@ label.field > span:first-child {
 .summary-list {
   display: grid;
   gap: 0;
-  margin: 0 0 var(--space-lg);
+  margin: 0 0 var(--space-md);
   padding: 0;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
@@ -629,7 +630,7 @@ label.field > span:first-child {
 .transfer-list {
   display: grid;
   gap: 0;
-  margin: 0 0 var(--space-lg);
+  margin: 0 0 var(--space-md);
   padding: 0;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
@@ -750,7 +751,7 @@ label.field > span:first-child {
 
 .admin-table th,
 .admin-bookings__table th {
-  background: var(--color-lavender-muted);
+  background: var(--color-sage-muted);
   font-weight: 600;
   color: var(--color-text-muted);
   font-size: var(--admin-font-size-sm);

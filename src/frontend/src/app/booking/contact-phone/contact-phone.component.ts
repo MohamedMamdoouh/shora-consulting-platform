@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { BookingFlowStateService } from '../booking-flow-state.service';
+import { APP_COPY } from '../../core/i18n/app-copy.constants';
 import { formatSlotSummary } from '../utils/slot-grouping.util';
 import { BookingStepIndicatorComponent } from '../shared/booking-step-indicator.component';
 
@@ -17,6 +18,8 @@ export class ContactPhoneComponent {
   private readonly fb = inject(FormBuilder);
   private readonly bookingFlow = inject(BookingFlowStateService);
   private readonly router = inject(Router);
+
+  protected readonly copy = APP_COPY;
 
   readonly slotSummary = formatSlotSummary(this.bookingFlow.getState()!.slotStartUtc);
 

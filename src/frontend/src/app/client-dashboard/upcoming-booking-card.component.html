@@ -19,25 +19,25 @@
       <p class="upcoming-booking-card__instruction">{{ instruction }}</p>
     } @else {
       <p class="upcoming-booking-card__instruction upcoming-booking-card__instruction--muted">
-        لم يسجل رقم للمكالمة. تواصل مع المستشار إذا احتجت مساعدة.
+        {{ copy.client.noPhoneOnFile }}
       </p>
     }
   } @else if (whatsAppChatUrl; as chatUrl) {
     <div class="upcoming-booking-card__instruction">
-      <p>عند موعد الجلسة، اضغط على الرابط لبدء المحادثة مع المستشار عبر واتساب.</p>
+      <p>{{ copy.client.whatsAppSessionHint }}</p>
       <a [href]="chatUrl" target="_blank" rel="noopener noreferrer" class="upcoming-booking-card__chat-link">
         فتح محادثة واتساب
       </a>
     </div>
   } @else {
     <p class="upcoming-booking-card__instruction upcoming-booking-card__instruction--muted">
-      تعذر تحميل رابط واتساب. تواصل مع المستشار إذا احتجت مساعدة.
+      {{ copy.client.whatsAppLinkError }}
     </p>
   }
 
   @if (showPendingCancellation) {
     <div class="upcoming-booking-card__cancellation upcoming-booking-card__cancellation--pending" role="status">
-      <p>طلب الإلغاء قيد المراجعة — بانتظار قرار المستشار.</p>
+      <p>{{ copy.client.cancellationPending }}</p>
     </div>
   }
 
@@ -92,14 +92,14 @@
   @if (showWhatsAppFallback) {
     <div class="upcoming-booking-card__cancellation upcoming-booking-card__cancellation--whatsapp">
       <p>
-        لإلغاء الحجز قرب موعد الجلسة، تواصل مع المستشار على واتساب
+        {{ copy.client.cancelNearSessionPrefix }}
         @if (item.consultantWhatsAppNumber; as whatsAppNumber) {
           : <span dir="ltr">{{ whatsAppNumber }}</span>
         }.
       </p>
       @if (consultantWhatsAppContactUrl; as contactUrl) {
         <a [href]="contactUrl" target="_blank" rel="noopener noreferrer" class="upcoming-booking-card__chat-link">
-          مراسلة المستشار على واتساب
+          {{ copy.client.whatsAppContact }}
         </a>
       }
     </div>

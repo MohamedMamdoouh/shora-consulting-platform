@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { readApiError, readApiErrorCode } from '../../core/api/api-error.util';
 import { BookingService } from '../../core/booking/booking.service';
 import { readBookingErrorMessage } from '../booking-error.util';
+import { APP_COPY } from '../../core/i18n/app-copy.constants';
 import { PaymentInstructionsPanelComponent } from '../shared/payment-instructions-panel.component';
 import { BookingStepIndicatorComponent } from '../shared/booking-step-indicator.component';
 
@@ -25,6 +26,7 @@ export class PaymentInstructionsComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly bookingService = inject(BookingService);
 
+  protected readonly copy = APP_COPY;
   viewModel: PaymentInstructionsViewModel = { status: 'loading' };
   bookingId: string | null = null;
 

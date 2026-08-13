@@ -1,80 +1,88 @@
-/* Shora Design System — Soft Lavender (reference-aligned) */
+/* Shora Design System — Forest Sanctuary (reference-aligned) */
 
 :root {
   /* Palette */
-  --color-background: #f9fafc;
+  --color-background: #fdfbf7;
   --color-paper: #ffffff;
-  --color-linen: #f4f6fa;
+  --color-linen: #f5f1ea;
   --color-surface: #ffffff;
   --color-surface-elevated: #ffffff;
-  --color-ink: #1e293b;
+  --color-ink: #1a2e2a;
   --color-text: var(--color-ink);
-  --color-text-muted: #64748b;
-  --color-text-subtle: #94a3b8;
+  --color-text-muted: #5c7268;
+  --color-text-subtle: #8a9e94;
 
-  /* Brand — soft purple */
-  --color-primary: #8a79c4;
-  --color-primary-hover: #7a6bb4;
-  --color-primary-light: #a394d4;
-  --color-primary-muted: rgba(138, 121, 196, 0.12);
-  --color-primary-subtle: rgba(138, 121, 196, 0.06);
-  --color-primary-soft: #ede9f8;
+  /* Brand — deep forest green */
+  --color-primary: #1a3a3a;
+  --color-primary-hover: #152f2f;
+  --color-primary-light: #2d5550;
+  --color-primary-muted: rgba(26, 58, 58, 0.1);
+  --color-primary-subtle: rgba(26, 58, 58, 0.05);
+  --color-primary-soft: #e8f0ed;
   --color-on-primary: #ffffff;
 
-  --color-accent: #e8847a;
-  --color-accent-hover: #d97368;
-  --color-accent-muted: rgba(232, 132, 122, 0.12);
-  --color-peach: #f5ebe8;
-  --color-peach-muted: rgba(245, 235, 232, 0.8);
-  --color-coral: #e8847a;
-  --color-lavender: #ede9f8;
-  --color-lavender-muted: rgba(237, 233, 248, 0.65);
+  /* Secondary — sage */
+  --color-accent: #7a9e8e;
+  --color-accent-hover: #688a7c;
+  --color-accent-muted: rgba(122, 158, 142, 0.14);
+  --color-sage: #a8c5b5;
+  --color-sage-muted: rgba(168, 197, 181, 0.45);
+  --color-sand: #ede8df;
+  --color-sand-muted: rgba(237, 232, 223, 0.85);
+  --color-beige: #f0ebe3;
+  --color-coral: #b8956a;
 
-  --color-glow: #8a79c4;
-  --color-glow-muted: rgba(138, 121, 196, 0.1);
+  /* Legacy aliases */
+  --color-peach: var(--color-beige);
+  --color-peach-muted: var(--color-sand-muted);
+  --color-lavender: var(--color-primary-soft);
+  --color-lavender-muted: var(--color-sage-muted);
 
-  --color-border: rgba(30, 41, 59, 0.08);
-  --color-border-subtle: rgba(30, 41, 59, 0.04);
-  --color-header: rgba(255, 255, 255, 0.92);
+  --color-glow: var(--color-sage);
+  --color-glow-muted: rgba(122, 158, 142, 0.12);
+
+  --color-border: rgba(26, 46, 42, 0.1);
+  --color-border-subtle: rgba(26, 46, 42, 0.05);
+  --color-header: rgba(253, 251, 247, 0.94);
 
   /* Gradients */
-  --gradient-brand: linear-gradient(135deg, #8a79c4 0%, #9d8fd0 100%);
-  --gradient-brand-hover: linear-gradient(135deg, #7a6bb4 0%, #8a79c4 100%);
-  --gradient-text: linear-gradient(135deg, #8a79c4 0%, #b08fd4 100%);
-  --gradient-bg-soft: linear-gradient(180deg, #f9fafc 0%, #f4f6fa 100%);
+  --gradient-brand: linear-gradient(135deg, #1a3a3a 0%, #234848 100%);
+  --gradient-brand-hover: linear-gradient(135deg, #152f2f 0%, #1a3a3a 100%);
+  --gradient-text: linear-gradient(135deg, #1a3a3a 0%, #4a7c6f 100%);
+  --gradient-bg-soft: linear-gradient(180deg, #fdfbf7 0%, #f5f1ea 100%);
   --gradient-hero-glow: radial-gradient(
     ellipse 80% 60% at 30% 40%,
-    rgba(138, 121, 196, 0.08) 0%,
+    rgba(122, 158, 142, 0.12) 0%,
     transparent 70%
   );
-  --gradient-cta-banner: linear-gradient(135deg, #ede9f8 0%, #f3f0fa 100%);
+  --gradient-cta-banner: linear-gradient(135deg, #e8f0ed 0%, #f5f1ea 100%);
 
   /* Semantic */
-  --color-success: #22a06b;
-  --color-success-bg: #ecfdf3;
-  --color-success-border: #abefc6;
-  --color-warning: #b45309;
-  --color-warning-bg: #fffbeb;
-  --color-warning-border: #fde68a;
-  --color-error: #dc2626;
-  --color-error-hover: #b91c1c;
-  --color-error-bg: #fef2f2;
-  --color-error-border: #fecaca;
-  --color-info: #475569;
-  --color-info-bg: #f1f5f9;
-  --color-info-border: #cbd5e1;
+  --color-success: #2d6a4f;
+  --color-success-bg: #ecf5f0;
+  --color-success-border: #b8d9c8;
+  --color-warning: #9a6b2e;
+  --color-warning-bg: #faf5eb;
+  --color-warning-border: #e8d5b0;
+  --color-error: #c0392b;
+  --color-error-hover: #a33225;
+  --color-error-bg: #fdf2f0;
+  --color-error-border: #f0c4bc;
+  --color-info: #4a6670;
+  --color-info-bg: #eef3f4;
+  --color-info-border: #c5d4d8;
 
-  /* Topic accents */
-  --color-topic-purple: #8a79c4;
-  --color-topic-purple-bg: rgba(138, 121, 196, 0.1);
-  --color-topic-green: #22a06b;
-  --color-topic-green-bg: rgba(34, 160, 107, 0.1);
-  --color-topic-orange: #e8847a;
-  --color-topic-orange-bg: rgba(232, 132, 122, 0.12);
-  --color-topic-pink: #d473a8;
-  --color-topic-pink-bg: rgba(212, 115, 168, 0.1);
-  --color-topic-sky: #0284c7;
-  --color-topic-sky-bg: rgba(2, 132, 199, 0.1);
+  /* Topic accents — harmonized forest palette */
+  --color-topic-purple: #1a3a3a;
+  --color-topic-purple-bg: rgba(26, 58, 58, 0.1);
+  --color-topic-green: #4a7c6f;
+  --color-topic-green-bg: rgba(74, 124, 111, 0.12);
+  --color-topic-orange: #b8956a;
+  --color-topic-orange-bg: rgba(184, 149, 106, 0.14);
+  --color-topic-pink: #7a8b6e;
+  --color-topic-pink-bg: rgba(122, 139, 110, 0.12);
+  --color-topic-sky: #5b8a9a;
+  --color-topic-sky-bg: rgba(91, 138, 154, 0.12);
 
   /* Legacy card aliases */
   --color-card-purple: #ffffff;
@@ -99,7 +107,7 @@
   --font-size-xl: 1.375rem;
   --font-size-2xl: 1.875rem;
   --font-size-3xl: 2.75rem;
-  --line-height-body: 1.75;
+  --line-height-body: 1.65;
   --line-height-heading: 1.25;
   --line-height-tight: 1.3;
   --line-height-admin: 1.55;
@@ -109,10 +117,10 @@
   --space-xs: 0.25rem;
   --space-sm: 0.5rem;
   --space-md: 1rem;
-  --space-lg: 1.5rem;
-  --space-xl: 2rem;
-  --space-2xl: 3rem;
-  --space-3xl: 4.5rem;
+  --space-lg: 1.25rem;
+  --space-xl: 1.25rem;
+  --space-2xl: 1.5rem;
+  --space-3xl: 2.25rem;
 
   /* Admin density */
   --admin-space-sm: 0.375rem;
@@ -121,28 +129,28 @@
   --admin-font-size-sm: 0.8125rem;
   --admin-font-size-base: 0.9375rem;
 
-  /* Radius */
+  /* Radius — reference: 8–10px buttons, soft card corners */
   --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 24px;
-  --radius-xl: 28px;
-  --radius-2xl: 36px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
   --radius-arch: 999px 999px 0 0;
   --radius-full: 999px;
 
-  /* Shadows */
-  --shadow-sm: 0 2px 8px rgba(30, 41, 59, 0.04);
-  --shadow-md: 0 6px 20px rgba(30, 41, 59, 0.06);
-  --shadow-lg: 0 12px 36px rgba(30, 41, 59, 0.08);
-  --shadow-header: 0 2px 16px rgba(30, 41, 59, 0.04);
-  --shadow-card: 0 2px 16px rgba(30, 41, 59, 0.05);
-  --shadow-card-hover: 0 8px 28px rgba(30, 41, 59, 0.08);
+  /* Shadows — warm green-tinted */
+  --shadow-sm: 0 2px 8px rgba(26, 46, 42, 0.05);
+  --shadow-md: 0 6px 20px rgba(26, 46, 42, 0.07);
+  --shadow-lg: 0 12px 36px rgba(26, 46, 42, 0.09);
+  --shadow-header: 0 2px 16px rgba(26, 46, 42, 0.05);
+  --shadow-card: 0 2px 16px rgba(26, 46, 42, 0.06);
+  --shadow-card-hover: 0 8px 28px rgba(26, 46, 42, 0.1);
 
   /* Layout */
   --content-max: 44rem;
   --content-wide: 58rem;
   --content-full: 76rem;
-  --header-height: 4.5rem;
+  --header-height: 3.75rem;
 
   /* Motion */
   --transition-fast: 150ms ease;

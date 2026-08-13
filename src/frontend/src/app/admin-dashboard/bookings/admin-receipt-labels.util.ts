@@ -12,7 +12,7 @@ export const RECEIPT_DECLINE_REASON_OPTIONS: ReadonlyArray<{
   { value: 'UnreadableImage', label: 'صورة غير واضحة' },
   { value: 'AmountMismatch', label: 'المبلغ غير مطابق' },
   { value: 'DuplicateReceipt', label: 'إيصال مكرر' },
-  { value: 'UnverifiableTransfer', label: 'تعذّر التحقق من التحويل' },
+  { value: 'UnverifiableTransfer', label: 'تعذر التحقق من التحويل' },
   { value: 'Other', label: 'سبب آخر' },
 ];
 

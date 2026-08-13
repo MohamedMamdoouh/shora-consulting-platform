@@ -2,8 +2,6 @@
   <section class="section hero">
     <div class="hero__inner">
       <div class="hero__content">
-        <app-brand-logo class="hero__logo" />
-        <span class="hero__eyebrow">{{ copy.home.eyebrow }}</span>
         <h1>
           {{ copy.home.heroTitleLine1 }}<br />
           <span class="hero__gradient">{{ copy.home.heroTitleHighlight }}</span>
@@ -11,19 +9,18 @@
         <p>{{ copy.home.heroDescription }}</p>
         <div class="hero__actions">
           <app-booking-cta [label]="copy.cta.bookSessionNow" [showCalendarIcon]="true" />
-          <div class="hero__trust">
-            <span class="hero__trust-avatars" aria-hidden="true">
-              <span></span>
-              <span></span>
-              <span></span>
-            </span>
-            <p>{{ copy.home.trustNote }}</p>
-          </div>
         </div>
       </div>
 
       <div class="hero__visual">
-        <app-counseling-scene />
+        <img
+          class="hero__photo"
+          src="/profile.jpeg?v=2"
+          [attr.alt]="copy.instructor.photoAlt"
+          width="1024"
+          height="1024"
+          decoding="async"
+        />
       </div>
     </div>
   </section>

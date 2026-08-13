@@ -16,12 +16,12 @@ import { Component, input } from '@angular/core';
   styles: `
     :host {
       display: block;
-      margin-bottom: var(--space-2xl);
+      margin-bottom: var(--space-md);
     }
 
     .page-header__inner {
       display: grid;
-      gap: var(--space-md);
+      gap: var(--space-sm);
       text-align: start;
     }
 

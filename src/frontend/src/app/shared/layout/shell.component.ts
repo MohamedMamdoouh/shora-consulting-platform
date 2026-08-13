@@ -13,7 +13,6 @@ import { BrandLogoComponent } from '../components/brand-logo.component';
 export class ShellComponent {
   protected readonly auth = inject(AuthService);
   protected readonly copy = APP_COPY;
-  protected readonly currentYear = new Date().getFullYear();
   protected navOpen = false;
 
   toggleNav(): void {

@@ -7,50 +7,43 @@ import { Component, input } from '@angular/core';
     '[class.brand-logo--compact]': 'compact()',
   },
   template: `
-    <svg viewBox="0 0 128 128" fill="none" role="img" [attr.aria-label]="ariaLabel()">
-      <defs>
-        <linearGradient [attr.id]="bgId" x1="8" y1="8" x2="120" y2="120" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#EDE9F8" />
-          <stop offset="1" stop-color="#FFF5F0" />
-        </linearGradient>
-        <linearGradient [attr.id]="brandId" x1="28" y1="96" x2="100" y2="24" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#8A79C4" />
-          <stop offset="0.55" stop-color="#E8847A" />
-          <stop offset="1" stop-color="#F5A962" />
-        </linearGradient>
-      </defs>
-      <rect x="8" y="8" width="112" height="112" rx="28" [attr.fill]="'url(#' + bgId + ')'" />
+    <svg
+      viewBox="0 0 40 40"
+      fill="none"
+      [attr.role]="decorative() ? 'presentation' : 'img'"
+      [attr.aria-hidden]="decorative() ? 'true' : null"
+      [attr.aria-label]="decorative() ? null : ariaLabel()"
+    >
+      <rect x="2" y="2" width="36" height="36" rx="12" fill="currentColor" fill-opacity="0.08" />
       <path
-        d="M64 92c-14 0-24-10-24-22 0-8 5-14 12-17-2 8 2 16 8 20-6-4-8-12-5-19 8 5 13 14 9 23 4-6 4-14 0-20 6 4 9 12 7 19 7-3 12-9 12-17-7 3-12 9-12 17 0 12-10 22-24 22z"
-        [attr.fill]="'url(#' + brandId + ')'"
+        d="M26 11v18M26 11H17.5c-3.2 0-5.5 2.2-5.5 5.2V28"
+        stroke="currentColor"
+        stroke-width="2.75"
+        stroke-linecap="round"
+        stroke-linejoin="round"
       />
-      <circle cx="48" cy="52" r="5" fill="#8A79C4" opacity="0.9" />
-      <circle cx="80" cy="52" r="5" fill="#E8847A" opacity="0.9" />
     </svg>
   `,
   styles: `
     :host {
       display: inline-block;
       line-height: 0;
+      color: var(--color-primary);
     }
 
     svg {
       display: block;
       width: auto;
-      height: 4.5rem;
+      height: 3rem;
     }
 
     :host(.brand-logo--compact) svg {
-      height: 2.75rem;
+      height: 2rem;
     }
   `,
 })
 export class BrandLogoComponent {
-  private static nextId = 0;
-
   readonly compact = input(false);
-  readonly ariaLabel = input('شورى');
-
-  protected readonly bgId = `shora-bg-${BrandLogoComponent.nextId}`;
-  protected readonly brandId = `shora-brand-${BrandLogoComponent.nextId++}`;
+  readonly decorative = input(false);
+  readonly ariaLabel = input('محمود البنا');
 }

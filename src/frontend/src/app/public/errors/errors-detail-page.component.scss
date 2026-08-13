@@ -15,7 +15,7 @@
 }
 
 .errors-detail__header {
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-md);
 }
 
 .errors-detail__status {
@@ -47,7 +47,7 @@
 .errors-detail__meta {
   margin: 0;
   display: grid;
-  gap: var(--space-lg);
+  gap: var(--space-md);
 
   dt {
     margin: 0 0 var(--space-xs);

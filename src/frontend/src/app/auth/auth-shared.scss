@@ -2,17 +2,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: calc(100vh - var(--header-height) - 8rem);
-  padding: var(--space-lg) 0;
+  min-height: calc(100vh - var(--header-height) - 2rem);
+  padding: var(--space-sm) 0;
 }
 
 .auth-card {
   position: relative;
   width: 100%;
   max-width: 28rem;
-  padding: var(--space-2xl);
-  padding-top: calc(var(--space-2xl) + 0.5rem);
-  background: var(--color-surface);
+  padding: var(--space-lg);
+  padding-top: calc(var(--space-lg) + 0.5rem);
+  background: var(--color-paper);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
@@ -32,7 +32,7 @@
 
 .auth-card h1 {
   margin-top: 0;
-  margin-bottom: var(--space-lg);
+  margin-bottom: var(--space-md);
   text-align: center;
   font-size: var(--font-size-2xl);
   font-weight: 800;
@@ -76,7 +76,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-  margin-top: var(--space-lg);
+  margin-top: var(--space-md);
   text-align: center;
 }
 
@@ -91,7 +91,7 @@
   gap: var(--space-md);
   text-align: center;
   color: var(--color-text-subtle);
-  margin: var(--space-lg) 0;
+  margin: var(--space-md) 0;
   font-size: var(--font-size-sm);
 }
 
@@ -110,7 +110,7 @@
 
 @media (max-width: 640px) {
   .auth-card {
-    padding: var(--space-xl);
-    padding-top: calc(var(--space-xl) + 0.5rem);
+    padding: var(--space-lg);
+    padding-top: calc(var(--space-lg) + 0.5rem);
   }
 }

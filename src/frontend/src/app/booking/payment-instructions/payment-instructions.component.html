@@ -19,10 +19,7 @@
       @case ('submitted') {
         <div class="state-panel state-panel--success">
           <h2>تم رفع الإيصال</h2>
-          <p>
-            استلمنا إيصال الدفع. سيراجعه المستشار، وستصلك رسالة تأكيد بالبريد الإلكتروني بعد
-            الموافقة.
-          </p>
+          <p>{{ copy.booking.receiptSubmitted }}</p>
           <button type="button" class="btn" (click)="goToDashboard()">
             الانتقال إلى لوحة العميل
           </button>

@@ -15,9 +15,9 @@ const BOOKING_ERROR_MESSAGES: Record<string, string> = {
   [ErrorCodes.Booking.Forbidden]: 'لا يمكنك عرض تعليمات هذا الحجز.',
   [ErrorCodes.Booking.InvalidStatus]: 'تعليمات الدفع غير متاحة لهذا الحجز.',
   [ErrorCodes.Cancellation.TooLate]:
-    'فات الأوان لطلب الإلغاء عبر الموقع — تواصل مع المستشار على واتساب.',
+    'فات الأوان لطلب الإلغاء عبر الموقع — تواصل معي على واتساب.',
   [ErrorCodes.Cancellation.ReopenExhausted]:
-    'لا يمكن تقديم طلب إلغاء آخر عبر الموقع — تواصل مع المستشار على واتساب.',
+    'لا يمكن تقديم طلب إلغاء آخر عبر الموقع — تواصل معي على واتساب.',
   [ErrorCodes.Payment.UploadDeadlinePassed]: 'انتهت مهلة رفع الإيصال.',
   [ErrorCodes.Payment.InvalidReceiptFile]: 'ملف الإيصال غير صالح. استخدم JPG أو PNG أو WebP أو PDF.',
   [ErrorCodes.Payment.ReceiptTooLarge]: 'حجم ملف الإيصال أكبر من 5 ميجابايت.',

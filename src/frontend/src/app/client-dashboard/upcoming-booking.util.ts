@@ -1,6 +1,8 @@
 import { DeliveryMethod } from '@contracts/booking';
 import { formatSlotRange, formatSlotStartTime } from './client-dashboard-slot.util';
 
+import { APP_COPY } from '../core/i18n/app-copy.constants';
+
 export function formatDeliveryMethodLabel(method: DeliveryMethod): string {
   switch (method) {
     case 'VoiceCall':
@@ -21,7 +23,7 @@ export function formatVoiceCallInstruction(
   }
 
   const time = formatSlotStartTime(slotStartUtc);
-  return `ستتلقى مكالمة في ${time} على الرقم ${contactPhone}.`;
+  return APP_COPY.client.voiceCallInstruction(time, contactPhone);
 }
 
 export function buildWhatsAppChatUrl(

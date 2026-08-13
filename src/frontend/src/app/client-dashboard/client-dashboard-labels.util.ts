@@ -1,6 +1,6 @@
 const CANCELLATION_REASON_LABELS: Record<string, string> = {
   'Cancelled by you': 'ألغيت الحجز بنفسك',
-  'Cancelled by the consultant': 'ألغى المستشار الحجز',
+  'Cancelled by the consultant': 'أُلغيت الجلسة',
   'Receipt not uploaded in time': 'لم يرفع الإيصال في الوقت المحدد',
 };
 

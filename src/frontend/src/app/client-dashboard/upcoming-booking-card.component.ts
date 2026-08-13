@@ -17,6 +17,7 @@ import {
   formatDeliveryMethodLabel,
   formatVoiceCallInstruction,
 } from './upcoming-booking.util';
+import { APP_COPY } from '../core/i18n/app-copy.constants';
 
 @Component({
   selector: 'app-upcoming-booking-card',
@@ -26,6 +27,8 @@ import {
 })
 export class UpcomingBookingCardComponent {
   private readonly bookingService = inject(BookingService);
+
+  protected readonly copy = APP_COPY;
 
   @Input({ required: true }) item!: MyBookingListItem;
   @Input({ required: true }) slotLabel!: string;
@@ -95,9 +98,7 @@ export class UpcomingBookingCardComponent {
       return;
     }
 
-    const confirmed = window.confirm(
-      'طلب الإلغاء يحتاج موافقة المستشار. إذا وافق، سيسترد المبلغ يدويًا. هل تريد المتابعة؟',
-    );
+    const confirmed = window.confirm(this.copy.client.cancellationConfirm);
 
     if (!confirmed) {
       return;

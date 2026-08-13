@@ -14,7 +14,7 @@
       <button type="button" class="choice-card choice-card--voice" (click)="selectDeliveryMethod('VoiceCall')">
         <span class="choice-card__icon" aria-hidden="true"></span>
         <span class="choice-card__title">مكالمة صوتية</span>
-        <span class="choice-card__detail">سيتصل بك المستشار في الموعد على رقم هاتفك.</span>
+        <span class="choice-card__detail">{{ copy.booking.voiceDetail }}</span>
       </button>
 
       <button type="button" class="choice-card choice-card--chat" (click)="selectDeliveryMethod('Chat')">

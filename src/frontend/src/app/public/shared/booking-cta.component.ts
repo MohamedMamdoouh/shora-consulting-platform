@@ -17,8 +17,21 @@ import { APP_COPY } from '../../core/i18n/app-copy.constants';
       @if (showCalendarIcon()) {
         <span class="booking-cta__icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
-            <rect x="4" y="5" width="16" height="15" rx="2" stroke="currentColor" stroke-width="1.75" />
-            <path d="M4 9h16M8 3v4M16 3v4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
+            <rect
+              x="4"
+              y="5"
+              width="16"
+              height="15"
+              rx="2"
+              stroke="currentColor"
+              stroke-width="1.75"
+            />
+            <path
+              d="M4 9h16M8 3v4M16 3v4"
+              stroke="currentColor"
+              stroke-width="1.75"
+              stroke-linecap="round"
+            />
           </svg>
         </span>
       }

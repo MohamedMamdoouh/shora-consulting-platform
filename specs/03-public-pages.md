@@ -1,6 +1,6 @@
 # 03 — Public Pages (Home, About, Services)
 
-Status: **Done** — RTL pages at `/`, `/about`, and `/services` with localized copy, home-page branding (`logo.svg`), and working CTAs into `/booking/start`. Consultant-specific credentials and photo can replace generic bio text when provided.
+Status: **Done** — RTL pages at `/`, `/about`, and `/services` with localized copy, home-page branding (`logo.svg`), and working CTAs into `/booking/start`. Practitioner-specific credentials and photo can replace generic bio text when provided.
 
 ## 1. Goals
 
@@ -10,23 +10,23 @@ These pages must feel **warm, not clinical**, load fast on mobile (primary traff
 
 ## 2. Home Page (`/`)
 
-Sections (RTL; some copy remains placeholder until the consultant supplies final text):
+Sections (RTL; some copy remains placeholder until the practitioner supplies final text):
 
 1. **Hero** — warm one-line value proposition + a single prominent "Book a Session" call-to-action button (routes to `/booking/start`, which opens slot selection directly — no login required to browse and select, per spec 04 #2).
 2. **What we help with** — short list of the five topics (communication, trust, premarital, dating confidence, long-distance), each a small card, purely descriptive (not clickable service tiers — pricing is flat).
-3. **How it works** — visual steps: Book a time → Transfer the fee (Vodafone Cash or InstaPay) and upload your receipt → Consultant confirms → Get called/messaged at your slot. Sets expectations that payment is by manual transfer and that delivery happens via phone/WhatsApp.
+3. **How it works** — visual steps: Book a time → Transfer the fee (Vodafone Cash or InstaPay) and upload your receipt → Practitioner confirms → Get called/messaged at your slot. Sets expectations that payment is by manual transfer and that delivery happens via phone/WhatsApp.
 4. **Secondary CTA** — repeat booking button at the bottom for mobile scroll-through visitors.
 
 ## 3. About Page (`/about`)
 
-- Consultant bio/credentials section — **placeholder text** (e.g. generic "About the Consultant" placeholder paragraph), clearly marked in code comments as `TODO: replace with real bio content`.
+- Practitioner bio/credentials section — **placeholder text** (e.g. generic "About me" placeholder paragraph), clearly marked in code comments as `TODO: replace with real bio content`.
 - Tone: personal, warm, first-person voice — reinforces trust before booking.
 - Single CTA at the end linking to booking.
 
 ## 4. Services Page (`/services`)
 
 - Explains the five topics in a bit more depth than the Home page cards (placeholder descriptions per topic).
-- States clearly: single session, flat price (rendered dynamically from `GET /api/settings/public` — price should not be hardcoded in the frontend since admin can change it), delivered via voice call or chat. Payment is by manual transfer (Vodafone Cash or InstaPay) with a receipt uploaded for the consultant to confirm — there is no online card payment.
+- States clearly: single session, flat price (rendered dynamically from `GET /api/settings/public` — price should not be hardcoded in the frontend since admin can change it), delivered via voice call or chat. Payment is by manual transfer (Vodafone Cash or InstaPay) with a receipt uploaded for the practitioner to confirm — there is no online card payment.
 - Explains privacy: clients can use a display name, and their information is kept confidential (reduces stigma/privacy hesitation).
 - CTA to start booking — opens the booking flow at slot selection; the visitor only logs in/signs up at the reserve step (spec 04 #2), not before browsing.
 
@@ -42,5 +42,5 @@ Sections (RTL; some copy remains placeholder until the consultant supplies final
 
 ## 7. Open Items for This Area
 
-- Actual bio/credentials content, and final copy for all placeholder text — to be supplied by the consultant later.
+- Actual bio/credentials content, and final copy for all placeholder text — to be supplied by the practitioner later.
 - Any branding assets (logo, color palette, photo) not yet provided — placeholder visual style will be used until supplied.

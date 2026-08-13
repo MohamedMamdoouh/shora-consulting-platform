@@ -4,6 +4,9 @@ import { BookingCtaComponent } from '../../public/shared/booking-cta.component';
 
 @Component({
   selector: 'app-footer-cta-banner',
+  host: {
+    class: 'footer-cta-host',
+  },
   imports: [BookingCtaComponent],
   template: `
     <aside class="footer-cta" aria-label="دعوة للحجز">
@@ -16,30 +19,27 @@ import { BookingCtaComponent } from '../../public/shared/booking-cta.component';
       <div class="footer-cta__visual" aria-hidden="true">
         <div class="footer-cta__icon footer-cta__icon--calendar">
           <svg viewBox="0 0 48 48" width="40" height="40" fill="none">
-            <rect x="8" y="12" width="32" height="28" rx="6" fill="#8A79C4" opacity="0.15" />
-            <rect x="8" y="12" width="32" height="28" rx="6" stroke="#8A79C4" stroke-width="2" />
-            <path d="M8 20h32" stroke="#8A79C4" stroke-width="2" />
-            <path d="M18 8v8M30 8v8" stroke="#8A79C4" stroke-width="2" stroke-linecap="round" />
-            <rect x="16" y="26" width="6" height="6" rx="1.5" fill="#8A79C4" />
-          </svg>
-        </div>
-        <div class="footer-cta__icon footer-cta__icon--clock">
-          <svg viewBox="0 0 48 48" width="36" height="36" fill="none">
-            <circle cx="24" cy="26" r="14" fill="#E8847A" opacity="0.15" />
-            <circle cx="24" cy="26" r="14" stroke="#E8847A" stroke-width="2" />
-            <path d="M24 20v7l5 3" stroke="#E8847A" stroke-width="2" stroke-linecap="round" />
-            <path d="M24 8v4" stroke="#E8847A" stroke-width="2" stroke-linecap="round" />
+            <rect x="8" y="12" width="32" height="28" rx="6" fill="#1A3A3A" opacity="0.12" />
+            <rect x="8" y="12" width="32" height="28" rx="6" stroke="#1A3A3A" stroke-width="2" />
+            <path d="M8 20h32" stroke="#1A3A3A" stroke-width="2" />
+            <path d="M18 8v8M30 8v8" stroke="#1A3A3A" stroke-width="2" stroke-linecap="round" />
+            <rect x="16" y="26" width="6" height="6" rx="1.5" fill="#1A3A3A" />
           </svg>
         </div>
       </div>
     </aside>
   `,
   styles: `
+    :host {
+      display: block;
+      margin-top: var(--space-lg);
+    }
+
     .footer-cta {
       display: grid;
-      gap: var(--space-xl);
+      gap: var(--space-sm);
       align-items: center;
-      padding: var(--space-2xl);
+      padding: var(--space-md);
       background: var(--gradient-cta-banner);
       border: 1px solid var(--color-primary-muted);
       border-radius: var(--radius-lg);
@@ -48,7 +48,7 @@ import { BookingCtaComponent } from '../../public/shared/booking-cta.component';
 
     .footer-cta__content {
       display: grid;
-      gap: var(--space-md);
+      gap: var(--space-sm);
     }
 
     .footer-cta__title {
@@ -67,7 +67,7 @@ import { BookingCtaComponent } from '../../public/shared/booking-cta.component';
 
     .footer-cta__visual {
       position: relative;
-      min-height: 5rem;
+      min-height: 3.5rem;
     }
 
     .footer-cta__icon {
@@ -81,26 +81,21 @@ import { BookingCtaComponent } from '../../public/shared/booking-cta.component';
     }
 
     .footer-cta__icon--calendar {
-      inset-inline-end: 20%;
-      top: 0;
+      inset-inline-end: 0;
+      top: 50%;
+      transform: translateY(-50%);
       padding: var(--space-sm);
-    }
-
-    .footer-cta__icon--clock {
-      inset-inline-start: 15%;
-      bottom: 0;
-      padding: var(--space-xs);
     }
 
     @media (min-width: 768px) {
       .footer-cta {
         grid-template-columns: 1fr auto;
-        padding: var(--space-2xl) var(--space-3xl);
+        padding: var(--space-md) var(--space-lg);
       }
 
       .footer-cta__visual {
-        width: 10rem;
-        min-height: 6rem;
+        width: 4rem;
+        min-height: 3rem;
       }
     }
   `,

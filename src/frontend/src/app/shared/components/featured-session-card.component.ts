@@ -2,11 +2,10 @@ import { Component, input } from '@angular/core';
 import { APP_COPY } from '../../core/i18n/app-copy.constants';
 import { formatCurrency, formatDurationMinutes } from '../../core/i18n/app-locale';
 import { BookingCtaComponent } from '../../public/shared/booking-cta.component';
-import { CounselingSceneComponent } from './counseling-scene.component';
 
 @Component({
   selector: 'app-featured-session-card',
-  imports: [BookingCtaComponent, CounselingSceneComponent],
+  imports: [BookingCtaComponent],
   template: `
     <article class="featured-session">
       <div class="featured-session__content">
@@ -15,7 +14,10 @@ import { CounselingSceneComponent } from './counseling-scene.component';
 
         <div class="featured-session__meta">
           <div class="featured-session__meta-item">
-            <span class="featured-session__meta-icon featured-session__meta-icon--price" aria-hidden="true">
+            <span
+              class="featured-session__meta-icon featured-session__meta-icon--price"
+              aria-hidden="true"
+            >
               <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
                 <path
                   d="M20.5 10.5c0 4.4-3.6 8-8 8H8l-3 3v-4.5C3.5 14.1 3.5 9.9 6 7.4S11.6 4.5 16 4.5c2.5 0 4.5 2 4.5 6z"
@@ -29,15 +31,25 @@ import { CounselingSceneComponent } from './counseling-scene.component';
             </span>
             <div>
               <span class="featured-session__meta-label">{{ copy.session.priceLabel }}</span>
-              <strong class="featured-session__meta-value">{{ formatPrice(sessionPrice()) }}</strong>
+              <strong class="featured-session__meta-value">{{
+                formatPrice(sessionPrice())
+              }}</strong>
             </div>
           </div>
 
           <div class="featured-session__meta-item">
-            <span class="featured-session__meta-icon featured-session__meta-icon--duration" aria-hidden="true">
+            <span
+              class="featured-session__meta-icon featured-session__meta-icon--duration"
+              aria-hidden="true"
+            >
               <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
                 <circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.75" />
-                <path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
+                <path
+                  d="M12 7.5V12l3 2"
+                  stroke="currentColor"
+                  stroke-width="1.75"
+                  stroke-linecap="round"
+                />
               </svg>
             </span>
             <div>
@@ -49,7 +61,10 @@ import { CounselingSceneComponent } from './counseling-scene.component';
           </div>
 
           <div class="featured-session__meta-item">
-            <span class="featured-session__meta-icon featured-session__meta-icon--method" aria-hidden="true">
+            <span
+              class="featured-session__meta-icon featured-session__meta-icon--method"
+              aria-hidden="true"
+            >
               <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
                 <path
                   d="M17.5 4.5A8.5 8.5 0 0112 20.5 8.5 8.5 0 016.5 4.5a8.5 8.5 0 0111 0z"
@@ -96,15 +111,22 @@ import { CounselingSceneComponent } from './counseling-scene.component';
       </div>
 
       <div class="featured-session__visual">
-        <app-counseling-scene />
+        <img
+          class="featured-session__photo"
+          src="/hero-counselor.png"
+          [attr.alt]="copy.instructor.photoAlt"
+          width="320"
+          height="400"
+          decoding="async"
+        />
       </div>
     </article>
   `,
   styles: `
     .featured-session {
       display: grid;
-      gap: var(--space-xl);
-      padding: var(--space-xl);
+      gap: var(--space-sm);
+      padding: var(--space-md);
       background: var(--color-surface);
       border: 1px solid var(--color-border);
       border-radius: var(--radius-lg);
@@ -113,7 +135,7 @@ import { CounselingSceneComponent } from './counseling-scene.component';
 
     .featured-session__content {
       display: grid;
-      gap: var(--space-lg);
+      gap: var(--space-sm);
     }
 
     .featured-session__title {
@@ -152,8 +174,8 @@ import { CounselingSceneComponent } from './counseling-scene.component';
     }
 
     .featured-session__meta-icon--price {
-      background: rgba(220, 38, 38, 0.08);
-      color: #dc2626;
+      background: var(--color-accent-muted);
+      color: var(--color-accent);
     }
 
     .featured-session__meta-icon--duration {
@@ -214,12 +236,25 @@ import { CounselingSceneComponent } from './counseling-scene.component';
       justify-content: center;
     }
 
+    .featured-session__photo {
+      display: block;
+      width: 100%;
+      max-width: 14rem;
+      height: auto;
+      border-radius: 50% 50% var(--radius-xl) var(--radius-xl);
+      object-fit: cover;
+      aspect-ratio: 4 / 5;
+      box-shadow: var(--shadow-card);
+      border: 3px solid var(--color-surface);
+      outline: 1px solid var(--color-border);
+    }
+
     @media (min-width: 768px) {
       .featured-session {
         grid-template-columns: 1.1fr 0.9fr;
         align-items: center;
-        padding: var(--space-2xl);
-        gap: var(--space-2xl);
+        padding: var(--space-md) var(--space-lg);
+        gap: var(--space-md);
       }
 
       .featured-session__meta-item {

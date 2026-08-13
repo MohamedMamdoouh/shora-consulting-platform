@@ -38,7 +38,7 @@ The client dashboard at `/dashboard` is fully wired to `GET /api/v1/bookings/min
 
 ## 1. Purpose
 
-A simple view for logged-in clients to see their booking history and upcoming session details, to complete payment (upload a transfer receipt) for a pending booking, and to request cancellation of an upcoming confirmed session (spec 04 #3). No self-service rescheduling — a client who wants a different time asks the consultant to cancel and then rebooks.
+A simple view for logged-in clients to see their booking history and upcoming session details, to complete payment (upload a transfer receipt) for a pending booking, and to request cancellation of an upcoming confirmed session (spec 04 #3). No self-service rescheduling — a client who wants a different time asks the practitioner to cancel and then rebooks.
 
 ## 2. Page: `/dashboard`
 

@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/MohamedMamdoouh/shora-consulting-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/MohamedMamdoouh/shora-consulting-platform/actions/workflows/ci.yml)
 
-RTL relationship consulting booking platform. Clients browse availability, reserve a session, pay by manual bank transfer (Vodafone Cash or InstaPay), upload a receipt, and receive the session by voice call or chat. A single **Admin** (consultant) manages settings, availability, receipt approval, cancellations, and refunds.
+RTL personal practice site for one-to-one relationship consulting sessions. Clients browse availability, reserve a session, pay by manual bank transfer (Vodafone Cash or InstaPay), upload a receipt, and receive the session by voice call or chat. A single **Admin** (the practitioner) manages settings, availability, receipt approval, cancellations, and refunds.
 
 **Status:** MVP feature set is implemented in code (backend, frontend, CI/CD). Production hosting uses Railway + Neon PostgreSQL + Azure Blob Storage — see [Deployment](#23-deployment).
 
@@ -51,9 +51,9 @@ RTL relationship consulting booking platform. Clients browse availability, reser
 | Item                 | Description                                                                                                         |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | **Name**             | Shora                                                                                                               |
-| **Purpose**          | Online booking for one-to-one relationship consulting sessions                                                      |
-| **Problem**          | Lets a consultant offer bookable sessions with manual local payment verification, without an online payment gateway |
-| **Target users**     | **Clients** — people booking sessions; **Admin** — the consultant operating the practice                            |
+| **Purpose**          | Personal practice booking site for one-to-one relationship consulting sessions                                      |
+| **Problem**          | Lets a single practitioner offer bookable sessions with manual local payment verification, without an online payment gateway |
+| **Target users**     | **Clients** — people booking sessions; **Admin** — the practitioner operating their personal practice                            |
 | **Language / UX**    | RTL UI (`lang="ar"`), mobile-first public pages                                                                     |
 | **Deployment model** | Single container: API + Angular SPA on one origin (required for auth cookies)                                       |
 
@@ -1027,7 +1027,7 @@ Documented in code/specs (not a committed roadmap):
 
 | Limitation                                           | Source                                              |
 | ---------------------------------------------------- | --------------------------------------------------- |
-| Placeholder consultant bio/copy on public pages      | `specs/03-public-pages.md` open items               |
+| Placeholder practitioner bio/copy on public pages      | `specs/03-public-pages.md` open items               |
 | No real malware scanner on receipts                  | `PassThroughMalwareScanner`                         |
 | No online payment gateway                            | By design (`specs/05-payments.md`)                  |
 | No horizontal scaling / Redis                        | MVP topology (`specs/08-cross-cutting-concerns.md`) |

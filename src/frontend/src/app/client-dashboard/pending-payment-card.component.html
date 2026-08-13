@@ -11,9 +11,7 @@
 
   @if (uploadSuccess) {
     <div class="pending-payment-card__success" role="status">
-      <p>
-        تم رفع الإيصال. سيراجعه المستشار وستصلك رسالة تأكيد بالبريد الإلكتروني بعد الموافقة.
-      </p>
+      <p>{{ copy.client.receiptUploaded }}</p>
     </div>
   } @else if (instructions; as paymentInstructions) {
     <app-payment-instructions-panel

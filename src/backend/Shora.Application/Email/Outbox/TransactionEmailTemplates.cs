@@ -116,7 +116,7 @@ internal static class TransactionEmailTemplates
             ActionUrl: links.ClientDashboard(),
             ActionLabel: "عرض حجوزاتي",
             RecipientName: context.Recipient.DisplayName,
-            FooterNote: "نتطلع إلى جلستك. إذا احتجت مساعدة، راسلنا عبر لوحة العميل.",
+            FooterNote: "أتطلع إلى جلستك. إذا احتجت مساعدة، راسلني عبر لوحة العميل.",
             AdditionalTokens: BuildDetailTokens(
                 ("SlotTime", TransactionEmailLabels.HtmlEncode(slotText)),
                 ("DeliveryMethod", TransactionEmailLabels.HtmlEncode(
@@ -197,7 +197,7 @@ internal static class TransactionEmailTemplates
             ActionUrl: links.ClientPayment(booking.Id),
             ActionLabel: "رفع إيصال جديد",
             RecipientName: context.Recipient.DisplayName,
-            FooterNote: "إذا كان لديك أي استفسار، راسلنا عبر لوحة العميل.",
+            FooterNote: "إذا كان لديك أي استفسار، راسلني عبر لوحة العميل.",
             AdditionalTokens: BuildDetailTokens(
                 ("DeclineReason", TransactionEmailLabels.HtmlEncode(reason)),
                 ("ReasonNoteHtml", note),
@@ -298,7 +298,7 @@ internal static class TransactionEmailTemplates
             ActionUrl: links.ClientDashboard(),
             ActionLabel: "عرض حجوزاتي",
             RecipientName: context.Recipient.DisplayName,
-            FooterNote: "إذا لم تستلم المبلغ بعد، تواصل معنا عبر لوحة العميل.",
+            FooterNote: "إذا لم تستلم المبلغ بعد، تواصل معي عبر لوحة العميل.",
             AdditionalTokens: BuildDetailTokens(
                 ("RefundAmount", TransactionEmailLabels.HtmlEncode(
                     TransactionEmailLabels.FormatMoney(amount, currency))),

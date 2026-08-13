@@ -7,9 +7,7 @@
   </header>
 
   <div class="pending-approval-card__message" role="status">
-    <p>
-      استلمنا إيصال الدفع، وهو الآن قيد المراجعة. سنرسل لك بريدًا إلكترونيًا بعد موافقة المستشار.
-    </p>
+    <p>{{ copy.client.receiptPending }}</p>
   </div>
 
   @if (item.receiptThumbnailUrl; as thumbnailUrl) {

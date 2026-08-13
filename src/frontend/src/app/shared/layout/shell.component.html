@@ -2,7 +2,8 @@
   <header class="shell__header">
     <div class="shell__header-inner">
       <a routerLink="/" class="shell__brand" [attr.aria-label]="copy.brand.homeAriaLabel">
-        <app-brand-logo [compact]="true" />
+        <app-brand-logo [compact]="true" [decorative]="true" />
+        <span class="shell__brand-name">{{ copy.brand.name }}</span>
       </a>
 
       <button
@@ -24,12 +25,15 @@
           (click)="closeNav()"
           >{{ copy.nav.home }}</a
         >
-        <a routerLink="/about" routerLinkActive="active" (click)="closeNav()">{{ copy.nav.about }}</a>
-        <a routerLink="/services" routerLinkActive="active" (click)="closeNav()">{{ copy.nav.services }}</a>
+        <a routerLink="/about" routerLinkActive="active" (click)="closeNav()">{{
+          copy.nav.about
+        }}</a>
+        <a routerLink="/services" routerLinkActive="active" (click)="closeNav()">{{
+          copy.nav.services
+        }}</a>
         <a
           routerLink="/booking/start"
           routerLinkActive="active"
-          class="shell__nav-cta"
           (click)="closeNav()"
           >{{ copy.nav.bookSession }}</a
         >
@@ -38,9 +42,16 @@
 
         @if (auth.currentUser(); as user) {
           @if (user.role === 'Admin') {
-            <a routerLink="/admin" routerLinkActive="active" (click)="closeNav()">{{ copy.nav.admin }}</a>
+            <a routerLink="/admin" routerLinkActive="active" (click)="closeNav()">{{
+              copy.nav.admin
+            }}</a>
           } @else {
-            <a routerLink="/dashboard" routerLinkActive="active" class="shell__nav-user" (click)="closeNav()">
+            <a
+              routerLink="/dashboard"
+              routerLinkActive="active"
+              class="shell__nav-user"
+              (click)="closeNav()"
+            >
               <span class="shell__nav-user-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none">
                   <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.75" />
@@ -65,16 +76,27 @@
                   stroke-width="1.75"
                   stroke-linejoin="round"
                 />
-                <path d="M14 12H4M7 9l-3 3 3 3" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" />
+                <path
+                  d="M14 12H4M7 9l-3 3 3 3"
+                  stroke="currentColor"
+                  stroke-width="1.75"
+                  stroke-linecap="round"
+                />
               </svg>
             </span>
             {{ copy.nav.logout }}
           </button>
         } @else {
-          <a routerLink="/auth/login" routerLinkActive="active" (click)="closeNav()">{{ copy.nav.login }}</a>
-          <a routerLink="/auth/signup" routerLinkActive="active" class="shell__nav-signup" (click)="closeNav()">{{
-            copy.nav.signup
+          <a routerLink="/auth/login" routerLinkActive="active" (click)="closeNav()">{{
+            copy.nav.login
           }}</a>
+          <a
+            routerLink="/auth/signup"
+            routerLinkActive="active"
+            class="shell__nav-signup"
+            (click)="closeNav()"
+            >{{ copy.nav.signup }}</a
+          >
         }
       </nav>
     </div>
@@ -94,13 +116,45 @@
 
   <footer class="shell__footer">
     <div class="shell__footer-inner">
-      <p class="shell__footer-tagline">{{ copy.brand.tagline }}</p>
+      <div class="shell__footer-links">
       <nav class="shell__footer-nav" [attr.aria-label]="copy.nav.legalNavLabel">
         <a routerLink="/privacy">{{ copy.nav.privacy }}</a>
-        <span aria-hidden="true">·</span>
         <a routerLink="/terms">{{ copy.nav.terms }}</a>
+        <a routerLink="/about">{{ copy.footer.aboutLink }}</a>
       </nav>
-      <p class="shell__footer-copy">© {{ currentYear }} {{ copy.brand.name }}</p>
+
+      <div class="shell__footer-divider" aria-hidden="true"></div>
+
+      <ul class="shell__footer-social" [attr.aria-label]="copy.footer.socialNavLabel">
+        @for (social of copy.footer.social; track social.id) {
+          <li>
+            <a
+              [href]="social.href"
+              target="_blank"
+              rel="noopener noreferrer"
+              [attr.aria-label]="social.label"
+            >
+              @switch (social.id) {
+                @case ('facebook') {
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+                    <path
+                      d="M13.5 9.5H16l-.75 3H13.5V20h-3v-7.5H8V9.5h2.5V7.8c0-2 1.2-3.3 3.2-3.3H16v2.7h-1.5c-.7 0-1 .4-1 1v1.3z"
+                    />
+                  </svg>
+                }
+                @case ('tiktok') {
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+                    <path
+                      d="M15.75 5.25a4.5 4.5 0 003 1.12V9.9a6.9 6.9 0 01-3-.64v6.74a4.86 4.86 0 11-4.86-4.86c.17 0 .34.01.5.03v2.98a1.88 1.88 0 102.64 1.72V2.25h2.72v3z"
+                    />
+                  </svg>
+                }
+              }
+            </a>
+          </li>
+        }
+      </ul>
+      </div>
     </div>
   </footer>
 </div>

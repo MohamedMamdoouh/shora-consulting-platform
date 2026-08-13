@@ -1,7 +1,7 @@
 const CANCELLATION_REASON_LABELS: Record<string, string> = {
-  'Cancelled by you': 'ألغيت الحجز بنفسك',
-  'Cancelled by the consultant': 'أُلغيت الجلسة',
-  'Receipt not uploaded in time': 'لم يرفع الإيصال في الوقت المحدد',
+  'Cancelled by you': 'تم إلغاء الجلسة من طرفك',
+  'Cancelled by the consultant': 'تم إلغاء الجلسة',
+  'Receipt not uploaded in time': 'لم يُرفَع الإيصال في الوقت المحدد',
 };
 
 const REFUND_LABELS: Record<string, string> = {
@@ -14,7 +14,7 @@ export function localizeCancellationReasonLabel(label: string | null | undefined
     return null;
   }
 
-  return CANCELLATION_REASON_LABELS[label] ?? label;
+  return CANCELLATION_REASON_LABELS[label] ?? null;
 }
 
 export function localizeRefundLabel(label: string | null | undefined): string | null {
@@ -22,7 +22,7 @@ export function localizeRefundLabel(label: string | null | undefined): string | 
     return null;
   }
 
-  return REFUND_LABELS[label] ?? label;
+  return REFUND_LABELS[label] ?? null;
 }
 
 export function formatPastBookingNotes(

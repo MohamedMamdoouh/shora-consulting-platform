@@ -6,6 +6,7 @@
 
 .pending-approval-card {
   @include card.dashboard-card-shell;
+  @include card.card-stack;
 }
 
 .pending-approval-card__header {
@@ -36,7 +37,6 @@
 
 .pending-approval-card__message {
   padding: var(--space-lg);
-  margin-bottom: var(--space-lg);
   background: var(--color-warning-bg);
   border: 1px solid var(--color-warning-border);
   border-radius: var(--radius-lg);
@@ -51,7 +51,7 @@
 .pending-approval-card__receipt {
   display: grid;
   gap: var(--space-sm);
-  margin: 0 0 var(--space-lg);
+  margin: 0;
 }
 
 .pending-approval-card__receipt figcaption {

@@ -1,5 +1,7 @@
+@use '../../shared/styles/dashboard-card' as card;
+
 :host {
-  display: block;
+  @include card.card-stack;
 }
 
 .upload-form .btn--primary {

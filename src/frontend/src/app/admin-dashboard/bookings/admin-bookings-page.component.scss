@@ -74,6 +74,16 @@
   font-size: var(--admin-font-size-base);
 }
 
+.admin-bookings__cell--placeholder {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.admin-bookings__placeholder {
+  display: block;
+  color: var(--color-text-muted);
+}
+
 .admin-bookings__row--queue {
   background: var(--color-warning-bg);
 }

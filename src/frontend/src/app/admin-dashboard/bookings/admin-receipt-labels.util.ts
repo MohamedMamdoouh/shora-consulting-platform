@@ -1,28 +1,10 @@
-import {
-  AdminPaymentReceiptItem,
-  PaymentMethod,
-  ReceiptDeclineReasonCode,
-} from '@contracts/payments';
+import { AdminPaymentReceiptItem, PaymentMethod } from '@contracts/payments';
 import { formatCurrency, formatDateTime } from '../../core/i18n/app-locale';
 
-export const RECEIPT_DECLINE_REASON_OPTIONS: ReadonlyArray<{
-  value: ReceiptDeclineReasonCode;
-  label: string;
-}> = [
-  { value: 'UnreadableImage', label: 'صورة غير واضحة' },
-  { value: 'AmountMismatch', label: 'المبلغ غير مطابق' },
-  { value: 'DuplicateReceipt', label: 'إيصال مكرر' },
-  { value: 'UnverifiableTransfer', label: 'تعذر التحقق من التحويل' },
-  { value: 'Other', label: 'سبب آخر' },
-];
-
-export function formatReceiptDeclineReasonCode(code?: string | null): string | null {
-  if (!code) {
-    return null;
-  }
-
-  return RECEIPT_DECLINE_REASON_OPTIONS.find((option) => option.value === code)?.label ?? code;
-}
+export {
+  formatReceiptDeclineReasonCode,
+  RECEIPT_DECLINE_REASON_OPTIONS,
+} from '../../core/i18n/receipt-decline-labels.util';
 
 export function formatPaymentMethod(method?: PaymentMethod | null): string {
   switch (method) {

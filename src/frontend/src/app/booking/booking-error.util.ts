@@ -3,16 +3,16 @@ import { ErrorCodes } from '@contracts/error-codes';
 const BOOKING_ERROR_MESSAGES: Record<string, string> = {
   [ErrorCodes.Booking.SlotUnavailable]: 'هذا الموعد لم يعد متاحًا. يرجى اختيار موعد آخر.',
   [ErrorCodes.Booking.HoldCapExceeded]:
-    'لديك الحد الأقصى من الحجوزات غير المؤكدة. قم بإلغاءأحدها من لوحتك ثم حاول مجددًا.',
+    'لديك الحد الأقصى من الحجوزات غير المؤكدة. قم بإلغاء أحدها من لوحتك ثم حاول مجددًا.',
   [ErrorCodes.Booking.EmailNotVerified]: 'يرجى تأكيد بريدك الإلكتروني قبل حجز جلسة.',
   [ErrorCodes.Booking.ContactPhoneRequired]: 'رقم الهاتف مطلوب للمكالمة الصوتية.',
   [ErrorCodes.Booking.ContactPhoneInvalid]: 'رقم الهاتف غير صالح. استخدم رقم موبايل مصري صحيح.',
   [ErrorCodes.Booking.NotFound]: 'لم يتم العثور على الحجز.',
   [ErrorCodes.Booking.Forbidden]: 'لا يمكنك عرض تعليمات هذا الحجز.',
   [ErrorCodes.Booking.InvalidStatus]: 'تعليمات الدفع غير متاحة لهذا الحجز.',
-  [ErrorCodes.Cancellation.TooLate]: 'فات الأوان لطلب الإلغاء عبر الموقع — تواصل معي على واتساب.',
+  [ErrorCodes.Cancellation.TooLate]: 'فات الأوان لطلب الإلغاء عبر الموقع — تواصل معنا على واتساب.',
   [ErrorCodes.Cancellation.ReopenExhausted]:
-    'لا يمكن تقديم طلب إلغاء آخر عبر الموقع — تواصل معي على واتساب.',
+    'لا يمكن تقديم طلب إلغاء آخر عبر الموقع — تواصل معنا على واتساب.',
   [ErrorCodes.Payment.UploadDeadlinePassed]: 'انتهت مهلة رفع الإيصال.',
   [ErrorCodes.Payment.InvalidReceiptFile]:
     'ملف الإيصال غير صالح. استخدم JPG أو PNG أو WebP أو PDF.',

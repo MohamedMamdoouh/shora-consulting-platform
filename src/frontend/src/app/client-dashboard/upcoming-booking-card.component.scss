@@ -6,6 +6,7 @@
 
 .upcoming-booking-card {
   @include card.dashboard-card-shell;
+  @include card.card-stack;
 }
 
 .upcoming-booking-card__header {
@@ -93,7 +94,6 @@
 .upcoming-booking-card__cancellation {
   display: grid;
   gap: var(--space-sm);
-  margin-top: var(--space-lg);
   padding: var(--space-lg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);

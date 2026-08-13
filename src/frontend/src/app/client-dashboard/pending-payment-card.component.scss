@@ -6,6 +6,7 @@
 
 .pending-payment-card {
   @include card.dashboard-card-shell;
+  @include card.card-stack;
 }
 
 .pending-payment-card__header {
@@ -43,7 +44,6 @@
 
 .pending-payment-card__success {
   padding: var(--space-lg);
-  margin-bottom: var(--space-lg);
   background: var(--color-success-bg);
   border: 1px solid var(--color-success-border);
   border-radius: var(--radius-lg);
@@ -58,7 +58,6 @@
 .pending-payment-card__fallback {
   display: grid;
   gap: var(--space-md);
-  margin-bottom: var(--space-lg);
 }
 
 .pending-payment-card__fallback p {
@@ -69,7 +68,6 @@
 .pending-payment-card__footer {
   display: grid;
   gap: var(--space-sm);
-  margin-top: var(--space-lg);
   padding-top: var(--space-lg);
   border-top: 1px solid var(--color-border-subtle);
 }

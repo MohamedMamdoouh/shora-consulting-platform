@@ -149,7 +149,7 @@ public class HealthEndpointTests : IDisposable
         {
             builder.UseSetting(WebHostDefaults.EnvironmentKey, Environments.Production);
             builder.UseSetting("ConnectionStrings:DefaultConnection", connectionString);
-            builder.UseSetting("AllowedHosts", "shora-production.up.railway.app;healthcheck.railway.app");
+            builder.UseSetting("AllowedHosts", "mahmoudelbanna.up.railway.app;healthcheck.railway.app");
             builder.UseSetting("Jwt:SigningKey", "test-signing-key-min-32-characters-long!");
             builder.ConfigureAppConfiguration((_, config) =>
             {
@@ -158,8 +158,8 @@ public class HealthEndpointTests : IDisposable
                     ["Jwt:Issuer"] = "Shora",
                     ["Jwt:Audience"] = "Shora.Web",
                     ["Jwt:SigningKey"] = "test-signing-key-min-32-characters-long!",
-                    ["Frontend:BaseUrl"] = "https://shora-production.up.railway.app",
-                    ["Cors:AllowedOrigins:0"] = "https://shora-production.up.railway.app",
+                    ["Frontend:BaseUrl"] = "https://mahmoudelbanna.up.railway.app",
+                    ["Cors:AllowedOrigins:0"] = "https://mahmoudelbanna.up.railway.app",
                     ["Email:ApiKey"] = "xkeysib-test",
                     ["Email:FromAddress"] = "noreply@example.com",
                     ["Storage:ConnectionString"] = "UseDevelopmentStorage=true",

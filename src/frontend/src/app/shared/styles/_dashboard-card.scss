@@ -9,6 +9,11 @@
     transform var(--transition-base);
 }
 
+@mixin card-stack($gap: var(--space-md)) {
+  display: grid;
+  gap: $gap;
+}
+
 @mixin dashboard-card-header {
   display: flex;
   flex-wrap: wrap;
@@ -37,6 +42,10 @@
   &:hover {
     box-shadow: var(--shadow-card-hover);
   }
+}
+
+.card-stack {
+  @include card-stack;
 }
 
 .dashboard-card__header {

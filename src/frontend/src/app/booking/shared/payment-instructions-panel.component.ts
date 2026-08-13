@@ -15,6 +15,7 @@ import { firstValueFrom } from 'rxjs';
 import { readApiError, readApiErrorCode } from '../../core/api/api-error.util';
 import { BookingService } from '../../core/booking/booking.service';
 import { formatCurrency, formatNumber } from '../../core/i18n/app-locale';
+import { formatReceiptDeclineReasonCode } from '../../core/i18n/receipt-decline-labels.util';
 import { readBookingErrorMessage } from '../booking-error.util';
 
 @Component({
@@ -53,6 +54,7 @@ export class PaymentInstructionsPanelComponent implements OnChanges, OnDestroy {
   }
 
   readonly formatPrice = formatCurrency;
+  readonly formatDeclineReason = formatReceiptDeclineReasonCode;
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;

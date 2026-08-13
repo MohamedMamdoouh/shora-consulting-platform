@@ -1,7 +1,8 @@
 @if (declineReason) {
   <div class="decline-banner" role="status">
     <p>
-      تم رفض الإيصال السابق: {{ declineReason }}. يرجى رفع إيصال جديد قبل انتهاء المهلة.
+      تم رفض الإيصال السابق: {{ formatDeclineReason(declineReason) }}. يرجى رفع إيصال جديد قبل
+      انتهاء المهلة.
     </p>
   </div>
 }

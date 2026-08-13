@@ -37,7 +37,7 @@ export class PaymentInstructionsPanelComponent implements OnChanges, OnDestroy {
   readonly deadlineExpired = signal(false);
   uploadMethod: PaymentMethod = 'VodafoneCash';
   senderReference = '';
-  selectedFile: File | null = null;
+  readonly selectedFile = signal<File | null>(null);
   readonly uploadError = signal('');
   readonly uploading = signal(false);
 
@@ -58,17 +58,16 @@ export class PaymentInstructionsPanelComponent implements OnChanges, OnDestroy {
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.selectedFile = input.files?.[0] ?? null;
+    this.selectedFile.set(input.files?.[0] ?? null);
     this.uploadError.set('');
   }
 
   async submitReceipt(): Promise<void> {
-    if (this.uploading() || this.deadlineExpired()) {
-      return;
-    }
-
-    if (!this.selectedFile) {
-      this.uploadError.set('يرجى اختيار صورة الإيصال.');
+    const file = this.selectedFile();
+    if (this.uploading() || this.deadlineExpired() || !file) {
+      if (!file && !this.uploading() && !this.deadlineExpired()) {
+        this.uploadError.set('يرجى اختيار صورة الإيصال.');
+      }
       return;
     }
 
@@ -79,7 +78,7 @@ export class PaymentInstructionsPanelComponent implements OnChanges, OnDestroy {
       await firstValueFrom(
         this.bookingService.uploadReceipt(
           this.bookingId,
-          this.selectedFile,
+          file,
           this.uploadMethod,
           this.senderReference,
         ),

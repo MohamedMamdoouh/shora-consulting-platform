@@ -4,6 +4,11 @@
   display: block;
 }
 
+.state-panel--error p {
+  color: var(--color-error);
+  font-weight: 600;
+}
+
 .day-list {
   display: grid;
   gap: var(--space-md);

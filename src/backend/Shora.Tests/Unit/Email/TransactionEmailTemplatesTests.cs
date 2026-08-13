@@ -65,7 +65,7 @@ public class TransactionEmailTemplatesTests
 
         Assert.Contains("من قام بالإلغاء", html);
         Assert.Contains("النظام (تلقائيًا)", html);
-        Assert.Contains("لم يُرفَع الإيصال في الوقت المحدد", html);
+        Assert.Contains("لم يتم رفع الإيصال في الوقت المحدد", html);
         Assert.DoesNotContain("{{", html);
     }
 

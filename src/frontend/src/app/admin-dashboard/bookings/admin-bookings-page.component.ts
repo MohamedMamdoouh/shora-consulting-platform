@@ -179,22 +179,35 @@ export class AdminBookingsPageComponent implements OnInit {
   }
 
   async onReceiptReviewChanged(): Promise<void> {
-    this.actionMessage.set('تم تحديث حالة الحجز.');
+    const name = this.receiptReviewItem()?.clientDisplayName;
+    this.actionMessage.set(
+      name
+        ? this.copy.admin.customerAction(name, 'تم تحديث حالة الحجز.')
+        : 'تم تحديث حالة الحجز.',
+    );
     this.receiptReviewItem.set(null);
     await this.loadBookings(this.currentPage());
   }
 
   async onCancellationReviewChanged(): Promise<void> {
-    this.actionMessage.set('تم تحديث حالة طلب الإلغاء.');
+    const name = this.cancellationReviewItem()?.clientDisplayName;
+    this.actionMessage.set(
+      name
+        ? this.copy.admin.customerAction(name, 'تم تحديث حالة طلب الإلغاء.')
+        : 'تم تحديث حالة طلب الإلغاء.',
+    );
     this.cancellationReviewItem.set(null);
     await this.loadBookings(this.currentPage());
   }
 
   async onRefundChanged(): Promise<void> {
-    this.actionMessage.set(
+    const name = this.refundPanelItem()?.clientDisplayName;
+    const message =
       this.refundPanelMode() === 'revoke'
         ? 'تم التراجع عن تسجيل الاسترداد.'
-        : 'تم تسجيل الاسترداد وإرسال تأكيد للعميل.',
+        : 'تم تسجيل الاسترداد وإرسال تأكيد للعميل.';
+    this.actionMessage.set(
+      name ? this.copy.admin.customerAction(name, message) : message,
     );
     this.closeRefundPanel();
     await this.loadBookings(this.currentPage());
@@ -223,9 +236,12 @@ export class AdminBookingsPageComponent implements OnInit {
     try {
       await firstValueFrom(this.adminBookingsService.cancelBooking(item.bookingId));
       this.actionMessage.set(
-        item.paymentStatus === 'Approved'
-          ? 'تم إلغاء الحجز — استرداد مستحق.'
-          : 'تم إلغاء الحجز.',
+        this.copy.admin.customerAction(
+          item.clientDisplayName,
+          item.paymentStatus === 'Approved'
+            ? 'تم إلغاء الحجز — استرداد مستحق.'
+            : 'تم إلغاء الحجز.',
+        ),
       );
       await this.loadBookings(this.currentPage());
     } catch (error) {

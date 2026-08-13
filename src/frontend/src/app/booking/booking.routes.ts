@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { clientGuard } from '../core/auth/auth.guard';
 import {
+  blockAdminBookingGuard,
   bookingPhoneGuard,
   bookingReviewGuard,
   bookingSlotSelectedGuard,
@@ -10,6 +11,7 @@ import { DeliveryMethodComponent } from './delivery-method/delivery-method.compo
 import { PaymentInstructionsComponent } from './payment-instructions/payment-instructions.component';
 import { ReviewComponent } from './review/review.component';
 import { SlotPickerComponent } from './slot-picker/slot-picker.component';
+
 export const BOOKING_ROUTES: Routes = [
   {
     path: 'start',
@@ -18,22 +20,22 @@ export const BOOKING_ROUTES: Routes = [
   {
     path: 'delivery',
     component: DeliveryMethodComponent,
-    canActivate: [bookingSlotSelectedGuard],
+    canActivate: [blockAdminBookingGuard, bookingSlotSelectedGuard],
   },
   {
     path: 'phone',
     component: ContactPhoneComponent,
-    canActivate: [bookingPhoneGuard],
+    canActivate: [blockAdminBookingGuard, bookingPhoneGuard],
   },
   {
     path: 'review',
     component: ReviewComponent,
-    canActivate: [bookingReviewGuard],
+    canActivate: [blockAdminBookingGuard, bookingReviewGuard],
   },
   {
     path: 'payment/:id',
     component: PaymentInstructionsComponent,
-    canActivate: [clientGuard],
+    canActivate: [blockAdminBookingGuard, clientGuard],
   },
   { path: '', redirectTo: 'start', pathMatch: 'full' },
 ];

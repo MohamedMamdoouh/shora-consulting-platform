@@ -129,9 +129,11 @@ button:active,
 button:disabled,
 .btn:disabled,
 .btn[aria-disabled='true'] {
-  opacity: 0.55;
+  opacity: 0.45;
   cursor: not-allowed;
   transform: none;
+  pointer-events: none;
+  box-shadow: none;
 }
 
 button.secondary,
@@ -171,6 +173,12 @@ button.secondary:hover,
 .btn--danger:hover {
   background: var(--color-error-hover);
   color: var(--color-on-primary);
+}
+
+.btn--danger:disabled,
+.btn--danger[aria-disabled='true'] {
+  background: var(--color-error);
+  border-color: var(--color-error);
 }
 
 .btn--gradient {
@@ -293,6 +301,10 @@ label.field > span:first-child {
   font-size: var(--font-size-xs);
   font-weight: 500;
   margin: 0;
+}
+
+.field-invalid {
+  border-color: var(--color-error) !important;
 }
 
 /* Badges */
@@ -550,11 +562,22 @@ label.field > span:first-child {
     transform var(--transition-base);
 }
 
+button.choice-card:hover,
 .choice-card:hover {
-  background: var(--color-primary-muted);
+  background: var(--color-primary-soft);
   border-color: var(--color-primary-light);
   box-shadow: var(--shadow-card-hover);
   color: var(--color-text);
+}
+
+button.choice-card:hover .choice-card__title,
+.choice-card:hover .choice-card__title {
+  color: var(--color-text);
+}
+
+button.choice-card:hover .choice-card__detail,
+.choice-card:hover .choice-card__detail {
+  color: var(--color-primary-light);
 }
 
 .choice-card:focus-visible {

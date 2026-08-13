@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  resolveAdminBookingGuard,
   resolvePhoneGuard,
   resolveReviewGuard,
   resolveSlotSelectedGuard,
@@ -29,6 +30,12 @@ describe('booking guard decisions', () => {
       resolveReviewGuard(state({ deliveryMethod: 'VoiceCall', contactPhone: '01012345678' })),
     ).toBe(true);
     expect(resolveReviewGuard(state({ deliveryMethod: 'Chat', contactPhone: null }))).toBe(true);
+  });
+
+  it('sends admins back to the start page instead of later booking steps', () => {
+    expect(resolveAdminBookingGuard('Admin')).toBe('/booking/start');
+    expect(resolveAdminBookingGuard('Client')).toBe(true);
+    expect(resolveAdminBookingGuard(null)).toBe(true);
   });
 });
 

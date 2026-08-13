@@ -10,8 +10,7 @@
       <div>
         <h3 id="receipt-panel-title">مراجعة إيصال الدفع</h3>
         <p class="receipt-panel__subtitle">
-          {{ copy.admin.customerNameLabel }}:
-          <strong>{{ clientDisplayName }}</strong>
+          {{ copy.admin.customerName(clientDisplayName) }}
         </p>
       </div>
       <button type="button" class="receipt-panel__close" (click)="close()" aria-label="إغلاق">

@@ -65,14 +65,23 @@
       accept="image/jpeg,image/png,image/webp,application/pdf"
       (change)="onFileSelected($event)"
       [disabled]="uploading() || deadlineExpired()"
+      [attr.aria-invalid]="!selectedFile()"
     />
   </label>
+
+  @if (!selectedFile() && !deadlineExpired()) {
+    <p class="field-error" role="alert">يرجى اختيار صورة الإيصال.</p>
+  }
 
   @if (uploadError()) {
     <p class="upload-error" aria-live="polite">{{ uploadError() }}</p>
   }
 
-  <button type="submit" class="btn btn--primary" [disabled]="uploading() || deadlineExpired()">
+  <button
+    type="submit"
+    class="btn btn--primary"
+    [disabled]="uploading() || deadlineExpired() || !selectedFile()"
+  >
     {{ uploading() ? 'جاري الرفع...' : 'رفع الإيصال' }}
   </button>
 </form>

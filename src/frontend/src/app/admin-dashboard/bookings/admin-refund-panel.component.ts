@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, EventEmitter, Input, Output, Signal, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminBookingListItem } from '@contracts/booking';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, map, startWith } from 'rxjs';
 import { readApiError, readApiErrorCode } from '../../core/api/api-error.util';
 import { AdminPaymentsService } from '../../core/admin/admin-payments.service';
 import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
@@ -41,33 +42,34 @@ export class AdminRefundPanelComponent {
     correctionReason: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(1000)]),
   });
 
-  hasCorrectionReason(): boolean {
-    return this.revokeForm.controls.correctionReason.value.trim().length > 0;
-  }
+  private readonly referenceText = trimmedValue(this.recordForm.controls.reference);
+  private readonly correctionReasonText = trimmedValue(this.revokeForm.controls.correctionReason);
 
-  correctionReasonError(): string | null {
+  readonly hasReference = computed(() => this.referenceText().length > 0);
+  readonly hasCorrectionReason = computed(() => this.correctionReasonText().length > 0);
+
+  readonly referenceError = computed(() =>
+    this.hasReference() ? null : this.copy.admin.dialog.refundReferenceRequired,
+  );
+
+  readonly correctionReasonError = computed(() => {
     if (!this.hasCorrectionReason()) {
       return this.copy.admin.dialog.revokeRefundReasonRequired;
     }
 
-    if (this.revokeForm.controls.correctionReason.hasError('maxlength')) {
+    if (this.correctionReasonText().length > 1000) {
       return this.copy.admin.dialog.revokeRefundReasonTooLong;
     }
 
     return null;
-  }
+  });
 
   close(): void {
     this.closed.emit();
   }
 
   async submitRecord(): Promise<void> {
-    if (this.isSubmitting() || !this.item.paymentId) {
-      return;
-    }
-
-    if (this.recordForm.invalid) {
-      this.recordForm.markAllAsTouched();
+    if (this.isSubmitting() || !this.item.paymentId || !this.hasReference()) {
       return;
     }
 
@@ -97,18 +99,16 @@ export class AdminRefundPanelComponent {
   }
 
   async submitRevoke(): Promise<void> {
-    if (this.isSubmitting() || !this.item.paymentId) {
-      return;
-    }
-
-    if (this.revokeForm.invalid || !this.hasCorrectionReason()) {
-      this.revokeForm.markAllAsTouched();
+    if (this.isSubmitting() || !this.item.paymentId || !this.hasCorrectionReason()) {
       return;
     }
 
     const confirmed = await this.confirmDialog.confirm({
       title: this.copy.admin.dialog.revokeRefundTitle,
-      message: this.copy.admin.dialog.revokeRefundMessage,
+      message: this.copy.admin.customerAction(
+        this.item.clientDisplayName,
+        this.copy.admin.dialog.revokeRefundMessage,
+      ),
       detail: this.copy.admin.customerName(this.item.clientDisplayName),
       confirmLabel: this.copy.admin.dialog.revokeRefundAction,
       variant: 'danger',
@@ -141,4 +141,14 @@ export class AdminRefundPanelComponent {
       this.isSubmitting.set(false);
     }
   }
+}
+
+function trimmedValue(control: AbstractControl<string>): Signal<string> {
+  return toSignal(
+    control.valueChanges.pipe(
+      startWith(control.value),
+      map((value) => value.trim()),
+    ),
+    { initialValue: control.value.trim() },
+  );
 }

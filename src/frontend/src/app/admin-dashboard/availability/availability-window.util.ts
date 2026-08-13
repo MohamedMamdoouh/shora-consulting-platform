@@ -20,7 +20,9 @@ export const DAY_OF_WEEK_OPTIONS: ReadonlyArray<{ value: DayOfWeekName; label: s
 
 const DAY_NAME_BY_INDEX = DAY_OF_WEEK_NAMES;
 
-export function parseDayOfWeek(value: DayOfWeek | string | number | null | undefined): DayOfWeekName {
+export function parseDayOfWeek(
+  value: DayOfWeek | string | number | null | undefined,
+): DayOfWeekName {
   if (typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= 6) {
     return DAY_NAME_BY_INDEX[value] ?? 'Monday';
   }
@@ -119,7 +121,7 @@ export function getWindowFieldError(control: AbstractControl | null, field: stri
     return 'هذا الحقل مطلوب.';
   }
 
-  if (control.errors['windowRange'] || field === 'endTime' && control.errors['windowRange']) {
+  if (control.errors['windowRange'] || (field === 'endTime' && control.errors['windowRange'])) {
     return 'وقت النهاية يجب أن يكون بعد وقت البداية.';
   }
 

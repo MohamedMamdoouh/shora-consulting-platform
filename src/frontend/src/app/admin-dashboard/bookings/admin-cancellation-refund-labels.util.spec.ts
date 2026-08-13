@@ -66,13 +66,14 @@ describe('admin cancellation and refund action labels', () => {
     expect(canDirectCancelBooking(booking({ status: 'Completed' }), NOW_MS)).toBe(false);
   });
 
-  it('formats remaining cancellation decision time and expired deadlines deterministically', () => {
+  it('formats remaining cancellation decision time as hours and minutes only', () => {
     const deadline = new Date(NOW_MS + (2 * 3600 + 5 * 60 + 9) * 1000).toISOString();
 
-    expect(formatRemainingTime(deadline, NOW_MS)).toContain('2');
-    expect(formatRemainingTime(deadline, NOW_MS)).toContain('5');
-    expect(formatRemainingTime(deadline, NOW_MS)).toContain('9');
-    expect(formatRemainingTime('2026-08-06T09:59:59.000Z', NOW_MS)).not.toContain('2');
+    expect(formatRemainingTime(deadline, NOW_MS)).toBe('2 ساعة 5 دقيقة');
+    expect(formatRemainingTime(new Date(NOW_MS + 37 * 60 * 1000).toISOString(), NOW_MS)).toBe(
+      '37 دقيقة',
+    );
+    expect(formatRemainingTime('2026-08-06T09:59:59.000Z', NOW_MS)).toBe('انتهت مهلة القرار');
   });
 
   it('includes trimmed client reason when building the cancellation queue note', () => {
@@ -116,6 +117,7 @@ describe('admin cancellation and refund action labels', () => {
   it('labels the customer name in the direct-cancel confirmation', () => {
     const unpaid = buildDirectCancelConfirm(booking({ status: 'PendingPayment' }));
     expect(unpaid.detail).toBe('اسم العميل: Client One');
+    expect(unpaid.message).toContain('اسم العميل: Client One');
     expect(unpaid.message).toContain('هذا الحجز');
     expect(unpaid.message).not.toContain('استرداد مستحق');
 
@@ -123,6 +125,7 @@ describe('admin cancellation and refund action labels', () => {
       booking({ status: 'Confirmed', paymentStatus: 'Approved' }),
     );
     expect(paid.detail).toBe('اسم العميل: Client One');
+    expect(paid.message).toContain('اسم العميل: Client One');
     expect(paid.message).toContain('استرداد مستحق');
   });
 

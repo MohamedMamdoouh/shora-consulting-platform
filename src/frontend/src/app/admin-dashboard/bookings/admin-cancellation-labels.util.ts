@@ -1,24 +1,19 @@
-import {
-  AdminBookingListItem,
-  CancellationDecisionReasonCode,
-} from '@contracts/booking';
+import { AdminBookingListItem, CancellationDecisionReasonCode } from '@contracts/booking';
 import { APP_COPY } from '../../core/i18n/app-copy.constants';
-import { formatDateTime } from '../../core/i18n/app-locale';
+import { formatDateTime, formatNumber } from '../../core/i18n/app-locale';
 
 export const CANCELLATION_DECISION_REASON_OPTIONS: ReadonlyArray<{
   value: CancellationDecisionReasonCode;
   label: string;
 }> = [
   { value: 'TimingConflict', label: 'تعارض في المواعيد' },
-  { value: 'InsufficientReason', label: 'السبب غير كافٍ' },
+  { value: 'InsufficientReason', label: 'السبب غير كافي' },
   { value: 'Policy', label: 'سياسة الإلغاء' },
   { value: 'Other', label: 'سبب آخر' },
 ];
 
 export function isCancellationRequestPending(item: AdminBookingListItem): boolean {
-  return (
-    item.status === 'CancellationRequested' && item.cancellationRequest?.status === 'Pending'
-  );
+  return item.status === 'CancellationRequested' && item.cancellationRequest?.status === 'Pending';
 }
 
 export function canDirectCancelBooking(item: AdminBookingListItem, nowMs = Date.now()): boolean {
@@ -48,24 +43,15 @@ export function formatRemainingTime(deadlineUtc: string, nowMs = Date.now()): st
     return 'انتهت مهلة القرار';
   }
 
-  const totalSeconds = Math.floor(remainingMs / 1000);
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-
-  const parts: string[] = [];
+  const totalMinutes = Math.floor(remainingMs / 60_000);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
 
   if (hours > 0) {
-    parts.push(`${hours} س`);
+    return `${formatNumber(hours)} ساعة ${formatNumber(minutes)} دقيقة`;
   }
 
-  if (minutes > 0 || hours > 0) {
-    parts.push(`${minutes} د`);
-  }
-
-  parts.push(`${seconds} ث`);
-
-  return parts.join(' ');
+  return `${formatNumber(minutes)} دقيقة`;
 }
 
 export function formatCancellationQueueNote(item: AdminBookingListItem): string | null {
@@ -89,11 +75,13 @@ export function buildDirectCancelConfirm(item: AdminBookingListItem): {
   message: string;
   detail: string;
 } {
-  const refundNote =
-    item.paymentStatus === 'Approved' ? APP_COPY.admin.dialog.refundDueNote : '';
+  const refundNote = item.paymentStatus === 'Approved' ? APP_COPY.admin.dialog.refundDueNote : '';
 
   return {
-    message: APP_COPY.admin.dialog.cancelBookingMessage(refundNote),
+    message: APP_COPY.admin.customerAction(
+      item.clientDisplayName,
+      APP_COPY.admin.dialog.cancelBookingMessage(refundNote),
+    ),
     detail: APP_COPY.admin.customerName(item.clientDisplayName),
   };
 }

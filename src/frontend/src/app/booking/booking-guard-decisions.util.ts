@@ -11,6 +11,14 @@ export interface BookingGuardState {
 export type BookingGuardDecision =
   true | '/booking/start' | '/booking/delivery' | '/booking/phone' | '/booking/review';
 
+export function isAdminBlockedFromBooking(role: string | null | undefined): boolean {
+  return role === 'Admin';
+}
+
+export function resolveAdminBookingGuard(role: string | null | undefined): BookingGuardDecision {
+  return isAdminBlockedFromBooking(role) ? '/booking/start' : true;
+}
+
 export function resolveSlotSelectedGuard(hasSlot: boolean): BookingGuardDecision {
   return hasSlot ? true : '/booking/start';
 }

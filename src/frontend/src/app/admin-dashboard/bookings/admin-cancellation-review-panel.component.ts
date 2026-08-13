@@ -1,13 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  OnInit,
-  Output,
-  inject,
-  signal,
-} from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { AdminBookingListItem, CancellationDecisionReasonCode } from '@contracts/booking';
 import { firstValueFrom } from 'rxjs';
@@ -28,7 +19,7 @@ import {
   templateUrl: './admin-cancellation-review-panel.component.html',
   styleUrl: './admin-cancellation-review-panel.component.scss',
 })
-export class AdminCancellationReviewPanelComponent implements OnInit, OnDestroy {
+export class AdminCancellationReviewPanelComponent {
   private readonly fb = inject(FormBuilder);
   private readonly adminBookingsService = inject(AdminBookingsService);
   private readonly confirmDialog = inject(ConfirmDialogService);
@@ -44,29 +35,15 @@ export class AdminCancellationReviewPanelComponent implements OnInit, OnDestroy 
   readonly isApproving = signal(false);
   readonly isDeclining = signal(false);
   readonly showDeclineForm = signal(false);
-  readonly countdownLabel = signal('');
 
   readonly declineReasonOptions = CANCELLATION_DECISION_REASON_OPTIONS;
   readonly formatRequestedAt = formatRequestedAt;
+  readonly formatRemainingTime = formatRemainingTime;
 
   readonly declineForm = this.fb.nonNullable.group({
     reasonCode: this.fb.nonNullable.control<CancellationDecisionReasonCode>('Policy'),
     reasonNote: this.fb.control<string | null>(null),
   });
-
-  private countdownTimer: ReturnType<typeof setInterval> | null = null;
-
-  ngOnInit(): void {
-    this.updateCountdown();
-    this.countdownTimer = setInterval(() => this.updateCountdown(), 1000);
-  }
-
-  ngOnDestroy(): void {
-    if (this.countdownTimer !== null) {
-      clearInterval(this.countdownTimer);
-      this.countdownTimer = null;
-    }
-  }
 
   close(): void {
     this.closed.emit();
@@ -82,7 +59,10 @@ export class AdminCancellationReviewPanelComponent implements OnInit, OnDestroy 
 
     const confirmed = await this.confirmDialog.confirm({
       title: this.copy.admin.dialog.approveCancellationTitle,
-      message: this.copy.admin.dialog.approveCancellationMessage(refundNote),
+      message: this.copy.admin.customerAction(
+        this.item.clientDisplayName,
+        this.copy.admin.dialog.approveCancellationMessage(refundNote),
+      ),
       detail: this.copy.admin.customerName(this.item.clientDisplayName),
       confirmLabel: this.copy.admin.dialog.approveCancellationAction,
       variant: 'danger',
@@ -155,14 +135,4 @@ export class AdminCancellationReviewPanelComponent implements OnInit, OnDestroy 
     }
   }
 
-  private updateCountdown(): void {
-    const deadline = this.item.cancellationRequest?.autoDeclineAtUtc;
-
-    if (!deadline) {
-      this.countdownLabel.set('—');
-      return;
-    }
-
-    this.countdownLabel.set(formatRemainingTime(deadline));
-  }
 }

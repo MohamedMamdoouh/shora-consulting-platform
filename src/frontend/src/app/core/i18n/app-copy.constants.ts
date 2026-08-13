@@ -131,6 +131,7 @@ export const APP_COPY = {
     voiceDetail: 'سيتم الاتصال بك في الموعد على رقم هاتفك.',
     receiptSubmitted:
       'تم استلام إيصال الدفع. ستتم المراجعة، وستصلك رسالة تأكيد بالبريد الإلكتروني بعد الموافقة.',
+    adminCannotBook: 'حساب المشرف لا يمكنه حجز جلسة. استخدم حساب عميل لإتمام الحجز.',
   },
   client: {
     receiptPending:
@@ -155,8 +156,8 @@ export const APP_COPY = {
       `سيتم الاتصال بك في ${time} على الرقم ${phone}.`,
   },
   admin: {
-    customerNameLabel: 'اسم العميل',
     customerName: (name: string) => `اسم العميل: ${name}`,
+    customerAction: (name: string, message: string) => `اسم العميل: ${name} — ${message}`,
     dialog: {
       deleteWindowTitle: 'حذف نافذة التوفر',
       deleteWindowMessage: 'سيتم حذف هذه النافذة وإعادة توليد المواعيد المتاحة.',
@@ -189,6 +190,7 @@ export const APP_COPY = {
       revokeRefundSubmitting: 'جاري التراجع...',
       revokeRefundReasonRequired: 'سبب التصحيح مطلوب. اكتب السبب لتأكيد التراجع.',
       revokeRefundReasonTooLong: 'سبب التصحيح يجب ألا يتجاوز 1000 حرف.',
+      refundReferenceRequired: 'مرجع التحويل مطلوب.',
       cancelBookingTitle: 'إلغاء الحجز',
       cancelBookingMessage: (refundNote: string) =>
         `هل تريد إلغاء هذا الحجز؟${refundNote}`,

@@ -28,7 +28,7 @@ export function formatPaymentStatus(status: string): string {
     case 'Refunded':
       return 'مسترد';
     case 'Void':
-      return 'ملغى';
+      return 'تم إلغاؤه';
     default:
       return status;
   }

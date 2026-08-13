@@ -61,12 +61,14 @@
         <a routerLink="/services" routerLinkActive="active" (click)="closeNav()">{{
           copy.nav.services
         }}</a>
-        <a
-          routerLink="/booking/start"
-          routerLinkActive="active"
-          (click)="closeNav()"
-          >{{ copy.nav.bookSession }}</a
-        >
+        @if (auth.currentUser()?.role !== 'Admin') {
+          <a
+            routerLink="/booking/start"
+            routerLinkActive="active"
+            (click)="closeNav()"
+            >{{ copy.nav.bookSession }}</a
+          >
+        }
 
         <div class="shell__nav-divider" aria-hidden="true"></div>
 

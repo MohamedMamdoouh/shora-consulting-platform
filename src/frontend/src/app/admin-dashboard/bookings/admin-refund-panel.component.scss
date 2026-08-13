@@ -38,13 +38,14 @@
 }
 
 .refund-panel__subtitle {
+  display: inline-block;
   margin: var(--space-xs) 0 0;
-  color: var(--color-text-muted);
-  font-size: 0.875rem;
-}
-
-.refund-panel__subtitle strong {
+  padding: var(--space-xs) var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-linen);
   color: var(--color-text);
+  font-size: 0.875rem;
   font-weight: 600;
 }
 
@@ -90,6 +91,10 @@
   background: var(--color-background);
   color: var(--color-text);
   font: inherit;
+}
+
+.refund-panel__form .field-invalid {
+  border-color: var(--color-error);
 }
 
 .refund-panel__actions {

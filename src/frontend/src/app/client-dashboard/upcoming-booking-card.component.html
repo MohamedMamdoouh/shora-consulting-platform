@@ -4,7 +4,9 @@
       <span class="upcoming-booking-card__time">{{ slotLabel }}</span>
       <span
         class="upcoming-booking-card__status"
-        [class.upcoming-booking-card__status--cancellation-requested]="statusModifier === 'cancellation-requested'"
+        [class.upcoming-booking-card__status--cancellation-requested]="
+          statusModifier === 'cancellation-requested'
+        "
       >
         {{ statusLabel }}
       </span>
@@ -25,7 +27,12 @@
   } @else if (whatsAppChatUrl; as chatUrl) {
     <div class="upcoming-booking-card__instruction">
       <p>{{ copy.client.whatsAppSessionHint }}</p>
-      <a [href]="chatUrl" target="_blank" rel="noopener noreferrer" class="upcoming-booking-card__chat-link">
+      <a
+        [href]="chatUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="upcoming-booking-card__chat-link"
+      >
         فتح محادثة واتساب
       </a>
     </div>
@@ -36,15 +43,21 @@
   }
 
   @if (showPendingCancellation) {
-    <div class="upcoming-booking-card__cancellation upcoming-booking-card__cancellation--pending" role="status">
+    <div
+      class="upcoming-booking-card__cancellation upcoming-booking-card__cancellation--pending"
+      role="status"
+    >
       <p>{{ copy.client.cancellationPending }}</p>
     </div>
   }
 
   @if (showDeclinedBanner) {
-    <div class="upcoming-booking-card__cancellation upcoming-booking-card__cancellation--declined" role="status">
+    <div
+      class="upcoming-booking-card__cancellation upcoming-booking-card__cancellation--declined"
+      role="status"
+    >
       <p>
-        رفض طلب الإلغاء — الجلسة ما زالت قائمة.
+        تم رفض طلب الإلغاء، ويبقى موعدك قائمًا.
         @if (declinedReason) {
           السبب: {{ declinedReason }}
         }
@@ -76,7 +89,9 @@
       </label>
 
       @if (cancellationActionError()) {
-        <p class="upcoming-booking-card__error" aria-live="polite">{{ cancellationActionError() }}</p>
+        <p class="upcoming-booking-card__error" aria-live="polite">
+          {{ cancellationActionError() }}
+        </p>
       }
 
       <button
@@ -96,10 +111,16 @@
         {{ copy.client.cancelNearSessionPrefix }}
         @if (item.consultantWhatsAppNumber; as whatsAppNumber) {
           : <span dir="ltr">{{ whatsAppNumber }}</span>
-        }.
+        }
+        .
       </p>
       @if (consultantWhatsAppContactUrl; as contactUrl) {
-        <a [href]="contactUrl" target="_blank" rel="noopener noreferrer" class="upcoming-booking-card__chat-link">
+        <a
+          [href]="contactUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="upcoming-booking-card__chat-link"
+        >
           {{ copy.client.whatsAppContact }}
         </a>
       }

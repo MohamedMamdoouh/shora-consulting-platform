@@ -45,5 +45,5 @@ import { Component, input } from '@angular/core';
 export class BrandLogoComponent {
   readonly compact = input(false);
   readonly decorative = input(false);
-  readonly ariaLabel = input('محمود البنا');
+  readonly ariaLabel = input('دكتور محمود البنا');
 }

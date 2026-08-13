@@ -111,7 +111,7 @@
 .hero__visual {
   position: relative;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   min-height: 0;
   @include fade-in-up(200ms);
@@ -124,8 +124,9 @@
   height: auto;
   border-radius: 50% 50% var(--radius-xl) var(--radius-xl);
   object-fit: cover;
-  aspect-ratio: 4 / 5;
-  box-shadow: var(--shadow-card);
+  object-position: center 18%;
+  aspect-ratio: 3 / 4;
+  box-shadow: var(--shadow-md);
   border: 2px solid var(--color-surface);
   outline: 1px solid var(--color-border);
 }

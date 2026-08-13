@@ -55,7 +55,7 @@ public class AvailabilityEndpointTests : IDisposable
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<AvailabilityResponse>();
+        var body = await response.Content.ReadApiJsonAsync<AvailabilityResponse>();
         Assert.NotNull(body);
         Assert.NotEmpty(body!.Slots);
         Assert.All(body.Slots, slot => Assert.True(slot.EndTimeUtc > slot.StartTimeUtc));
@@ -111,7 +111,7 @@ public class AvailabilityEndpointTests : IDisposable
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<AvailabilityResponse>();
+        var body = await response.Content.ReadApiJsonAsync<AvailabilityResponse>();
         Assert.NotNull(body);
         Assert.DoesNotContain(body!.Slots, returned => returned.Id == slot.Id);
     }

@@ -55,7 +55,7 @@ public class AdminReceiptEndpointTests : IDisposable
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<AdminBookingReceiptsResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<AdminBookingReceiptsResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.Equal(bookingId, body!.BookingId);
         Assert.Equal(nameof(PaymentStatus.UnderReview), body.PaymentStatus);
@@ -111,7 +111,7 @@ public class AdminReceiptEndpointTests : IDisposable
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<AdminBookingReceiptsResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<AdminBookingReceiptsResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.Single(body!.Receipts);
         Assert.Null(body.Receipts[0].ImageReadUrl);
@@ -141,7 +141,7 @@ public class AdminReceiptEndpointTests : IDisposable
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<AdminBookingReceiptsResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<AdminBookingReceiptsResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.Single(body!.Receipts);
         Assert.Null(body.Receipts[0].ImageReadUrl);
@@ -176,7 +176,7 @@ public class AdminReceiptEndpointTests : IDisposable
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<AdminReceiptDecisionResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<AdminReceiptDecisionResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.Equal(bookingId, body!.BookingId);
         Assert.Equal(nameof(BookingStatus.Confirmed), body.BookingStatus);
@@ -258,14 +258,14 @@ public class AdminReceiptEndpointTests : IDisposable
         await UploadReceiptAsync(client, bookingId, cancellationToken);
 
         var adminClient = await CreateAdminClientAsync(cancellationToken);
-        var response = await adminClient.PostAsJsonAsync(
+        var response = await adminClient.PostApiJsonAsync(
             $"/api/v1/admin/bookings/{bookingId}/receipts/decline",
             new { reasonCode = "UnreadableImage", reasonNote = "Image is blurry" },
             cancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<AdminReceiptDecisionResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<AdminReceiptDecisionResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.Equal(bookingId, body!.BookingId);
         Assert.Equal(nameof(BookingStatus.PendingPayment), body.BookingStatus);
@@ -311,7 +311,7 @@ public class AdminReceiptEndpointTests : IDisposable
             null,
             cancellationToken);
 
-        var declineTask = adminClient2.PostAsJsonAsync(
+        var declineTask = adminClient2.PostApiJsonAsync(
             $"/api/v1/admin/bookings/{bookingId}/receipts/decline",
             new DeclineReceiptRequest(ContractDeclineReasonCode.Other, null),
             cancellationToken);
@@ -342,7 +342,7 @@ public class AdminReceiptEndpointTests : IDisposable
         await UploadReceiptAsync(client, bookingId, cancellationToken);
 
         var adminClient = await CreateAdminClientAsync(cancellationToken);
-        var declineResponse = await adminClient.PostAsJsonAsync(
+        var declineResponse = await adminClient.PostApiJsonAsync(
             $"/api/v1/admin/bookings/{bookingId}/receipts/decline",
             new DeclineReceiptRequest(ContractDeclineReasonCode.AmountMismatch, "Sent 400 EGP"),
             cancellationToken);
@@ -365,7 +365,7 @@ public class AdminReceiptEndpointTests : IDisposable
             cancellationToken);
         Assert.Equal(HttpStatusCode.OK, historyResponse.StatusCode);
 
-        var history = await historyResponse.Content.ReadFromJsonAsync<AdminBookingReceiptsResponse>(cancellationToken);
+        var history = await historyResponse.Content.ReadApiJsonAsync<AdminBookingReceiptsResponse>(cancellationToken);
         Assert.NotNull(history);
         Assert.Equal(2, history!.Receipts.Count);
         Assert.Equal(nameof(ReceiptReviewStatus.Declined), history.Receipts[0].ReviewStatus);
@@ -420,13 +420,13 @@ public class AdminReceiptEndpointTests : IDisposable
     private async Task<HttpClient> CreateAdminClientAsync(CancellationToken cancellationToken)
     {
         var client = CreateClient();
-        var loginResponse = await client.PostAsJsonAsync(
+        var loginResponse = await client.PostApiJsonAsync(
             "/api/v1/auth/login",
             new LoginRequest("admin@test.local", "TestPass123!"),
             cancellationToken);
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
 
-        var loginBody = await loginResponse.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var loginBody = await loginResponse.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginBody!.AccessToken);
         return client;
     }
@@ -437,7 +437,7 @@ public class AdminReceiptEndpointTests : IDisposable
     {
         var client = CreateClient();
 
-        await client.PostAsJsonAsync("/api/v1/auth/signup", new SignUpRequest(
+        await client.PostApiJsonAsync("/api/v1/auth/signup", new SignUpRequest(
             email,
             "Password123!",
             "Test Client"), cancellationToken);
@@ -448,13 +448,13 @@ public class AdminReceiptEndpointTests : IDisposable
         Assert.NotNull(user);
 
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user!);
-        await client.PostAsJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(email, token), cancellationToken);
+        await client.PostApiJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(email, token), cancellationToken);
 
-        var loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(
+        var loginResponse = await client.PostApiJsonAsync("/api/v1/auth/login", new LoginRequest(
             email,
             "Password123!"), cancellationToken);
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
-        var loginBody = await loginResponse.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var loginBody = await loginResponse.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginBody!.AccessToken);
 
         return (client, user!.Id);
@@ -475,13 +475,13 @@ public class AdminReceiptEndpointTests : IDisposable
         var slotId = await GetOpenSlotIdAsync(cancellationToken);
         var (client, _) = await CreateVerifiedClientAsync(email, cancellationToken);
 
-        var response = await client.PostAsJsonAsync("/api/v1/bookings", new CreateBookingRequest(
+        var response = await client.PostApiJsonAsync("/api/v1/bookings", new CreateBookingRequest(
             slotId,
             ContractDeliveryMethod.Chat,
             null), cancellationToken);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<ReserveBookingResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<ReserveBookingResponse>(cancellationToken);
         return (client, body!.BookingId, slotId);
     }
 
@@ -529,7 +529,7 @@ public class AdminReceiptEndpointTests : IDisposable
         string expectedCode,
         CancellationToken cancellationToken)
     {
-        var problem = await response.Content.ReadFromJsonAsync<ProblemDetailsWithCode>(cancellationToken);
+        var problem = await response.Content.ReadApiJsonAsync<ProblemDetailsWithCode>(cancellationToken);
         Assert.NotNull(problem);
         Assert.Equal(expectedCode, problem!.Code);
     }

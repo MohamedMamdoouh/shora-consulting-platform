@@ -35,14 +35,14 @@ public class AdminRefundEndpointTests : IDisposable
         var (paymentId, bookingId) = await CreateRefundDuePaymentAsync("refund-record@example.com", cancellationToken);
 
         var adminClient = await CreateAdminClientAsync(cancellationToken);
-        var response = await adminClient.PostAsJsonAsync(
+        var response = await adminClient.PostApiJsonAsync(
             $"/api/v1/admin/payments/{paymentId}/refunds/record",
             new RecordRefundRequest("VC-123456", "Manual Vodafone Cash refund"),
             cancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<PaymentRefundResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<PaymentRefundResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.Equal(paymentId, body!.PaymentId);
         Assert.Equal(bookingId, body.BookingId);
@@ -74,13 +74,13 @@ public class AdminRefundEndpointTests : IDisposable
         var adminClient = await CreateAdminClientAsync(cancellationToken);
         var request = new RecordRefundRequest("VC-999999", null);
 
-        var firstResponse = await adminClient.PostAsJsonAsync(
+        var firstResponse = await adminClient.PostApiJsonAsync(
             $"/api/v1/admin/payments/{paymentId}/refunds/record",
             request,
             cancellationToken);
         Assert.Equal(HttpStatusCode.OK, firstResponse.StatusCode);
 
-        var secondResponse = await adminClient.PostAsJsonAsync(
+        var secondResponse = await adminClient.PostApiJsonAsync(
             $"/api/v1/admin/payments/{paymentId}/refunds/record",
             request,
             cancellationToken);
@@ -102,19 +102,19 @@ public class AdminRefundEndpointTests : IDisposable
         var (paymentId, bookingId) = await CreateRefundDuePaymentAsync("refund-revoke@example.com", cancellationToken);
 
         var adminClient = await CreateAdminClientAsync(cancellationToken);
-        var recordResponse = await adminClient.PostAsJsonAsync(
+        var recordResponse = await adminClient.PostApiJsonAsync(
             $"/api/v1/admin/payments/{paymentId}/refunds/record",
             new RecordRefundRequest("VC-555555", null),
             cancellationToken);
         Assert.Equal(HttpStatusCode.OK, recordResponse.StatusCode);
 
-        var revokeResponse = await adminClient.PostAsJsonAsync(
+        var revokeResponse = await adminClient.PostApiJsonAsync(
             $"/api/v1/admin/payments/{paymentId}/refunds/revoke",
             new RevokeRefundRequest("Recorded against the wrong booking"),
             cancellationToken);
         Assert.Equal(HttpStatusCode.OK, revokeResponse.StatusCode);
 
-        var body = await revokeResponse.Content.ReadFromJsonAsync<PaymentRefundResponse>(cancellationToken);
+        var body = await revokeResponse.Content.ReadApiJsonAsync<PaymentRefundResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.Equal(paymentId, body!.PaymentId);
         Assert.Equal(bookingId, body.BookingId);
@@ -152,7 +152,7 @@ public class AdminRefundEndpointTests : IDisposable
         var payment = await context.Payments.AsNoTracking().SingleAsync(p => p.BookingId == bookingId, cancellationToken);
 
         var adminClient = await CreateAdminClientAsync(cancellationToken);
-        var response = await adminClient.PostAsJsonAsync(
+        var response = await adminClient.PostApiJsonAsync(
             $"/api/v1/admin/payments/{payment.Id}/refunds/record",
             new RecordRefundRequest("VC-000001", null),
             cancellationToken);
@@ -211,13 +211,13 @@ public class AdminRefundEndpointTests : IDisposable
     private async Task<HttpClient> CreateAdminClientAsync(CancellationToken cancellationToken)
     {
         var client = CreateClient();
-        var loginResponse = await client.PostAsJsonAsync(
+        var loginResponse = await client.PostApiJsonAsync(
             "/api/v1/auth/login",
             new LoginRequest("admin@test.local", "TestPass123!"),
             cancellationToken);
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
 
-        var loginBody = await loginResponse.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var loginBody = await loginResponse.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginBody!.AccessToken);
         return client;
     }
@@ -228,7 +228,7 @@ public class AdminRefundEndpointTests : IDisposable
     {
         var client = CreateClient();
 
-        await client.PostAsJsonAsync("/api/v1/auth/signup", new SignUpRequest(
+        await client.PostApiJsonAsync("/api/v1/auth/signup", new SignUpRequest(
             email,
             "Password123!",
             "Test Client"), cancellationToken);
@@ -239,13 +239,13 @@ public class AdminRefundEndpointTests : IDisposable
         Assert.NotNull(user);
 
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user!);
-        await client.PostAsJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(email, token), cancellationToken);
+        await client.PostApiJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(email, token), cancellationToken);
 
-        var loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(
+        var loginResponse = await client.PostApiJsonAsync("/api/v1/auth/login", new LoginRequest(
             email,
             "Password123!"), cancellationToken);
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
-        var loginBody = await loginResponse.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var loginBody = await loginResponse.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginBody!.AccessToken);
 
         return (client, user!.Id);
@@ -266,13 +266,13 @@ public class AdminRefundEndpointTests : IDisposable
         var slotId = await GetOpenSlotIdAsync(cancellationToken);
         var (client, _) = await CreateVerifiedClientAsync(email, cancellationToken);
 
-        var response = await client.PostAsJsonAsync("/api/v1/bookings", new CreateBookingRequest(
+        var response = await client.PostApiJsonAsync("/api/v1/bookings", new CreateBookingRequest(
             slotId,
             ContractDeliveryMethod.Chat,
             null), cancellationToken);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<ReserveBookingResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<ReserveBookingResponse>(cancellationToken);
         return (client, body!.BookingId, slotId);
     }
 
@@ -320,7 +320,7 @@ public class AdminRefundEndpointTests : IDisposable
         string expectedCode,
         CancellationToken cancellationToken)
     {
-        var problem = await response.Content.ReadFromJsonAsync<ProblemDetailsWithCode>(cancellationToken);
+        var problem = await response.Content.ReadApiJsonAsync<ProblemDetailsWithCode>(cancellationToken);
         Assert.NotNull(problem);
         Assert.Equal(expectedCode, problem!.Code);
     }

@@ -38,13 +38,13 @@ public class AuthEndpointTests : IDisposable
         var cancellationToken = TestContext.Current.CancellationToken;
         var client = CreateClient();
 
-        var response = await client.PostAsJsonAsync("/api/v1/auth/signup", new SignUpRequest(
+        var response = await client.PostApiJsonAsync("/api/v1/auth/signup", new SignUpRequest(
             "client@example.com",
             "Password123!",
             "Test Client"), cancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        var body = await response.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.Equal("Client", body!.Role);
         Assert.False(body.EmailConfirmed);
@@ -57,19 +57,19 @@ public class AuthEndpointTests : IDisposable
         var cancellationToken = TestContext.Current.CancellationToken;
         var client = CreateClient();
 
-        await client.PostAsJsonAsync("/api/v1/auth/signup", new SignUpRequest(
+        await client.PostApiJsonAsync("/api/v1/auth/signup", new SignUpRequest(
             "dup@example.com",
             "Password123!",
             null), cancellationToken);
 
-        var response = await client.PostAsJsonAsync("/api/v1/auth/signup", new SignUpRequest(
+        var response = await client.PostApiJsonAsync("/api/v1/auth/signup", new SignUpRequest(
             "dup@example.com",
             "Password123!",
             null), cancellationToken);
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
 
-        var problemJson = await response.Content.ReadFromJsonAsync<JsonElement>(cancellationToken);
+        var problemJson = await response.Content.ReadApiJsonAsync<JsonElement>(cancellationToken);
         Assert.Equal(ApiProblemDetailsMapper.ErrorTypeFor(ErrorCodes.Auth.DuplicateEmail), problemJson.GetProperty("type").GetString());
         Assert.Equal(ErrorCodes.Auth.DuplicateEmail, problemJson.GetProperty("code").GetString());
         Assert.Equal(409, problemJson.GetProperty("status").GetInt32());
@@ -81,12 +81,12 @@ public class AuthEndpointTests : IDisposable
         var cancellationToken = TestContext.Current.CancellationToken;
         var client = CreateClient();
 
-        var response = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(
+        var response = await client.PostApiJsonAsync("/api/v1/auth/login", new LoginRequest(
             "admin@test.local",
             "TestPass123!"), cancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        var body = await response.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         Assert.Equal("Admin", body!.Role);
     }
 
@@ -96,20 +96,20 @@ public class AuthEndpointTests : IDisposable
         var cancellationToken = TestContext.Current.CancellationToken;
         var client = CreateClient();
 
-        var loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(
+        var loginResponse = await client.PostApiJsonAsync("/api/v1/auth/login", new LoginRequest(
             "admin@test.local",
             "TestPass123!"), cancellationToken);
 
         Assert.True(loginResponse.Headers.TryGetValues("Set-Cookie", out var cookies));
         Assert.Contains("shora_refresh=", string.Join(';', cookies!));
 
-        var loginBody = await loginResponse.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var loginBody = await loginResponse.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginBody!.AccessToken);
 
         var refreshResponse = await client.PostAsync("/api/v1/auth/refresh", null, cancellationToken);
         Assert.Equal(HttpStatusCode.OK, refreshResponse.StatusCode);
 
-        var refreshBody = await refreshResponse.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var refreshBody = await refreshResponse.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         Assert.NotEqual(loginBody.AccessToken, refreshBody!.AccessToken);
     }
 
@@ -119,7 +119,7 @@ public class AuthEndpointTests : IDisposable
         var cancellationToken = TestContext.Current.CancellationToken;
         var client = CreateClient();
 
-        await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(
+        await client.PostApiJsonAsync("/api/v1/auth/login", new LoginRequest(
             "admin@test.local",
             "TestPass123!"), cancellationToken);
 
@@ -136,7 +136,7 @@ public class AuthEndpointTests : IDisposable
         var cancellationToken = TestContext.Current.CancellationToken;
         var client = CreateClient();
 
-        await client.PostAsJsonAsync("/api/v1/auth/signup", new SignUpRequest(
+        await client.PostApiJsonAsync("/api/v1/auth/signup", new SignUpRequest(
             "verify@example.com",
             "Password123!",
             null), cancellationToken);
@@ -147,7 +147,7 @@ public class AuthEndpointTests : IDisposable
         Assert.NotNull(user);
 
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user!);
-        var verifyResponse = await client.PostAsJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(
+        var verifyResponse = await client.PostApiJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(
             "verify@example.com",
             token), cancellationToken);
 
@@ -165,7 +165,7 @@ public class AuthEndpointTests : IDisposable
         var cancellationToken = TestContext.Current.CancellationToken;
         var client = CreateClient();
 
-        await client.PostAsJsonAsync("/api/v1/auth/signup", new SignUpRequest(
+        await client.PostApiJsonAsync("/api/v1/auth/signup", new SignUpRequest(
             "verify-session@example.com",
             "Password123!",
             null), cancellationToken);
@@ -176,12 +176,12 @@ public class AuthEndpointTests : IDisposable
         Assert.NotNull(user);
 
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user!);
-        var verifyResponse = await client.PostAsJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(
+        var verifyResponse = await client.PostApiJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(
             "verify-session@example.com",
             token), cancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, verifyResponse.StatusCode);
-        var authBody = await verifyResponse.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var authBody = await verifyResponse.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         Assert.NotNull(authBody);
         Assert.True(authBody!.EmailConfirmed);
         Assert.NotEmpty(authBody.AccessToken);
@@ -193,7 +193,7 @@ public class AuthEndpointTests : IDisposable
         var cancellationToken = TestContext.Current.CancellationToken;
         var client = CreateClient();
 
-        await client.PostAsJsonAsync("/api/v1/auth/signup", new SignUpRequest(
+        await client.PostApiJsonAsync("/api/v1/auth/signup", new SignUpRequest(
             "verify-space-token@example.com",
             "Password123!",
             null), cancellationToken);
@@ -205,7 +205,7 @@ public class AuthEndpointTests : IDisposable
 
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user!);
         var corruptedToken = token.Replace('+', ' ');
-        var verifyResponse = await client.PostAsJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(
+        var verifyResponse = await client.PostApiJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(
             "verify-space-token@example.com",
             corruptedToken), cancellationToken);
 
@@ -223,7 +223,7 @@ public class AuthEndpointTests : IDisposable
         var cancellationToken = TestContext.Current.CancellationToken;
         var client = CreateClient();
 
-        await client.PostAsJsonAsync("/api/v1/auth/signup", new SignUpRequest(
+        await client.PostApiJsonAsync("/api/v1/auth/signup", new SignUpRequest(
             "already-verified@example.com",
             "Password123!",
             null), cancellationToken);
@@ -234,17 +234,17 @@ public class AuthEndpointTests : IDisposable
         Assert.NotNull(user);
 
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user!);
-        var firstVerify = await client.PostAsJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(
+        var firstVerify = await client.PostApiJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(
             "already-verified@example.com",
             token), cancellationToken);
         Assert.Equal(HttpStatusCode.OK, firstVerify.StatusCode);
 
-        var secondVerify = await client.PostAsJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(
+        var secondVerify = await client.PostApiJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(
             "already-verified@example.com",
             token), cancellationToken);
         Assert.Equal(HttpStatusCode.OK, secondVerify.StatusCode);
 
-        var authBody = await secondVerify.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var authBody = await secondVerify.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         Assert.NotNull(authBody);
         Assert.True(authBody!.EmailConfirmed);
         Assert.NotEmpty(authBody.AccessToken);
@@ -256,7 +256,7 @@ public class AuthEndpointTests : IDisposable
         var cancellationToken = TestContext.Current.CancellationToken;
         var client = CreateClient();
 
-        await client.PostAsJsonAsync("/api/v1/auth/signup", new SignUpRequest(
+        await client.PostApiJsonAsync("/api/v1/auth/signup", new SignUpRequest(
             "reset@example.com",
             "Password123!",
             null), cancellationToken);
@@ -266,7 +266,7 @@ public class AuthEndpointTests : IDisposable
         var user = await userManager.FindByEmailAsync("reset@example.com");
         var resetToken = await userManager.GeneratePasswordResetTokenAsync(user!);
 
-        var resetResponse = await client.PostAsJsonAsync("/api/v1/auth/reset-password", new ResetPasswordRequest(
+        var resetResponse = await client.PostApiJsonAsync("/api/v1/auth/reset-password", new ResetPasswordRequest(
             "reset@example.com",
             resetToken,
             "NewPassword123!"), cancellationToken);
@@ -276,12 +276,12 @@ public class AuthEndpointTests : IDisposable
         var refreshAfterReset = await client.PostAsync("/api/v1/auth/refresh", null, cancellationToken);
         Assert.Equal(HttpStatusCode.Unauthorized, refreshAfterReset.StatusCode);
 
-        var oldLogin = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(
+        var oldLogin = await client.PostApiJsonAsync("/api/v1/auth/login", new LoginRequest(
             "reset@example.com",
             "Password123!"), cancellationToken);
         Assert.Equal(HttpStatusCode.Unauthorized, oldLogin.StatusCode);
 
-        var newLogin = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(
+        var newLogin = await client.PostApiJsonAsync("/api/v1/auth/login", new LoginRequest(
             "reset@example.com",
             "NewPassword123!"), cancellationToken);
         Assert.Equal(HttpStatusCode.OK, newLogin.StatusCode);
@@ -293,7 +293,7 @@ public class AuthEndpointTests : IDisposable
         var cancellationToken = TestContext.Current.CancellationToken;
         var client = CreateClient();
 
-        var response = await client.PostAsJsonAsync("/api/v1/auth/google", new GoogleSignInRequest("google-user-1"), cancellationToken);
+        var response = await client.PostApiJsonAsync("/api/v1/auth/google", new GoogleSignInRequest("google-user-1"), cancellationToken);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         using var scope = _factory.Services.CreateScope();
@@ -309,7 +309,7 @@ public class AuthEndpointTests : IDisposable
         var cancellationToken = TestContext.Current.CancellationToken;
         var client = CreateClient();
 
-        await client.PostAsJsonAsync("/api/v1/auth/signup", new SignUpRequest(
+        await client.PostApiJsonAsync("/api/v1/auth/signup", new SignUpRequest(
             "squatter@example.com",
             "Password123!",
             null), cancellationToken);
@@ -323,7 +323,7 @@ public class AuthEndpointTests : IDisposable
             Assert.True(await userManager.HasPasswordAsync(user));
         }
 
-        var googleResponse = await client.PostAsJsonAsync("/api/v1/auth/google", new GoogleSignInRequest("email:squatter@example.com"), cancellationToken);
+        var googleResponse = await client.PostApiJsonAsync("/api/v1/auth/google", new GoogleSignInRequest("email:squatter@example.com"), cancellationToken);
         Assert.Equal(HttpStatusCode.OK, googleResponse.StatusCode);
 
         using (var scope = _factory.Services.CreateScope())
@@ -335,7 +335,7 @@ public class AuthEndpointTests : IDisposable
             Assert.False(await userManager.HasPasswordAsync(user));
         }
 
-        var oldPasswordLogin = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(
+        var oldPasswordLogin = await client.PostApiJsonAsync("/api/v1/auth/login", new LoginRequest(
             "squatter@example.com",
             "Password123!"), cancellationToken);
         Assert.Equal(HttpStatusCode.Unauthorized, oldPasswordLogin.StatusCode);
@@ -347,7 +347,7 @@ public class AuthEndpointTests : IDisposable
         var cancellationToken = TestContext.Current.CancellationToken;
         var client = CreateClient();
 
-        var loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(
+        var loginResponse = await client.PostApiJsonAsync("/api/v1/auth/login", new LoginRequest(
             "admin@test.local",
             "TestPass123!"), cancellationToken);
 
@@ -371,7 +371,7 @@ public class AuthEndpointTests : IDisposable
         var cancellationToken = TestContext.Current.CancellationToken;
         var client = CreateClient();
 
-        var loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(
+        var loginResponse = await client.PostApiJsonAsync("/api/v1/auth/login", new LoginRequest(
             "admin@test.local",
             "TestPass123!"), cancellationToken);
 

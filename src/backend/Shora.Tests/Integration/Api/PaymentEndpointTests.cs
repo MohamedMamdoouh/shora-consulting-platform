@@ -46,7 +46,7 @@ public class PaymentEndpointTests : IDisposable
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<UploadReceiptResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<UploadReceiptResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.NotEqual(Guid.Empty, body!.ReceiptId);
         Assert.Equal(bookingId, body.BookingId);
@@ -267,7 +267,7 @@ public class PaymentEndpointTests : IDisposable
     {
         var client = CreateClient();
 
-        await client.PostAsJsonAsync("/api/v1/auth/signup", new SignUpRequest(
+        await client.PostApiJsonAsync("/api/v1/auth/signup", new SignUpRequest(
             email,
             "Password123!",
             "Test Client"), cancellationToken);
@@ -278,13 +278,13 @@ public class PaymentEndpointTests : IDisposable
         Assert.NotNull(user);
 
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user!);
-        await client.PostAsJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(email, token), cancellationToken);
+        await client.PostApiJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(email, token), cancellationToken);
 
-        var loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(
+        var loginResponse = await client.PostApiJsonAsync("/api/v1/auth/login", new LoginRequest(
             email,
             "Password123!"), cancellationToken);
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
-        var loginBody = await loginResponse.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var loginBody = await loginResponse.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginBody!.AccessToken);
 
         return (client, user!.Id);
@@ -305,13 +305,13 @@ public class PaymentEndpointTests : IDisposable
         var slotId = await GetOpenSlotIdAsync(cancellationToken);
         var (client, _) = await CreateVerifiedClientAsync(email, cancellationToken);
 
-        var response = await client.PostAsJsonAsync("/api/v1/bookings", new CreateBookingRequest(
+        var response = await client.PostApiJsonAsync("/api/v1/bookings", new CreateBookingRequest(
             slotId,
             ContractDeliveryMethod.Chat,
             null), cancellationToken);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<ReserveBookingResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<ReserveBookingResponse>(cancellationToken);
         return (client, body!.BookingId, slotId);
     }
 
@@ -362,7 +362,7 @@ public class PaymentEndpointTests : IDisposable
         string expectedCode,
         CancellationToken cancellationToken)
     {
-        var problem = await response.Content.ReadFromJsonAsync<ProblemDetailsWithCode>(cancellationToken);
+        var problem = await response.Content.ReadApiJsonAsync<ProblemDetailsWithCode>(cancellationToken);
         Assert.NotNull(problem);
         Assert.Equal(expectedCode, problem!.Code);
     }

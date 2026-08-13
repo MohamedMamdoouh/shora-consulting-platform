@@ -47,7 +47,7 @@ public class ReceiptAntiReplayEndpointTests : IDisposable
                 cancellationToken);
             Assert.Equal(HttpStatusCode.OK, firstResponse.StatusCode);
 
-            var firstBody = await firstResponse.Content.ReadFromJsonAsync<UploadReceiptResponse>(cancellationToken);
+            var firstBody = await firstResponse.Content.ReadApiJsonAsync<UploadReceiptResponse>(cancellationToken);
             Assert.NotNull(firstBody);
             Assert.Empty(firstBody!.ReviewWarnings);
         }
@@ -66,7 +66,7 @@ public class ReceiptAntiReplayEndpointTests : IDisposable
 
         Assert.Equal(HttpStatusCode.OK, secondResponse.StatusCode);
 
-        var secondBody = await secondResponse.Content.ReadFromJsonAsync<UploadReceiptResponse>(cancellationToken);
+        var secondBody = await secondResponse.Content.ReadApiJsonAsync<UploadReceiptResponse>(cancellationToken);
         Assert.NotNull(secondBody);
         Assert.Contains(nameof(ReceiptReviewWarning.DuplicateContentHash), secondBody!.ReviewWarnings);
 
@@ -76,7 +76,7 @@ public class ReceiptAntiReplayEndpointTests : IDisposable
             cancellationToken);
         Assert.Equal(HttpStatusCode.OK, historyResponse.StatusCode);
 
-        var history = await historyResponse.Content.ReadFromJsonAsync<AdminBookingReceiptsResponse>(cancellationToken);
+        var history = await historyResponse.Content.ReadApiJsonAsync<AdminBookingReceiptsResponse>(cancellationToken);
         Assert.NotNull(history);
         Assert.Single(history!.Receipts);
         Assert.Contains(nameof(ReceiptReviewWarning.DuplicateContentHash), history.Receipts[0].ReviewWarnings);
@@ -103,7 +103,7 @@ public class ReceiptAntiReplayEndpointTests : IDisposable
                 cancellationToken);
             Assert.Equal(HttpStatusCode.OK, uploadResponse.StatusCode);
 
-            var declineResponse = await adminClient.PostAsJsonAsync(
+            var declineResponse = await adminClient.PostApiJsonAsync(
                 $"/api/v1/admin/bookings/{bookingId}/receipts/decline",
                 new DeclineReceiptRequest(ContractDeclineReasonCode.Other, null),
                 cancellationToken);
@@ -142,13 +142,13 @@ public class ReceiptAntiReplayEndpointTests : IDisposable
     private async Task<HttpClient> CreateAdminClientAsync(CancellationToken cancellationToken)
     {
         var client = CreateClient();
-        var loginResponse = await client.PostAsJsonAsync(
+        var loginResponse = await client.PostApiJsonAsync(
             "/api/v1/auth/login",
             new LoginRequest("admin@test.local", "TestPass123!"),
             cancellationToken);
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
 
-        var loginBody = await loginResponse.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var loginBody = await loginResponse.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginBody!.AccessToken);
         return client;
     }
@@ -159,7 +159,7 @@ public class ReceiptAntiReplayEndpointTests : IDisposable
     {
         var client = CreateClient();
 
-        await client.PostAsJsonAsync("/api/v1/auth/signup", new SignUpRequest(
+        await client.PostApiJsonAsync("/api/v1/auth/signup", new SignUpRequest(
             email,
             "Password123!",
             "Test Client"), cancellationToken);
@@ -170,13 +170,13 @@ public class ReceiptAntiReplayEndpointTests : IDisposable
         Assert.NotNull(user);
 
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user!);
-        await client.PostAsJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(email, token), cancellationToken);
+        await client.PostApiJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(email, token), cancellationToken);
 
-        var loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(
+        var loginResponse = await client.PostApiJsonAsync("/api/v1/auth/login", new LoginRequest(
             email,
             "Password123!"), cancellationToken);
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
-        var loginBody = await loginResponse.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var loginBody = await loginResponse.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginBody!.AccessToken);
 
         return client;
@@ -197,13 +197,13 @@ public class ReceiptAntiReplayEndpointTests : IDisposable
         var slotId = await GetOpenSlotIdAsync(cancellationToken);
         var client = await CreateVerifiedClientAsync(email, cancellationToken);
 
-        var response = await client.PostAsJsonAsync("/api/v1/bookings", new CreateBookingRequest(
+        var response = await client.PostApiJsonAsync("/api/v1/bookings", new CreateBookingRequest(
             slotId,
             ContractDeliveryMethod.Chat,
             null), cancellationToken);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<ReserveBookingResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<ReserveBookingResponse>(cancellationToken);
         return (client, body!.BookingId, slotId);
     }
 

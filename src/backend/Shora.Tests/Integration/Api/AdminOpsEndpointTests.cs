@@ -33,7 +33,7 @@ public class AdminOpsEndpointTests : IDisposable
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<AdminOpsAlertsResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<AdminOpsAlertsResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.NotNull(body!.Alerts);
     }
@@ -70,7 +70,7 @@ public class AdminOpsEndpointTests : IDisposable
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<AdminOpsRunbooksResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<AdminOpsRunbooksResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.Equal(7, body!.Runbooks.Count);
 
@@ -133,13 +133,13 @@ public class AdminOpsEndpointTests : IDisposable
     private async Task<HttpClient> CreateAdminClientAsync(CancellationToken cancellationToken)
     {
         var client = CreateClient();
-        var loginResponse = await client.PostAsJsonAsync(
+        var loginResponse = await client.PostApiJsonAsync(
             "/api/v1/auth/login",
             new LoginRequest("admin@test.local", "TestPass123!"),
             cancellationToken);
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
 
-        var loginBody = await loginResponse.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var loginBody = await loginResponse.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginBody!.AccessToken);
         return client;
     }
@@ -150,7 +150,7 @@ public class AdminOpsEndpointTests : IDisposable
     {
         var client = CreateClient();
 
-        await client.PostAsJsonAsync(
+        await client.PostApiJsonAsync(
             "/api/v1/auth/signup",
             new SignUpRequest(email, "Password123!", "Test Client"),
             cancellationToken);
@@ -161,13 +161,13 @@ public class AdminOpsEndpointTests : IDisposable
         Assert.NotNull(user);
 
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user!);
-        await client.PostAsJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(email, token), cancellationToken);
+        await client.PostApiJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(email, token), cancellationToken);
 
-        var loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(
+        var loginResponse = await client.PostApiJsonAsync("/api/v1/auth/login", new LoginRequest(
             email,
             "Password123!"), cancellationToken);
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
-        var loginBody = await loginResponse.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var loginBody = await loginResponse.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginBody!.AccessToken);
 
         return client;

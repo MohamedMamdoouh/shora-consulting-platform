@@ -52,7 +52,7 @@ public sealed class ErrorCatalogEndpointTests : IDisposable
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<ErrorCatalogEntryResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<ErrorCatalogEntryResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.Equal(ErrorCodes.Auth.DuplicateEmail, body!.Code);
         Assert.Equal(409, body.Status);
@@ -70,7 +70,7 @@ public sealed class ErrorCatalogEndpointTests : IDisposable
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
 
-        var problemJson = await response.Content.ReadFromJsonAsync<JsonElement>(cancellationToken);
+        var problemJson = await response.Content.ReadApiJsonAsync<JsonElement>(cancellationToken);
         Assert.Equal(ErrorCodes.Errors.NotFound, problemJson.GetProperty("code").GetString());
     }
 
@@ -84,7 +84,7 @@ public sealed class ErrorCatalogEndpointTests : IDisposable
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<ErrorCatalogListResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<ErrorCatalogListResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.Contains(body!.Items, e => e.Code == ErrorCodes.Auth.DuplicateEmail);
         Assert.DoesNotContain(body.Items, e => e.Code == ErrorCodes.Errors.NotFound);

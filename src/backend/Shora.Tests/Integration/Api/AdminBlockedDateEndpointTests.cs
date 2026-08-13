@@ -39,7 +39,7 @@ public class AdminBlockedDateEndpointTests : IDisposable
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<List<BlockedDateResponse>>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<List<BlockedDateResponse>>(cancellationToken);
         Assert.NotNull(body);
         Assert.Empty(body!);
     }
@@ -67,11 +67,11 @@ public class AdminBlockedDateEndpointTests : IDisposable
             slot.EndTimeUtc,
             "Vacation");
 
-        var response = await adminClient.PostAsJsonAsync("/api/v1/admin/blocked-dates", request, cancellationToken);
+        var response = await adminClient.PostApiJsonAsync("/api/v1/admin/blocked-dates", request, cancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<BlockedDateResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<BlockedDateResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.Equal(request.StartUtc, body!.StartUtc);
         Assert.Equal(request.EndUtc, body.EndUtc);
@@ -97,11 +97,11 @@ public class AdminBlockedDateEndpointTests : IDisposable
 
         var request = new CreateBlockedDateRequest(slot.StartTimeUtc, slot.EndTimeUtc, "Should fail");
 
-        var response = await adminClient.PostAsJsonAsync("/api/v1/admin/blocked-dates", request, cancellationToken);
+        var response = await adminClient.PostApiJsonAsync("/api/v1/admin/blocked-dates", request, cancellationToken);
 
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
 
-        var problemJson = await response.Content.ReadFromJsonAsync<JsonElement>(cancellationToken);
+        var problemJson = await response.Content.ReadApiJsonAsync<JsonElement>(cancellationToken);
         Assert.Equal(ErrorCodes.Availability.BlockedRangeConflictsWithBookings, problemJson.GetProperty("code").GetString());
         var conflictingIds = problemJson.GetProperty("conflictingBookingIds").EnumerateArray().Select(item => item.GetGuid()).ToList();
         Assert.Contains(bookingId, conflictingIds);
@@ -117,7 +117,7 @@ public class AdminBlockedDateEndpointTests : IDisposable
         var adminClient = await CreateAdminClientAsync(cancellationToken);
         var startUtc = DateTime.UtcNow.AddDays(5);
 
-        var response = await adminClient.PostAsJsonAsync(
+        var response = await adminClient.PostApiJsonAsync(
             "/api/v1/admin/blocked-dates",
             new CreateBlockedDateRequest(startUtc, startUtc, null),
             cancellationToken);
@@ -133,13 +133,13 @@ public class AdminBlockedDateEndpointTests : IDisposable
         var adminClient = await CreateAdminClientAsync(cancellationToken);
         var slot = await GetOpenSlotAsync(cancellationToken);
 
-        var createResponse = await adminClient.PostAsJsonAsync(
+        var createResponse = await adminClient.PostApiJsonAsync(
             "/api/v1/admin/blocked-dates",
             new CreateBlockedDateRequest(slot.StartTimeUtc, slot.EndTimeUtc, "Temp"),
             cancellationToken);
         createResponse.EnsureSuccessStatusCode();
 
-        var created = await createResponse.Content.ReadFromJsonAsync<BlockedDateResponse>(cancellationToken);
+        var created = await createResponse.Content.ReadApiJsonAsync<BlockedDateResponse>(cancellationToken);
         Assert.NotNull(created);
 
         var deleteResponse = await adminClient.DeleteAsync($"/api/v1/admin/blocked-dates/{created!.Id}", cancellationToken);
@@ -193,13 +193,13 @@ public class AdminBlockedDateEndpointTests : IDisposable
     private async Task<HttpClient> CreateAdminClientAsync(CancellationToken cancellationToken)
     {
         var client = CreateClient();
-        var loginResponse = await client.PostAsJsonAsync(
+        var loginResponse = await client.PostApiJsonAsync(
             "/api/v1/auth/login",
             new LoginRequest("admin@test.local", "TestPass123!"),
             cancellationToken);
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
 
-        var loginBody = await loginResponse.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var loginBody = await loginResponse.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginBody!.AccessToken);
         return client;
     }
@@ -210,7 +210,7 @@ public class AdminBlockedDateEndpointTests : IDisposable
     {
         var client = CreateClient();
 
-        await client.PostAsJsonAsync(
+        await client.PostApiJsonAsync(
             "/api/v1/auth/signup",
             new SignUpRequest(email, "Password123!", "Test Client"),
             cancellationToken);
@@ -221,18 +221,18 @@ public class AdminBlockedDateEndpointTests : IDisposable
         Assert.NotNull(user);
 
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user!);
-        await client.PostAsJsonAsync(
+        await client.PostApiJsonAsync(
             "/api/v1/auth/verify-email",
             new VerifyEmailRequest(email, token),
             cancellationToken);
 
-        var loginResponse = await client.PostAsJsonAsync(
+        var loginResponse = await client.PostApiJsonAsync(
             "/api/v1/auth/login",
             new LoginRequest(email, "Password123!"),
             cancellationToken);
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
 
-        var loginBody = await loginResponse.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var loginBody = await loginResponse.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginBody!.AccessToken);
 
         return client;
@@ -245,13 +245,13 @@ public class AdminBlockedDateEndpointTests : IDisposable
         var slotId = await GetOpenSlotIdAsync(cancellationToken);
         var client = await CreateVerifiedClientAsync(email, cancellationToken);
 
-        var response = await client.PostAsJsonAsync("/api/v1/bookings", new CreateBookingRequest(
+        var response = await client.PostApiJsonAsync("/api/v1/bookings", new CreateBookingRequest(
             slotId,
             ContractDeliveryMethod.Chat,
             null), cancellationToken);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<ReserveBookingResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<ReserveBookingResponse>(cancellationToken);
         return (client, body!.BookingId, slotId);
     }
 
@@ -260,7 +260,7 @@ public class AdminBlockedDateEndpointTests : IDisposable
         string expectedCode,
         CancellationToken cancellationToken)
     {
-        var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(cancellationToken);
+        var problem = await response.Content.ReadApiJsonAsync<ProblemDetails>(cancellationToken);
         Assert.NotNull(problem);
         Assert.Equal(expectedCode, problem!.Extensions["code"]?.ToString());
     }

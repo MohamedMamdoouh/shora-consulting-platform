@@ -49,7 +49,7 @@ public class SettingsPublicEndpointTests : IDisposable
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<PublicSettingsResponse>();
+        var body = await response.Content.ReadApiJsonAsync<PublicSettingsResponse>();
         Assert.NotNull(body);
         Assert.True(body.SessionPrice > 0);
         Assert.True(body.SessionDurationMinutes > 0);

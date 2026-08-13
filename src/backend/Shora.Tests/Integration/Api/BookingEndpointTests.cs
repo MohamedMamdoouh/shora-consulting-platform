@@ -37,14 +37,14 @@ public class BookingEndpointTests : IDisposable
         var slotId = await GetOpenSlotIdAsync(cancellationToken);
         var (client, userId) = await CreateVerifiedClientAsync("reserve-success@example.com", cancellationToken);
 
-        var response = await client.PostAsJsonAsync("/api/v1/bookings", new CreateBookingRequest(
+        var response = await client.PostApiJsonAsync("/api/v1/bookings", new CreateBookingRequest(
             slotId,
             ContractDeliveryMethod.Chat,
             null), cancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<ReserveBookingResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<ReserveBookingResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.NotEqual(Guid.Empty, body!.BookingId);
         Assert.True(body.PaymentInstructions.Amount > 0);
@@ -80,13 +80,13 @@ public class BookingEndpointTests : IDisposable
         var (firstClient, _) = await CreateVerifiedClientAsync("reserve-first@example.com", cancellationToken);
         var (secondClient, _) = await CreateVerifiedClientAsync("reserve-second@example.com", cancellationToken);
 
-        var firstResponse = await firstClient.PostAsJsonAsync("/api/v1/bookings", new CreateBookingRequest(
+        var firstResponse = await firstClient.PostApiJsonAsync("/api/v1/bookings", new CreateBookingRequest(
             slotId,
             ContractDeliveryMethod.Chat,
             null), cancellationToken);
         Assert.Equal(HttpStatusCode.OK, firstResponse.StatusCode);
 
-        var secondResponse = await secondClient.PostAsJsonAsync("/api/v1/bookings", new CreateBookingRequest(
+        var secondResponse = await secondClient.PostApiJsonAsync("/api/v1/bookings", new CreateBookingRequest(
             slotId,
             ContractDeliveryMethod.Chat,
             null), cancellationToken);
@@ -103,7 +103,7 @@ public class BookingEndpointTests : IDisposable
         await SeedUnconfirmedHoldsAsync(userId, 3, cancellationToken);
 
         var slotId = await GetOpenSlotIdAsync(cancellationToken);
-        var response = await client.PostAsJsonAsync("/api/v1/bookings", new CreateBookingRequest(
+        var response = await client.PostApiJsonAsync("/api/v1/bookings", new CreateBookingRequest(
             slotId,
             ContractDeliveryMethod.Chat,
             null), cancellationToken);
@@ -119,18 +119,18 @@ public class BookingEndpointTests : IDisposable
         var slotId = await GetOpenSlotIdAsync(cancellationToken);
         var client = CreateClient();
 
-        await client.PostAsJsonAsync("/api/v1/auth/signup", new SignUpRequest(
+        await client.PostApiJsonAsync("/api/v1/auth/signup", new SignUpRequest(
             "reserve-unverified@example.com",
             "Password123!",
             "Unverified Client"), cancellationToken);
 
-        var loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(
+        var loginResponse = await client.PostApiJsonAsync("/api/v1/auth/login", new LoginRequest(
             "reserve-unverified@example.com",
             "Password123!"), cancellationToken);
-        var loginBody = await loginResponse.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var loginBody = await loginResponse.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginBody!.AccessToken);
 
-        var response = await client.PostAsJsonAsync("/api/v1/bookings", new CreateBookingRequest(
+        var response = await client.PostApiJsonAsync("/api/v1/bookings", new CreateBookingRequest(
             slotId,
             ContractDeliveryMethod.Chat,
             null), cancellationToken);
@@ -146,7 +146,7 @@ public class BookingEndpointTests : IDisposable
         var slotId = await GetOpenSlotIdAsync(cancellationToken);
         var (client, _) = await CreateVerifiedClientAsync("reserve-voice@example.com", cancellationToken);
 
-        var response = await client.PostAsJsonAsync("/api/v1/bookings", new CreateBookingRequest(
+        var response = await client.PostApiJsonAsync("/api/v1/bookings", new CreateBookingRequest(
             slotId,
             ContractDeliveryMethod.VoiceCall,
             null), cancellationToken);
@@ -162,7 +162,7 @@ public class BookingEndpointTests : IDisposable
         var slotId = await GetOpenSlotIdAsync(cancellationToken);
         var (client, userId) = await CreateVerifiedClientAsync("reserve-voice-ok@example.com", cancellationToken);
 
-        var response = await client.PostAsJsonAsync("/api/v1/bookings", new CreateBookingRequest(
+        var response = await client.PostApiJsonAsync("/api/v1/bookings", new CreateBookingRequest(
             slotId,
             ContractDeliveryMethod.VoiceCall,
             "01012345678"), cancellationToken);
@@ -238,7 +238,7 @@ public class BookingEndpointTests : IDisposable
         var availabilityResponse = await availabilityClient.GetAsync(url, cancellationToken);
         Assert.Equal(HttpStatusCode.OK, availabilityResponse.StatusCode);
 
-        var availability = await availabilityResponse.Content.ReadFromJsonAsync<AvailabilityResponse>(cancellationToken);
+        var availability = await availabilityResponse.Content.ReadApiJsonAsync<AvailabilityResponse>(cancellationToken);
         Assert.Contains(availability!.Slots, returned => returned.Id == slotId);
     }
 
@@ -308,7 +308,7 @@ public class BookingEndpointTests : IDisposable
         var response = await client.GetAsync($"/api/v1/bookings/{bookingId}/payment-instructions", cancellationToken);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<PaymentInstructionsResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<PaymentInstructionsResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.Equal(500m, body!.Amount);
         Assert.Equal("EGP", body.Currency);
@@ -354,14 +354,14 @@ public class BookingEndpointTests : IDisposable
         var cancellationToken = TestContext.Current.CancellationToken;
         var (client, bookingId) = await CreateConfirmedBookingAsync("cancellation-happy@example.com", cancellationToken);
 
-        var response = await client.PostAsJsonAsync(
+        var response = await client.PostApiJsonAsync(
             $"/api/v1/bookings/{bookingId}/cancellation-requests",
             new CancellationRequestBody("Schedule conflict"),
             cancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<CancellationRequestResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<CancellationRequestResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.NotEqual(Guid.Empty, body!.RequestId);
         Assert.Equal(ContractCancellationRequestStatus.Pending, body.Status);
@@ -399,7 +399,7 @@ public class BookingEndpointTests : IDisposable
         var (client, bookingId) = await CreateConfirmedBookingAsync("cancellation-too-late@example.com", cancellationToken);
         await SetBookingSlotStartAsync(bookingId, DateTime.UtcNow.AddMinutes(30), cancellationToken);
 
-        var response = await client.PostAsJsonAsync(
+        var response = await client.PostApiJsonAsync(
             $"/api/v1/bookings/{bookingId}/cancellation-requests",
             new CancellationRequestBody(null),
             cancellationToken);
@@ -418,7 +418,7 @@ public class BookingEndpointTests : IDisposable
         var cancellationToken = TestContext.Current.CancellationToken;
         var (client, bookingId) = await CreateConfirmedBookingAsync("cancellation-reopen@example.com", cancellationToken);
 
-        var firstResponse = await client.PostAsJsonAsync(
+        var firstResponse = await client.PostApiJsonAsync(
             $"/api/v1/bookings/{bookingId}/cancellation-requests",
             new CancellationRequestBody("First request"),
             cancellationToken);
@@ -426,13 +426,13 @@ public class BookingEndpointTests : IDisposable
 
         await SimulateDeclinedCancellationRequestAsync(bookingId, cancellationToken);
 
-        var reopenResponse = await client.PostAsJsonAsync(
+        var reopenResponse = await client.PostApiJsonAsync(
             $"/api/v1/bookings/{bookingId}/cancellation-requests",
             new CancellationRequestBody("Second request"),
             cancellationToken);
         Assert.Equal(HttpStatusCode.OK, reopenResponse.StatusCode);
 
-        var body = await reopenResponse.Content.ReadFromJsonAsync<CancellationRequestResponse>(cancellationToken);
+        var body = await reopenResponse.Content.ReadApiJsonAsync<CancellationRequestResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.Equal(ContractCancellationRequestStatus.Pending, body!.Status);
         Assert.Equal(nameof(BookingStatus.CancellationRequested), body.BookingStatus);
@@ -451,7 +451,7 @@ public class BookingEndpointTests : IDisposable
         var cancellationToken = TestContext.Current.CancellationToken;
         var (client, bookingId) = await CreateConfirmedBookingAsync("cancellation-reopen-exhausted@example.com", cancellationToken);
 
-        var firstResponse = await client.PostAsJsonAsync(
+        var firstResponse = await client.PostApiJsonAsync(
             $"/api/v1/bookings/{bookingId}/cancellation-requests",
             new CancellationRequestBody(null),
             cancellationToken);
@@ -459,7 +459,7 @@ public class BookingEndpointTests : IDisposable
 
         await SimulateDeclinedCancellationRequestAsync(bookingId, cancellationToken);
 
-        var reopenResponse = await client.PostAsJsonAsync(
+        var reopenResponse = await client.PostApiJsonAsync(
             $"/api/v1/bookings/{bookingId}/cancellation-requests",
             new CancellationRequestBody(null),
             cancellationToken);
@@ -467,7 +467,7 @@ public class BookingEndpointTests : IDisposable
 
         await SimulateDeclinedCancellationRequestAsync(bookingId, cancellationToken);
 
-        var secondReopenResponse = await client.PostAsJsonAsync(
+        var secondReopenResponse = await client.PostApiJsonAsync(
             $"/api/v1/bookings/{bookingId}/cancellation-requests",
             new CancellationRequestBody(null),
             cancellationToken);
@@ -482,7 +482,7 @@ public class BookingEndpointTests : IDisposable
         var cancellationToken = TestContext.Current.CancellationToken;
         var (client, bookingId) = await CreateConfirmedBookingAsync("cancellation-decision-seen@example.com", cancellationToken);
 
-        var requestResponse = await client.PostAsJsonAsync(
+        var requestResponse = await client.PostApiJsonAsync(
             $"/api/v1/bookings/{bookingId}/cancellation-requests",
             new CancellationRequestBody(null),
             cancellationToken);
@@ -535,7 +535,7 @@ public class BookingEndpointTests : IDisposable
         var response = await clientA.GetAsync("/api/v1/bookings/mine?status=Past&page=1&pageSize=10", cancellationToken);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<MyBookingsResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<MyBookingsResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.Equal(2, body!.TotalCount);
 
@@ -550,7 +550,7 @@ public class BookingEndpointTests : IDisposable
         Assert.True(returnedIds.SetEquals(ownedIds));
 
         var responseB = await clientB.GetAsync("/api/v1/bookings/mine?status=Past", cancellationToken);
-        var bodyB = await responseB.Content.ReadFromJsonAsync<MyBookingsResponse>(cancellationToken);
+        var bodyB = await responseB.Content.ReadApiJsonAsync<MyBookingsResponse>(cancellationToken);
         Assert.NotNull(bodyB);
         Assert.Single(bodyB!.Items);
     }
@@ -566,14 +566,14 @@ public class BookingEndpointTests : IDisposable
 
         var firstPageResponse = await client.GetAsync("/api/v1/bookings/mine?status=Past&page=1&pageSize=2", cancellationToken);
         Assert.Equal(HttpStatusCode.OK, firstPageResponse.StatusCode);
-        var firstPage = await firstPageResponse.Content.ReadFromJsonAsync<MyBookingsResponse>(cancellationToken);
+        var firstPage = await firstPageResponse.Content.ReadApiJsonAsync<MyBookingsResponse>(cancellationToken);
         Assert.NotNull(firstPage);
         Assert.Equal(3, firstPage!.TotalCount);
         Assert.Equal(2, firstPage.Items.Count);
         Assert.Equal([newestId, middleId], firstPage.Items.Select(item => item.BookingId).ToArray());
 
         var secondPageResponse = await client.GetAsync("/api/v1/bookings/mine?status=Past&page=2&pageSize=2", cancellationToken);
-        var secondPage = await secondPageResponse.Content.ReadFromJsonAsync<MyBookingsResponse>(cancellationToken);
+        var secondPage = await secondPageResponse.Content.ReadApiJsonAsync<MyBookingsResponse>(cancellationToken);
         Assert.NotNull(secondPage);
         Assert.Single(secondPage!.Items);
         Assert.Equal(oldestId, secondPage.Items[0].BookingId);
@@ -591,7 +591,7 @@ public class BookingEndpointTests : IDisposable
         var response = await client.GetAsync("/api/v1/bookings/mine?status=Upcoming", cancellationToken);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<MyBookingsResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<MyBookingsResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.Single(body!.Items);
         Assert.Equal(confirmedId, body.Items[0].BookingId);
@@ -614,7 +614,7 @@ public class BookingEndpointTests : IDisposable
         var response = await client.GetAsync("/api/v1/bookings/mine?status=Past", cancellationToken);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<MyBookingsResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<MyBookingsResponse>(cancellationToken);
         Assert.NotNull(body);
         var item = Assert.Single(body!.Items, i => i.BookingId == bookingId);
         Assert.Equal("Cancelled by you", item.CancellationReasonLabel);
@@ -627,7 +627,7 @@ public class BookingEndpointTests : IDisposable
         var cancellationToken = TestContext.Current.CancellationToken;
         var (client, bookingId) = await CreateConfirmedBookingAsync("list-mine-decline-meta@example.com", cancellationToken);
 
-        var requestResponse = await client.PostAsJsonAsync(
+        var requestResponse = await client.PostApiJsonAsync(
             $"/api/v1/bookings/{bookingId}/cancellation-requests",
             new CancellationRequestBody(null),
             cancellationToken);
@@ -638,7 +638,7 @@ public class BookingEndpointTests : IDisposable
         var response = await client.GetAsync("/api/v1/bookings/mine?status=Upcoming", cancellationToken);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<MyBookingsResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<MyBookingsResponse>(cancellationToken);
         Assert.NotNull(body);
         var item = Assert.Single(body!.Items, i => i.BookingId == bookingId);
         Assert.NotNull(item.CancellationRequest);
@@ -679,7 +679,7 @@ public class BookingEndpointTests : IDisposable
     {
         var client = CreateClient();
 
-        await client.PostAsJsonAsync("/api/v1/auth/signup", new SignUpRequest(
+        await client.PostApiJsonAsync("/api/v1/auth/signup", new SignUpRequest(
             email,
             "Password123!",
             "Test Client"), cancellationToken);
@@ -690,13 +690,13 @@ public class BookingEndpointTests : IDisposable
         Assert.NotNull(user);
 
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user!);
-        await client.PostAsJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(email, token), cancellationToken);
+        await client.PostApiJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(email, token), cancellationToken);
 
-        var loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(
+        var loginResponse = await client.PostApiJsonAsync("/api/v1/auth/login", new LoginRequest(
             email,
             "Password123!"), cancellationToken);
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
-        var loginBody = await loginResponse.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var loginBody = await loginResponse.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginBody!.AccessToken);
 
         return (client, user!.Id);
@@ -763,13 +763,13 @@ public class BookingEndpointTests : IDisposable
         var slotId = await GetOpenSlotIdAsync(cancellationToken);
         var (client, _) = await CreateVerifiedClientAsync(email, cancellationToken);
 
-        var response = await client.PostAsJsonAsync("/api/v1/bookings", new CreateBookingRequest(
+        var response = await client.PostApiJsonAsync("/api/v1/bookings", new CreateBookingRequest(
             slotId,
             ContractDeliveryMethod.Chat,
             null), cancellationToken);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<ReserveBookingResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<ReserveBookingResponse>(cancellationToken);
         return (client, body!.BookingId, slotId);
     }
 
@@ -843,7 +843,7 @@ public class BookingEndpointTests : IDisposable
         string expectedCode,
         CancellationToken cancellationToken)
     {
-        var problem = await response.Content.ReadFromJsonAsync<ProblemDetailsWithCode>(cancellationToken);
+        var problem = await response.Content.ReadApiJsonAsync<ProblemDetailsWithCode>(cancellationToken);
         Assert.NotNull(problem);
         Assert.Equal(expectedCode, problem!.Code);
     }
@@ -851,13 +851,13 @@ public class BookingEndpointTests : IDisposable
     private async Task<HttpClient> CreateAdminClientAsync(CancellationToken cancellationToken)
     {
         var client = CreateClient();
-        var loginResponse = await client.PostAsJsonAsync(
+        var loginResponse = await client.PostApiJsonAsync(
             "/api/v1/auth/login",
             new LoginRequest("admin@test.local", "TestPass123!"),
             cancellationToken);
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
 
-        var loginBody = await loginResponse.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var loginBody = await loginResponse.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginBody!.AccessToken);
         return client;
     }

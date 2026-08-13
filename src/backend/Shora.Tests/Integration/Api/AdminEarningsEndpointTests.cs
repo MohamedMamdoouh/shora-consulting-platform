@@ -47,7 +47,7 @@ public class AdminEarningsEndpointTests : IDisposable
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<AdminEarningsResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<AdminEarningsResponse>(cancellationToken);
         Assert.NotNull(body);
 
         await using var readScope = _factory.Services.CreateAsyncScope();
@@ -69,7 +69,7 @@ public class AdminEarningsEndpointTests : IDisposable
         var adminClient = await CreateAdminClientAsync(cancellationToken);
         var (paymentId, _) = await CreateRefundDuePaymentAsync("earnings-refunded@example.com", cancellationToken);
 
-        var recordResponse = await adminClient.PostAsJsonAsync(
+        var recordResponse = await adminClient.PostApiJsonAsync(
             $"/api/v1/admin/payments/{paymentId}/refunds/record",
             new RecordRefundRequest("VC-EARN-1", null),
             cancellationToken);
@@ -78,7 +78,7 @@ public class AdminEarningsEndpointTests : IDisposable
         var response = await adminClient.GetAsync("/api/v1/admin/earnings", cancellationToken);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<AdminEarningsResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<AdminEarningsResponse>(cancellationToken);
         Assert.NotNull(body);
 
         await using var scope = _factory.Services.CreateAsyncScope();
@@ -174,13 +174,13 @@ public class AdminEarningsEndpointTests : IDisposable
     private async Task<HttpClient> CreateAdminClientAsync(CancellationToken cancellationToken)
     {
         var client = CreateClient();
-        var loginResponse = await client.PostAsJsonAsync(
+        var loginResponse = await client.PostApiJsonAsync(
             "/api/v1/auth/login",
             new LoginRequest("admin@test.local", "TestPass123!"),
             cancellationToken);
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
 
-        var loginBody = await loginResponse.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var loginBody = await loginResponse.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginBody!.AccessToken);
         return client;
     }
@@ -191,7 +191,7 @@ public class AdminEarningsEndpointTests : IDisposable
     {
         var client = CreateClient();
 
-        await client.PostAsJsonAsync("/api/v1/auth/signup", new SignUpRequest(
+        await client.PostApiJsonAsync("/api/v1/auth/signup", new SignUpRequest(
             email,
             "Password123!",
             "Test Client"), cancellationToken);
@@ -202,13 +202,13 @@ public class AdminEarningsEndpointTests : IDisposable
         Assert.NotNull(user);
 
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user!);
-        await client.PostAsJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(email, token), cancellationToken);
+        await client.PostApiJsonAsync("/api/v1/auth/verify-email", new VerifyEmailRequest(email, token), cancellationToken);
 
-        var loginResponse = await client.PostAsJsonAsync("/api/v1/auth/login", new LoginRequest(
+        var loginResponse = await client.PostApiJsonAsync("/api/v1/auth/login", new LoginRequest(
             email,
             "Password123!"), cancellationToken);
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
-        var loginBody = await loginResponse.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var loginBody = await loginResponse.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginBody!.AccessToken);
 
         return (client, user!.Id);
@@ -229,13 +229,13 @@ public class AdminEarningsEndpointTests : IDisposable
         var slotId = await GetOpenSlotIdAsync(cancellationToken);
         var (client, _) = await CreateVerifiedClientAsync(email, cancellationToken);
 
-        var response = await client.PostAsJsonAsync("/api/v1/bookings", new CreateBookingRequest(
+        var response = await client.PostApiJsonAsync("/api/v1/bookings", new CreateBookingRequest(
             slotId,
             ContractDeliveryMethod.Chat,
             null), cancellationToken);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<ReserveBookingResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<ReserveBookingResponse>(cancellationToken);
         return (client, body!.BookingId, slotId);
     }
 

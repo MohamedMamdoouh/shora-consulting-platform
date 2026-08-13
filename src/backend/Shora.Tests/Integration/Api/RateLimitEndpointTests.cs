@@ -25,11 +25,11 @@ public class RateLimitEndpointTests : IDisposable
 
         for (var attempt = 1; attempt <= 5; attempt++)
         {
-            var response = await client.PostAsJsonAsync("/api/v1/auth/login", request, cancellationToken);
+            var response = await client.PostApiJsonAsync("/api/v1/auth/login", request, cancellationToken);
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         }
 
-        var sixthResponse = await client.PostAsJsonAsync("/api/v1/auth/login", request, cancellationToken);
+        var sixthResponse = await client.PostApiJsonAsync("/api/v1/auth/login", request, cancellationToken);
 
         Assert.Equal(HttpStatusCode.TooManyRequests, sixthResponse.StatusCode);
         Assert.True(sixthResponse.Headers.Contains("Retry-After"));

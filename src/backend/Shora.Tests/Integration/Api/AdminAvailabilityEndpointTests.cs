@@ -35,7 +35,7 @@ public class AdminAvailabilityEndpointTests : IDisposable
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<List<AvailabilityWindowResponse>>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<List<AvailabilityWindowResponse>>(cancellationToken);
         Assert.NotNull(body);
         Assert.Equal(5, body!.Count);
         Assert.All(body, window => Assert.True(window.IsActive));
@@ -66,21 +66,21 @@ public class AdminAvailabilityEndpointTests : IDisposable
             new TimeSpan(13, 0, 0),
             IsActive: true);
 
-        var response = await adminClient.PostAsJsonAsync(
+        var response = await adminClient.PostApiJsonAsync(
             "/api/v1/admin/availability-windows",
             createRequest,
             cancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<AvailabilityWindowResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<AvailabilityWindowResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.Equal(DayOfWeek.Friday, body!.DayOfWeek);
         Assert.Equal(createRequest.StartTime, body.StartTime);
         Assert.Equal(createRequest.EndTime, body.EndTime);
 
         var listResponse = await adminClient.GetAsync("/api/v1/admin/availability-windows", cancellationToken);
-        var windows = await listResponse.Content.ReadFromJsonAsync<List<AvailabilityWindowResponse>>(cancellationToken);
+        var windows = await listResponse.Content.ReadApiJsonAsync<List<AvailabilityWindowResponse>>(cancellationToken);
         Assert.Contains(windows!, window => window.Id == body.Id);
 
         var afterCount = await CountOpenSlotsAsync(cancellationToken);
@@ -107,7 +107,7 @@ public class AdminAvailabilityEndpointTests : IDisposable
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var body = await response.Content.ReadFromJsonAsync<AvailabilityWindowResponse>(cancellationToken);
+        var body = await response.Content.ReadApiJsonAsync<AvailabilityWindowResponse>(cancellationToken);
         Assert.NotNull(body);
         Assert.Equal(new TimeSpan(15, 0, 0), body!.StartTime);
         Assert.Equal(new TimeSpan(20, 0, 0), body.EndTime);
@@ -119,14 +119,14 @@ public class AdminAvailabilityEndpointTests : IDisposable
         var cancellationToken = TestContext.Current.CancellationToken;
         var adminClient = await CreateAdminClientAsync(cancellationToken);
 
-        var createResponse = await adminClient.PostAsJsonAsync(
+        var createResponse = await adminClient.PostApiJsonAsync(
             "/api/v1/admin/availability-windows",
             new CreateAvailabilityWindowRequest(
                 DayOfWeek.Saturday,
                 new TimeSpan(12, 0, 0),
                 new TimeSpan(14, 0, 0)),
             cancellationToken);
-        var created = await createResponse.Content.ReadFromJsonAsync<AvailabilityWindowResponse>(cancellationToken);
+        var created = await createResponse.Content.ReadApiJsonAsync<AvailabilityWindowResponse>(cancellationToken);
         Assert.NotNull(created);
 
         var deleteResponse = await adminClient.DeleteAsync(
@@ -144,7 +144,7 @@ public class AdminAvailabilityEndpointTests : IDisposable
         var cancellationToken = TestContext.Current.CancellationToken;
         var adminClient = await CreateAdminClientAsync(cancellationToken);
 
-        var response = await adminClient.PostAsJsonAsync(
+        var response = await adminClient.PostApiJsonAsync(
             "/api/v1/admin/availability-windows",
             new CreateAvailabilityWindowRequest(
                 DayOfWeek.Tuesday,
@@ -154,7 +154,7 @@ public class AdminAvailabilityEndpointTests : IDisposable
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(cancellationToken);
+        var problem = await response.Content.ReadApiJsonAsync<ValidationProblemDetails>(cancellationToken);
         Assert.NotNull(problem);
         Assert.Equal(ErrorCodes.General.Validation, problem!.Extensions["code"]?.ToString());
         Assert.True(problem.Errors.ContainsKey("endTime"));
@@ -195,7 +195,7 @@ public class AdminAvailabilityEndpointTests : IDisposable
             await context.SaveChangesAsync(cancellationToken);
         }
 
-        await adminClient.PostAsJsonAsync(
+        await adminClient.PostApiJsonAsync(
             "/api/v1/admin/availability-windows",
             new CreateAvailabilityWindowRequest(
                 DayOfWeek.Friday,
@@ -220,7 +220,7 @@ public class AdminAvailabilityEndpointTests : IDisposable
     {
         var response = await adminClient.GetAsync("/api/v1/admin/availability-windows", cancellationToken);
         response.EnsureSuccessStatusCode();
-        return (await response.Content.ReadFromJsonAsync<List<AvailabilityWindowResponse>>(cancellationToken))!;
+        return (await response.Content.ReadApiJsonAsync<List<AvailabilityWindowResponse>>(cancellationToken))!;
     }
 
     private async Task<int> CountOpenSlotsAsync(CancellationToken cancellationToken)
@@ -242,13 +242,13 @@ public class AdminAvailabilityEndpointTests : IDisposable
     private async Task<HttpClient> CreateAdminClientAsync(CancellationToken cancellationToken)
     {
         var client = CreateClient();
-        var loginResponse = await client.PostAsJsonAsync(
+        var loginResponse = await client.PostApiJsonAsync(
             "/api/v1/auth/login",
             new LoginRequest("admin@test.local", "TestPass123!"),
             cancellationToken);
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
 
-        var loginBody = await loginResponse.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var loginBody = await loginResponse.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginBody!.AccessToken);
         return client;
     }
@@ -259,7 +259,7 @@ public class AdminAvailabilityEndpointTests : IDisposable
     {
         var client = CreateClient();
 
-        await client.PostAsJsonAsync(
+        await client.PostApiJsonAsync(
             "/api/v1/auth/signup",
             new SignUpRequest(email, "Password123!", "Test Client"),
             cancellationToken);
@@ -270,18 +270,18 @@ public class AdminAvailabilityEndpointTests : IDisposable
         Assert.NotNull(user);
 
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user!);
-        await client.PostAsJsonAsync(
+        await client.PostApiJsonAsync(
             "/api/v1/auth/verify-email",
             new VerifyEmailRequest(email, token),
             cancellationToken);
 
-        var loginResponse = await client.PostAsJsonAsync(
+        var loginResponse = await client.PostApiJsonAsync(
             "/api/v1/auth/login",
             new LoginRequest(email, "Password123!"),
             cancellationToken);
         Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
 
-        var loginBody = await loginResponse.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
+        var loginBody = await loginResponse.Content.ReadApiJsonAsync<AuthResponse>(cancellationToken);
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginBody!.AccessToken);
 
         return client;
@@ -292,7 +292,7 @@ public class AdminAvailabilityEndpointTests : IDisposable
         string expectedCode,
         CancellationToken cancellationToken)
     {
-        var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(cancellationToken);
+        var problem = await response.Content.ReadApiJsonAsync<ProblemDetails>(cancellationToken);
         Assert.NotNull(problem);
         Assert.Equal(expectedCode, problem!.Extensions["code"]?.ToString());
     }

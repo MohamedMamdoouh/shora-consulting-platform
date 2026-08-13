@@ -146,7 +146,7 @@ public sealed class AuthService
         return _refreshTokenService.RevokeAsync(rawToken, cancellationToken);
     }
 
-    public async Task<Result<bool>> VerifyEmailAsync(
+    public async Task<Result<VerifyEmailOutcome>> VerifyEmailAsync(
         VerifyEmailRequest request,
         CancellationToken cancellationToken = default)
     {
@@ -160,15 +160,18 @@ public sealed class AuthService
 
         if (user.EmailConfirmed)
         {
-            return true;
+            return VerifyEmailOutcome.AlreadyVerified;
         }
 
         var result = await _userManager.ConfirmEmailAsync(user, request.Token);
-        return result.Succeeded
-            ? false
-            : Error.Validation(
+        if (!result.Succeeded)
+        {
+            return Error.Validation(
                 ErrorCodes.Auth.VerificationFailed,
                 "Invalid or expired verification token.");
+        }
+
+        return VerifyEmailOutcome.NewlyVerified;
     }
 
     public async Task ResendVerificationAsync(

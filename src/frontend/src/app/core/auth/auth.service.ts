@@ -107,11 +107,20 @@ export class AuthService {
     return this.refreshInFlight$;
   }
 
-  verifyEmail(email: string, token: string): Observable<MessageResponse> {
-    return this.http.post<MessageResponse>(`${environment.apiBaseUrl}/auth/verify-email`, {
-      email,
-      token,
-    });
+  verifyEmail(email: string, token: string): Observable<MessageResponse | AuthResponse> {
+    return this.http
+      .post<MessageResponse | AuthResponse>(
+        `${environment.apiBaseUrl}/auth/verify-email`,
+        { email, token },
+        { withCredentials: true },
+      )
+      .pipe(
+        tap((response) => {
+          if ('accessToken' in response) {
+            this.setSession(response, email);
+          }
+        }),
+      );
   }
 
   resendVerification(email: string): Observable<MessageResponse> {

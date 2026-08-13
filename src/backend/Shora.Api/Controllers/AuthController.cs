@@ -136,6 +136,7 @@ public sealed class AuthController : ApiControllerBase
     [EnableRateLimiting(RateLimitPolicies.AuthRecovery)]
     [EndpointName("Auth.VerifyEmail")]
     [EndpointSummary("Confirm email address with verification token")]
+    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(MessageResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
@@ -147,9 +148,31 @@ public sealed class AuthController : ApiControllerBase
             return ToProblem(result.Error!);
         }
 
-        return Ok(new MessageResponse(result.Value == true
+        var message = result.Value == VerifyEmailOutcome.AlreadyVerified
             ? "Email already verified."
-            : "Email verified."));
+            : "Email verified.";
+
+        var rawToken = _refreshCookieService.GetRefreshTokenFromRequest(Request);
+        if (!string.IsNullOrWhiteSpace(rawToken))
+        {
+            var user = await _userManager.FindByEmailAsync(request.Email.Trim());
+            if (user is not null)
+            {
+                var (rotation, auth) = await _authService.RefreshAsync(
+                    rawToken,
+                    HttpContext.Connection.RemoteIpAddress?.ToString(),
+                    Request.Headers.UserAgent,
+                    cancellationToken);
+
+                if (auth.IsSuccess && rotation.UserId == user.Id)
+                {
+                    SetRefreshCookie(auth.Value!, rotation.NewToken!.ExpiresAtUtc);
+                    return Ok(auth.Value!.Response);
+                }
+            }
+        }
+
+        return Ok(new MessageResponse(message));
     }
 
     [HttpPost("resend-verification")]

@@ -42,7 +42,17 @@ export class VerifyEmailPageComponent implements OnInit {
 
     try {
       const response = await firstValueFrom(this.auth.verifyEmail(email, token));
-      const alreadyVerified = response.message.toLowerCase().includes('already');
+
+      if (!('accessToken' in response)) {
+        try {
+          await firstValueFrom(this.auth.refresh());
+        } catch {
+          // User may have opened the link on another device without an active session.
+        }
+      }
+
+      const alreadyVerified =
+        'message' in response && response.message.toLowerCase().includes('already');
       this.completeSuccess(
         alreadyVerified
           ? 'حسابك مؤكد بالفعل. سيتم تحويلك لتسجيل الدخول.'

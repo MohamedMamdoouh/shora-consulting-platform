@@ -71,6 +71,21 @@
   }
 }
 
+@media (max-width: 480px) {
+  .receipt-panel-backdrop {
+    padding: var(--space-sm);
+  }
+
+  .receipt-panel {
+    padding: var(--space-md);
+    max-height: min(90vh, 40rem);
+  }
+
+  .receipt-panel__image {
+    max-height: 14rem;
+  }
+}
+
 .receipt-panel__summary dt,
 .receipt-panel__meta dt {
   margin: 0;

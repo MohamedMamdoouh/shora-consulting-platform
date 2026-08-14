@@ -95,3 +95,17 @@
     padding: var(--admin-space-md);
   }
 }
+
+@media (max-width: 480px) {
+  .admin-settings__section {
+    padding: var(--space-sm);
+  }
+
+  .admin-settings__section label {
+    font-size: var(--admin-font-size-sm);
+  }
+
+  .admin-settings__actions .btn {
+    flex: 1 1 auto;
+  }
+}

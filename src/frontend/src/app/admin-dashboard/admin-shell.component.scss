@@ -81,3 +81,10 @@
     flex-shrink: 0;
   }
 }
+
+@media (max-width: 480px) {
+  .admin-shell__nav a {
+    padding: var(--space-xs) var(--space-sm);
+    font-size: var(--admin-font-size-sm);
+  }
+}

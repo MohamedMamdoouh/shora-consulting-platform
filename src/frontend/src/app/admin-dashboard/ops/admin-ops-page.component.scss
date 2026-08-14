@@ -149,6 +149,13 @@
   }
 }
 
+@media (max-width: 480px) {
+  .admin-ops__card,
+  .admin-ops__panel--empty {
+    padding: var(--space-sm);
+  }
+}
+
 .admin-ops__context-row dt {
   margin: 0;
   color: var(--color-text-muted);

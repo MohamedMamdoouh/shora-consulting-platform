@@ -246,3 +246,13 @@
     flex: 1 1 auto;
   }
 }
+
+@media (max-width: 480px) {
+  .admin-availability__dialog {
+    padding: var(--space-sm);
+  }
+
+  .admin-availability__dialog-card {
+    padding: var(--admin-space-lg);
+  }
+}

@@ -821,6 +821,16 @@ table td {
   background: var(--color-error-bg);
 }
 
+@media (max-width: 480px) {
+  .admin-table th,
+  .admin-table td,
+  .admin-bookings__table th,
+  .admin-bookings__table td {
+    padding: var(--space-sm) var(--space-sm);
+    font-size: var(--admin-font-size-sm);
+  }
+}
+
 /* Pagination */
 .pagination {
   display: flex;

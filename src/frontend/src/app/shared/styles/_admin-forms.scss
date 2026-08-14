@@ -54,3 +54,19 @@
   gap: var(--space-sm);
   margin-inline-start: auto;
 }
+
+@media (max-width: 480px) {
+  .admin-toolbar label {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .admin-toolbar__actions {
+    width: 100%;
+    margin-inline-start: 0;
+  }
+
+  .admin-toolbar__actions .btn {
+    flex: 1 1 auto;
+  }
+}

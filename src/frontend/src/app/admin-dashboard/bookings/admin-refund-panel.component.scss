@@ -109,3 +109,17 @@
   background: var(--color-error-bg);
   color: var(--color-error);
 }
+
+@media (max-width: 480px) {
+  .refund-panel-backdrop {
+    padding: var(--space-sm);
+  }
+
+  .refund-panel {
+    padding: var(--space-md);
+  }
+
+  .refund-panel__actions .btn {
+    flex: 1 1 100%;
+  }
+}

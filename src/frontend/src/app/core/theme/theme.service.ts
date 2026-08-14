@@ -1,6 +1,6 @@
 import { computed, Injectable, signal } from '@angular/core';
 import {
-  oppositeTheme,
+  nextThemePreference,
   parseStoredThemePreference,
   resolveTheme,
   THEME_STORAGE_KEY,
@@ -34,7 +34,7 @@ export class ThemeService {
   }
 
   toggle(): void {
-    const next = oppositeTheme(this.resolved());
+    const next = nextThemePreference(this.preferenceState(), this.systemDark());
     this.preferenceState.set(next);
     persistPreference(next);
     this.apply();

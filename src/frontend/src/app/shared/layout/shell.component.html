@@ -10,36 +10,30 @@
         <button
           type="button"
           class="shell__theme-toggle"
-          role="switch"
-          [attr.aria-checked]="theme.resolved() === 'dark'"
           [attr.aria-label]="themeLabel()"
           (click)="cycleTheme()"
         >
-          <span class="shell__theme-toggle-track">
-            <span class="shell__theme-toggle-thumb">
-              @if (theme.resolved() === 'dark') {
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
-                  <path
-                    d="M19 12.8A7.5 7.5 0 0 1 11.2 5a7.5 7.5 0 1 0 7.8 7.8Z"
-                    stroke="currentColor"
-                    stroke-width="1.75"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-              } @else {
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
-                  <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.75" />
-                  <path
-                    d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M5.6 5.6l1.1 1.1M17.3 17.3l1.1 1.1M5.6 18.4l1.1-1.1M17.3 6.7l1.1-1.1"
-                    stroke="currentColor"
-                    stroke-width="1.75"
-                    stroke-linecap="round"
-                  />
-                </svg>
-              }
-            </span>
-          </span>
+          @if (theme.resolved() === 'dark') {
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+              <path
+                d="M19 12.8A7.5 7.5 0 0 1 11.2 5a7.5 7.5 0 1 0 7.8 7.8Z"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          } @else {
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.75" />
+              <path
+                d="M12 3v1.5M12 19.5V21M3 12h1.5M19.5 12H21M5.6 5.6l1.1 1.1M17.3 17.3l1.1 1.1M5.6 18.4l1.1-1.1M17.3 6.7l1.1-1.1"
+                stroke="currentColor"
+                stroke-width="1.75"
+                stroke-linecap="round"
+              />
+            </svg>
+          }
         </button>
 
         <button

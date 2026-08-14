@@ -146,6 +146,42 @@ public class AdminBookingsListEndpointTests : IDisposable
         Assert.True(item.CancellationRequest.AutoDeclineAtUtc > DateTime.UtcNow);
     }
 
+    [Fact]
+    public async Task List_bookings_filters_by_refund_due()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var adminClient = await CreateAdminClientAsync(cancellationToken);
+        var (_, userId) = await CreateVerifiedClientAsync("admin-list-refund-due@example.com", cancellationToken);
+
+        // Seed one booking that is refund due (Cancelled + Approved)
+        var refundDueBookingId = await SeedCancelledBookingAsync(
+            userId,
+            AuditActor.Client,
+            PaymentStatus.Approved,
+            cancellationToken);
+
+        // Seed another booking that is not refund due (Cancelled + Refunded)
+        var refundedBookingId = await SeedCancelledBookingAsync(
+            userId,
+            AuditActor.Client,
+            PaymentStatus.Refunded,
+            cancellationToken);
+
+        var response = await adminClient.GetAsync(
+            "/api/v1/admin/bookings?status=RefundDue&page=1&pageSize=20",
+            cancellationToken);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var body = await response.Content.ReadApiJsonAsync<AdminBookingsResponse>(cancellationToken);
+        Assert.NotNull(body);
+
+        // Should include the refund-due booking and exclude the already refunded one
+        Assert.Contains(body!.Items, item => item.BookingId == refundDueBookingId);
+        Assert.DoesNotContain(body.Items, item => item.BookingId == refundedBookingId);
+        Assert.All(body.Items, item => Assert.True(item.RefundDue));
+    }
+
     public void Dispose()
     {
         _factory.Dispose();

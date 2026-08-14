@@ -111,6 +111,11 @@ public sealed class AdminBookingListService(IApplicationDbContext dbContext)
             return query;
         }
 
+        if (statusFilter == AdminBookingStatusFilter.RefundDue)
+        {
+            return query.Where(booking => booking.Status == BookingStatus.Cancelled && booking.Payment != null && booking.Payment.Status == PaymentStatus.Approved);
+        }
+
         var status = MapStatusFilter(statusFilter.Value);
         return query.Where(booking => booking.Status == status);
     }

@@ -6,7 +6,7 @@ import {
 } from '../../client-dashboard/client-dashboard-labels.util';
 import { formatSlotRange } from '../../client-dashboard/client-dashboard-slot.util';
 
-export const BOOKING_STATUS_OPTIONS: ReadonlyArray<{ value: '' | BookingStatus; label: string }> = [
+export const BOOKING_STATUS_OPTIONS: ReadonlyArray<{ value: '' | BookingStatus | 'RefundDue'; label: string }> = [
   { value: '', label: 'كل الحالات' },
   { value: 'PendingPayment', label: 'في انتظار الدفع' },
   { value: 'PendingApproval', label: 'قيد مراجعة الدفع' },
@@ -14,6 +14,7 @@ export const BOOKING_STATUS_OPTIONS: ReadonlyArray<{ value: '' | BookingStatus; 
   { value: 'CancellationRequested', label: 'طلب إلغاء' },
   { value: 'Completed', label: 'مكتملة' },
   { value: 'Cancelled', label: 'ملغية' },
+  { value: 'RefundDue', label: 'استرداد' },
 ];
 
 export function isRefundedCancelledBooking(

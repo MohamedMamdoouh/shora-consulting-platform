@@ -7,7 +7,8 @@ public enum AdminBookingStatusFilter
     Confirmed = 2,
     CancellationRequested = 3,
     Completed = 4,
-    Cancelled = 5
+    Cancelled = 5,
+    RefundDue = 6
 }
 
 public static class AdminBookingsQueryLimits

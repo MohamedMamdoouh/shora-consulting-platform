@@ -96,7 +96,7 @@ export interface MyBookingsResponse {
   totalCount: number;
 }
 
-export type AdminBookingStatusFilter = BookingStatus;
+export type AdminBookingStatusFilter = BookingStatus | 'RefundDue';
 
 export const ADMIN_BOOKINGS_QUERY_LIMITS = {
   defaultPage: 1,

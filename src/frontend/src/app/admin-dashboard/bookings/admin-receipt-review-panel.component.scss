@@ -40,18 +40,6 @@
   font-size: 1rem;
 }
 
-.receipt-panel__subtitle {
-  display: inline-block;
-  margin: var(--space-xs) 0 0;
-  padding: var(--space-xs) var(--space-sm);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: var(--color-linen);
-  color: var(--color-text);
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
 .receipt-panel__close {
   border: none;
   background: transparent;
@@ -75,7 +63,7 @@
 
 @media (min-width: 640px) {
   .receipt-panel__summary dl {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .receipt-panel__meta {

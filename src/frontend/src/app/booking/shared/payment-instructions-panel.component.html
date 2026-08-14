@@ -64,12 +64,13 @@
       type="file"
       accept="image/jpeg,image/png,image/webp,application/pdf"
       (change)="onFileSelected($event)"
+      (blur)="markFileFieldTouched()"
       [disabled]="uploading() || deadlineExpired()"
-      [attr.aria-invalid]="!selectedFile()"
+      [attr.aria-invalid]="!selectedFile() && fileTouched() ? 'true' : null"
     />
   </label>
 
-  @if (!selectedFile() && !deadlineExpired()) {
+  @if (!selectedFile() && fileTouched() && !deadlineExpired()) {
     <p class="field-error" role="alert">يرجى اختيار صورة الإيصال.</p>
   }
 

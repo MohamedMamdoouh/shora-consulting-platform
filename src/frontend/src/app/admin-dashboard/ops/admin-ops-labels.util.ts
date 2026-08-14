@@ -26,7 +26,7 @@ const CONTEXT_KEY_LABELS: Record<string, string> = {
   deadLetterCount: 'عدد الرسائل المعطلة',
   windowHours: 'نافذة الساعات',
   jobName: 'اسم المهمة',
-  intervalSeconds: 'فترة التكرار (ثوان)',
+  intervalSeconds: 'فترة التكرار (ثواني)',
   intervalMultiplier: 'مضاعف الفترة',
   stalenessMinutes: 'دقائق التوقف',
   lastFailureAtUtc: 'آخر عملية فاشلة',
@@ -68,7 +68,9 @@ export function formatContextKey(key: string): string {
   return CONTEXT_KEY_LABELS[key] ?? key;
 }
 
-export function formatContextEntries(context: Record<string, string>): Array<{ key: string; label: string; value: string }> {
+export function formatContextEntries(
+  context: Record<string, string>,
+): Array<{ key: string; label: string; value: string }> {
   return Object.entries(context).map(([key, value]) => ({
     key,
     label: formatContextKey(key),
@@ -81,7 +83,8 @@ export function getAlertActionRoute(alert: AdminOpsAlertDto): string | null {
 }
 
 export function compareAlertsBySeverity(a: AdminOpsAlertDto, b: AdminOpsAlertDto): number {
-  const severityRank = (severity: string) => (severity === 'Critical' ? 0 : severity === 'Warning' ? 1 : 2);
+  const severityRank = (severity: string) =>
+    severity === 'Critical' ? 0 : severity === 'Warning' ? 1 : 2;
   const severityDiff = severityRank(a.severity) - severityRank(b.severity);
   if (severityDiff !== 0) {
     return severityDiff;
@@ -90,7 +93,10 @@ export function compareAlertsBySeverity(a: AdminOpsAlertDto, b: AdminOpsAlertDto
   return a.message.localeCompare(b.message);
 }
 
-export function countAlertsBySeverity(alerts: AdminOpsAlertDto[]): { critical: number; warning: number } {
+export function countAlertsBySeverity(alerts: AdminOpsAlertDto[]): {
+  critical: number;
+  warning: number;
+} {
   return alerts.reduce(
     (counts, alert) => {
       if (alert.severity === 'Critical') {

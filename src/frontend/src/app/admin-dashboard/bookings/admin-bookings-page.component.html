@@ -2,22 +2,10 @@
   <header class="admin-bookings__header">
     <h2>الحجوزات</h2>
     <p class="admin-bookings__note">
-      جميع حجوزات العملاء — الأوقات معروضة بتوقيتك المحلي. استخدم فلتر «تم إلغاؤها» لمعالجة
-      الاستردادات المستحقة.
+      جميع حجوزات العملاء — الأوقات معروضة بتوقيتك المحلي. استخدم فلتر «ملغية» لمعالجة الاستردادات
+      المستحقة.
     </p>
   </header>
-
-  @if (actionMessage()) {
-    <p class="admin-bookings__banner admin-bookings__banner--success" role="status">
-      {{ actionMessage() }}
-    </p>
-  }
-
-  @if (actionError()) {
-    <p class="admin-bookings__banner admin-bookings__banner--error" role="alert">
-      {{ actionError() }}
-    </p>
-  }
 
   <form class="admin-bookings__filters" [formGroup]="filtersForm" (ngSubmit)="applyFilters()">
     <label>
@@ -90,7 +78,8 @@
                     <span
                       class="admin-bookings__status"
                       [attr.data-status]="bookingStatusDataAttr(item.status, item.paymentStatus)"
-                    >{{ formatBookingStatus(item.status, item.paymentStatus) }}</span>
+                      >{{ formatBookingStatus(item.status, item.paymentStatus) }}</span
+                    >
                   </td>
                   <td [class.admin-bookings__cell--placeholder]="!formatRowNote(item)">
                     @if (formatRowNote(item); as note) {

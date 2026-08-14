@@ -31,7 +31,6 @@ export class AdminCancellationReviewPanelComponent {
   @Output() readonly closed = new EventEmitter<void>();
   @Output() readonly changed = new EventEmitter<void>();
 
-  readonly actionError = signal('');
   readonly isApproving = signal(false);
   readonly isDeclining = signal(false);
   readonly showDeclineForm = signal(false);
@@ -59,11 +58,7 @@ export class AdminCancellationReviewPanelComponent {
 
     const confirmed = await this.confirmDialog.confirm({
       title: this.copy.admin.dialog.approveCancellationTitle,
-      message: this.copy.admin.customerAction(
-        this.item.clientDisplayName,
-        this.copy.admin.dialog.approveCancellationMessage(refundNote),
-      ),
-      detail: this.copy.admin.customerName(this.item.clientDisplayName),
+      message: this.copy.admin.dialog.approveCancellationMessage(refundNote),
       confirmLabel: this.copy.admin.dialog.approveCancellationAction,
       variant: 'danger',
     });
@@ -73,19 +68,24 @@ export class AdminCancellationReviewPanelComponent {
     }
 
     this.isApproving.set(true);
-    this.actionError.set('');
 
     try {
       await firstValueFrom(this.adminBookingsService.approveCancellationRequest(this.item.bookingId));
-      this.changed.emit();
-      this.close();
+      await this.confirmDialog.result({
+        message: 'تمت الموافقة على طلب الإلغاء.',
+        onComplete: () => {
+          this.changed.emit();
+          this.close();
+        },
+      });
     } catch (error) {
-      this.actionError.set(
-        readBookingErrorMessage(
+      await this.confirmDialog.result({
+        message: readBookingErrorMessage(
           readApiErrorCode(error),
           readApiError(error, 'تعذر الموافقة على طلب الإلغاء. حاول مرة أخرى.'),
         ),
-      );
+        variant: 'danger',
+      });
     } finally {
       this.isApproving.set(false);
     }
@@ -93,7 +93,6 @@ export class AdminCancellationReviewPanelComponent {
 
   openDeclineForm(): void {
     this.showDeclineForm.set(true);
-    this.actionError.set('');
     this.declineForm.reset({
       reasonCode: 'Policy',
       reasonNote: null,
@@ -102,7 +101,6 @@ export class AdminCancellationReviewPanelComponent {
 
   cancelDeclineForm(): void {
     this.showDeclineForm.set(false);
-    this.actionError.set('');
   }
 
   async submitDecline(): Promise<void> {
@@ -112,7 +110,6 @@ export class AdminCancellationReviewPanelComponent {
 
     const values = this.declineForm.getRawValue();
     this.isDeclining.set(true);
-    this.actionError.set('');
 
     try {
       await firstValueFrom(
@@ -121,18 +118,23 @@ export class AdminCancellationReviewPanelComponent {
           reasonNote: values.reasonNote?.trim() || null,
         }),
       );
-      this.changed.emit();
-      this.close();
+      await this.confirmDialog.result({
+        message: 'تم رفض طلب الإلغاء.',
+        onComplete: () => {
+          this.changed.emit();
+          this.close();
+        },
+      });
     } catch (error) {
-      this.actionError.set(
-        readBookingErrorMessage(
+      await this.confirmDialog.result({
+        message: readBookingErrorMessage(
           readApiErrorCode(error),
           readApiError(error, 'تعذر رفض طلب الإلغاء. حاول مرة أخرى.'),
         ),
-      );
+        variant: 'danger',
+      });
     } finally {
       this.isDeclining.set(false);
     }
   }
-
 }

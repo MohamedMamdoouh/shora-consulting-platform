@@ -47,15 +47,18 @@ export class PendingApprovalCardComponent {
 
     try {
       await firstValueFrom(this.bookingService.cancelHold(this.item.bookingId));
-      this.changed.emit();
+      await this.confirmDialog.result({
+        message: 'تم إلغاء الحجز.',
+        onComplete: () => this.changed.emit(),
+      });
     } catch (err) {
-      const code = readApiErrorCode(err);
-      this.cancelError.set(
-        readBookingErrorMessage(
-          code,
+      await this.confirmDialog.result({
+        message: readBookingErrorMessage(
+          readApiErrorCode(err),
           readApiError(err, 'تعذر إلغاء الحجز. حاول مرة أخرى.'),
         ),
-      );
+        variant: 'danger',
+      });
     } finally {
       this.cancelling.set(false);
     }

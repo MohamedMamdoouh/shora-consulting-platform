@@ -3,13 +3,17 @@ import {
   Component,
   ElementRef,
   inject,
+  OnDestroy,
+  signal,
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { APP_COPY } from '../../core/i18n/app-copy.constants';
 import {
   ConfirmDialogRequest,
   ConfirmDialogService,
+  DEFAULT_RESULT_DIALOG_TIMEOUT_MS,
 } from '../../core/ui/confirm-dialog.service';
 
 @Component({
@@ -19,21 +23,21 @@ import {
     <dialog
       #dialogEl
       class="confirm-dialog"
-      [attr.closedby]="'any'"
-      [attr.role]="dialog.request()?.mode === 'alert' ? 'alertdialog' : 'dialog'"
+      [attr.closedby]="request()?.mode === 'result' ? null : 'any'"
+      [attr.role]="dialogRole()"
       aria-labelledby="confirm-dialog-title"
       aria-describedby="confirm-dialog-message"
       (click)="onDialogClick($event)"
       (close)="onNativeClose()"
     >
-      @if (dialog.request(); as request) {
+      @if (request(); as current) {
         <div
           class="confirm-dialog__card"
-          [class.confirm-dialog__card--danger]="request.variant === 'danger'"
-          [class.confirm-dialog__card--success]="request.variant === 'success'"
+          [class.confirm-dialog__card--danger]="current.variant === 'danger'"
+          [class.confirm-dialog__card--success]="current.variant === 'success'"
         >
           <div class="confirm-dialog__icon" aria-hidden="true">
-            @switch (request.variant) {
+            @switch (current.variant) {
               @case ('danger') {
                 <svg viewBox="0 0 24 24" width="28" height="28" fill="none">
                   <path
@@ -70,30 +74,35 @@ import {
             }
           </div>
           <h2 id="confirm-dialog-title" class="confirm-dialog__title">
-            {{ titleFor(request) }}
+            {{ titleFor(current) }}
           </h2>
-          <p id="confirm-dialog-message" class="confirm-dialog__message">{{ request.message }}</p>
-          @if (request.detail) {
-            <p class="confirm-dialog__detail">{{ request.detail }}</p>
+          <p id="confirm-dialog-message" class="confirm-dialog__message">{{ current.message }}</p>
+          @if (current.detail) {
+            <p class="confirm-dialog__detail">{{ current.detail }}</p>
+          }
+          @if (current.mode === 'result') {
+            <p class="confirm-dialog__countdown" aria-live="polite">
+              {{ countdownLabel(current) }}
+            </p>
           }
           <div class="confirm-dialog__actions">
             <button
               type="button"
               class="btn"
-              [class.btn--danger]="request.variant === 'danger'"
-              [attr.autofocus]="request.variant === 'danger' ? null : ''"
+              [class.btn--danger]="current.variant === 'danger'"
+              [attr.autofocus]="current.variant === 'danger' ? null : ''"
               (click)="accept()"
             >
-              {{ confirmLabelFor(request) }}
+              {{ confirmLabelFor(current) }}
             </button>
-            @if (request.mode !== 'alert') {
+            @if (current.mode === 'confirm') {
               <button
                 type="button"
                 class="btn btn--secondary"
-                [attr.autofocus]="request.variant === 'danger' ? '' : null"
+                [attr.autofocus]="current.variant === 'danger' ? '' : null"
                 (click)="dismiss()"
               >
-                {{ request.cancelLabel || copy.dialog.cancel }}
+                {{ current.cancelLabel || copy.dialog.cancel }}
               </button>
             }
           </div>
@@ -193,6 +202,16 @@ import {
       background: var(--color-error-bg);
     }
 
+    .confirm-dialog__countdown {
+      margin: 0;
+      width: 100%;
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-md);
+      background: var(--color-background);
+      color: var(--color-text-muted);
+      font-size: var(--font-size-sm);
+    }
+
     .confirm-dialog__actions {
       display: flex;
       flex-wrap: wrap;
@@ -214,67 +233,142 @@ import {
     }
   `,
 })
-export class ConfirmDialogComponent {
+export class ConfirmDialogComponent implements OnDestroy {
   private readonly dialogEl = viewChild<ElementRef<HTMLDialogElement>>('dialogEl');
+  private readonly router = inject(Router);
   private pendingResult: boolean | null = null;
+  private countdownTimer: ReturnType<typeof setInterval> | null = null;
+  private completingResult = false;
 
   protected readonly dialog = inject(ConfirmDialogService);
   protected readonly copy = APP_COPY;
+  protected readonly request = this.dialog.request;
+  protected readonly secondsLeft = signal(0);
 
   constructor() {
     afterRenderEffect(() => {
-      const request = this.dialog.request();
+      const current = this.request();
       const element = this.dialogEl()?.nativeElement;
       if (!element || typeof element.showModal !== 'function') {
         return;
       }
 
-      if (request && !element.open) {
+      if (current && !element.open) {
         element.showModal();
+        if (current.mode === 'result') {
+          this.startResultCountdown(current);
+        }
         return;
       }
 
-      if (!request && element.open) {
+      if (!current && element.open) {
+        this.clearResultCountdown();
         element.close();
       }
     });
   }
 
-  protected titleFor(request: ConfirmDialogRequest): string {
-    return (
-      request.title ||
-      (request.mode === 'alert' ? this.copy.dialog.successTitle : this.copy.dialog.defaultTitle)
-    );
+  ngOnDestroy(): void {
+    this.clearResultCountdown();
   }
 
-  protected confirmLabelFor(request: ConfirmDialogRequest): string {
-    return (
-      request.confirmLabel ||
-      (request.mode === 'alert' ? this.copy.dialog.acknowledge : this.copy.dialog.confirm)
-    );
+  protected dialogRole(): 'alertdialog' | 'dialog' {
+    const mode = this.request()?.mode;
+    return mode === 'alert' || mode === 'result' ? 'alertdialog' : 'dialog';
+  }
+
+  protected titleFor(current: ConfirmDialogRequest): string {
+    if (current.title) {
+      return current.title;
+    }
+
+    if (current.mode === 'result' && current.variant === 'danger') {
+      return this.copy.dialog.errorTitle;
+    }
+
+    return current.mode === 'alert' || current.mode === 'result'
+      ? this.copy.dialog.successTitle
+      : this.copy.dialog.defaultTitle;
+  }
+
+  protected confirmLabelFor(current: ConfirmDialogRequest): string {
+    if (current.confirmLabel) {
+      return current.confirmLabel;
+    }
+
+    return current.mode === 'alert' || current.mode === 'result'
+      ? this.copy.dialog.acknowledge
+      : this.copy.dialog.confirm;
+  }
+
+  protected countdownLabel(current: ConfirmDialogRequest): string {
+    const seconds = this.secondsLeft();
+    return current.redirectTo
+      ? this.copy.dialog.redirectingIn(seconds)
+      : this.copy.dialog.closingIn(seconds);
   }
 
   protected accept(): void {
-    this.closeWith(true);
+    void this.closeWith(true);
   }
 
   protected dismiss(): void {
-    this.closeWith(false);
+    void this.closeWith(false);
   }
 
   protected onNativeClose(): void {
-    const result = this.pendingResult ?? false;
+    const current = this.request();
+    const confirmed = this.pendingResult ?? (current?.mode === 'result' ? true : false);
     this.pendingResult = null;
-    this.dialog.settle(result);
+
+    if (current?.mode === 'result' && confirmed) {
+      void this.finishResult(current);
+      return;
+    }
+
+    this.dialog.settle(confirmed);
   }
 
   protected onDialogClick(event: MouseEvent): void {
-    if (event.target === event.currentTarget) {
-      this.dismiss();
+    if (event.target !== event.currentTarget) {
+      return;
+    }
+
+    const current = this.request();
+    if (current?.mode === 'result') {
+      void this.accept();
+      return;
+    }
+
+    void this.dismiss();
+  }
+
+  private startResultCountdown(current: ConfirmDialogRequest): void {
+    this.clearResultCountdown();
+
+    const timeoutMs = current.timeoutMs ?? DEFAULT_RESULT_DIALOG_TIMEOUT_MS;
+    const totalSeconds = Math.max(1, Math.ceil(timeoutMs / 1000));
+    this.secondsLeft.set(totalSeconds);
+
+    this.countdownTimer = setInterval(() => {
+      const next = this.secondsLeft() - 1;
+      if (next <= 0) {
+        void this.accept();
+        return;
+      }
+
+      this.secondsLeft.set(next);
+    }, 1000);
+  }
+
+  private clearResultCountdown(): void {
+    if (this.countdownTimer !== null) {
+      clearInterval(this.countdownTimer);
+      this.countdownTimer = null;
     }
   }
 
-  private closeWith(confirmed: boolean): void {
+  private async closeWith(confirmed: boolean): Promise<void> {
     this.pendingResult = confirmed;
     const element = this.dialogEl()?.nativeElement;
     if (element?.open) {
@@ -283,5 +377,30 @@ export class ConfirmDialogComponent {
     }
 
     this.onNativeClose();
+  }
+
+  private async finishResult(current: ConfirmDialogRequest): Promise<void> {
+    if (this.completingResult) {
+      return;
+    }
+
+    this.completingResult = true;
+    this.clearResultCountdown();
+
+    try {
+      if (current.onComplete) {
+        await current.onComplete();
+      }
+
+      if (current.redirectTo) {
+        const commands = Array.isArray(current.redirectTo)
+          ? current.redirectTo
+          : [current.redirectTo];
+        await this.router.navigate(commands);
+      }
+    } finally {
+      this.completingResult = false;
+      this.dialog.settle(true);
+    }
   }
 }

@@ -9,11 +9,7 @@
     </p>
   </header>
 
-  @if (uploadSuccess()) {
-    <div class="pending-payment-card__success" role="status">
-      <p>{{ copy.client.receiptUploaded }}</p>
-    </div>
-  } @else if (instructions; as paymentInstructions) {
+  @if (instructions; as paymentInstructions) {
     <app-payment-instructions-panel
       [bookingId]="item.bookingId"
       [instructions]="paymentInstructions"

@@ -96,19 +96,17 @@ describe('admin cancellation and refund action labels', () => {
     expect(canRecordRefund(booking({ refundDue: true, paymentId: null }))).toBe(false);
   });
 
-  it('labels the customer name in the direct-cancel confirmation', () => {
+  it('builds the direct-cancel confirmation without customer name', () => {
     const unpaid = buildDirectCancelConfirm(booking({ status: 'PendingPayment' }));
-    expect(unpaid.detail).toBe('اسم العميل: Client One');
-    expect(unpaid.message).toContain('اسم العميل: Client One');
     expect(unpaid.message).toContain('هذا الحجز');
+    expect(unpaid.message).not.toContain('اسم العميل');
     expect(unpaid.message).not.toContain('استرداد مستحق');
 
     const paid = buildDirectCancelConfirm(
       booking({ status: 'Confirmed', paymentStatus: 'Approved' }),
     );
-    expect(paid.detail).toBe('اسم العميل: Client One');
-    expect(paid.message).toContain('اسم العميل: Client One');
     expect(paid.message).toContain('استرداد مستحق');
+    expect(paid.message).not.toContain('اسم العميل');
   });
 
   it('shows row actions for reviewable, cancellable, and refundable bookings only', () => {

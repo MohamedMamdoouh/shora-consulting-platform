@@ -56,6 +56,9 @@ export const APP_COPY = {
     cancel: 'إلغاء',
     acknowledge: 'حسنًا',
     successTitle: 'تم بنجاح',
+    errorTitle: 'حدث خطأ',
+    redirectingIn: (seconds: number) => `جاري التحويل خلال ${seconds} ثواني`,
+    closingIn: (seconds: number) => `سيتم الإغلاق خلال ${seconds} ثواني`,
   },
   cta: {
     bookSession: 'احجز جلسة',
@@ -149,15 +152,14 @@ export const APP_COPY = {
       'طلب الإلغاء يحتاج موافقة. إذا تمت الموافقة، سيسترد المبلغ يدويًا. هل تريد المتابعة؟',
     cancellationConfirmAction: 'متابعة',
     cancelHoldTitle: 'إلغاء الحجز',
-    cancelHoldConfirm:
-      'هل تريد إلغاء هذا الحجز؟ سيتم تحرير الموعد ويمكنك حجز موعد آخر لاحقًا.',
+    cancelHoldConfirm: 'هل تريد إلغاء هذا الحجز؟ سيتم تحرير الموعد ويمكنك حجز موعد آخر لاحقًا.',
     cancelHoldAction: 'إلغاء الحجز',
     voiceCallInstruction: (time: string, phone: string) =>
-      `سيتم الاتصال بك في ${time} على الرقم ${phone}.`,
+      `سيتم الاتصال بك الساعة ${time} على الرقم ${phone}`,
   },
   admin: {
     customerName: (name: string) => `اسم العميل: ${name}`,
-    customerAction: (name: string, message: string) => `اسم العميل: ${name} — ${message}`,
+    customerAction: (message: string) => message,
     dialog: {
       deleteWindowTitle: 'حذف نافذة التوفر',
       deleteWindowMessage: 'سيتم حذف هذه النافذة وإعادة توليد المواعيد المتاحة.',
@@ -183,10 +185,12 @@ export const APP_COPY = {
       approveReceiptTitle: 'قبول الإيصال',
       approveReceiptMessage: 'هل تريد قبول إيصال الدفع وتأكيد هذا الحجز؟',
       approveReceiptAction: 'قبول',
+      declineReceiptTitle: 'رفض الإيصال',
+      declineReceiptMessage: 'هل تريد رفض إيصال الدفع؟',
+      declineReceiptAction: 'تأكيد الرفض',
       refundReferenceRequired: 'مرجع التحويل مطلوب.',
       cancelBookingTitle: 'إلغاء الحجز',
-      cancelBookingMessage: (refundNote: string) =>
-        `هل تريد إلغاء هذا الحجز؟${refundNote}`,
+      cancelBookingMessage: (refundNote: string) => `هل تريد إلغاء هذا الحجز؟${refundNote}`,
       cancelBookingAction: 'إلغاء الحجز',
       settingsSavedTitle: 'تم حفظ الإعدادات',
       settingsSavedMessage:

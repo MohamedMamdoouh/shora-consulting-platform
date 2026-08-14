@@ -16,7 +16,7 @@
       <header class="admin-availability__header">
         <h2>المواعيد والتوفر</h2>
         <p class="admin-availability__note">
-          نوافذ التوفر وفترات الحجب تُدخل وتُعرض حسب توقيتك المحلي (القاهرة).
+          نوافذ التوفر وفترات الحجب تُدخل وتعرض حسب توقيتك المحلي (القاهرة).
         </p>
       </header>
 
@@ -36,9 +36,14 @@
         } @else {
           <ul class="admin-availability__list">
             @for (window of state.windows; track window.id) {
-              <li class="admin-availability__row" [class.admin-availability__row--editing]="editingWindowId() === window.id">
+              <li
+                class="admin-availability__row"
+                [class.admin-availability__row--editing]="editingWindowId() === window.id"
+              >
                 <div class="admin-availability__row-main">
-                  <span class="admin-availability__row-title">{{ formatWindowSummary(window) }}</span>
+                  <span class="admin-availability__row-title">{{
+                    formatWindowSummary(window)
+                  }}</span>
                   <span
                     class="admin-availability__badge"
                     [class.admin-availability__badge--inactive]="!window.isActive"
@@ -159,8 +164,8 @@
         <div class="admin-availability__section-header">
           <h3>فترات الإجازات</h3>
           <p class="admin-availability__note">
-            مواعيد أنت غير متاح فيها. لا يمكن حجب موعد مرتبط بحجز نشط. يجب إلغاء الحجز أولًا من
-            لوحة الحجوزات.
+            مواعيد أنت غير متاح فيها. لا يمكن حجب موعد مرتبط بحجز نشط. يجب إلغاء الحجز أولًا من لوحة
+            الحجوزات.
           </p>
         </div>
 
@@ -171,7 +176,9 @@
             @for (blockedDate of state.blockedDates; track blockedDate.id) {
               <li class="admin-availability__row">
                 <div class="admin-availability__row-main">
-                  <span class="admin-availability__row-title">{{ formatBlockedRangeSummary(blockedDate) }}</span>
+                  <span class="admin-availability__row-title">{{
+                    formatBlockedRangeSummary(blockedDate)
+                  }}</span>
                 </div>
 
                 <div class="admin-availability__row-actions">
@@ -195,7 +202,11 @@
           <h3>إضافة فترة حجب</h3>
         </div>
 
-        <form class="admin-availability__form" [formGroup]="blockedForm" (ngSubmit)="submitBlockedDate()">
+        <form
+          class="admin-availability__form"
+          [formGroup]="blockedForm"
+          (ngSubmit)="submitBlockedDate()"
+        >
           <div class="admin-availability__time-row">
             <label>
               من
@@ -223,7 +234,11 @@
           </label>
 
           <div class="admin-availability__actions">
-            <button type="submit" class="btn" [disabled]="blockedForm.invalid || isSubmittingBlocked()">
+            <button
+              type="submit"
+              class="btn"
+              [disabled]="blockedForm.invalid || isSubmittingBlocked()"
+            >
               {{ blockedSubmitLabel() }}
             </button>
           </div>

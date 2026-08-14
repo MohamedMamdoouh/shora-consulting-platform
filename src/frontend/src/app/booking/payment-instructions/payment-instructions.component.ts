@@ -1,9 +1,10 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { PaymentInstructionsResponse } from '@contracts/payments';
 import { firstValueFrom } from 'rxjs';
 import { readApiError, readApiErrorCode } from '../../core/api/api-error.util';
 import { BookingService } from '../../core/booking/booking.service';
+import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
 import { readBookingErrorMessage } from '../booking-error.util';
 import { APP_COPY } from '../../core/i18n/app-copy.constants';
 import { PaymentInstructionsPanelComponent } from '../shared/payment-instructions-panel.component';
@@ -12,8 +13,7 @@ import { BookingStepIndicatorComponent } from '../shared/booking-step-indicator.
 type PaymentInstructionsViewModel =
   | { status: 'loading' }
   | { status: 'error'; message: string }
-  | { status: 'ready'; instructions: PaymentInstructionsResponse }
-  | { status: 'submitted' };
+  | { status: 'ready'; instructions: PaymentInstructionsResponse };
 
 @Component({
   selector: 'app-payment-instructions',
@@ -23,8 +23,8 @@ type PaymentInstructionsViewModel =
 })
 export class PaymentInstructionsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
   private readonly bookingService = inject(BookingService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   protected readonly copy = APP_COPY;
   readonly viewModel = signal<PaymentInstructionsViewModel>({ status: 'loading' });
@@ -38,12 +38,11 @@ export class PaymentInstructionsComponent implements OnInit {
     await this.loadInstructions();
   }
 
-  goToDashboard(): void {
-    void this.router.navigate(['/dashboard']);
-  }
-
-  onReceiptSubmitted(): void {
-    this.viewModel.set({ status: 'submitted' });
+  async onReceiptSubmitted(): Promise<void> {
+    await this.confirmDialog.result({
+      message: this.copy.booking.receiptSubmitted,
+      redirectTo: ['/dashboard'],
+    });
   }
 
   private async loadInstructions(): Promise<void> {

@@ -38,6 +38,7 @@ export class PaymentInstructionsPanelComponent implements OnChanges, OnDestroy {
   uploadMethod: PaymentMethod = 'VodafoneCash';
   senderReference = '';
   readonly selectedFile = signal<File | null>(null);
+  readonly fileTouched = signal(false);
   readonly uploadError = signal('');
   readonly uploading = signal(false);
 
@@ -59,13 +60,19 @@ export class PaymentInstructionsPanelComponent implements OnChanges, OnDestroy {
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     this.selectedFile.set(input.files?.[0] ?? null);
+    this.fileTouched.set(true);
     this.uploadError.set('');
+  }
+
+  markFileFieldTouched(): void {
+    this.fileTouched.set(true);
   }
 
   async submitReceipt(): Promise<void> {
     const file = this.selectedFile();
     if (this.uploading() || this.deadlineExpired() || !file) {
       if (!file && !this.uploading() && !this.deadlineExpired()) {
+        this.fileTouched.set(true);
         this.uploadError.set('يرجى اختيار صورة الإيصال.');
       }
       return;

@@ -109,7 +109,7 @@ export class AdminSettingsPageComponent implements OnInit {
       this.isSubmitting.set(false);
     }
 
-    await this.confirmDialog.alert({
+    await this.confirmDialog.result({
       title: this.copy.admin.dialog.settingsSavedTitle,
       message: this.copy.admin.dialog.settingsSavedMessage,
     });

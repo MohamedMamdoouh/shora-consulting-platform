@@ -13,7 +13,7 @@ export const BOOKING_STATUS_OPTIONS: ReadonlyArray<{ value: '' | BookingStatus; 
   { value: 'Confirmed', label: 'مؤكدة' },
   { value: 'CancellationRequested', label: 'طلب إلغاء' },
   { value: 'Completed', label: 'مكتملة' },
-  { value: 'Cancelled', label: 'تم إلغاؤها' },
+  { value: 'Cancelled', label: 'ملغية' },
 ];
 
 export function isRefundedCancelledBooking(
@@ -23,10 +23,7 @@ export function isRefundedCancelledBooking(
   return status === 'Cancelled' && paymentStatus === 'Refunded';
 }
 
-export function formatBookingStatus(
-  status: BookingStatus,
-  paymentStatus?: string | null,
-): string {
+export function formatBookingStatus(status: BookingStatus, paymentStatus?: string | null): string {
   if (isRefundedCancelledBooking(status, paymentStatus)) {
     return 'مستردة';
   }

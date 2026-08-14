@@ -17,16 +17,6 @@
         </div>
       }
 
-      @case ('submitted') {
-        <div class="state-panel state-panel--success">
-          <h2>تم رفع الإيصال</h2>
-          <p>{{ copy.booking.receiptSubmitted }}</p>
-          <button type="button" class="btn" (click)="goToDashboard()">
-            الانتقال إلى لوحة العميل
-          </button>
-        </div>
-      }
-
       @case ('ready') {
         @if (vm.instructions; as instructions) {
           <p class="intro">

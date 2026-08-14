@@ -19,9 +19,8 @@
     </header>
 
     <p class="refund-panel__hint">
-      {{ copy.admin.customerName(item.clientDisplayName) }} — أرسل المبلغ للعميل عبر فودافون
-      كاش أو إنستا باي خارج النظام، ثم سجل مرجع التحويل هنا. سيصله بريد إلكتروني لتأكيد
-      الاسترداد.
+      أرسل المبلغ للعميل عبر فودافون كاش أو إنستا باي خارج النظام، ثم سجل مرجع التحويل هنا.
+      سيصله بريد إلكتروني لتأكيد الاسترداد.
     </p>
 
     <form class="refund-panel__form" [formGroup]="recordForm" (ngSubmit)="submitRecord()">
@@ -32,8 +31,9 @@
           formControlName="reference"
           maxlength="500"
           autocomplete="off"
+          (blur)="markReferenceTouched()"
           [class.field-invalid]="!!referenceError()"
-          [attr.aria-invalid]="!hasReference()"
+          [attr.aria-invalid]="referenceTouched() && !hasReference() ? 'true' : null"
           [attr.aria-describedby]="referenceError() ? 'refund-reference-error' : null"
         />
         @if (referenceError(); as error) {
@@ -45,10 +45,6 @@
         ملاحظة (اختياري)
         <textarea formControlName="note" rows="3" placeholder="مثال: استرداد عبر فودافون كاش"></textarea>
       </label>
-
-      @if (actionError()) {
-        <p class="refund-panel__message refund-panel__message--error" role="alert">{{ actionError() }}</p>
-      }
 
       <div class="refund-panel__actions">
         <button type="submit" class="btn" [disabled]="!hasReference() || isSubmitting()">

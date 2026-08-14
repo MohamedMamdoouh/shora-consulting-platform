@@ -250,7 +250,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
       this.invalidateAvailabilityCache();
       this.startCreate();
       await this.refreshWindows();
-      await this.confirmDialog.alert({
+      await this.confirmDialog.result({
         title: this.copy.admin.dialog.windowSavedTitle,
         message: editingId
           ? this.copy.admin.dialog.windowUpdatedMessage
@@ -291,7 +291,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
       this.invalidateAvailabilityCache();
       this.resetBlockedForm();
       await this.refreshBlockedDates();
-      await this.confirmDialog.alert({
+      await this.confirmDialog.result({
         title: this.copy.admin.dialog.blockedDateAddedTitle,
         message: this.copy.admin.dialog.blockedDateAddedMessage,
         detail: formatBlockedRangeSummary(created),
@@ -353,7 +353,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
       }
 
       await this.refreshWindows();
-      await this.confirmDialog.alert({
+      await this.confirmDialog.result({
         title: this.copy.admin.dialog.windowDeletedTitle,
         message: this.copy.admin.dialog.windowDeletedMessage,
         detail: formatWindowSummary(window),
@@ -388,7 +388,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
       await firstValueFrom(this.adminBlockedDateService.deleteBlockedDate(blockedDate.id));
       this.invalidateAvailabilityCache();
       await this.refreshBlockedDates();
-      await this.confirmDialog.alert({
+      await this.confirmDialog.result({
         title: this.copy.admin.dialog.blockedDateRemovedTitle,
         message: this.copy.admin.dialog.blockedDateRemovedMessage,
         detail: formatBlockedRangeSummary(blockedDate),

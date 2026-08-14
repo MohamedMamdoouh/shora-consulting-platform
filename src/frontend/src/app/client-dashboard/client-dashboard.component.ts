@@ -80,7 +80,7 @@ export class ClientDashboardComponent implements OnInit {
       case 'Completed':
         return 'مكتملة';
       case 'Cancelled':
-        return 'تم إلغاؤها';
+        return 'ملغية';
       default:
         return status;
     }

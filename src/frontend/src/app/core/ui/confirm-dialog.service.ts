@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
-export type ConfirmDialogMode = 'confirm' | 'alert';
+export type ConfirmDialogMode = 'confirm' | 'alert' | 'result';
 export type ConfirmDialogVariant = 'default' | 'danger' | 'success';
 
 export interface ConfirmDialogOptions {
@@ -13,11 +13,27 @@ export interface ConfirmDialogOptions {
   mode?: ConfirmDialogMode;
 }
 
+export interface ResultDialogOptions {
+  title?: string;
+  message: string;
+  detail?: string;
+  confirmLabel?: string;
+  variant?: ConfirmDialogVariant;
+  timeoutMs?: number;
+  redirectTo?: string | readonly string[] | null;
+  onComplete?: () => void | Promise<void>;
+}
+
 export interface ConfirmDialogRequest extends ConfirmDialogOptions {
   readonly mode: ConfirmDialogMode;
   readonly variant: ConfirmDialogVariant;
+  readonly timeoutMs?: number;
+  readonly redirectTo?: string | readonly string[] | null;
+  readonly onComplete?: () => void | Promise<void>;
   readonly resolve: (confirmed: boolean) => void;
 }
+
+export const DEFAULT_RESULT_DIALOG_TIMEOUT_MS = 5000;
 
 @Injectable({ providedIn: 'root' })
 export class ConfirmDialogService {
@@ -43,6 +59,27 @@ export class ConfirmDialogService {
       ...options,
       mode: 'alert',
       variant: options.variant ?? 'success',
+    });
+  }
+
+  result(options: ResultDialogOptions): Promise<void> {
+    this.settle(false);
+
+    return new Promise((resolve) => {
+      this.requestState.set({
+        title: options.title,
+        message: options.message,
+        detail: options.detail,
+        confirmLabel: options.confirmLabel,
+        mode: 'result',
+        variant: options.variant ?? 'success',
+        timeoutMs: options.timeoutMs ?? DEFAULT_RESULT_DIALOG_TIMEOUT_MS,
+        redirectTo: options.redirectTo ?? null,
+        onComplete: options.onComplete,
+        resolve: () => {
+          resolve();
+        },
+      });
     });
   }
 

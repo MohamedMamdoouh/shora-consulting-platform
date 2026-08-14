@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { ErrorCodes } from '@contracts/error-codes';
 import { AuthService } from '../core/auth/auth.service';
 import { readApiError, readApiErrorCode } from '../core/api/api-error.util';
+import { ConfirmDialogService } from '../core/ui/confirm-dialog.service';
 
 @Component({
   selector: 'app-verify-email-page',
@@ -15,6 +16,7 @@ export class VerifyEmailPageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly auth = inject(AuthService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   readonly status = signal<'loading' | 'success' | 'error'>('loading');
   readonly message = signal('');
@@ -50,28 +52,33 @@ export class VerifyEmailPageComponent implements OnInit {
 
       const alreadyVerified =
         'message' in response && response.message.toLowerCase().includes('already');
-      this.completeSuccess(
+      await this.completeSuccess(
         alreadyVerified
-          ? 'حسابك مؤكد بالفعل. جاري تحويلك…'
-          : 'تم تأكيد بريدك الإلكتروني بنجاح. جاري تحويلك…',
+          ? 'حسابك مؤكد بالفعل.'
+          : 'تم تأكيد بريدك الإلكتروني بنجاح.',
       );
     } catch (err) {
-      this.status.set('error');
-      this.message.set(
+      const errorMessage =
         readApiErrorCode(err) === ErrorCodes.Auth.VerificationFailed
           ? 'رابط التحقق منتهي أو غير صالح.'
-          : readApiError(err, 'تعذر تأكيد البريد الإلكتروني. حاول مرة أخرى.'),
-      );
+          : readApiError(err, 'تعذر تأكيد البريد الإلكتروني. حاول مرة أخرى.');
+      this.status.set('error');
+      this.message.set(errorMessage);
+      await this.confirmDialog.result({
+        message: errorMessage,
+        variant: 'danger',
+      });
     }
   }
 
-  private completeSuccess(message: string): void {
+  private async completeSuccess(message: string): Promise<void> {
     this.status.set('success');
     this.message.set(message);
 
-    setTimeout(() => {
-      void this.redirectAfterSuccess();
-    }, 2000);
+    await this.confirmDialog.result({
+      message,
+      onComplete: () => this.redirectAfterSuccess(),
+    });
   }
 
   private async redirectAfterSuccess(): Promise<void> {

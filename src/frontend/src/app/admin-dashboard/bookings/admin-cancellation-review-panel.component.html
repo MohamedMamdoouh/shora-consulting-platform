@@ -9,9 +9,6 @@
     <header class="cancellation-panel__header">
       <div>
         <h3 id="cancellation-panel-title">مراجعة طلب الإلغاء</h3>
-        <p class="cancellation-panel__subtitle">
-          {{ copy.admin.customerName(item.clientDisplayName) }}
-        </p>
       </div>
       <button type="button" class="cancellation-panel__close" (click)="close()" aria-label="إغلاق">
         ×
@@ -20,6 +17,10 @@
 
     @if (item.cancellationRequest; as request) {
       <dl class="cancellation-panel__meta">
+        <div>
+          <dt>العميل</dt>
+          <dd>{{ item.clientDisplayName }}</dd>
+        </div>
         <div>
           <dt>تاريخ الطلب</dt>
           <dd>{{ formatRequestedAt(request.requestedAtUtc) }}</dd>
@@ -39,14 +40,7 @@
 
       @if (item.paymentStatus === 'Approved') {
         <p class="cancellation-panel__hint">
-          {{ copy.admin.customerName(item.clientDisplayName) }} — الدفع مقبول — الموافقة على
-          الإلغاء ستضع علامة «استرداد مستحق».
-        </p>
-      }
-
-      @if (actionError()) {
-        <p class="cancellation-panel__message cancellation-panel__message--error" role="alert">
-          {{ actionError() }}
+          الدفع مقبول — الموافقة على الإلغاء ستضع علامة «استرداد مستحق».
         </p>
       }
 

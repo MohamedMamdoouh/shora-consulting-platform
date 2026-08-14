@@ -132,8 +132,11 @@ button:disabled,
   opacity: 0.45;
   cursor: not-allowed;
   transform: none;
-  pointer-events: none;
   box-shadow: none;
+}
+
+.btn[aria-disabled='true'] {
+  pointer-events: none;
 }
 
 button.secondary,

@@ -123,15 +123,18 @@ export class UpcomingBookingCardComponent {
       );
 
       this.cancellationReason.set('');
-      this.changed.emit();
+      await this.confirmDialog.result({
+        message: 'تم إرسال طلب الإلغاء.',
+        onComplete: () => this.changed.emit(),
+      });
     } catch (err) {
-      const code = readApiErrorCode(err);
-      this.cancellationActionError.set(
-        readBookingErrorMessage(
-          code,
+      await this.confirmDialog.result({
+        message: readBookingErrorMessage(
+          readApiErrorCode(err),
           readApiError(err, 'تعذر إرسال طلب الإلغاء. حاول مرة أخرى.'),
         ),
-      );
+        variant: 'danger',
+      });
     } finally {
       this.requestingCancellation.set(false);
     }
@@ -149,15 +152,18 @@ export class UpcomingBookingCardComponent {
       await firstValueFrom(
         this.bookingService.markCancellationDecisionSeen(this.item.bookingId),
       );
-      this.changed.emit();
+      await this.confirmDialog.result({
+        message: 'تم تسجيل الإقرار.',
+        onComplete: () => this.changed.emit(),
+      });
     } catch (err) {
-      const code = readApiErrorCode(err);
-      this.cancellationActionError.set(
-        readBookingErrorMessage(
-          code,
+      await this.confirmDialog.result({
+        message: readBookingErrorMessage(
+          readApiErrorCode(err),
           readApiError(err, 'تعذر تسجيل الإقرار. حاول مرة أخرى.'),
         ),
-      );
+        variant: 'danger',
+      });
     } finally {
       this.acknowledgingDecision.set(false);
     }

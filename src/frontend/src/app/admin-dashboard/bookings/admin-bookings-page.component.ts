@@ -72,8 +72,6 @@ export class AdminBookingsPageComponent implements OnInit {
   readonly receiptReviewItem = signal<AdminBookingListItem | null>(null);
   readonly cancellationReviewItem = signal<AdminBookingListItem | null>(null);
   readonly refundPanelItem = signal<AdminBookingListItem | null>(null);
-  readonly actionMessage = signal('');
-  readonly actionError = signal('');
   readonly cancellingBookingId = signal<string | null>(null);
 
   readonly canGoPrevious = computed(() => this.currentPage() > 1);
@@ -135,8 +133,6 @@ export class AdminBookingsPageComponent implements OnInit {
 
   openReceiptReview(item: AdminBookingListItem): void {
     this.receiptReviewItem.set(item);
-    this.actionMessage.set('');
-    this.actionError.set('');
   }
 
   closeReceiptReview(): void {
@@ -145,8 +141,6 @@ export class AdminBookingsPageComponent implements OnInit {
 
   openCancellationReview(item: AdminBookingListItem): void {
     this.cancellationReviewItem.set(item);
-    this.actionMessage.set('');
-    this.actionError.set('');
   }
 
   closeCancellationReview(): void {
@@ -155,8 +149,6 @@ export class AdminBookingsPageComponent implements OnInit {
 
   openRecordRefund(item: AdminBookingListItem): void {
     this.refundPanelItem.set(item);
-    this.actionMessage.set('');
-    this.actionError.set('');
   }
 
   closeRefundPanel(): void {
@@ -164,33 +156,16 @@ export class AdminBookingsPageComponent implements OnInit {
   }
 
   async onReceiptReviewChanged(): Promise<void> {
-    const name = this.receiptReviewItem()?.clientDisplayName;
-    this.actionMessage.set(
-      name
-        ? this.copy.admin.customerAction(name, 'تم تحديث حالة الحجز.')
-        : 'تم تحديث حالة الحجز.',
-    );
     this.receiptReviewItem.set(null);
     await this.loadBookings(this.currentPage());
   }
 
   async onCancellationReviewChanged(): Promise<void> {
-    const name = this.cancellationReviewItem()?.clientDisplayName;
-    this.actionMessage.set(
-      name
-        ? this.copy.admin.customerAction(name, 'تم تحديث حالة طلب الإلغاء.')
-        : 'تم تحديث حالة طلب الإلغاء.',
-    );
     this.cancellationReviewItem.set(null);
     await this.loadBookings(this.currentPage());
   }
 
   async onRefundChanged(): Promise<void> {
-    const name = this.refundPanelItem()?.clientDisplayName;
-    const message = 'تم تسجيل الاسترداد وإرسال تأكيد للعميل.';
-    this.actionMessage.set(
-      name ? this.copy.admin.customerAction(name, message) : message,
-    );
     this.closeRefundPanel();
     await this.loadBookings(this.currentPage());
   }
@@ -212,27 +187,24 @@ export class AdminBookingsPageComponent implements OnInit {
     }
 
     this.cancellingBookingId.set(item.bookingId);
-    this.actionError.set('');
-    this.actionMessage.set('');
 
     try {
       await firstValueFrom(this.adminBookingsService.cancelBooking(item.bookingId));
-      this.actionMessage.set(
-        this.copy.admin.customerAction(
-          item.clientDisplayName,
+      await this.confirmDialog.result({
+        message:
           item.paymentStatus === 'Approved'
             ? 'تم إلغاء الحجز — استرداد مستحق.'
             : 'تم إلغاء الحجز.',
-        ),
-      );
-      await this.loadBookings(this.currentPage());
+        onComplete: () => this.loadBookings(this.currentPage()),
+      });
     } catch (error) {
-      this.actionError.set(
-        readBookingErrorMessage(
+      await this.confirmDialog.result({
+        message: readBookingErrorMessage(
           readApiErrorCode(error),
           readApiError(error, 'تعذر إلغاء الحجز. حاول مرة أخرى.'),
         ),
-      );
+        variant: 'danger',
+      });
     } finally {
       this.cancellingBookingId.set(null);
     }

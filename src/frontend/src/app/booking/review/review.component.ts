@@ -11,6 +11,7 @@ import { isSlotUnavailableError, readBookingErrorMessage } from '../booking-erro
 import { BookingFlowStateService } from '../booking-flow-state.service';
 import { formatSlotSummary } from '../utils/slot-grouping.util';
 import { BookingStepIndicatorComponent } from '../shared/booking-step-indicator.component';
+import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
 
 @Component({
   selector: 'app-booking-review',
@@ -24,6 +25,7 @@ export class ReviewComponent implements OnInit {
   private readonly bookingService = inject(BookingService);
   private readonly apiCache = inject(ApiCacheService);
   private readonly router = inject(Router);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   readonly flow = this.bookingFlow.getState()!;
   readonly slotSummary = formatSlotSummary(this.flow.slotStartUtc);
@@ -103,16 +105,20 @@ export class ReviewComponent implements OnInit {
 
     try {
       const response = await firstValueFrom(this.bookingService.reserve(request));
-      this.bookingFlow.clear();
-      await this.router.navigate(['/booking/payment', response.bookingId]);
+      await this.confirmDialog.result({
+        message: 'تم حجز موعدك. أكمل الدفع الآن.',
+        redirectTo: ['/booking/payment', response.bookingId],
+        onComplete: () => this.bookingFlow.clear(),
+      });
     } catch (err) {
       const code = readApiErrorCode(err);
-      this.errorMessage.set(
-        readBookingErrorMessage(
+      await this.confirmDialog.result({
+        message: readBookingErrorMessage(
           code,
           readApiError(err, 'تعذر إتمام الحجز. حاول مرة أخرى.'),
         ),
-      );
+        variant: 'danger',
+      });
       this.slotUnavailable.set(isSlotUnavailableError(code));
     } finally {
       this.isSubmitting.set(false);

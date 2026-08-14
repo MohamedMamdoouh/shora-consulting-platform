@@ -9,9 +9,6 @@
     <header class="receipt-panel__header">
       <div>
         <h3 id="receipt-panel-title">مراجعة إيصال الدفع</h3>
-        <p class="receipt-panel__subtitle">
-          {{ copy.admin.customerName(clientDisplayName) }}
-        </p>
       </div>
       <button type="button" class="receipt-panel__close" (click)="close()" aria-label="إغلاق">
         ×
@@ -36,6 +33,10 @@
       @case ('ready') {
         <div class="receipt-panel__summary">
           <dl>
+            <div>
+              <dt>العميل</dt>
+              <dd>{{ clientDisplayName }}</dd>
+            </div>
             <div>
               <dt>المبلغ</dt>
               <dd>{{ formatMoney(state.data.amount, state.data.currency) }}</dd>
@@ -107,12 +108,6 @@
                 } @else {
                   تعذر إنشاء رابط عرض للصورة.
                 }
-              </p>
-            }
-
-            @if (actionError()) {
-              <p class="receipt-panel__message receipt-panel__message--error" role="alert">
-                {{ actionError() }}
               </p>
             }
 

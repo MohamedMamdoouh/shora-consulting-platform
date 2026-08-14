@@ -5,6 +5,7 @@ import { AdminBookingListItem } from '@contracts/booking';
 import { firstValueFrom, map, startWith } from 'rxjs';
 import { readApiError, readApiErrorCode } from '../../core/api/api-error.util';
 import { AdminPaymentsService } from '../../core/admin/admin-payments.service';
+import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
 import { APP_COPY } from '../../core/i18n/app-copy.constants';
 import { readBookingErrorMessage } from '../../booking/booking-error.util';
 
@@ -17,6 +18,7 @@ import { readBookingErrorMessage } from '../../booking/booking-error.util';
 export class AdminRefundPanelComponent {
   private readonly fb = inject(FormBuilder);
   private readonly adminPaymentsService = inject(AdminPaymentsService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
 
   protected readonly copy = APP_COPY;
 
@@ -25,8 +27,8 @@ export class AdminRefundPanelComponent {
   @Output() readonly closed = new EventEmitter<void>();
   @Output() readonly changed = new EventEmitter<void>();
 
-  readonly actionError = signal('');
   readonly isSubmitting = signal(false);
+  readonly referenceTouched = signal(false);
 
   readonly recordForm = this.fb.nonNullable.group({
     reference: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(500)]),
@@ -38,21 +40,32 @@ export class AdminRefundPanelComponent {
   readonly hasReference = computed(() => this.referenceText().length > 0);
 
   readonly referenceError = computed(() =>
-    this.hasReference() ? null : this.copy.admin.dialog.refundReferenceRequired,
+    this.referenceTouched() && !this.hasReference()
+      ? this.copy.admin.dialog.refundReferenceRequired
+      : null,
   );
 
   close(): void {
     this.closed.emit();
   }
 
+  markReferenceTouched(): void {
+    this.referenceTouched.set(true);
+    this.recordForm.controls.reference.markAsTouched();
+  }
+
   async submitRecord(): Promise<void> {
-    if (this.isSubmitting() || !this.item.paymentId || !this.hasReference()) {
+    if (this.isSubmitting() || !this.item.paymentId) {
+      return;
+    }
+
+    if (!this.hasReference()) {
+      this.markReferenceTouched();
       return;
     }
 
     const values = this.recordForm.getRawValue();
     this.isSubmitting.set(true);
-    this.actionError.set('');
 
     try {
       await firstValueFrom(
@@ -61,15 +74,21 @@ export class AdminRefundPanelComponent {
           note: values.note?.trim() || null,
         }),
       );
-      this.changed.emit();
-      this.close();
+      await this.confirmDialog.result({
+        message: 'تم تسجيل الاسترداد وإرسال تأكيد للعميل.',
+        onComplete: () => {
+          this.changed.emit();
+          this.close();
+        },
+      });
     } catch (error) {
-      this.actionError.set(
-        readBookingErrorMessage(
+      await this.confirmDialog.result({
+        message: readBookingErrorMessage(
           readApiErrorCode(error),
           readApiError(error, 'تعذر تسجيل الاسترداد. حاول مرة أخرى.'),
         ),
-      );
+        variant: 'danger',
+      });
     } finally {
       this.isSubmitting.set(false);
     }

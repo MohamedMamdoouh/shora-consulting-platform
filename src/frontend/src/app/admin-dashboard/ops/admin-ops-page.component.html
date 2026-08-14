@@ -4,7 +4,8 @@
       <div>
         <h2>تنبيهات التشغيل</h2>
         <p class="admin-ops__note">
-          تعرض التنبيهات التي يكتشفها النظام أثناء مراقبته. لكل تنبيه خطوات واضحة لمعرفة المشكلة وكيفية التعامل معها.
+          تعرض التنبيهات التي يكتشفها النظام أثناء مراقبته. لكل تنبيه خطوات واضحة لمعرفة المشكلة
+          وكيفية التعامل معها.
         </p>
       </div>
 
@@ -29,7 +30,10 @@
       @if (state.alerts.length === 0) {
         <div class="admin-ops__panel admin-ops__panel--empty">
           <p>لا توجد تنبيهات نشطة حاليًا.</p>
-          <p class="admin-ops__note">تُحدّث حالة التنبيهات تلقائيًا كل 5 دقائق تقريبًا، ويمكنك الضغط على «تحديث» لمعرفة أحدث حالة.</p>
+          <p class="admin-ops__note">
+            يتم تحديث حالة التنبيهات تلقائيًا كل 5 دقائق تقريبًا، ويمكنك الضغط على «تحديث» لمعرفة
+            أحدث حالة.
+          </p>
         </div>
       } @else {
         <div class="admin-ops__summary" aria-live="polite">
@@ -43,11 +47,13 @@
 
         <ul class="admin-ops__list">
           @for (alert of state.alerts; track alert.message + alert.runbookId + alert.severity) {
-            <li
-              class="admin-ops__card admin-ops__card--{{ severityCssModifier(alert.severity) }}"
-            >
+            <li class="admin-ops__card admin-ops__card--{{ severityCssModifier(alert.severity) }}">
               <div class="admin-ops__card-header">
-                <span class="admin-ops__badge admin-ops__badge--{{ severityCssModifier(alert.severity) }}">
+                <span
+                  class="admin-ops__badge admin-ops__badge--{{
+                    severityCssModifier(alert.severity)
+                  }}"
+                >
                   {{ formatAlertSeverity(alert.severity) }}
                 </span>
                 <h3>{{ formatAlertKind(alert.kind) }}</h3>

@@ -29,7 +29,6 @@ export class PendingPaymentCardComponent {
 
   readonly cancelError = signal('');
   readonly cancelling = signal(false);
-  readonly uploadSuccess = signal(false);
 
   get instructions() {
     return getPendingPaymentInstructions(this.item);
@@ -56,22 +55,27 @@ export class PendingPaymentCardComponent {
 
     try {
       await firstValueFrom(this.bookingService.cancelHold(this.item.bookingId));
-      this.changed.emit();
+      await this.confirmDialog.result({
+        message: 'تم إلغاء الحجز.',
+        onComplete: () => this.changed.emit(),
+      });
     } catch (err) {
-      const code = readApiErrorCode(err);
-      this.cancelError.set(
-        readBookingErrorMessage(
-          code,
+      await this.confirmDialog.result({
+        message: readBookingErrorMessage(
+          readApiErrorCode(err),
           readApiError(err, 'تعذر إلغاء الحجز. حاول مرة أخرى.'),
         ),
-      );
+        variant: 'danger',
+      });
     } finally {
       this.cancelling.set(false);
     }
   }
 
-  onReceiptSubmitted(): void {
-    this.uploadSuccess.set(true);
-    this.changed.emit();
+  async onReceiptSubmitted(): Promise<void> {
+    await this.confirmDialog.result({
+      message: this.copy.client.receiptUploaded,
+      redirectTo: ['/dashboard'],
+    });
   }
 }

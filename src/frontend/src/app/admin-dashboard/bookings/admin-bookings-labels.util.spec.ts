@@ -12,8 +12,8 @@ describe('admin booking status and notes', () => {
   });
 
   it('keeps the cancelled label until a refund is recorded', () => {
-    expect(formatBookingStatus('Cancelled')).toBe('تم إلغاؤها');
-    expect(formatBookingStatus('Cancelled', 'Approved')).toBe('تم إلغاؤها');
+    expect(formatBookingStatus('Cancelled')).toBe('ملغية');
+    expect(formatBookingStatus('Cancelled', 'Approved')).toBe('ملغية');
     expect(bookingStatusDataAttr('Cancelled', 'Approved')).toBe('Cancelled');
   });
 
@@ -23,14 +23,14 @@ describe('admin booking status and notes', () => {
   });
 
   it('adds refunded copy to cancelled notes after a refund is recorded', () => {
-    expect(
-      formatCancellationNote('Cancelled', 'Cancelled by you', false, null, 'Refunded'),
-    ).toBe('تم الإلغاء من طرف العميل · تم استرداد المبلغ');
+    expect(formatCancellationNote('Cancelled', 'Cancelled by you', false, null, 'Refunded')).toBe(
+      'تم الإلغاء من طرف العميل · تم استرداد المبلغ',
+    );
   });
 
   it('adds refund-due copy while the refund is still outstanding', () => {
-    expect(
-      formatCancellationNote('Cancelled', 'Cancelled by you', true, null, 'Approved'),
-    ).toBe('تم الإلغاء من طرف العميل · استرداد مستحق');
+    expect(formatCancellationNote('Cancelled', 'Cancelled by you', true, null, 'Approved')).toBe(
+      'تم الإلغاء من طرف العميل · استرداد مستحق',
+    );
   });
 });

@@ -99,7 +99,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
   });
 
   readonly blockedSubmitLabel = computed(() =>
-    this.isSubmittingBlocked() ? 'جاري الإضافة...' : 'إضافة الحجب',
+    this.isSubmittingBlocked() ? 'جاري الإضافة...' : 'إضافة موعد غير متاح',
   );
 
   readonly dayOptions = DAY_OF_WEEK_OPTIONS;
@@ -308,20 +308,20 @@ export class AdminAvailabilityPageComponent implements OnInit {
       if (conflictingIds?.length) {
         this.conflictingBookingIds.set(conflictingIds);
         this.blockedErrorMessage.set(
-          'تتعارض فترة الحجب مع حجوزات قائمة. قم بإلغاءهذه الحجوزات أولًا ثم حاول مرة أخرى.',
+          'يتعارض الموعد غير المتاح مع حجوزات قائمة. قم بإلغاء هذه الحجوزات أولًا ثم حاول مرة أخرى.',
         );
         return;
       }
 
       if (readApiErrorCode(error) === ErrorCodes.Availability.BlockedRangeConflictsWithBookings) {
         this.blockedErrorMessage.set(
-          'تتعارض فترة الحجب مع حجوزات قائمة. قم بإلغاءالحجوزات المتعارضة أولًا ثم حاول مرة أخرى.',
+          'يتعارض الموعد غير المتاح مع حجوزات قائمة. قم بإلغاء الحجوزات المتعارضة أولًا ثم حاول مرة أخرى.',
         );
         return;
       }
 
       this.blockedErrorMessage.set(
-        readApiError(error, 'تعذر إضافة فترة الحجب. تحقق من البيانات وحاول مرة أخرى.'),
+        readApiError(error, 'تعذر إضافة موعد غير متاح. تحقق من البيانات وحاول مرة أخرى.'),
       );
     } finally {
       this.isSubmittingBlocked.set(false);
@@ -397,7 +397,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
         detail: formatBlockedRangeSummary(blockedDate),
       });
     } catch (error) {
-      this.blockedErrorMessage.set(readApiError(error, 'تعذر إزالة فترة الحجب. حاول مرة أخرى.'));
+      this.blockedErrorMessage.set(readApiError(error, 'تعذر إزالة موعد غير متاح. حاول مرة أخرى.'));
     } finally {
       this.deletingBlockedDateId.set(null);
     }
@@ -432,7 +432,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
       const blockedDates = await firstValueFrom(this.adminBlockedDateService.listBlockedDates());
       this.pageState.set({ ...current, blockedDates: sortBlockedDates(blockedDates) });
     } catch (error) {
-      this.blockedErrorMessage.set(readApiError(error, 'تعذر تحديث قائمة فترات الحجب.'));
+      this.blockedErrorMessage.set(readApiError(error, 'تعذر تحديث قائمة المواعيد غير المتاحة.'));
     }
   }
 

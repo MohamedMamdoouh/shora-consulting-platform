@@ -2,7 +2,7 @@
   <header class="admin-bookings__header">
     <h2>الحجوزات</h2>
     <p class="admin-bookings__note">
-      جميع حجوزات العملاء — الأوقات معروضة بتوقيتك المحلي. استخدم فلتر «ملغية» لمعالجة الاستردادات
+      جميع حجوزات العملاء — الأوقات معروضة بتوقيتك المحلي. استخدم فلتر «استرداد» لمعالجة الاستردادات
       المستحقة.
     </p>
   </header>
@@ -29,6 +29,12 @@
 
     <div class="admin-bookings__filter-actions">
       <button type="submit" class="btn">تطبيق الفلتر</button>
+      @if (filtersForm.get('status')?.value === 'RefundDue') {
+        <span class="badge badge--error admin-bookings__filter-pill">استرداد</span>
+      }
+      @if (filtersForm.get('status')?.value === 'CancellationRequested') {
+        <span class="badge badge--error admin-bookings__filter-pill">طلب إلغاء</span>
+      }
     </div>
   </form>
 

@@ -160,15 +160,15 @@
 
       <article class="admin-availability__section">
         <div class="admin-availability__section-header">
-          <h3>فترات الإجازات</h3>
+          <h3>مواعيد غير متاحة</h3>
           <p class="admin-availability__note">
-            مواعيد أنت غير متاح فيها. لا يمكن حجب موعد مرتبط بحجز نشط. يجب إلغاء الحجز أولًا من لوحة
-            الحجوزات.
+            مواعيد أنت غير متاح فيها. لا يمكن تحديد موعد غير متاح مرتبط بحجز نشط. يجب إلغاء الحجز
+            أولًا من لوحة الحجوزات.
           </p>
         </div>
 
         @if (state.blockedDates.length === 0) {
-          <p class="admin-availability__state">لا توجد فترات حجب بعد.</p>
+          <p class="admin-availability__state">لا توجد مواعيد غير متاحة بعد.</p>
         } @else {
           <ul class="admin-availability__list">
             @for (blockedDate of state.blockedDates; track blockedDate.id) {
@@ -197,7 +197,7 @@
 
       <article class="admin-availability__section">
         <div class="admin-availability__section-header">
-          <h3>إضافة فترة حجب</h3>
+          <h3>إضافة موعد غير متاح</h3>
         </div>
 
         <form

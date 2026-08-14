@@ -32,11 +32,7 @@ import {
 import { AdminCancellationReviewPanelComponent } from './admin-cancellation-review-panel.component';
 import { AdminReceiptReviewPanelComponent } from './admin-receipt-review-panel.component';
 import { AdminRefundPanelComponent } from './admin-refund-panel.component';
-import {
-  canRecordRefund,
-  hasBookingRowActions,
-  isRefundDueRow,
-} from './admin-refund-labels.util';
+import { canRecordRefund, hasBookingRowActions, isRefundDueRow } from './admin-refund-labels.util';
 
 type PageState =
   | { status: 'loading' }
@@ -101,7 +97,7 @@ export class AdminBookingsPageComponent implements OnInit {
   readonly totalPages = totalPages;
 
   readonly filtersForm = this.fb.nonNullable.group({
-    status: this.fb.nonNullable.control<'' | BookingStatus>(''),
+    status: this.fb.nonNullable.control<'' | AdminBookingStatusFilter>(''),
     fromDate: this.fb.control<string | null>(null),
     toDate: this.fb.control<string | null>(null),
   });
@@ -192,9 +188,7 @@ export class AdminBookingsPageComponent implements OnInit {
       await firstValueFrom(this.adminBookingsService.cancelBooking(item.bookingId));
       await this.confirmDialog.result({
         message:
-          item.paymentStatus === 'Approved'
-            ? 'تم إلغاء الحجز — استرداد مستحق.'
-            : 'تم إلغاء الحجز.',
+          item.paymentStatus === 'Approved' ? 'تم إلغاء الحجز — استرداد مستحق.' : 'تم إلغاء الحجز.',
         onComplete: () => this.loadBookings(this.currentPage()),
       });
     } catch (error) {

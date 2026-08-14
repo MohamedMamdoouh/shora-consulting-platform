@@ -151,6 +151,11 @@ export const APP_COPY = {
     cancellationConfirm:
       'طلب الإلغاء يحتاج موافقة. إذا تمت الموافقة، سيسترد المبلغ يدويًا. هل تريد المتابعة؟',
     cancellationConfirmAction: 'متابعة',
+    cancellationReasonTitle: 'سبب الإلغاء',
+    cancellationReasonMessage: 'يمكنك ذكر سبب الإلغاء لمساعدتنا في التحسين (اختياري).',
+    cancellationReasonLabel: 'سبب الإلغاء (اختياري)',
+    cancellationReasonPlaceholder: 'مثال: تعارض في الموعد',
+    cancellationReasonAction: 'طلب إلغاء الجلسة',
     cancelHoldTitle: 'إلغاء الحجز',
     cancelHoldConfirm: 'هل تريد إلغاء هذا الحجز؟ سيتم تحرير الموعد ويمكنك حجز موعد آخر لاحقًا.',
     cancelHoldAction: 'إلغاء الحجز',

@@ -2,7 +2,7 @@
 // Angular view-encapsulation means each component needs its own copy of these rules.
 
 .dashboard-section__header h2 {
-  margin: 0;
+  margin: 0 0 var(--space-xl);
 }
 
 .dashboard__empty-actions {

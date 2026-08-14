@@ -75,19 +75,6 @@
 
   @if (showRequestCancellation) {
     <div class="upcoming-booking-card__cancellation">
-      <label class="field">
-        <span>سبب الإلغاء (اختياري)</span>
-        <textarea
-          [ngModel]="cancellationReason()"
-          (ngModelChange)="cancellationReason.set($event)"
-          name="cancellationReason"
-          rows="2"
-          maxlength="500"
-          placeholder="مثال: تعارض في الموعد"
-          [disabled]="requestingCancellation()"
-        ></textarea>
-      </label>
-
       @if (cancellationActionError()) {
         <p class="upcoming-booking-card__error" aria-live="polite">
           {{ cancellationActionError() }}

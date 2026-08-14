@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
-export type ConfirmDialogMode = 'confirm' | 'alert' | 'result';
+export type ConfirmDialogMode = 'confirm' | 'alert' | 'result' | 'prompt';
 export type ConfirmDialogVariant = 'default' | 'danger' | 'success';
 
 export interface ConfirmDialogOptions {
@@ -11,6 +11,18 @@ export interface ConfirmDialogOptions {
   cancelLabel?: string;
   variant?: ConfirmDialogVariant;
   mode?: ConfirmDialogMode;
+}
+
+export interface PromptDialogOptions {
+  title?: string;
+  message: string;
+  inputLabel?: string;
+  placeholder?: string;
+  initialValue?: string;
+  maxLength?: number;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  variant?: ConfirmDialogVariant;
 }
 
 export interface ResultDialogOptions {
@@ -30,6 +42,9 @@ export interface ConfirmDialogRequest extends ConfirmDialogOptions {
   readonly timeoutMs?: number;
   readonly redirectTo?: string | readonly string[] | null;
   readonly onComplete?: () => void | Promise<void>;
+  readonly inputLabel?: string;
+  readonly placeholder?: string;
+  readonly maxLength?: number;
   readonly resolve: (confirmed: boolean) => void;
 }
 
@@ -40,6 +55,7 @@ export class ConfirmDialogService {
   private readonly requestState = signal<ConfirmDialogRequest | null>(null);
 
   readonly request = this.requestState.asReadonly();
+  readonly promptValue = signal('');
 
   confirm(options: ConfirmDialogOptions): Promise<boolean> {
     this.settle(false);
@@ -50,6 +66,27 @@ export class ConfirmDialogService {
         mode: options.mode ?? 'confirm',
         variant: options.variant ?? 'default',
         resolve,
+      });
+    });
+  }
+
+  /** Resolves to the entered (trimmed) text, or undefined if the user dismissed the dialog. */
+  prompt(options: PromptDialogOptions): Promise<string | undefined> {
+    this.settle(false);
+    this.promptValue.set(options.initialValue ?? '');
+
+    return new Promise((resolve) => {
+      this.requestState.set({
+        title: options.title,
+        message: options.message,
+        inputLabel: options.inputLabel,
+        placeholder: options.placeholder,
+        maxLength: options.maxLength,
+        confirmLabel: options.confirmLabel,
+        cancelLabel: options.cancelLabel,
+        mode: 'prompt',
+        variant: options.variant ?? 'default',
+        resolve: (confirmed) => resolve(confirmed ? this.promptValue().trim() : undefined),
       });
     });
   }

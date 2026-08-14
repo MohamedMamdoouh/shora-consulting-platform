@@ -8,6 +8,7 @@ import {
   viewChild,
   ViewEncapsulation,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { APP_COPY } from '../../core/i18n/app-copy.constants';
 import {
@@ -19,6 +20,7 @@ import {
 @Component({
   selector: 'app-confirm-dialog',
   encapsulation: ViewEncapsulation.None,
+  imports: [FormsModule],
   template: `
     <dialog
       #dialogEl
@@ -85,6 +87,22 @@ import {
               {{ countdownLabel(current) }}
             </p>
           }
+          @if (current.mode === 'prompt') {
+            <label class="field confirm-dialog__field">
+              @if (current.inputLabel) {
+                <span>{{ current.inputLabel }}</span>
+              }
+              <textarea
+                [ngModel]="dialog.promptValue()"
+                (ngModelChange)="dialog.promptValue.set($event)"
+                name="confirmDialogPrompt"
+                rows="2"
+                [maxlength]="current.maxLength ?? 500"
+                [placeholder]="current.placeholder ?? ''"
+                autofocus
+              ></textarea>
+            </label>
+          }
           <div class="confirm-dialog__actions">
             <button
               type="button"
@@ -95,7 +113,7 @@ import {
             >
               {{ confirmLabelFor(current) }}
             </button>
-            @if (current.mode === 'confirm') {
+            @if (current.mode === 'confirm' || current.mode === 'prompt') {
               <button
                 type="button"
                 class="btn btn--secondary"
@@ -184,6 +202,10 @@ import {
       color: var(--color-text-muted);
       font-size: var(--font-size-base);
       line-height: var(--line-height-body);
+    }
+
+    .confirm-dialog__field {
+      width: 100%;
     }
 
     .confirm-dialog__detail {

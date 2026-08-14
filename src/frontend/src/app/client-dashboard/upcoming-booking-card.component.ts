@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { BookingStatus, MyBookingListItem } from '@contracts/booking';
 import { firstValueFrom } from 'rxjs';
 import { readApiError } from '../core/api/api-error.util';
@@ -21,7 +20,6 @@ import { ConfirmDialogService } from '../core/ui/confirm-dialog.service';
 
 @Component({
   selector: 'app-upcoming-booking-card',
-  imports: [FormsModule],
   templateUrl: './upcoming-booking-card.component.html',
   styleUrl: './upcoming-booking-card.component.scss',
 })
@@ -39,7 +37,6 @@ export class UpcomingBookingCardComponent {
 
   readonly formatDeliveryMethodLabel = formatDeliveryMethodLabel;
 
-  readonly cancellationReason = signal('');
   cancellationError = '';
   readonly cancellationActionError = signal('');
   readonly requestingCancellation = signal(false);
@@ -110,18 +107,29 @@ export class UpcomingBookingCardComponent {
       return;
     }
 
+    const reason = await this.confirmDialog.prompt({
+      title: this.copy.client.cancellationReasonTitle,
+      message: this.copy.client.cancellationReasonMessage,
+      inputLabel: this.copy.client.cancellationReasonLabel,
+      placeholder: this.copy.client.cancellationReasonPlaceholder,
+      confirmLabel: this.copy.client.cancellationReasonAction,
+      variant: 'danger',
+    });
+
+    if (reason === undefined) {
+      return;
+    }
+
     this.requestingCancellation.set(true);
     this.cancellationActionError.set('');
 
     try {
-      const reason = this.cancellationReason().trim();
       await firstValueFrom(
         this.bookingService.requestCancellation(this.item.bookingId, {
           reason: reason || null,
         }),
       );
 
-      this.cancellationReason.set('');
       await this.confirmDialog.result({
         message: 'تم إرسال طلب الإلغاء.',
         onComplete: () => this.changed.emit(),

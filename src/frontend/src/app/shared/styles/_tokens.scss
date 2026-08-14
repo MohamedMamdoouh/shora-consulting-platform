@@ -51,6 +51,12 @@
   --color-whatsapp-hover: #0d6b60;
   --color-on-whatsapp: #ffffff;
 
+  /* Theme toggle switch — fixed palette, intentionally does not flip with [data-theme] */
+  --color-toggle-track: #16211e;
+  --color-toggle-track-active: #1a3a3a;
+  --color-toggle-thumb: #fdfbf7;
+  --color-toggle-icon: #16211e;
+
   /* Gradients */
   --gradient-brand: linear-gradient(135deg, #1a3a3a 0%, #234848 100%);
   --gradient-brand-hover: linear-gradient(135deg, #152f2f 0%, #1a3a3a 100%);

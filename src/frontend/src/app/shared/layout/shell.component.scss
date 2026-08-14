@@ -83,14 +83,15 @@
   width: 3.25rem;
   height: 1.75rem;
   padding: 0;
-  border: 1px solid var(--color-border);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 999px;
-  background: var(--color-border);
+  background: var(--color-toggle-track);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.25);
   transition: background-color 0.2s ease;
 }
 
 .shell__theme-toggle[aria-checked='true'] {
-  background: var(--color-primary);
+  background: var(--color-toggle-track-active);
 }
 
 .shell__theme-toggle-track {
@@ -109,14 +110,14 @@
   width: 1.25rem;
   height: 1.25rem;
   border-radius: 50%;
-  background: var(--color-surface);
-  color: var(--color-text);
+  background: var(--color-toggle-thumb);
+  color: var(--color-toggle-icon);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   transition: inset-inline-start 0.2s ease;
 }
 
 .shell__theme-toggle[aria-checked='true'] .shell__theme-toggle-thumb {
   inset-inline-start: calc(100% - 1.25rem - 2px);
-  color: var(--color-primary);
 }
 
 .shell__menu-icon,

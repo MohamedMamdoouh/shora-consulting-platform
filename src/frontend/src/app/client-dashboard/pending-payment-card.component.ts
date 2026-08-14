@@ -9,6 +9,7 @@ import { readBookingErrorMessage } from '../booking/booking-error.util';
 import { getPendingPaymentInstructions } from './pending-payment.util';
 import { APP_COPY } from '../core/i18n/app-copy.constants';
 import { ConfirmDialogService } from '../core/ui/confirm-dialog.service';
+import { buildReceiptUploadedResult } from './pending-payment-card-dialog.util';
 
 @Component({
   selector: 'app-pending-payment-card',
@@ -73,10 +74,8 @@ export class PendingPaymentCardComponent {
   }
 
   async onReceiptSubmitted(): Promise<void> {
-    await this.confirmDialog.result({
-      message: this.copy.client.receiptUploaded,
-      redirectTo: ['/dashboard'],
-      onComplete: () => this.changed.emit(),
-    });
+    await this.confirmDialog.result(
+      buildReceiptUploadedResult(this.copy.client.receiptUploaded, () => this.changed.emit()),
+    );
   }
 }

@@ -1,0 +1,6 @@
+#!/bin/sh
+# Clean local build artifacts before push
+rm -rf publish
+find src/backend -type d \( -name bin -o -name obj \) -prune -exec rm -rf {} +
+rm -rf src/frontend/dist
+exit 0

@@ -1,9 +1,8 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { ErrorCodes } from '@contracts/error-codes';
 import { AuthService } from '../core/auth/auth.service';
-import { readApiError, readApiErrorCode } from '../core/api/api-error.util';
+import { readApiError } from '../core/api/api-error.util';
 import { ConfirmDialogService } from '../core/ui/confirm-dialog.service';
 
 @Component({
@@ -53,15 +52,10 @@ export class VerifyEmailPageComponent implements OnInit {
       const alreadyVerified =
         'message' in response && response.message.toLowerCase().includes('already');
       await this.completeSuccess(
-        alreadyVerified
-          ? 'حسابك مؤكد بالفعل.'
-          : 'تم تأكيد بريدك الإلكتروني بنجاح.',
+        alreadyVerified ? 'حسابك مؤكد بالفعل.' : 'تم تأكيد بريدك الإلكتروني بنجاح.',
       );
     } catch (err) {
-      const errorMessage =
-        readApiErrorCode(err) === ErrorCodes.Auth.VerificationFailed
-          ? 'رابط التحقق منتهي أو غير صالح.'
-          : readApiError(err, 'تعذر تأكيد البريد الإلكتروني. حاول مرة أخرى.');
+      const errorMessage = readApiError(err, 'تعذر تأكيد البريد الإلكتروني. حاول مرة أخرى.');
       this.status.set('error');
       this.message.set(errorMessage);
       await this.confirmDialog.result({

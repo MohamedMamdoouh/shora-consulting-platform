@@ -1,0 +1,65 @@
+<article class="section section--card section--card-stack dashboard-section">
+  <div class="dashboard-section__header">
+    <h2 class="section-heading">السجل</h2>
+  </div>
+
+  @let history = section();
+  @switch (history.status) {
+    @case ('loading') {
+      <p class="state-message" aria-live="polite">جاري تحميل السجل...</p>
+    }
+    @case ('error') {
+      <div class="state-panel state-panel--error">
+        <p>{{ history.message }}</p>
+        <button type="button" class="btn" (click)="load(true)">إعادة المحاولة</button>
+      </div>
+    }
+    @case ('ready') {
+      @if (history.items.length === 0) {
+        <p class="state-message">لا توجد جلسات سابقة بعد.</p>
+      } @else {
+        <ul class="booking-list">
+          @for (item of history.items; track item.bookingId) {
+            <li class="booking-row booking-row--past">
+              <div class="booking-row__main">
+                <span class="booking-row__time">{{ formatSlotRange(item) }}</span>
+                <span
+                  class="booking-row__status"
+                  [class.booking-row__status--cancelled]="item.status === 'Cancelled'"
+                  [class.booking-row__status--completed]="item.status === 'Completed'"
+                >
+                  {{ formatStatus(item.status) }}
+                </span>
+              </div>
+              @if (formatPastBookingCancellation(item); as cancellation) {
+                <div class="booking-row__notes">
+                  <p>{{ cancellation.cancelledBy }}</p>
+                  @if (cancellation.detail) {
+                    <p>السبب: {{ cancellation.detail }}</p>
+                  }
+                  @if (cancellation.refund) {
+                    <p>{{ cancellation.refund }}</p>
+                  }
+                </div>
+              }
+            </li>
+          }
+        </ul>
+
+        @if (hasMore()) {
+          <div class="pagination pagination--load-more">
+            <button
+              type="button"
+              class="btn btn--secondary btn--sm"
+              [disabled]="loadingMore()"
+              (click)="loadMore()"
+            >
+              {{ loadingMore() ? 'جاري التحميل...' : 'عرض المزيد' }}
+            </button>
+            <p class="pagination__info">{{ history.items.length }} من {{ history.totalCount }}</p>
+          </div>
+        }
+      }
+    }
+  }
+</article>

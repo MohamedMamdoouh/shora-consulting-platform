@@ -2,10 +2,9 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { PaymentInstructionsResponse } from '@contracts/payments';
 import { firstValueFrom } from 'rxjs';
-import { readApiError, readApiErrorCode } from '../../core/api/api-error.util';
+import { readApiError } from '../../core/api/api-error.util';
 import { BookingService } from '../../core/booking/booking.service';
 import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
-import { readBookingErrorMessage } from '../booking-error.util';
 import { APP_COPY } from '../../core/i18n/app-copy.constants';
 import { PaymentInstructionsPanelComponent } from '../shared/payment-instructions-panel.component';
 import { BookingStepIndicatorComponent } from '../shared/booking-step-indicator.component';
@@ -64,13 +63,9 @@ export class PaymentInstructionsComponent implements OnInit {
       );
       this.viewModel.set({ status: 'ready', instructions });
     } catch (err) {
-      const code = readApiErrorCode(err);
       this.viewModel.set({
         status: 'error',
-        message: readBookingErrorMessage(
-          code,
-          readApiError(err, 'تعذر تحميل تعليمات الدفع. حاول مرة أخرى.'),
-        ),
+        message: readApiError(err, 'تعذر تحميل تعليمات الدفع. حاول مرة أخرى.'),
       });
     }
   }

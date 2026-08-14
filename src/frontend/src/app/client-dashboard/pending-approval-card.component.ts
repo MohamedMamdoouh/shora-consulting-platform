@@ -1,9 +1,8 @@
 import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
 import { MyBookingListItem } from '@contracts/booking';
 import { firstValueFrom } from 'rxjs';
-import { readApiError, readApiErrorCode } from '../core/api/api-error.util';
+import { readApiError } from '../core/api/api-error.util';
 import { BookingService } from '../core/booking/booking.service';
-import { readBookingErrorMessage } from '../booking/booking-error.util';
 import { APP_COPY } from '../core/i18n/app-copy.constants';
 import { ConfirmDialogService } from '../core/ui/confirm-dialog.service';
 
@@ -53,10 +52,7 @@ export class PendingApprovalCardComponent {
       });
     } catch (err) {
       await this.confirmDialog.result({
-        message: readBookingErrorMessage(
-          readApiErrorCode(err),
-          readApiError(err, 'تعذر إلغاء الحجز. حاول مرة أخرى.'),
-        ),
+        message: readApiError(err, 'تعذر إلغاء الحجز. حاول مرة أخرى.'),
         variant: 'danger',
       });
     } finally {

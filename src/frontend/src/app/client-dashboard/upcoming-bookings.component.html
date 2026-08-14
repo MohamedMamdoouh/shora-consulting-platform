@@ -1,0 +1,40 @@
+<article class="section section--card section--card-stack dashboard-section">
+  <div class="dashboard-section__header">
+    <h2 class="section-heading">الجلسات القادمة</h2>
+  </div>
+
+  @let upcoming = section();
+  @switch (upcoming.status) {
+    @case ('loading') {
+      <p class="state-message" aria-live="polite">جاري تحميل الجلسات القادمة...</p>
+    }
+    @case ('error') {
+      <div class="state-panel state-panel--error">
+        <p>{{ upcoming.message }}</p>
+        <button type="button" class="btn" (click)="load()">إعادة المحاولة</button>
+      </div>
+    }
+    @case ('ready') {
+      @if (upcoming.items.length === 0) {
+        <p class="state-message">لا توجد جلسات قادمة حاليًا.</p>
+        <div class="dashboard__empty-actions">
+          <a routerLink="/booking/start" class="btn">احجز جلسة</a>
+          <a routerLink="/services" class="btn btn--secondary">تعرف على الخدمات</a>
+        </div>
+      } @else {
+        <ul class="booking-list">
+          @for (item of upcoming.items; track item.bookingId) {
+            <li>
+              <app-upcoming-booking-card
+                [item]="item"
+                [slotLabel]="formatSlotRange(item)"
+                [statusLabel]="formatStatus(item.status)"
+                (changed)="load()"
+              />
+            </li>
+          }
+        </ul>
+      }
+    }
+  }
+</article>

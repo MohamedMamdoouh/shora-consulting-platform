@@ -176,7 +176,7 @@ export class AdminSettingsPageComponent implements OnInit {
         continue;
       }
 
-      control.setErrors({ ...control.errors, server: messages[0] });
+      control.setErrors({ ...control.errors, server: true });
       control.markAsTouched();
     }
 

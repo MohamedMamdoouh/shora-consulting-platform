@@ -2,11 +2,10 @@ import { Component, EventEmitter, Input, Output, inject, signal } from '@angular
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { AdminBookingListItem, CancellationDecisionReasonCode } from '@contracts/booking';
 import { firstValueFrom } from 'rxjs';
-import { readApiError, readApiErrorCode } from '../../core/api/api-error.util';
+import { readApiError } from '../../core/api/api-error.util';
 import { AdminBookingsService } from '../../core/admin/admin-bookings.service';
 import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
 import { APP_COPY } from '../../core/i18n/app-copy.constants';
-import { readBookingErrorMessage } from '../../booking/booking-error.util';
 import {
   CANCELLATION_DECISION_REASON_OPTIONS,
   formatRemainingTime,
@@ -82,10 +81,7 @@ export class AdminCancellationReviewPanelComponent {
       });
     } catch (error) {
       await this.confirmDialog.result({
-        message: readBookingErrorMessage(
-          readApiErrorCode(error),
-          readApiError(error, 'تعذر الموافقة على طلب الإلغاء. حاول مرة أخرى.'),
-        ),
+        message: readApiError(error, 'تعذر الموافقة على طلب الإلغاء. حاول مرة أخرى.'),
         variant: 'danger',
       });
     } finally {
@@ -141,10 +137,7 @@ export class AdminCancellationReviewPanelComponent {
       });
     } catch (error) {
       await this.confirmDialog.result({
-        message: readBookingErrorMessage(
-          readApiErrorCode(error),
-          readApiError(error, 'تعذر رفض طلب الإلغاء. حاول مرة أخرى.'),
-        ),
+        message: readApiError(error, 'تعذر رفض طلب الإلغاء. حاول مرة أخرى.'),
         variant: 'danger',
       });
     } finally {

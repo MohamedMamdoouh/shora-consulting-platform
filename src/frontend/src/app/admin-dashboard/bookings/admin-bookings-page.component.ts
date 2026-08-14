@@ -7,11 +7,10 @@ import {
   BookingStatus,
 } from '@contracts/booking';
 import { firstValueFrom } from 'rxjs';
-import { readApiError, readApiErrorCode } from '../../core/api/api-error.util';
+import { readApiError } from '../../core/api/api-error.util';
 import { AdminBookingsService } from '../../core/admin/admin-bookings.service';
 import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
 import { APP_COPY } from '../../core/i18n/app-copy.constants';
-import { readBookingErrorMessage } from '../../booking/booking-error.util';
 import {
   BOOKING_STATUS_OPTIONS,
   bookingStatusDataAttr,
@@ -193,10 +192,7 @@ export class AdminBookingsPageComponent implements OnInit {
       });
     } catch (error) {
       await this.confirmDialog.result({
-        message: readBookingErrorMessage(
-          readApiErrorCode(error),
-          readApiError(error, 'تعذر إلغاء الحجز. حاول مرة أخرى.'),
-        ),
+        message: readApiError(error, 'تعذر إلغاء الحجز. حاول مرة أخرى.'),
         variant: 'danger',
       });
     } finally {

@@ -1,5 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ProblemDetails } from '@contracts/common';
+import { API_ERROR_MESSAGES } from './api-error-messages';
 
 function problemFromHttpError(error: HttpErrorResponse): ProblemDetails | null {
   const body = error.error;
@@ -10,13 +11,18 @@ function problemFromHttpError(error: HttpErrorResponse): ProblemDetails | null {
   return body as ProblemDetails;
 }
 
+/**
+ * Resolves an Arabic message for an API error. Backend `title`/`detail` text is English and is
+ * never surfaced to the UI — known error codes map to Arabic via `API_ERROR_MESSAGES`, otherwise
+ * the caller-supplied Arabic `fallback` is used.
+ */
 export function readApiError(error: unknown, fallback: string): string {
   if (!(error instanceof HttpErrorResponse)) {
     return fallback;
   }
 
-  const problem = problemFromHttpError(error);
-  return problem?.detail ?? problem?.title ?? fallback;
+  const code = problemFromHttpError(error)?.code;
+  return (code && API_ERROR_MESSAGES[code]) ?? fallback;
 }
 
 export function readApiErrorCode(error: unknown): string | undefined {

@@ -7,7 +7,7 @@ import { ApiCacheService } from '../../core/api/api-cache.service';
 import { readApiError, readApiErrorCode } from '../../core/api/api-error.util';
 import { AuthService } from '../../core/auth/auth.service';
 import { BookingService } from '../../core/booking/booking.service';
-import { isSlotUnavailableError, readBookingErrorMessage } from '../booking-error.util';
+import { isSlotUnavailableError } from '../booking-error.util';
 import { BookingFlowStateService } from '../booking-flow-state.service';
 import { formatSlotSummary } from '../utils/slot-grouping.util';
 import { BookingStepIndicatorComponent } from '../shared/booking-step-indicator.component';
@@ -112,10 +112,7 @@ export class ReviewComponent implements OnInit {
       });
     } catch (err) {
       const code = readApiErrorCode(err);
-      const message = readBookingErrorMessage(
-        code,
-        readApiError(err, 'تعذر إتمام الحجز. حاول مرة أخرى.'),
-      );
+      const message = readApiError(err, 'تعذر إتمام الحجز. حاول مرة أخرى.');
       this.errorMessage.set(message);
       this.slotUnavailable.set(isSlotUnavailableError(code));
       await this.confirmDialog.result({

@@ -1,0 +1,43 @@
+<article class="section section--card section--card-stack dashboard-section">
+  <div class="dashboard-section__header">
+    <h2 class="section-heading">في انتظار الدفع أو المراجعة</h2>
+  </div>
+
+  @let pending = section();
+  @switch (pending.status) {
+    @case ('loading') {
+      <p class="state-message" aria-live="polite">جاري تحميل الحجوزات المعلقة...</p>
+    }
+    @case ('error') {
+      <div class="state-panel state-panel--error">
+        <p>{{ pending.message }}</p>
+        <button type="button" class="btn" (click)="load()">إعادة المحاولة</button>
+      </div>
+    }
+    @case ('ready') {
+      @if (pending.items.length === 0) {
+        <p class="state-message">لا توجد حجوزات تحتاج إجراء الآن.</p>
+      } @else {
+        <ul class="booking-list">
+          @for (item of pending.items; track item.bookingId) {
+            <li>
+              @if (item.status === 'PendingPayment') {
+                <app-pending-payment-card
+                  [item]="item"
+                  [slotLabel]="formatSlotRange(item)"
+                  (changed)="load()"
+                />
+              } @else if (item.status === 'PendingApproval') {
+                <app-pending-approval-card
+                  [item]="item"
+                  [slotLabel]="formatSlotRange(item)"
+                  (changed)="load()"
+                />
+              }
+            </li>
+          }
+        </ul>
+      }
+    }
+  }
+</article>

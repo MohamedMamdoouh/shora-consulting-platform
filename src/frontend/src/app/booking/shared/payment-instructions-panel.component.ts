@@ -12,12 +12,11 @@ import {
 import { FormsModule } from '@angular/forms';
 import { PaymentInstructionsResponse, PaymentMethod } from '@contracts/payments';
 import { firstValueFrom } from 'rxjs';
-import { readApiError, readApiErrorCode } from '../../core/api/api-error.util';
+import { readApiError } from '../../core/api/api-error.util';
 import { BookingService } from '../../core/booking/booking.service';
 import { formatCurrency, formatNumber } from '../../core/i18n/app-locale';
 import { APP_COPY } from '../../core/i18n/app-copy.constants';
 import { formatReceiptDeclineReasonCode } from '../../core/i18n/receipt-decline-labels.util';
-import { readBookingErrorMessage } from '../booking-error.util';
 import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
 
 @Component({
@@ -109,10 +108,7 @@ export class PaymentInstructionsPanelComponent implements OnChanges, OnDestroy {
       this.clearCountdown();
       this.receiptSubmitted.emit();
     } catch (err) {
-      const code = readApiErrorCode(err);
-      this.uploadError.set(
-        readBookingErrorMessage(code, readApiError(err, 'تعذر رفع الإيصال. حاول مرة أخرى.')),
-      );
+      this.uploadError.set(readApiError(err, 'تعذر رفع الإيصال. حاول مرة أخرى.'));
     } finally {
       this.uploading.set(false);
     }

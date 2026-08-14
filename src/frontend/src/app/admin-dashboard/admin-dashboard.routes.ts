@@ -12,7 +12,6 @@ export const ADMIN_DASHBOARD_ROUTES: Routes = [
     path: '',
     canActivate: [adminGuard],
     component: AdminShellComponent,
-    data: { title: 'لوحة الإدارة' },
     children: [
       {
         path: '',
@@ -22,27 +21,22 @@ export const ADMIN_DASHBOARD_ROUTES: Routes = [
       {
         path: 'settings',
         component: AdminSettingsPageComponent,
-        data: { title: 'الإعدادات' },
       },
       {
         path: 'availability',
         component: AdminAvailabilityPageComponent,
-        data: { title: 'المواعيد' },
       },
       {
         path: 'bookings',
         component: AdminBookingsPageComponent,
-        data: { title: 'الحجوزات' },
       },
       {
         path: 'earnings',
         component: AdminEarningsPageComponent,
-        data: { title: 'الأرباح' },
       },
       {
         path: 'ops',
         component: AdminOpsPageComponent,
-        data: { title: 'تنبيهات التشغيل' },
       },
     ],
   },

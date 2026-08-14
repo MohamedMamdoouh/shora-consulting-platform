@@ -2,8 +2,7 @@ import { Component, EventEmitter, Input, Output, inject, signal } from '@angular
 import { FormsModule } from '@angular/forms';
 import { BookingStatus, MyBookingListItem } from '@contracts/booking';
 import { firstValueFrom } from 'rxjs';
-import { readBookingErrorMessage } from '../booking/booking-error.util';
-import { readApiError, readApiErrorCode } from '../core/api/api-error.util';
+import { readApiError } from '../core/api/api-error.util';
 import { BookingService } from '../core/booking/booking.service';
 import {
   buildConsultantWhatsAppContactUrl,
@@ -129,10 +128,7 @@ export class UpcomingBookingCardComponent {
       });
     } catch (err) {
       await this.confirmDialog.result({
-        message: readBookingErrorMessage(
-          readApiErrorCode(err),
-          readApiError(err, 'تعذر إرسال طلب الإلغاء. حاول مرة أخرى.'),
-        ),
+        message: readApiError(err, 'تعذر إرسال طلب الإلغاء. حاول مرة أخرى.'),
         variant: 'danger',
       });
     } finally {
@@ -149,19 +145,14 @@ export class UpcomingBookingCardComponent {
     this.cancellationActionError.set('');
 
     try {
-      await firstValueFrom(
-        this.bookingService.markCancellationDecisionSeen(this.item.bookingId),
-      );
+      await firstValueFrom(this.bookingService.markCancellationDecisionSeen(this.item.bookingId));
       await this.confirmDialog.result({
         message: 'تم تسجيل الإقرار.',
         onComplete: () => this.changed.emit(),
       });
     } catch (err) {
       await this.confirmDialog.result({
-        message: readBookingErrorMessage(
-          readApiErrorCode(err),
-          readApiError(err, 'تعذر تسجيل الإقرار. حاول مرة أخرى.'),
-        ),
+        message: readApiError(err, 'تعذر تسجيل الإقرار. حاول مرة أخرى.'),
         variant: 'danger',
       });
     } finally {

@@ -1,20 +1,14 @@
 import { ErrorCodes } from '@contracts/error-codes';
 import { describe, expect, it } from 'vitest';
-import { readBookingErrorMessage } from './booking-error.util';
+import { isSlotUnavailableError } from './booking-error.util';
 
-describe('readBookingErrorMessage', () => {
-  it.each([
-    [ErrorCodes.Payment.UploadDeadlinePassed, 'انتهت مهلة رفع الإيصال.'],
-    [ErrorCodes.Payment.InvalidReceiptFile, 'ملف الإيصال غير صالح. استخدم JPG أو PNG أو WebP أو PDF.'],
-    [ErrorCodes.Payment.ReceiptTooLarge, 'حجم ملف الإيصال أكبر من 5 ميجابايت.'],
-    [ErrorCodes.Payment.InvalidMethod, 'يرجى اختيار طريقة الدفع المستخدمة.'],
-    [ErrorCodes.Payment.InvalidStatus, 'لا يمكن رفع إيصال لهذا الحجز في حالته الحالية.'],
-    [ErrorCodes.Payment.NotFound, 'لم يتم العثور على الدفع.'],
-  ])('maps payment error code %s to a checkout message', (code, expectedMessage) => {
-    expect(readBookingErrorMessage(code, 'fallback')).toBe(expectedMessage);
+describe('isSlotUnavailableError', () => {
+  it('returns true for the slot-unavailable code', () => {
+    expect(isSlotUnavailableError(ErrorCodes.Booking.SlotUnavailable)).toBe(true);
   });
 
-  it('keeps using the fallback for unknown payment errors', () => {
-    expect(readBookingErrorMessage('payment.unhandled', 'fallback')).toBe('fallback');
+  it('returns false for other codes or undefined', () => {
+    expect(isSlotUnavailableError(ErrorCodes.Booking.NotFound)).toBe(false);
+    expect(isSlotUnavailableError(undefined)).toBe(false);
   });
 });

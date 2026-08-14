@@ -1,3 +1,16 @@
+const BOOKING_STATUS_LABELS: Record<string, string> = {
+  PendingPayment: 'في انتظار الدفع',
+  PendingApproval: 'قيد مراجعة الدفع',
+  Confirmed: 'مؤكدة',
+  CancellationRequested: 'طلب إلغاء',
+  Completed: 'مكتملة',
+  Cancelled: 'ملغية',
+};
+
+export function formatBookingStatusLabel(status: string): string {
+  return BOOKING_STATUS_LABELS[status] ?? status;
+}
+
 const CLIENT_CANCELLATION_REASON_LABELS: Record<string, string> = {
   'Cancelled by you': 'تم الإلغاء من طرفك',
   'Cancelled by the instructor': 'تم الإلغاء من طرف المستشار',

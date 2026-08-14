@@ -57,8 +57,10 @@ describe('admin settings validation utilities', () => {
     control.markAsTouched();
     expect(getAdminSettingsFieldError(control, 'sessionPrice')).not.toBeNull();
 
-    control.setErrors({ server: 'Server says no', required: true });
-    expect(getAdminSettingsFieldError(control, 'sessionPrice')).toBe('Server says no');
+    control.setErrors({ server: true, required: true });
+    expect(getAdminSettingsFieldError(control, 'sessionPrice')).toBe(
+      'تحقق من صحة القيمة المدخلة في هذا الحقل.',
+    );
   });
 
   it('uses field-specific boundary messages for high-risk numeric settings', () => {

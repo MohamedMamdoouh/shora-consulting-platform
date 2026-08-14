@@ -12,11 +12,10 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminBookingListItem } from '@contracts/booking';
 import { firstValueFrom, map, startWith } from 'rxjs';
-import { readApiError, readApiErrorCode } from '../../core/api/api-error.util';
+import { readApiError } from '../../core/api/api-error.util';
 import { AdminPaymentsService } from '../../core/admin/admin-payments.service';
 import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
 import { APP_COPY } from '../../core/i18n/app-copy.constants';
-import { readBookingErrorMessage } from '../../booking/booking-error.util';
 
 @Component({
   selector: 'app-admin-refund-panel',
@@ -104,10 +103,7 @@ export class AdminRefundPanelComponent {
       });
     } catch (error) {
       await this.confirmDialog.result({
-        message: readBookingErrorMessage(
-          readApiErrorCode(error),
-          readApiError(error, 'تعذر تسجيل الاسترداد. حاول مرة أخرى.'),
-        ),
+        message: readApiError(error, 'تعذر تسجيل الاسترداد. حاول مرة أخرى.'),
         variant: 'danger',
       });
     } finally {

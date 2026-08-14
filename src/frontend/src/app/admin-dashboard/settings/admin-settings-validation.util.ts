@@ -59,7 +59,7 @@ export function getAdminSettingsFieldError(
   }
 
   if (control.errors['server']) {
-    return control.errors['server'] as string;
+    return 'تحقق من صحة القيمة المدخلة في هذا الحقل.';
   }
 
   if (control.errors['required']) {

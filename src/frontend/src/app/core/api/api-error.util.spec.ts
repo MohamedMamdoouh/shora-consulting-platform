@@ -2,22 +2,26 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { readApiError, readApiErrorCode } from './api-error.util';
 
 describe('readApiError', () => {
-  it('returns detail from problem body', () => {
+  it('returns the Arabic catalog message for a known error code', () => {
     const error = new HttpErrorResponse({
-      error: { detail: 'Email is already registered.' },
+      error: { code: 'auth.duplicate_email', detail: 'Email is already registered.' },
       status: 409,
     });
 
-    expect(readApiError(error, 'fallback')).toBe('Email is already registered.');
+    expect(readApiError(error, 'fallback')).toBe('هذا البريد الإلكتروني مسجل بالفعل.');
   });
 
-  it('returns title when detail is missing', () => {
+  it('returns fallback for an unknown error code, never the raw backend text', () => {
     const error = new HttpErrorResponse({
-      error: { title: 'Conflict' },
+      error: {
+        code: 'some.unmapped_code',
+        detail: 'Some English backend message.',
+        title: 'Conflict',
+      },
       status: 409,
     });
 
-    expect(readApiError(error, 'fallback')).toBe('Conflict');
+    expect(readApiError(error, 'fallback')).toBe('fallback');
   });
 
   it('returns fallback for empty or malformed body', () => {

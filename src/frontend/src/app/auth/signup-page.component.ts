@@ -2,9 +2,8 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { ErrorCodes } from '@contracts/error-codes';
 import { AuthService } from '../core/auth/auth.service';
-import { readApiError, readApiErrorCode } from '../core/api/api-error.util';
+import { readApiError } from '../core/api/api-error.util';
 import { getAuthFieldError } from '../core/forms/auth-field-error.util';
 
 @Component({
@@ -51,11 +50,6 @@ export class SignupPageComponent {
       );
       await this.auth.redirectAfterLogin(response.role, this.returnUrl);
     } catch (err) {
-      if (readApiErrorCode(err) === ErrorCodes.Auth.DuplicateEmail) {
-        this.errorMessage.set('هذا البريد الإلكتروني مسجل بالفعل.');
-        return;
-      }
-
       this.errorMessage.set(readApiError(err, 'تعذر إنشاء الحساب. راجع البيانات وحاول مرة أخرى.'));
     } finally {
       this.isSubmitting.set(false);

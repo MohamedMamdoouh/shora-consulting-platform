@@ -76,6 +76,7 @@ export class PendingPaymentCardComponent {
     await this.confirmDialog.result({
       message: this.copy.client.receiptUploaded,
       redirectTo: ['/dashboard'],
+      onComplete: () => this.changed.emit(),
     });
   }
 }

@@ -24,7 +24,7 @@ const CONTEXT_KEY_LABELS: Record<string, string> = {
   aggregateId: 'معرف الكيان',
   lastError: 'آخر خطأ',
   deadLetterCount: 'عدد الرسائل المعطلة',
-  windowHours: 'نافذة الساعات',
+  windowHours: 'ساعات التوفر',
   jobName: 'اسم المهمة',
   intervalSeconds: 'فترة التكرار (ثواني)',
   intervalMultiplier: 'مضاعف الفترة',

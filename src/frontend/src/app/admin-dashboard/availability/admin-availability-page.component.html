@@ -16,7 +16,7 @@
       <header class="admin-availability__header">
         <h2>المواعيد والتوفر</h2>
         <p class="admin-availability__note">
-          نوافذ التوفر وفترات الحجب تُدخل وتعرض حسب توقيتك المحلي (القاهرة).
+          المواعيد المتاحة وفترات الحجب تُدخل وتعرض حسب توقيتك المحلي (القاهرة).
         </p>
       </header>
 
@@ -28,11 +28,11 @@
 
       <article class="admin-availability__section">
         <div class="admin-availability__section-header">
-          <h3>نوافذ التوفر المتكررة</h3>
+          <h3>المواعيد المتاحة المتكررة</h3>
         </div>
 
         @if (state.windows.length === 0) {
-          <p class="admin-availability__state">لا توجد نوافذ توفر بعد.</p>
+          <p class="admin-availability__state">لا توجد مواعيد متاحة بعد.</p>
         } @else {
           <ul class="admin-availability__list">
             @for (window of state.windows; track window.id) {
@@ -105,7 +105,7 @@
 
           <label class="admin-availability__checkbox">
             <input type="checkbox" formControlName="isActive" />
-            <span>النافذة نشطة</span>
+            <span>الموعد متاح</span>
           </label>
 
           <div class="admin-availability__actions">

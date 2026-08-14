@@ -87,7 +87,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
   readonly isEditing = computed(() => this.editingWindowId() !== null);
 
   readonly formTitle = computed(() =>
-    this.isEditing() ? 'تعديل نافذة التوفر' : 'إضافة نافذة توفر',
+    this.isEditing() ? 'تعديل الموعد المتاح' : 'إضافة موعد متاح',
   );
 
   readonly submitLabel = computed(() => {
@@ -95,7 +95,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
       return this.isEditing() ? 'جاري الحفظ...' : 'جاري الإضافة...';
     }
 
-    return this.isEditing() ? 'حفظ التعديلات' : 'إضافة النافذة';
+    return this.isEditing() ? 'حفظ التعديلات' : 'إضافة الموعد';
   });
 
   readonly blockedSubmitLabel = computed(() =>
@@ -109,7 +109,10 @@ export class AdminAvailabilityPageComponent implements OnInit {
   readonly getBlockedFieldError = getBlockedDateFieldError;
 
   readonly form = this.fb.nonNullable.group({
-    dayOfWeek: this.fb.nonNullable.control<DayOfWeekName>('Monday', windowFormValidators().dayOfWeek),
+    dayOfWeek: this.fb.nonNullable.control<DayOfWeekName>(
+      'Monday',
+      windowFormValidators().dayOfWeek,
+    ),
     startTime: this.fb.nonNullable.control('16:00', windowFormValidators().startTime),
     endTime: this.fb.nonNullable.control('21:00', windowFormValidators().endTime),
     isActive: this.fb.nonNullable.control(true, windowFormValidators().isActive),
@@ -263,7 +266,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
       }
 
       this.errorMessage.set(
-        readApiError(error, 'تعذر حفظ نافذة التوفر. راجع البيانات وحاول مرة أخرى.'),
+        readApiError(error, 'تعذر حفظ الموعد المتاح. راجع البيانات وحاول مرة أخرى.'),
       );
     } finally {
       this.isSubmitting.set(false);
@@ -359,7 +362,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
         detail: formatWindowSummary(window),
       });
     } catch (error) {
-      this.errorMessage.set(readApiError(error, 'تعذر حذف نافذة التوفر. حاول مرة أخرى.'));
+      this.errorMessage.set(readApiError(error, 'تعذر حذف الموعد المتاح. حاول مرة أخرى.'));
     } finally {
       this.deletingWindowId.set(null);
     }
@@ -413,7 +416,7 @@ export class AdminAvailabilityPageComponent implements OnInit {
     } catch (error) {
       this.pageState.set({
         status: 'error',
-        message: readApiError(error, 'تعذر تحميل نوافذ التوفر. حاول مرة أخرى.'),
+        message: readApiError(error, 'تعذر تحميل المواعيد المتاحة. حاول مرة أخرى.'),
       });
     }
   }

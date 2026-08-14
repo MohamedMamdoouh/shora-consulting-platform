@@ -15,8 +15,10 @@ import { firstValueFrom } from 'rxjs';
 import { readApiError, readApiErrorCode } from '../../core/api/api-error.util';
 import { BookingService } from '../../core/booking/booking.service';
 import { formatCurrency, formatNumber } from '../../core/i18n/app-locale';
+import { APP_COPY } from '../../core/i18n/app-copy.constants';
 import { formatReceiptDeclineReasonCode } from '../../core/i18n/receipt-decline-labels.util';
 import { readBookingErrorMessage } from '../booking-error.util';
+import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
 
 @Component({
   selector: 'app-payment-instructions-panel',
@@ -26,6 +28,9 @@ import { readBookingErrorMessage } from '../booking-error.util';
 })
 export class PaymentInstructionsPanelComponent implements OnChanges, OnDestroy {
   private readonly bookingService = inject(BookingService);
+  private readonly confirmDialog = inject(ConfirmDialogService);
+
+  protected readonly copy = APP_COPY;
 
   @Input({ required: true }) bookingId!: string;
   @Input({ required: true }) instructions!: PaymentInstructionsResponse;
@@ -78,6 +83,16 @@ export class PaymentInstructionsPanelComponent implements OnChanges, OnDestroy {
       return;
     }
 
+    const confirmed = await this.confirmDialog.confirm({
+      title: this.copy.client.submitReceiptTitle,
+      message: this.copy.client.submitReceiptMessage,
+      confirmLabel: this.copy.client.submitReceiptAction,
+    });
+
+    if (!confirmed) {
+      return;
+    }
+
     this.uploading.set(true);
     this.uploadError.set('');
 
@@ -96,10 +111,7 @@ export class PaymentInstructionsPanelComponent implements OnChanges, OnDestroy {
     } catch (err) {
       const code = readApiErrorCode(err);
       this.uploadError.set(
-        readBookingErrorMessage(
-          code,
-          readApiError(err, 'تعذر رفع الإيصال. حاول مرة أخرى.'),
-        ),
+        readBookingErrorMessage(code, readApiError(err, 'تعذر رفع الإيصال. حاول مرة أخرى.')),
       );
     } finally {
       this.uploading.set(false);

@@ -1,4 +1,13 @@
-import { Component, EventEmitter, Input, Output, Signal, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  Signal,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AbstractControl, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdminBookingListItem } from '@contracts/booking';
@@ -65,6 +74,18 @@ export class AdminRefundPanelComponent {
     }
 
     const values = this.recordForm.getRawValue();
+
+    const confirmed = await this.confirmDialog.confirm({
+      title: this.copy.admin.dialog.recordRefundTitle,
+      message: this.copy.admin.dialog.recordRefundMessage,
+      confirmLabel: this.copy.admin.dialog.recordRefundAction,
+      variant: 'danger',
+    });
+
+    if (!confirmed) {
+      return;
+    }
+
     this.isSubmitting.set(true);
 
     try {

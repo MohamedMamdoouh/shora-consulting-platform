@@ -70,7 +70,10 @@ export class AdminSettingsPageComponent implements OnInit {
     try {
       const settings = await firstValueFrom(this.adminSettingsService.getSettings());
       this.patchForm(settings);
-      this.pageState.set({ status: 'ready', receiptRetentionMonths: settings.receiptRetentionMonths });
+      this.pageState.set({
+        status: 'ready',
+        receiptRetentionMonths: settings.receiptRetentionMonths,
+      });
     } catch (error) {
       this.pageState.set({
         status: 'error',
@@ -89,6 +92,16 @@ export class AdminSettingsPageComponent implements OnInit {
       return;
     }
 
+    const confirmed = await this.confirmDialog.confirm({
+      title: this.copy.admin.dialog.saveSettingsTitle,
+      message: this.copy.admin.dialog.saveSettingsMessage,
+      confirmLabel: this.copy.admin.dialog.saveSettingsAction,
+    });
+
+    if (!confirmed) {
+      return;
+    }
+
     this.errorMessage.set('');
     this.isSubmitting.set(true);
 
@@ -96,14 +109,19 @@ export class AdminSettingsPageComponent implements OnInit {
       const payload = this.buildUpdateRequest();
       const updated = await firstValueFrom(this.adminSettingsService.updateSettings(payload));
       this.patchForm(updated);
-      this.pageState.set({ status: 'ready', receiptRetentionMonths: updated.receiptRetentionMonths });
+      this.pageState.set({
+        status: 'ready',
+        receiptRetentionMonths: updated.receiptRetentionMonths,
+      });
       this.apiCache.invalidate(settingsPublicRequest(environment.apiBaseUrl).url);
     } catch (error) {
       if (this.applyServerValidationErrors(error)) {
         return;
       }
 
-      this.errorMessage.set(readApiError(error, 'تعذر حفظ الإعدادات. راجع البيانات وحاول مرة أخرى.'));
+      this.errorMessage.set(
+        readApiError(error, 'تعذر حفظ الإعدادات. راجع البيانات وحاول مرة أخرى.'),
+      );
       return;
     } finally {
       this.isSubmitting.set(false);

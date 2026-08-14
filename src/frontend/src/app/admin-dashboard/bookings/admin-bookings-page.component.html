@@ -1,10 +1,21 @@
 <section class="admin-bookings">
   <header class="admin-bookings__header">
     <h2>الحجوزات</h2>
-    <p class="admin-bookings__note">
-      جميع حجوزات العملاء — الأوقات معروضة بتوقيتك المحلي. استخدم فلتر «استرداد» لمعالجة الاستردادات
-      المستحقة.
-    </p>
+    <p class="admin-bookings__note">جميع حجوزات العملاء — الأوقات معروضة بتوقيتك المحلي.</p>
+    <ul class="admin-bookings__legend">
+      <li class="admin-bookings__legend-item">
+        <span class="badge badge--error">استرداد</span>
+        <span class="admin-bookings__legend-text"
+          >استخدم فلتر «استرداد» لعرض الحجوزات التي تحتاج إلى رد الأموال</span
+        >
+      </li>
+      <li class="admin-bookings__legend-item">
+        <span class="badge badge--error">طلب إلغاء</span>
+        <span class="admin-bookings__legend-text"
+          >استخدم فلتر «طلب إلغاء» لعرض الحجوزات التي تتطلب منك اتخاذ قرار</span
+        >
+      </li>
+    </ul>
   </header>
 
   <form class="admin-bookings__filters" [formGroup]="filtersForm" (ngSubmit)="applyFilters()">
@@ -29,12 +40,6 @@
 
     <div class="admin-bookings__filter-actions">
       <button type="submit" class="btn">تطبيق الفلتر</button>
-      @if (filtersForm.get('status')?.value === 'RefundDue') {
-        <span class="badge badge--error admin-bookings__filter-pill">استرداد</span>
-      }
-      @if (filtersForm.get('status')?.value === 'CancellationRequested') {
-        <span class="badge badge--error admin-bookings__filter-pill">طلب إلغاء</span>
-      }
     </div>
   </form>
 

@@ -43,18 +43,24 @@
   @extend .admin-toolbar__actions;
 }
 
-.admin-bookings__filter-pill {
-  display: inline-flex;
+.admin-bookings__legend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin: var(--space-sm) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-bookings__legend-item {
+  display: flex;
   align-items: center;
-  padding: 0.125rem 0.5rem;
-  border-radius: var(--radius-full);
-  font-weight: 700;
+  gap: var(--space-sm);
+}
+
+.admin-bookings__legend-text {
+  color: var(--color-text-muted);
   font-size: var(--admin-font-size-sm);
-  background: var(--color-error-bg);
-  color: var(--color-error);
-  border: 1px solid var(--color-error-border);
-  box-shadow: var(--shadow-sm, none);
-  margin-inline-start: var(--space-sm);
 }
 
 .admin-bookings__panel {

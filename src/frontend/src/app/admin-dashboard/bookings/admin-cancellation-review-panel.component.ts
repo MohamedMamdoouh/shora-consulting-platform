@@ -70,7 +70,9 @@ export class AdminCancellationReviewPanelComponent {
     this.isApproving.set(true);
 
     try {
-      await firstValueFrom(this.adminBookingsService.approveCancellationRequest(this.item.bookingId));
+      await firstValueFrom(
+        this.adminBookingsService.approveCancellationRequest(this.item.bookingId),
+      );
       await this.confirmDialog.result({
         message: 'تمت الموافقة على طلب الإلغاء.',
         onComplete: () => {
@@ -109,6 +111,18 @@ export class AdminCancellationReviewPanelComponent {
     }
 
     const values = this.declineForm.getRawValue();
+
+    const confirmed = await this.confirmDialog.confirm({
+      title: this.copy.admin.dialog.declineCancellationTitle,
+      message: this.copy.admin.dialog.declineCancellationMessage,
+      confirmLabel: this.copy.admin.dialog.declineCancellationAction,
+      variant: 'danger',
+    });
+
+    if (!confirmed) {
+      return;
+    }
+
     this.isDeclining.set(true);
 
     try {

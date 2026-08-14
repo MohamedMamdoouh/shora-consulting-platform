@@ -5,6 +5,9 @@ using Shora.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var webRootPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
+Directory.CreateDirectory(webRootPath);
+
 builder.Services.AddApiServices(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
 builder.Services.AddShoraCaching(builder.Configuration);
@@ -34,7 +37,9 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors(CorsOptions.PolicyName);
 
-if (!app.Environment.IsDevelopment())
+var staticIndexPath = Path.Combine(app.Environment.WebRootPath ?? app.Environment.ContentRootPath, "index.html");
+
+if (!app.Environment.IsDevelopment() && File.Exists(staticIndexPath))
 {
     app.UseDefaultFiles();
     app.UseStaticFiles();
@@ -46,7 +51,7 @@ app.UseRateLimiter();
 app.UseOutputCache();
 app.MapControllers();
 
-if (!app.Environment.IsDevelopment())
+if (!app.Environment.IsDevelopment() && File.Exists(staticIndexPath))
 {
     app.MapFallbackToFile("index.html");
 }

@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 
-
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
@@ -15,12 +14,9 @@
   </ItemGroup>
 
 
-
   <ItemGroup>
 
     <PackageReference Include="Azure.Storage.Blobs" />
-
-    <PackageReference Include="Google.Apis.Auth" />
 
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
@@ -39,6 +35,4 @@
   </ItemGroup>
 
 
-
 </Project>
-

@@ -10,8 +10,6 @@ public sealed record SignUpRequest(string Email, string Password, string? Displa
 
 public sealed record LoginRequest(string Email, string Password);
 
-public sealed record GoogleSignInRequest(string IdToken);
-
 public sealed record VerifyEmailRequest(string Email, string Token);
 
 public sealed record ResendVerificationRequest(string Email);

@@ -1,55 +1,52 @@
 <div class="auth-page">
-<section class="auth-card">
-  <h1>تسجيل الدخول</h1>
+  <section class="auth-card">
+    <h1>تسجيل الدخول</h1>
 
-  @if (infoMessage()) {
-    <div class="auth-banner" role="status">
-      <p>{{ infoMessage() }}</p>
+    @if (infoMessage()) {
+      <div class="auth-banner" role="status">
+        <p>{{ infoMessage() }}</p>
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <p class="auth-error">{{ errorMessage() }}</p>
+    }
+
+    <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+      <label>
+        البريد الإلكتروني
+        <input
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          [attr.aria-invalid]="form.controls.email.touched && form.controls.email.invalid"
+        />
+        @if (getFieldError(form.controls.email, 'email'); as fieldError) {
+          <span class="auth-field-error" role="alert">{{ fieldError }}</span>
+        }
+      </label>
+
+      <label>
+        كلمة المرور
+        <input
+          type="password"
+          formControlName="password"
+          autocomplete="current-password"
+          [attr.aria-invalid]="form.controls.password.touched && form.controls.password.invalid"
+        />
+        @if (getFieldError(form.controls.password, 'password'); as fieldError) {
+          <span class="auth-field-error" role="alert">{{ fieldError }}</span>
+        }
+      </label>
+
+      <button type="submit" class="btn" [disabled]="form.invalid || isSubmitting()">
+        {{ isSubmitting() ? 'جاري تسجيل الدخول…' : 'دخول' }}
+      </button>
+    </form>
+
+    <div class="auth-links">
+      <a [routerLink]="['/auth/signup']" [queryParams]="authQueryParams">إنشاء حساب جديد</a>
+      <a routerLink="/auth/forgot-password">نسيت كلمة المرور؟</a>
     </div>
-  }
-
-  @if (errorMessage()) {
-    <p class="auth-error">{{ errorMessage() }}</p>
-  }
-
-  <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
-    <label>
-      البريد الإلكتروني
-      <input
-        type="email"
-        formControlName="email"
-        autocomplete="email"
-        [attr.aria-invalid]="form.controls.email.touched && form.controls.email.invalid"
-      />
-      @if (getFieldError(form.controls.email, 'email'); as fieldError) {
-        <span class="auth-field-error" role="alert">{{ fieldError }}</span>
-      }
-    </label>
-
-    <label>
-      كلمة المرور
-      <input
-        type="password"
-        formControlName="password"
-        autocomplete="current-password"
-        [attr.aria-invalid]="form.controls.password.touched && form.controls.password.invalid"
-      />
-      @if (getFieldError(form.controls.password, 'password'); as fieldError) {
-        <span class="auth-field-error" role="alert">{{ fieldError }}</span>
-      }
-    </label>
-
-    <button type="submit" class="btn" [disabled]="form.invalid || isSubmitting()">
-      {{ isSubmitting() ? 'جاري تسجيل الدخول…' : 'دخول' }}
-    </button>
-  </form>
-
-  <div class="auth-divider">أو</div>
-  <div id="google-signin-button"></div>
-
-  <div class="auth-links">
-    <a [routerLink]="['/auth/signup']" [queryParams]="authQueryParams">إنشاء حساب جديد</a>
-    <a routerLink="/auth/forgot-password">نسيت كلمة المرور؟</a>
-  </div>
-</section>
+  </section>
 </div>

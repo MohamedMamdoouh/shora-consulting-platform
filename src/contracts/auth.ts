@@ -16,10 +16,6 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface GoogleSignInRequest {
-  idToken: string;
-}
-
 export interface VerifyEmailRequest {
   email: string;
   token: string;

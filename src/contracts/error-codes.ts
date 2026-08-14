@@ -5,7 +5,6 @@ export const ErrorCodes = {
     RefreshTokenMissing: "auth.refresh_token_missing",
     RefreshTokenInvalid: "auth.refresh_token_invalid",
     RefreshTokenReuse: "auth.refresh_token_reuse",
-    GoogleSignInFailed: "auth.google_sign_in_failed",
     VerificationFailed: "auth.verification_failed",
     ResetFailed: "auth.reset_failed",
     UserNotFound: "auth.user_not_found",

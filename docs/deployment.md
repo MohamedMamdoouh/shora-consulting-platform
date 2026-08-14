@@ -127,7 +127,6 @@ Also set `AllowedHosts` to the hostname only (e.g. `<your-app>.up.railway.app` �
 | `Email__ApiKey`                            | Brevo API key (`xkeysib-...`)                           |
 | `Email__FromAddress`                       | Brevo verified sender (must match dashboard exactly)    |
 | `AdminSeed__Email` / `AdminSeed__Password` | One-time admin bootstrap — **remove after first login** |
-| `Google__ClientId`                         | Optional                                                |
 
 ### Common non-secret values
 
@@ -143,11 +142,11 @@ If `Cors__AllowedOrigins__0` on Railway is still `http://localhost:4200`, it ove
 
 In Production, [`FrontendOptionsValidator`](../src/backend/Shora.Application/Options/FrontendOptionsValidator.cs) and [`CorsOptionsValidator`](../src/backend/Shora.Application/Options/CorsOptionsValidator.cs) run at startup and **fail fast** when:
 
-| Check | Applies to |
-| --- | --- |
-| Must be a valid absolute **HTTPS** URL | `Frontend__BaseUrl`, each `Cors__AllowedOrigins__*` entry |
+| Check                                   | Applies to                                                                                                                        |
+| --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Must be a valid absolute **HTTPS** URL  | `Frontend__BaseUrl`, each `Cors__AllowedOrigins__*` entry                                                                         |
 | Must not contain `YOUR_PRODUCTION_HOST` | Same (placeholder host in [`ProductionConfigValidation`](../src/backend/Shora.Application/Options/ProductionConfigValidation.cs)) |
-| At least one CORS origin required | `Cors__AllowedOrigins` |
+| At least one CORS origin required       | `Cors__AllowedOrigins`                                                                                                            |
 
 HTTP URLs (including `http://localhost:4200`) are rejected in Production. Railway variables override [`appsettings.Production.json`](../src/backend/Shora.Api/appsettings.Production.json) — ensure both URL settings match your live HTTPS origin.
 
@@ -203,12 +202,10 @@ Inherits from base `appsettings.json` unless overridden:
 
 ### Frontend (build-time, not Railway)
 
-| File                                                                                      | Purpose                                                                                     |
-| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| [`environment.production.ts`](../src/frontend/src/environments/environment.production.ts) | `googleClientId` for Google button; `apiBaseUrl: '/api/v1'` is correct for same-site deploy |
-| [`angular.json`](../src/frontend/angular.json)                                            | Production build uses `fileReplacements` to swap in `environment.production.ts`             |
-
-Set `googleClientId` in `environment.production.ts` **before merge to `main`** so the Deploy workflow bakes it into the SPA bundle.
+| File                                                                                      | Purpose                                                                         |
+| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| [`environment.production.ts`](../src/frontend/src/environments/environment.production.ts) | `apiBaseUrl: '/api/v1'` is correct for same-site deploy                         |
+| [`angular.json`](../src/frontend/angular.json)                                            | Production build uses `fileReplacements` to swap in `environment.production.ts` |
 
 ## 5. GitHub secrets and variables
 
@@ -235,31 +232,14 @@ The Deploy job fails explicitly if any of `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`
 
 Enable **branch protection** on `main` so CI passes before merge (recommended).
 
-## 6. Google OAuth (optional)
-
-Only needed for the Google sign-in button on the login page.
-
-1. [Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services → Credentials** → **Create credentials → OAuth client ID**.
-2. Application type: **Web application**.
-3. **Authorized JavaScript origins:** your production HTTPS URL (same as `Frontend__BaseUrl`).
-4. **Authorized redirect URIs:** not required for the current Google Identity Services button flow (ID token only).
-5. Copy the **Client ID** into Railway `Google__ClientId` and `googleClientId` in [`environment.production.ts`](../src/frontend/src/environments/environment.production.ts).
-6. Redeploy (merge to `main`) after changing the frontend file.
-
-`Google__ClientSecret` is **not used** by the current ID-token flow — only `Google__ClientId` is validated server-side.
-
-First-time Google users sign in from the **login** page (not signup).
-
-## 7. Custom domain (optional)
+## 6. Custom domain (optional)
 
 1. Railway → **Settings → Networking** → add custom domain → complete DNS (CNAME to Railway-provided target).
 2. Update **all** URL-dependent settings to the new HTTPS origin (no trailing slash):
    - `Frontend__BaseUrl`
    - `Cors__AllowedOrigins__0`
-   - Google Cloud **Authorized JavaScript origins** (if using Google sign-in)
-   - Rebuild frontend if origins change (same `googleClientId`; origins must include the new domain)
 
-Optional: add **`shora.dev`** as a second custom domain on the same Railway service so RFC 7807 `type` URIs (`https://shora.dev/errors/{code}`) resolve to the live error reference pages without changing API responses.
+- Rebuild frontend if origins change
 
 ## 8. Manual redeploy
 

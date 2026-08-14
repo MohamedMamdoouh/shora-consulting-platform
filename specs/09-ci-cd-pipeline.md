@@ -6,27 +6,27 @@ This spec defines how Shora is built, validated, and deployed. It complements sp
 
 ### Workflow files
 
-| File | Role | Trigger |
-| --- | --- | --- |
-| [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) | Build + test (backend and frontend separately) | Push/PR to `main` |
+| File                                                              | Role                                                       | Trigger             |
+| ----------------------------------------------------------------- | ---------------------------------------------------------- | ------------------- |
+| [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)         | Build + test (backend and frontend separately)             | Push/PR to `main`   |
 | [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) | Production publish artifact + GHCR push + Railway redeploy | Push to `main` only |
 
 Operator go-live steps: [docs/deployment.md](../docs/deployment.md).
 
 ### Implementation summary
 
-| Sub-phase | Scope | Status |
-| --- | --- | --- |
-| 09.1 | CI path detection (`changes` job) | **Done** |
-| 09.2 | Backend CI (restore, build, test) | **Done** |
-| 09.3 | Frontend CI (install, build, test) | **Done** |
-| 09.4 | CI hygiene (Dependabot, branch protection, CI badge) | **Done** |
-| 09.5 | Same-site static hosting (`wwwroot`, SPA fallback) | **Done** |
-| 09.6 | Production config contract (env vars, CORS origin) | **Done** |
-| 09.7 | Hosting prerequisites (Railway + Neon + Azure Blob) | **Done** (operator checklist) |
-| 09.8 | Publish artifact build (npm → wwwroot → dotnet publish) | **Done** (deploy.yml) |
-| 09.9 | Deploy workflow (`deploy.yml`, production gate) | **Done** (needs Railway + GitHub secrets to run) |
-| 09.10 | Startup migrations & rollback policy | **Done** (code) |
+| Sub-phase | Scope                                                   | Status                                           |
+| --------- | ------------------------------------------------------- | ------------------------------------------------ |
+| 09.1      | CI path detection (`changes` job)                       | **Done**                                         |
+| 09.2      | Backend CI (restore, build, test)                       | **Done**                                         |
+| 09.3      | Frontend CI (install, build, test)                      | **Done**                                         |
+| 09.4      | CI hygiene (Dependabot, branch protection, CI badge)    | **Done**                                         |
+| 09.5      | Same-site static hosting (`wwwroot`, SPA fallback)      | **Done**                                         |
+| 09.6      | Production config contract (env vars, CORS origin)      | **Done**                                         |
+| 09.7      | Hosting prerequisites (Railway + Neon + Azure Blob)     | **Done** (operator checklist)                    |
+| 09.8      | Publish artifact build (npm → wwwroot → dotnet publish) | **Done** (deploy.yml)                            |
+| 09.9      | Deploy workflow (`deploy.yml`, production gate)         | **Done** (needs Railway + GitHub secrets to run) |
+| 09.10     | Startup migrations & rollback policy                    | **Done** (code)                                  |
 
 ---
 
@@ -53,9 +53,9 @@ Operator go-live steps: [docs/deployment.md](../docs/deployment.md).
 
 **Workflow:** [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) — `changes` job.
 
-| Step | Action / detail |
-| --- | --- |
-| Checkout | `actions/checkout@v4` |
+| Step        | Action / detail                                                               |
+| ----------- | ----------------------------------------------------------------------------- |
+| Checkout    | `actions/checkout@v4`                                                         |
 | Path filter | `dorny/paths-filter@v3` — outputs `backend`, `frontend`, `workflows` booleans |
 
 Backend and frontend jobs run only when their paths (or `.github/workflows/**`) change.
@@ -70,13 +70,13 @@ Backend and frontend jobs run only when their paths (or `.github/workflows/**`) 
 
 **Workflow:** [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) — `backend` job (needs `changes`, gated on path filter).
 
-| Step | Command / action |
-| --- | --- |
-| Checkout | `actions/checkout@v4` |
+| Step       | Command / action                                       |
+| ---------- | ------------------------------------------------------ |
+| Checkout   | `actions/checkout@v4`                                  |
 | Setup .NET | `actions/setup-dotnet@v4` — `dotnet-version: '10.0.x'` |
-| Restore | `dotnet restore` in `src/backend` |
-| Build | `dotnet build --no-restore` |
-| Test | `dotnet test --no-build --verbosity normal` |
+| Restore    | `dotnet restore` in `src/backend`                      |
+| Build      | `dotnet build --no-restore`                            |
+| Test       | `dotnet test --no-build --verbosity normal`            |
 
 - **xUnit tests** in `Shora.Tests` (PostgreSQL via Testcontainers — Docker required on the runner).
 - **Cache:** NuGet packages via `setup-dotnet` cache.
@@ -99,13 +99,13 @@ Stop any running `Shora.Api` process before building — a running API locks out
 
 **Workflow:** [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) — `frontend` job (needs `changes`, gated on path filter).
 
-| Step | Command / action |
-| --- | --- |
-| Checkout | `actions/checkout@v4` |
+| Step       | Command / action                                                                                |
+| ---------- | ----------------------------------------------------------------------------------------------- |
+| Checkout   | `actions/checkout@v4`                                                                           |
 | Setup Node | `actions/setup-node@v4` — `node-version: '22.x'`, npm cache on `src/frontend/package-lock.json` |
-| Install | `npm ci` in `src/frontend` |
-| Build | `npm run build` (production config per `angular.json`) |
-| Test | `CI=true npm test` (headless Vitest via `@angular/build:unit-test`) |
+| Install    | `npm ci` in `src/frontend`                                                                      |
+| Build      | `npm run build` (production config per `angular.json`)                                          |
+| Test       | `CI=true npm test` (headless Vitest via `@angular/build:unit-test`)                             |
 
 - **Cache:** npm dependencies keyed on `package-lock.json`.
 
@@ -124,11 +124,11 @@ $env:CI = "true"; npm test
 
 **Purpose:** Keep dependencies current, enforce green CI before merge, and surface pipeline health.
 
-| Item | Purpose | Status |
-| --- | --- | --- |
-| **Dependabot** ([`.github/dependabot.yml`](../.github/dependabot.yml)) | Monthly PRs for NuGet (`src/backend`) and npm (`src/frontend`) dependency updates | **Done** |
-| **Branch protection** (GitHub UI) | Require CI workflow green before merging to `main` | **Manual setup** — see [workflows README](../.github/workflows/README.md#branch-protection) |
-| **CI badge** ([`README.md`](../README.md)) | Visibility of pipeline health on the default branch | **Done** |
+| Item                                                                   | Purpose                                                                           | Status                                                                                      |
+| ---------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| **Dependabot** ([`.github/dependabot.yml`](../.github/dependabot.yml)) | Monthly PRs for NuGet (`src/backend`) and npm (`src/frontend`) dependency updates | **Done**                                                                                    |
+| **Branch protection** (GitHub UI)                                      | Require CI workflow green before merging to `main`                                | **Manual setup** — see [workflows README](../.github/workflows/README.md#branch-protection) |
+| **CI badge** ([`README.md`](../README.md))                             | Visibility of pipeline health on the default branch                               | **Done**                                                                                    |
 
 **Branch protection setup** (one-time, after first successful CI run on `main`):
 
@@ -175,19 +175,18 @@ dotnet run --project Shora.Api
 
 Set secrets via environment variables (double-underscore nesting). Never commit values.
 
-| Setting | Notes |
-| --- | --- |
-| `ConnectionStrings__DefaultConnection` | Neon PostgreSQL |
-| `Jwt__SigningKey` | Strong random key, min 32 chars (spec 02) |
-| `Storage__ConnectionString` | Blob account — private Azure Storage container (spec 05) |
-| `Storage__ReceiptContainer` | Private container name (`receipts`) |
-| `Google__ClientId` | Google OAuth client ID (optional; spec 02) — `ClientSecret` unused by ID-token flow |
-| `Email__*` | Brevo settings (spec 02, outbox) — `ApiKey` + `FromAddress` required at startup |
-| `Frontend__BaseUrl` | Production HTTPS URL (e.g. `https://<your-app>.up.railway.app`) |
-| `Cors__AllowedOrigins__0` | Same production HTTPS URL (same-site + `AllowCredentials`) |
-| `AllowedHosts` | Hostname only (no `https://`) |
-| `AdminSeed__Email`, `AdminSeed__Password` | One-time admin bootstrap — remove from Railway after first login |
-| `Seed__*` | Optional payment/contact defaults before first startup — see [`docs/deployment.md`](../docs/deployment.md) |
+| Setting                                   | Notes                                                                                                      |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `ConnectionStrings__DefaultConnection`    | Neon PostgreSQL                                                                                            |
+| `Jwt__SigningKey`                         | Strong random key, min 32 chars (spec 02)                                                                  |
+| `Storage__ConnectionString`               | Blob account — private Azure Storage container (spec 05)                                                   |
+| `Storage__ReceiptContainer`               | Private container name (`receipts`)                                                                        |
+| `Email__*`                                | Brevo settings (spec 02, outbox) — `ApiKey` + `FromAddress` required at startup                            |
+| `Frontend__BaseUrl`                       | Production HTTPS URL (e.g. `https://<your-app>.up.railway.app`)                                            |
+| `Cors__AllowedOrigins__0`                 | Same production HTTPS URL (same-site + `AllowCredentials`)                                                 |
+| `AllowedHosts`                            | Hostname only (no `https://`)                                                                              |
+| `AdminSeed__Email`, `AdminSeed__Password` | One-time admin bootstrap — remove from Railway after first login                                           |
+| `Seed__*`                                 | Optional payment/contact defaults before first startup — see [`docs/deployment.md`](../docs/deployment.md) |
 
 Refresh cookies automatically use `Secure=true` and `SameSite=Strict` outside Development ([`RefreshCookieService`](../src/backend/Shora.Infrastructure/Services/RefreshCookieService.cs)).
 
@@ -208,12 +207,12 @@ Set `Frontend__BaseUrl` and `Cors__AllowedOrigins__0` on Railway to the same pro
 
 **Done.** Checklist: [`docs/deployment.md`](../docs/deployment.md).
 
-| Resource | Purpose |
-| --- | --- |
-| **Railway** | Host .NET 10 API + static Angular (single container) |
-| **Neon PostgreSQL** | Production database |
-| **Azure Blob Storage** | Private receipt container (spec 05) |
-| **GHCR** | `ghcr.io/<owner>/<repo>:production` |
+| Resource               | Purpose                                              |
+| ---------------------- | ---------------------------------------------------- |
+| **Railway**            | Host .NET 10 API + static Angular (single container) |
+| **Neon PostgreSQL**    | Production database                                  |
+| **Azure Blob Storage** | Private receipt container (spec 05)                  |
+| **GHCR**               | `ghcr.io/<owner>/<repo>:production`                  |
 
 **Verify:** Railway variables configured; GitHub Deploy workflow green; `GET https://<production-url>/api/v1/health` returns OK.
 
@@ -241,15 +240,15 @@ Sequence:
 
 **Done.** Workflow: [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml). Setup: [docs/deployment.md](../docs/deployment.md), [`.github/workflows/README.md`](../.github/workflows/README.md).
 
-| Concern | Design |
-| --- | --- |
-| **Triggers** | Push to `main` only — no manual dispatch |
-| **Concurrency** | One run per branch; `cancel-in-progress: true` cancels an older in-progress Deploy when a newer push to `main` starts |
-| **Environments** | GitHub Environment `production` (optional approval gate) |
+| Concern                    | Design                                                                                                                                          |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Triggers**               | Push to `main` only — no manual dispatch                                                                                                        |
+| **Concurrency**            | One run per branch; `cancel-in-progress: true` cancels an older in-progress Deploy when a newer push to `main` starts                           |
+| **Environments**           | GitHub Environment `production` (optional approval gate)                                                                                        |
 | **Missing Railway config** | Deploy job **Require Railway configuration** step fails if `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`, or `RAILWAY_TOKEN` is unset — no silent skip |
-| **Build** | Same sequence as 09.8 in the `build` job |
-| **Deploy target** | Railway service (Docker image from GHCR) |
-| **Auth** | GitHub secret `RAILWAY_TOKEN` (Railway **project token** for `production`); GHCR push via `GITHUB_TOKEN` |
+| **Build**                  | Same sequence as 09.8 in the `build` job                                                                                                        |
+| **Deploy target**          | Railway service (Docker image from GHCR)                                                                                                        |
+| **Auth**                   | GitHub secret `RAILWAY_TOKEN` (Railway **project token** for `production`); GHCR push via `GITHUB_TOKEN`                                        |
 
 ### GitHub setup (Railway path)
 

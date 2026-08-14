@@ -84,16 +84,6 @@ export class AuthService {
       .pipe(tap((response) => this.setSession(response, email)));
   }
 
-  googleSignIn(idToken: string): Observable<AuthResponse> {
-    return this.http
-      .post<AuthResponse>(
-        `${environment.apiBaseUrl}/auth/google`,
-        { idToken },
-        { withCredentials: true },
-      )
-      .pipe(tap((response) => this.setSession(response)));
-  }
-
   refresh(): Observable<AuthResponse> {
     if (this.isLoggingOut) {
       return throwError(() => new Error('Logout in progress'));

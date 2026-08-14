@@ -288,60 +288,6 @@ public class AuthEndpointTests : IDisposable
     }
 
     [Fact]
-    public async Task Google_sign_in_creates_confirmed_client()
-    {
-        var cancellationToken = TestContext.Current.CancellationToken;
-        var client = CreateClient();
-
-        var response = await client.PostApiJsonAsync("/api/v1/auth/google", new GoogleSignInRequest("google-user-1"), cancellationToken);
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-        using var scope = _factory.Services.CreateScope();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-        var user = await userManager.FindByEmailAsync("google-user-1@google.test");
-        Assert.NotNull(user);
-        Assert.True(user!.EmailConfirmed);
-    }
-
-    [Fact]
-    public async Task Google_pre_takeover_revokes_password_and_confirms_email()
-    {
-        var cancellationToken = TestContext.Current.CancellationToken;
-        var client = CreateClient();
-
-        await client.PostApiJsonAsync("/api/v1/auth/signup", new SignUpRequest(
-            "squatter@example.com",
-            "Password123!",
-            null), cancellationToken);
-
-        using (var scope = _factory.Services.CreateScope())
-        {
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-            var user = await userManager.FindByEmailAsync("squatter@example.com");
-            Assert.NotNull(user);
-            Assert.False(user!.EmailConfirmed);
-            Assert.True(await userManager.HasPasswordAsync(user));
-        }
-
-        var googleResponse = await client.PostApiJsonAsync("/api/v1/auth/google", new GoogleSignInRequest("email:squatter@example.com"), cancellationToken);
-        Assert.Equal(HttpStatusCode.OK, googleResponse.StatusCode);
-
-        using (var scope = _factory.Services.CreateScope())
-        {
-            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-            var user = await userManager.FindByEmailAsync("squatter@example.com");
-            Assert.NotNull(user);
-            Assert.True(user!.EmailConfirmed);
-            Assert.False(await userManager.HasPasswordAsync(user));
-        }
-
-        var oldPasswordLogin = await client.PostApiJsonAsync("/api/v1/auth/login", new LoginRequest(
-            "squatter@example.com",
-            "Password123!"), cancellationToken);
-        Assert.Equal(HttpStatusCode.Unauthorized, oldPasswordLogin.StatusCode);
-    }
-
-    [Fact]
     public async Task Refresh_grace_window_allows_second_presented_token()
     {
         var cancellationToken = TestContext.Current.CancellationToken;

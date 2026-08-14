@@ -4,10 +4,10 @@ CI/CD behavior for Shora. For hosting setup and secrets, see [docs/deployment.md
 
 ## Overview
 
-| Workflow | File | Runs when | Deploys? |
-| --- | --- | --- | --- |
-| **CI** | [`ci.yml`](ci.yml) | Every push and PR to `main` | No — validates code only |
-| **Deploy** | [`deploy.yml`](deploy.yml) | Push to `main` | Yes — builds publish artifact, pushes container to GHCR, redeploys Railway |
+| Workflow   | File                       | Runs when                   | Deploys?                                                                   |
+| ---------- | -------------------------- | --------------------------- | -------------------------------------------------------------------------- |
+| **CI**     | [`ci.yml`](ci.yml)         | Every push and PR to `main` | No — validates code only                                                   |
+| **Deploy** | [`deploy.yml`](deploy.yml) | Push to `main`              | Yes — builds publish artifact, pushes container to GHCR, redeploys Railway |
 
 **CI** and **Deploy** serve different jobs. CI keeps `main` healthy; Deploy ships a release after Railway, Neon/Azure Storage, and GitHub secrets exist.
 
@@ -15,11 +15,11 @@ CI/CD behavior for Shora. For hosting setup and secrets, see [docs/deployment.md
 
 ## CI (`ci.yml`)
 
-| Job | When it runs | Working directory | Steps |
-| --- | --- | --- | --- |
-| **Changes** | Always | repo root | `dorny/paths-filter@v3` — sets backend/frontend flags |
-| **Backend** | `src/backend/**` or `.github/workflows/**` changed | `src/backend` | `dotnet restore` → `build` → `test` |
-| **Frontend** | `src/frontend/**` or `.github/workflows/**` changed | `src/frontend` | `npm ci` → `npm run build` → `npm test` (`CI=true`) |
+| Job          | When it runs                                        | Working directory | Steps                                                 |
+| ------------ | --------------------------------------------------- | ----------------- | ----------------------------------------------------- |
+| **Changes**  | Always                                              | repo root         | `dorny/paths-filter@v3` — sets backend/frontend flags |
+| **Backend**  | `src/backend/**` or `.github/workflows/**` changed  | `src/backend`     | `dotnet restore` → `build` → `test`                   |
+| **Frontend** | `src/frontend/**` or `.github/workflows/**` changed | `src/frontend`    | `npm ci` → `npm run build` → `npm test` (`CI=true`)   |
 
 - Backend tests use Testcontainers PostgreSQL (Docker required on the runner).
 - Docs/spec-only changes skip the jobs that did not touch backend or frontend code.
@@ -66,8 +66,6 @@ See [docs/deployment.md](../docs/deployment.md) for:
 4. GHCR pull access
 5. GitHub `RAILWAY_*` secrets and variables
 6. Branch protection on `main`
-
-Google sign-in: set `googleClientId` in [`environment.production.ts`](../src/frontend/src/environments/environment.production.ts) before merge (build-time). Production builds use `fileReplacements` in [`angular.json`](../src/frontend/angular.json).
 
 ---
 

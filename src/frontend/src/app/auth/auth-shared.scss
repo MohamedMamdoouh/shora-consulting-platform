@@ -103,11 +103,6 @@
   background: var(--color-border);
 }
 
-#google-signin-button {
-  display: flex;
-  justify-content: center;
-}
-
 @media (max-width: 640px) {
   .auth-card {
     padding: var(--space-lg);

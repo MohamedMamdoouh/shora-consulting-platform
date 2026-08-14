@@ -211,14 +211,13 @@ All auth pages support optional `returnUrl` query param for post-login redirect.
 
 - Email + password form with validation
 - Submit button with loading state
-- Google Sign-In button (shown only if `googleClientId` configured)
 - Links to signup and forgot password
 - Session expired info message (`?reason=sessionExpired`)
 - Error messages for invalid credentials
 
-**Key actions:** Login, Google sign-in, navigate to signup/forgot-password
+**Key actions:** Login, navigate to signup/forgot-password
 
-**API:** `POST /auth/login`, `POST /auth/google`
+**API:** `POST /auth/login`
 
 ---
 

@@ -203,30 +203,6 @@ public sealed class AuthController : ApiControllerBase
         return Ok(new MessageResponse("Password reset successful."));
     }
 
-    [HttpPost("google")]
-    [EnableRateLimiting(RateLimitPolicies.AuthCredential)]
-    [EndpointName("Auth.GoogleSignIn")]
-    [EndpointSummary("Sign in or register with Google ID token")]
-    [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
-    public async Task<IActionResult> Google(GoogleSignInRequest request, CancellationToken cancellationToken)
-    {
-        var result = await _authService.GoogleSignInAsync(
-            request,
-            HttpContext.Connection.RemoteIpAddress?.ToString(),
-            Request.Headers.UserAgent,
-            cancellationToken);
-
-        if (result.IsFailure)
-        {
-            return ToProblem(result.Error!);
-        }
-
-        SetRefreshCookie(result.Value!);
-        return Ok(result.Value!.Response);
-    }
-
     [Authorize]
     [HttpGet("me")]
     [EndpointName("Auth.GetCurrentUser")]

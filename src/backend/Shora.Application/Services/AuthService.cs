@@ -16,7 +16,6 @@ public sealed class AuthService
     private readonly IJwtTokenService _jwtTokenService;
     private readonly IRefreshTokenService _refreshTokenService;
     private readonly AuthEmailService _authEmailService;
-    private readonly IGoogleTokenValidator _googleTokenValidator;
     private readonly ILogger<AuthService> _logger;
 
     public AuthService(
@@ -24,14 +23,12 @@ public sealed class AuthService
         IJwtTokenService jwtTokenService,
         IRefreshTokenService refreshTokenService,
         AuthEmailService authEmailService,
-        IGoogleTokenValidator googleTokenValidator,
         ILogger<AuthService> logger)
     {
         _userManager = userManager;
         _jwtTokenService = jwtTokenService;
         _refreshTokenService = refreshTokenService;
         _authEmailService = authEmailService;
-        _googleTokenValidator = googleTokenValidator;
         _logger = logger;
     }
 
@@ -246,63 +243,6 @@ public sealed class AuthService
 
         await _refreshTokenService.RevokeAllForUserAsync(user.Id, cancellationToken);
         return Result.Success();
-    }
-
-    public async Task<Result<AuthResult>> GoogleSignInAsync(
-        GoogleSignInRequest request,
-        string? ipAddress,
-        string? userAgent,
-        CancellationToken cancellationToken = default)
-    {
-        var payload = await _googleTokenValidator.ValidateAsync(request.IdToken, cancellationToken);
-        if (payload is null)
-        {
-            return Error.Unauthorized(
-                ErrorCodes.Auth.GoogleSignInFailed,
-                "Invalid Google token.");
-        }
-
-        var user = await _userManager.FindByEmailAsync(payload.Email);
-        if (user is null)
-        {
-            user = new ApplicationUser
-            {
-                Id = Guid.NewGuid(),
-                UserName = payload.Email,
-                Email = payload.Email,
-                DisplayName = payload.Name,
-                EmailConfirmed = true,
-                Role = UserRole.Client
-            };
-
-            var createResult = await _userManager.CreateAsync(user);
-            if (!createResult.Succeeded)
-            {
-                return MapIdentityErrors(createResult);
-            }
-
-            await _userManager.AddToRoleAsync(user, AppRoles.Client);
-            await _userManager.AddLoginAsync(user, new UserLoginInfo("Google", payload.Subject, "Google"));
-        }
-        else
-        {
-            if (!user.EmailConfirmed)
-            {
-                user.EmailConfirmed = true;
-                await _userManager.UpdateAsync(user);
-                await _userManager.RemovePasswordAsync(user);
-                await _refreshTokenService.RevokeAllForUserAsync(user.Id, cancellationToken);
-            }
-
-            var logins = await _userManager.GetLoginsAsync(user);
-            if (logins.All(l => l.LoginProvider != "Google"))
-            {
-                await _userManager.AddLoginAsync(user, new UserLoginInfo("Google", payload.Subject, "Google"));
-            }
-        }
-
-        var authResult = await IssueTokensAsync(user, ipAddress, userAgent, cancellationToken);
-        return authResult;
     }
 
     public async Task<Result<AuthResponse>> BuildAuthResponseForUserAsync(

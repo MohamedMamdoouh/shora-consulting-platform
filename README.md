@@ -48,14 +48,14 @@ RTL personal practice site for one-to-one relationship consulting sessions. Clie
 
 ## 1. Project overview
 
-| Item                 | Description                                                                                                         |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| **Name**             | Shora                                                                                                               |
-| **Purpose**          | Personal practice booking site for one-to-one relationship consulting sessions                                      |
+| Item                 | Description                                                                                                                  |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| **Name**             | Shora                                                                                                                        |
+| **Purpose**          | Personal practice booking site for one-to-one relationship consulting sessions                                               |
 | **Problem**          | Lets a single practitioner offer bookable sessions with manual local payment verification, without an online payment gateway |
-| **Target users**     | **Clients** — people booking sessions; **Admin** — the practitioner operating their personal practice                            |
-| **Language / UX**    | RTL UI (`lang="ar"`), mobile-first public pages                                                                     |
-| **Deployment model** | Single container: API + Angular SPA on one origin (required for auth cookies)                                       |
+| **Target users**     | **Clients** — people booking sessions; **Admin** — the practitioner operating their personal practice                        |
+| **Language / UX**    | RTL UI (`lang="ar"`), mobile-first public pages                                                                              |
+| **Deployment model** | Single container: API + Angular SPA on one origin (required for auth cookies)                                                |
 
 Shora is a monorepo: .NET 10 backend (Clean Architecture), Angular 21 frontend, shared TypeScript/C# contracts, and GitHub Actions CI/CD.
 
@@ -65,24 +65,24 @@ Design specs for maintainers live in [`specs/`](specs/). Operator deployment det
 
 ## 2. Features
 
-| Feature                    | What it does                                                                              |
-| -------------------------- | ----------------------------------------------------------------------------------------- |
-| **Public marketing pages** | Home, About, Services, Privacy, Terms — CTAs into booking without a login wall            |
-| **Availability browsing**  | Clients see open slots in a date range (cached public API)                                |
-| **Multi-step booking**     | Pick slot → delivery method (voice/chat) → phone (voice only) → review → reserve          |
-| **Account & auth**         | Email/password signup, login, email verification, password reset, optional Google Sign-In |
-| **Manual payments**        | Client transfers fee off-platform, uploads receipt image; admin approves or declines      |
-| **Client dashboard**       | Upcoming, pending payment/approval, and paginated past bookings                           |
-| **Cancellation requests**  | Client requests cancellation; admin approves/declines; auto-decline near session time     |
-| **Admin settings**         | Session price, duration, buffer, payment numbers, WhatsApp, upload windows                |
-| **Admin availability**     | Recurring weekly windows and blocked date ranges                                          |
-| **Admin bookings**         | Filterable list, receipt review, direct cancel, cancellation queue                        |
-| **Refunds**                | Admin records manual refunds (no payment provider integration)                            |
-| **Earnings**               | Gross / refunded / net revenue summary with date filters                                  |
-| **Ops monitoring**         | Background health checks with admin alerts and runbooks at `/admin/ops`                   |
-| **Transactional email**    | Auth emails (direct Brevo) + booking/payment emails (outbox with retry)                    |
-| **Rate limiting**          | Per-endpoint per-IP limits on auth, availability, booking, receipts, cancellations        |
-| **CI/CD**                  | Path-filtered CI on PRs; deploy to Railway + GHCR on push to `main`                       |
+| Feature                    | What it does                                                                          |
+| -------------------------- | ------------------------------------------------------------------------------------- |
+| **Public marketing pages** | Home, About, Services, Privacy, Terms — CTAs into booking without a login wall        |
+| **Availability browsing**  | Clients see open slots in a date range (cached public API)                            |
+| **Multi-step booking**     | Pick slot → delivery method (voice/chat) → phone (voice only) → review → reserve      |
+| **Account & auth**         | Email/password signup, login, email verification, password reset                      |
+| **Manual payments**        | Client transfers fee off-platform, uploads receipt image; admin approves or declines  |
+| **Client dashboard**       | Upcoming, pending payment/approval, and paginated past bookings                       |
+| **Cancellation requests**  | Client requests cancellation; admin approves/declines; auto-decline near session time |
+| **Admin settings**         | Session price, duration, buffer, payment numbers, WhatsApp, upload windows            |
+| **Admin availability**     | Recurring weekly windows and blocked date ranges                                      |
+| **Admin bookings**         | Filterable list, receipt review, direct cancel, cancellation queue                    |
+| **Refunds**                | Admin records manual refunds (no payment provider integration)                        |
+| **Earnings**               | Gross / refunded / net revenue summary with date filters                              |
+| **Ops monitoring**         | Background health checks with admin alerts and runbooks at `/admin/ops`               |
+| **Transactional email**    | Auth emails (direct Brevo) + booking/payment emails (outbox with retry)               |
+| **Rate limiting**          | Per-endpoint per-IP limits on auth, availability, booking, receipts, cancellations    |
+| **CI/CD**                  | Path-filtered CI on PRs; deploy to Railway + GHCR on push to `main`                   |
 
 ---
 
@@ -96,12 +96,12 @@ Design specs for maintainers live in [`specs/`](specs/). Operator deployment det
 | Database             | PostgreSQL 16+ (Neon in production)                           | Primary data store                         |
 | Identity             | ASP.NET Core Identity                                         | Users, roles, password hashing             |
 | Authentication       | JWT Bearer + httpOnly refresh cookie                          | Access token in memory; refresh via cookie |
-| Google sign-in       | Google.Apis.Auth (ID token validation)                        | Optional OAuth button                      |
+| Frontend             | Angular 21 (standalone components)                            | SPA, lazy routes, Vitest                   |
 | Frontend             | Angular 21 (standalone components)                            | SPA, lazy routes, Vitest                   |
 | API contracts        | `Shora.Contracts` (C#) + `src/contracts` (TS)                 | Shared DTO shapes, manual sync             |
 | File storage         | Azure Blob Storage (Azurite locally)                          | Private receipt images                     |
 | Email (dev)          | `DevLoggingEmailSender`                                       | Logs emails to console                     |
-| Email (prod)         | Brevo HTTPS API                                              | Auth + transactional mail                  |
+| Email (prod)         | Brevo HTTPS API                                               | Auth + transactional mail                  |
 | Caching              | In-memory cache + ASP.NET Output Cache                        | Public settings & availability             |
 | Rate limiting        | ASP.NET Core Rate Limiter                                     | Abuse protection                           |
 | Testing              | xUnit v3, Testcontainers (PostgreSQL, Azurite)                | Unit + integration tests                   |
@@ -140,16 +140,16 @@ Shora/
 └── README.md
 ```
 
-| Path                               | Purpose                                                     |
-| ---------------------------------- | ----------------------------------------------------------- |
-| `src/backend/Shora.Api`            | Entry point, DI wiring, background job hosts, `Program.cs`  |
-| `src/backend/Shora.Application`    | Use-case services, outbox, ops monitoring, options classes  |
-| `src/backend/Shora.Domain`         | Pure domain model — no EF or ASP.NET references             |
+| Path                               | Purpose                                                           |
+| ---------------------------------- | ----------------------------------------------------------------- |
+| `src/backend/Shora.Api`            | Entry point, DI wiring, background job hosts, `Program.cs`        |
+| `src/backend/Shora.Application`    | Use-case services, outbox, ops monitoring, options classes        |
+| `src/backend/Shora.Domain`         | Pure domain model — no EF or ASP.NET references                   |
 | `src/backend/Shora.Infrastructure` | PostgreSQL, Identity stores, JWT/refresh, Azure Blob, Brevo email |
-| `src/backend/Shora.Contracts`      | API DTO records consumed by Api and mirrored in TS          |
-| `src/frontend`                     | Angular SPA; `@contracts/*` alias points to `src/contracts` |
-| `specs/`                           | Maintainer-facing design documentation                      |
-| `docs/`                            | Deployment and ops documentation                            |
+| `src/backend/Shora.Contracts`      | API DTO records consumed by Api and mirrored in TS                |
+| `src/frontend`                     | Angular SPA; `@contracts/*` alias points to `src/contracts`       |
+| `specs/`                           | Maintainer-facing design documentation                            |
+| `docs/`                            | Deployment and ops documentation                                  |
 
 ---
 
@@ -177,7 +177,7 @@ The Railway container runs **Shora.Api** (HTTP + background jobs) and serves the
 | ------------------ | ---------------------------------------------------------------------------- |
 | **Domain**         | Entities, enums, invariants                                                  |
 | **Application**    | Services, validators, `Result` pattern, `IApplicationDbContext`, outbox, ops |
-| **Infrastructure** | EF Core, Identity, JWT, refresh tokens, Brevo email, Azure Blob, seeder    |
+| **Infrastructure** | EF Core, Identity, JWT, refresh tokens, Brevo email, Azure Blob, seeder      |
 | **Api**            | Controllers, middleware, rate limits, background job hosts                   |
 | **Contracts**      | Shared DTO records (no business logic)                                       |
 
@@ -392,7 +392,7 @@ Configured in EF entity configurations (Infrastructure). Notable rules:
 | **No self-service reschedule**  | Client must cancel and rebook                                                                              |
 | **Delivery**                    | Voice call (requires phone) or chat (WhatsApp link at session time)                                        |
 | **Privacy**                     | Clients may use pseudonym display names                                                                    |
-| **Admin-only refunds**          | Manual record only; no automated payout integration                                                      |
+| **Admin-only refunds**          | Manual record only; no automated payout integration                                                        |
 
 ---
 
@@ -460,7 +460,7 @@ If `Storage:ConnectionString` is unset, `NotImplementedFileStorage` throws on up
 
 | Type              | Mechanism                              | Templates                                             |
 | ----------------- | -------------------------------------- | ----------------------------------------------------- |
-| **Auth emails**   | Direct Brevo via `AuthEmailService`   | Embedded HTML in `Shora.Application/Email/Templates/` |
+| **Auth emails**   | Direct Brevo via `AuthEmailService`    | Embedded HTML in `Shora.Application/Email/Templates/` |
 | **Transactional** | Outbox pattern + `OutboxDispatcherJob` | Rendered by `OutboxEmailRenderer`                     |
 
 ### Outbox message types
@@ -578,9 +578,9 @@ Use `__` (double underscore) for nested env vars on Railway (e.g. `Jwt__SigningK
 
 ### Required for full functionality (not always validated at startup)
 
-| Variable / setting                         | Purpose                                           |
-| ------------------------------------------ | ------------------------------------------------- |
-| `AdminSeed__Email` / `AdminSeed__Password` | One-time first admin (remove after login)         |
+| Variable / setting                         | Purpose                                   |
+| ------------------------------------------ | ----------------------------------------- |
+| `AdminSeed__Email` / `AdminSeed__Password` | One-time first admin (remove after login) |
 
 ### Optional
 
@@ -816,7 +816,7 @@ Detail: [`.github/workflows/README.md`](.github/workflows/README.md), [`specs/09
 | Compute + SPA   | Railway (single container)     |
 | Database        | Neon PostgreSQL                |
 | Receipt storage | Azure Blob (private container) |
-| Email           | Brevo (HTTPS API)             |
+| Email           | Brevo (HTTPS API)              |
 | Images          | GHCR                           |
 
 - Frontend is baked into `Shora.Api/wwwroot` at build time
@@ -1024,7 +1024,7 @@ Documented in code/specs (not a committed roadmap):
 
 | Limitation                                           | Source                                              |
 | ---------------------------------------------------- | --------------------------------------------------- |
-| Placeholder practitioner bio/copy on public pages      | `specs/03-public-pages.md` open items               |
+| Placeholder practitioner bio/copy on public pages    | `specs/03-public-pages.md` open items               |
 | No real malware scanner on receipts                  | `PassThroughMalwareScanner`                         |
 | No online payment gateway                            | By design (`specs/05-payments.md`)                  |
 | No horizontal scaling / Redis                        | MVP topology (`specs/08-cross-cutting-concerns.md`) |

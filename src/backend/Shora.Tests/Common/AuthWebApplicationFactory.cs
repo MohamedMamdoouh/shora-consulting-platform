@@ -40,7 +40,6 @@ public sealed class AuthWebApplicationFactory : WebApplicationFactory<Program>
                 ["Cors:AllowedOrigins:0"] = "http://localhost:4200",
                 ["AdminSeed:Email"] = "admin@test.local",
                 ["AdminSeed:Password"] = "TestPass123!",
-                ["Google:ClientId"] = "test-google-client-id",
                 ["Cache:Enabled"] = "true",
                 ["Cache:SettingsPublicTtlSeconds"] = "300",
                 ["Cache:AvailabilityTtlSeconds"] = "30",
@@ -50,8 +49,6 @@ public sealed class AuthWebApplicationFactory : WebApplicationFactory<Program>
 
         builder.ConfigureServices(services =>
         {
-            services.AddScoped<IGoogleTokenValidator, FakeGoogleTokenValidator>();
-
             var fileStorageDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IFileStorage));
             if (fileStorageDescriptor is not null)
             {
@@ -97,26 +94,5 @@ public sealed class AuthWebApplicationFactory : WebApplicationFactory<Program>
         }
 
         base.Dispose(disposing);
-    }
-}
-
-public sealed class FakeGoogleTokenValidator : IGoogleTokenValidator
-{
-    public Task<GoogleTokenPayload?> ValidateAsync(string idToken, CancellationToken cancellationToken = default)
-    {
-        if (idToken == "invalid")
-        {
-            return Task.FromResult<GoogleTokenPayload?>(null);
-        }
-
-        if (idToken.StartsWith("email:", StringComparison.Ordinal))
-        {
-            var email = idToken["email:".Length..];
-            return Task.FromResult<GoogleTokenPayload?>(
-                new GoogleTokenPayload(email, "Google User", Guid.NewGuid().ToString()));
-        }
-
-        return Task.FromResult<GoogleTokenPayload?>(
-            new GoogleTokenPayload($"{idToken}@google.test", "Google User", idToken));
     }
 }

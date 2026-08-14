@@ -1,31 +1,10 @@
-import { AfterViewInit, Component, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { environment } from '../../environments/environment';
 import { AuthService } from '../core/auth/auth.service';
-import { ThemeService } from '../core/theme/theme.service';
 import { readApiError } from '../core/api/api-error.util';
 import { getAuthFieldError } from '../core/forms/auth-field-error.util';
-
-declare global {
-  interface Window {
-    google?: {
-      accounts: {
-        id: {
-          initialize: (config: {
-            client_id: string;
-            callback: (response: { credential: string }) => void;
-          }) => void;
-          renderButton: (
-            element: HTMLElement,
-            config: { theme: string; size: string; width: number },
-          ) => void;
-        };
-      };
-    };
-  }
-}
 
 @Component({
   selector: 'app-login-page',
@@ -33,12 +12,10 @@ declare global {
   templateUrl: './login-page.component.html',
   styleUrl: './login-page.component.scss',
 })
-export class LoginPageComponent implements OnInit, AfterViewInit {
+export class LoginPageComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
-  private readonly theme = inject(ThemeService);
   private readonly route = inject(ActivatedRoute);
-  private googleButtonReady = false;
 
   readonly errorMessage = signal('');
   readonly infoMessage = signal('');
@@ -53,24 +30,10 @@ export class LoginPageComponent implements OnInit, AfterViewInit {
     password: ['', [Validators.required]],
   });
 
-  constructor() {
-    effect(() => {
-      this.theme.resolved();
-      if (this.googleButtonReady) {
-        this.renderGoogleButton();
-      }
-    });
-  }
-
   ngOnInit(): void {
     if (this.route.snapshot.queryParamMap.get('reason') === 'sessionExpired') {
       this.infoMessage.set('انتهت جلستك. يرجى تسجيل الدخول مرة أخرى.');
     }
-  }
-
-  ngAfterViewInit(): void {
-    this.googleButtonReady = true;
-    this.renderGoogleButton();
   }
 
   async submit(): Promise<void> {
@@ -94,41 +57,6 @@ export class LoginPageComponent implements OnInit, AfterViewInit {
       this.errorMessage.set(readApiError(err, 'البريد الإلكتروني أو كلمة المرور غير صحيحة.'));
     } finally {
       this.isSubmitting.set(false);
-    }
-  }
-
-  private renderGoogleButton(): void {
-    if (!environment.googleClientId) {
-      return;
-    }
-
-    const container = document.getElementById('google-signin-button');
-    if (!container || !window.google?.accounts?.id) {
-      return;
-    }
-
-    container.replaceChildren();
-
-    window.google.accounts.id.initialize({
-      client_id: environment.googleClientId,
-      callback: (response) => {
-        void this.handleGoogleSignIn(response.credential);
-      },
-    });
-
-    window.google.accounts.id.renderButton(container, {
-      theme: this.theme.resolved() === 'dark' ? 'filled_black' : 'outline',
-      size: 'large',
-      width: 280,
-    });
-  }
-
-  private async handleGoogleSignIn(credential: string): Promise<void> {
-    try {
-      const authResponse = await firstValueFrom(this.auth.googleSignIn(credential));
-      await this.auth.redirectAfterLogin(authResponse.role, this.returnUrl);
-    } catch (err) {
-      this.errorMessage.set(readApiError(err, 'تعذر تسجيل الدخول عبر جوجل.'));
     }
   }
 }

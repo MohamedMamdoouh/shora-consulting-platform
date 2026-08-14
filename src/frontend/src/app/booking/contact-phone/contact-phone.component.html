@@ -22,7 +22,9 @@
           maxlength="11"
           dir="ltr"
           placeholder="01012345678"
-          [attr.aria-invalid]="form.controls.contactPhone.touched && form.controls.contactPhone.invalid"
+          [attr.aria-invalid]="
+            form.controls.contactPhone.touched && form.controls.contactPhone.invalid
+          "
         />
         @if (phoneError(); as error) {
           <span class="field-error" role="alert">{{ error }}</span>

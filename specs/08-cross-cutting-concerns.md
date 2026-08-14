@@ -26,7 +26,7 @@ Uses ASP.NET Core's built-in rate limiting middleware. Limits are **per-IP** per
 
 | Endpoint(s)                                                                                  | Limit (starting point) | Status   |
 | -------------------------------------------------------------------------------------------- | ---------------------- | -------- |
-| `POST /api/auth/login`, `/signup`, `/google`                                                 | ~5 / minute / IP       | **Done** |
+| `POST /api/auth/login`, `/signup`                                                            | ~5 / minute / IP       | **Done** |
 | `POST /api/auth/forgot-password`, `/reset-password`, `/verify-email`, `/resend-verification` | ~5 / minute / IP       | **Done** |
 | `POST /api/auth/refresh`                                                                     | ~10 / minute / IP      | **Done** |
 | `GET /api/availability`                                                                      | ~30 / minute / IP      | **Done** |
@@ -101,14 +101,14 @@ Disable all jobs in dev/test via `BackgroundJobs:Enabled = false`.
 
 Tunable via `appsettings.json` (see `BackgroundJobOptions`, `OpsMonitoringOptions`, `RateLimitOptions`, `EmailOptions`):
 
-| Section | Purpose |
-| --- | --- |
-| `BackgroundJobs:Enabled` | Master switch (false in integration tests) |
-| `BackgroundJobs:*IntervalSeconds` | Per-job schedule (defaults match table above) |
-| `OpsMonitoring:*` | Alert thresholds (pending approval hours, refund-due hours, heartbeat multipliers, dead-letter burst count/window) |
-| `RateLimiting:*` | Per-endpoint IP limits |
-| `ReceiptUpload:RateLimitPerMinute` | Receipt upload cap (default 5/min/IP) |
-| `Email:*` | Brevo API key, from address (spec 08.4) |
+| Section                            | Purpose                                                                                                            |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `BackgroundJobs:Enabled`           | Master switch (false in integration tests)                                                                         |
+| `BackgroundJobs:*IntervalSeconds`  | Per-job schedule (defaults match table above)                                                                      |
+| `OpsMonitoring:*`                  | Alert thresholds (pending approval hours, refund-due hours, heartbeat multipliers, dead-letter burst count/window) |
+| `RateLimiting:*`                   | Per-endpoint IP limits                                                                                             |
+| `ReceiptUpload:RateLimitPerMinute` | Receipt upload cap (default 5/min/IP)                                                                              |
+| `Email:*`                          | Brevo API key, from address (spec 08.4)                                                                            |
 
 ## 4. Deployment
 

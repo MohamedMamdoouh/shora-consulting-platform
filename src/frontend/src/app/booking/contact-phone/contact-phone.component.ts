@@ -6,7 +6,7 @@ import { APP_COPY } from '../../core/i18n/app-copy.constants';
 import { formatSlotSummary } from '../utils/slot-grouping.util';
 import { BookingStepIndicatorComponent } from '../shared/booking-step-indicator.component';
 
-const EGYPT_MOBILE_PATTERN = /^(\+20|0)?1[0125]\d{8}$/;
+const DIGITS_MAX11_PATTERN = /^\d{1,11}$/;
 
 @Component({
   selector: 'app-contact-phone',
@@ -26,7 +26,7 @@ export class ContactPhoneComponent {
   readonly form = this.fb.nonNullable.group({
     contactPhone: [
       this.bookingFlow.getState()?.contactPhone ?? '',
-      [Validators.required, Validators.pattern(EGYPT_MOBILE_PATTERN)],
+      [Validators.required, Validators.pattern(DIGITS_MAX11_PATTERN), Validators.maxLength(11)],
     ],
   });
 

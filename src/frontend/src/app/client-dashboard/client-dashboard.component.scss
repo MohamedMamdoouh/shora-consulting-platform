@@ -9,6 +9,13 @@
   gap: var(--space-md);
 }
 
+/* Widen beyond the shared .page cap on large screens only; mobile/tablet unaffected */
+@media (min-width: 1024px) {
+  .dashboard {
+    max-width: var(--content-full);
+  }
+}
+
 .dashboard__header h1 {
   margin: 0 0 var(--space-sm);
 }

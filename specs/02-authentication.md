@@ -94,7 +94,7 @@ Uses Identity's built-in email-confirmation token and `EmailConfirmed` flag (spe
 - A **"Continue with Google"** button (Google Identity Services) on the login/signup screens obtains the Google ID token and calls `POST /api/auth/google` (#4).
 - `authInterceptor` attaches `Authorization: Bearer <token>` to API requests and sets `withCredentials: true` on auth calls so the refresh cookie is sent. On a 401 it attempts a single silent refresh, then retries or redirects to login.
 - `logout()` calls `POST /api/auth/logout` to revoke server-side and drops the in-memory access token.
-- `authGuard` / `adminGuard` route guards protect `client-dashboard` and `admin-dashboard` routes respectively.
+- `clientGuard` / `adminGuard` route guards protect client booking/dashboard routes and admin dashboard routes respectively (role comes from JWT via `AuthService`, not separate ping endpoints).
 
 ## 10. Explicitly Out of Scope (general MVP simplicity)
 

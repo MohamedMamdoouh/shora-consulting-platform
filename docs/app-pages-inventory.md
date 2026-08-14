@@ -6,15 +6,15 @@
 
 ## 1. Application Overview
 
-| Attribute | Value |
-|-----------|-------|
-| **Product name** | Shora (شورى) |
-| **Domain** | RTL personal practice booking site for relationship consulting |
-| **Primary language** | Arabic (`lang="ar"`, `dir="rtl"`) |
-| **Target users** | **Clients** (people booking sessions), **Admin** (single practitioner operating the practice) |
-| **Frontend stack** | Angular 21, standalone components, lazy-loaded routes |
-| **Layout shell** | All routes render inside `ShellComponent` (global header, footer, nav) except admin sub-pages which add `AdminShellComponent` |
-| **API base** | `/api/v1` (same origin in production) |
+| Attribute            | Value                                                                                                                         |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **Product name**     | Shora (شورى)                                                                                                                  |
+| **Domain**           | RTL personal practice booking site for relationship consulting                                                                |
+| **Primary language** | Arabic (`lang="ar"`, `dir="rtl"`)                                                                                             |
+| **Target users**     | **Clients** (people booking sessions), **Admin** (single practitioner operating the practice)                                 |
+| **Frontend stack**   | Angular 21, standalone components, lazy-loaded routes                                                                         |
+| **Layout shell**     | All routes render inside `ShellComponent` (global header, footer, nav) except admin sub-pages which add `AdminShellComponent` |
+| **API base**         | `/api/v1` (same origin in production)                                                                                         |
 
 ### Core business flow
 
@@ -26,11 +26,11 @@
 
 ### User roles and route access
 
-| Role | Access |
-|------|--------|
+| Role          | Access                                                      |
+| ------------- | ----------------------------------------------------------- |
 | **Anonymous** | Public pages, booking flow until review/reserve, auth pages |
-| **Client** | Client dashboard, booking payment page, own bookings |
-| **Admin** | All `/admin/*` pages; redirected away from `/dashboard` |
+| **Client**    | Client dashboard, booking payment page, own bookings        |
+| **Admin**     | All `/admin/*` pages; redirected away from `/dashboard`     |
 
 ### Global shell (`ShellComponent`)
 
@@ -47,9 +47,9 @@ Wraps every page and provides:
 
 ### 2.1 Home — `/`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | Public |
+| Field       | Detail                                                   |
+| ----------- | -------------------------------------------------------- |
+| **Access**  | Public                                                   |
 | **Purpose** | Primary landing page; convert visitors into booking flow |
 
 **Contains:**
@@ -68,9 +68,9 @@ Wraps every page and provides:
 
 ### 2.2 About — `/about`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | Public |
+| Field       | Detail                                     |
+| ----------- | ------------------------------------------ |
+| **Access**  | Public                                     |
 | **Purpose** | Introduce the practitioner and build trust |
 
 **Contains:**
@@ -90,9 +90,9 @@ Wraps every page and provides:
 
 ### 2.3 Services — `/services`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | Public |
+| Field       | Detail                                                                  |
+| ----------- | ----------------------------------------------------------------------- |
+| **Access**  | Public                                                                  |
 | **Purpose** | Explain the single session offering, topics, payment model, and privacy |
 
 **Contains:**
@@ -112,9 +112,9 @@ Wraps every page and provides:
 
 ### 2.4 Privacy Policy — `/privacy`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | Public |
+| Field       | Detail                   |
+| ----------- | ------------------------ |
+| **Access**  | Public                   |
 | **Purpose** | Legal privacy disclosure |
 
 **Contains (static legal prose):**
@@ -134,9 +134,9 @@ Wraps every page and provides:
 
 ### 2.5 Terms of Use — `/terms`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | Public |
+| Field       | Detail                             |
+| ----------- | ---------------------------------- |
+| **Access**  | Public                             |
 | **Purpose** | Legal terms and service boundaries |
 
 **Contains (static legal prose):**
@@ -156,9 +156,9 @@ Wraps every page and provides:
 
 ### 2.6 Error Catalog Index — `/errors`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | Public (developer/operator reference) |
+| Field       | Detail                                                          |
+| ----------- | --------------------------------------------------------------- |
+| **Access**  | Public (developer/operator reference)                           |
 | **Purpose** | Browse all API error codes returned as RFC 7807 Problem Details |
 
 **Contains:**
@@ -175,9 +175,9 @@ Wraps every page and provides:
 
 ### 2.7 Error Code Detail — `/errors/:code`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | Public |
+| Field       | Detail                                         |
+| ----------- | ---------------------------------------------- |
+| **Access**  | Public                                         |
 | **Purpose** | Show full documentation for one API error code |
 
 **Contains:**
@@ -202,10 +202,10 @@ All auth pages support optional `returnUrl` query param for post-login redirect.
 
 ### 3.1 Login — `/auth/login`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | Public (redirects authenticated users via post-login logic) |
-| **Purpose** | Sign in existing users |
+| Field       | Detail                                                      |
+| ----------- | ----------------------------------------------------------- |
+| **Access**  | Public (redirects authenticated users via post-login logic) |
+| **Purpose** | Sign in existing users                                      |
 
 **Contains:**
 
@@ -224,9 +224,9 @@ All auth pages support optional `returnUrl` query param for post-login redirect.
 
 ### 3.2 Signup — `/auth/signup`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | Public |
+| Field       | Detail                    |
+| ----------- | ------------------------- |
+| **Access**  | Public                    |
 | **Purpose** | Create new client account |
 
 **Contains:**
@@ -244,10 +244,10 @@ All auth pages support optional `returnUrl` query param for post-login redirect.
 
 ### 3.3 Verify Email — `/auth/verify-email`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | Public (via email link with `?email=&token=`) |
-| **Purpose** | Confirm email address after registration |
+| Field       | Detail                                        |
+| ----------- | --------------------------------------------- |
+| **Access**  | Public (via email link with `?email=&token=`) |
+| **Purpose** | Confirm email address after registration      |
 
 **Contains:**
 
@@ -263,9 +263,9 @@ All auth pages support optional `returnUrl` query param for post-login redirect.
 
 ### 3.4 Forgot Password — `/auth/forgot-password`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | Public |
+| Field       | Detail                       |
+| ----------- | ---------------------------- |
+| **Access**  | Public                       |
 | **Purpose** | Request password reset email |
 
 **Contains:**
@@ -282,10 +282,10 @@ All auth pages support optional `returnUrl` query param for post-login redirect.
 
 ### 3.5 Reset Password — `/auth/reset-password`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | Public (via email link with `?email=&token=`) |
-| **Purpose** | Set new password |
+| Field       | Detail                                        |
+| ----------- | --------------------------------------------- |
+| **Access**  | Public (via email link with `?email=&token=`) |
+| **Purpose** | Set new password                              |
 
 **Contains:**
 
@@ -314,10 +314,10 @@ Multi-step wizard with step indicator. Flow state stored in **sessionStorage** v
 
 ### 4.1 Slot Picker — `/booking/start`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | Public |
-| **Guard** | None |
+| Field       | Detail                               |
+| ----------- | ------------------------------------ |
+| **Access**  | Public                               |
+| **Guard**   | None                                 |
 | **Purpose** | Choose an available appointment slot |
 
 **Contains:**
@@ -336,11 +336,11 @@ Multi-step wizard with step indicator. Flow state stored in **sessionStorage** v
 
 ### 4.2 Delivery Method — `/booking/delivery`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | Public |
-| **Guard** | `bookingSlotSelectedGuard` (slot must be chosen) |
-| **Purpose** | Choose how the session will be delivered |
+| Field       | Detail                                           |
+| ----------- | ------------------------------------------------ |
+| **Access**  | Public                                           |
+| **Guard**   | `bookingSlotSelectedGuard` (slot must be chosen) |
+| **Purpose** | Choose how the session will be delivered         |
 
 **Contains:**
 
@@ -359,10 +359,10 @@ Multi-step wizard with step indicator. Flow state stored in **sessionStorage** v
 
 ### 4.3 Contact Phone — `/booking/phone`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | Public |
-| **Guard** | `bookingPhoneGuard` (voice call selected) |
+| Field       | Detail                                            |
+| ----------- | ------------------------------------------------- |
+| **Access**  | Public                                            |
+| **Guard**   | `bookingPhoneGuard` (voice call selected)         |
 | **Purpose** | Collect Egyptian mobile number for voice sessions |
 
 **Contains:**
@@ -381,11 +381,11 @@ Multi-step wizard with step indicator. Flow state stored in **sessionStorage** v
 
 ### 4.4 Booking Review — `/booking/review`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | Public to view; **login + verified email required to reserve** |
-| **Guard** | `bookingReviewGuard` (slot + delivery method set) |
-| **Purpose** | Confirm booking details and create reservation |
+| Field       | Detail                                                         |
+| ----------- | -------------------------------------------------------------- |
+| **Access**  | Public to view; **login + verified email required to reserve** |
+| **Guard**   | `bookingReviewGuard` (slot + delivery method set)              |
+| **Purpose** | Confirm booking details and create reservation                 |
 
 **Contains:**
 
@@ -405,9 +405,9 @@ Multi-step wizard with step indicator. Flow state stored in **sessionStorage** v
 
 ### 4.5 Payment Instructions — `/booking/payment/:id`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | **Client only** (`clientGuard`) |
+| Field       | Detail                                                    |
+| ----------- | --------------------------------------------------------- |
+| **Access**  | **Client only** (`clientGuard`)                           |
 | **Purpose** | Show payment details and upload receipt after reservation |
 
 **Contains:**
@@ -436,10 +436,10 @@ Multi-step wizard with step indicator. Flow state stored in **sessionStorage** v
 
 ### 5.1 Client Dashboard — `/dashboard`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | **Client only** (`clientGuard`; admins redirected to `/admin`) |
-| **Purpose** | Central hub for managing all client bookings |
+| Field       | Detail                                                         |
+| ----------- | -------------------------------------------------------------- |
+| **Access**  | **Client only** (`clientGuard`; admins redirected to `/admin`) |
+| **Purpose** | Central hub for managing all client bookings                   |
 
 **Contains three sections:**
 
@@ -495,24 +495,24 @@ All admin pages require **Admin role** (`adminGuard`). Wrapped in `AdminShellCom
 
 ### 6.1 Admin Settings — `/admin/settings`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | Admin |
+| Field       | Detail                                   |
+| ----------- | ---------------------------------------- |
+| **Access**  | Admin                                    |
 | **Purpose** | Configure practitioner business settings |
 
 **Contains editable form:**
 
-| Setting | Description |
-|---------|-------------|
-| Session price | Flat fee in EGP |
-| Session duration | Minutes per session |
-| Buffer minutes | Gap between sessions |
-| Receipt upload window | Minutes client has to upload after booking |
+| Setting                         | Description                                            |
+| ------------------------------- | ------------------------------------------------------ |
+| Session price                   | Flat fee in EGP                                        |
+| Session duration                | Minutes per session                                    |
+| Buffer minutes                  | Gap between sessions                                   |
+| Receipt upload window           | Minutes client has to upload after booking             |
 | Cancellation auto-decline hours | Hours before session when cancel requests auto-decline |
-| Consultant WhatsApp number | For chat sessions and client contact |
-| Vodafone Cash number | Payment destination |
-| InstaPay handle | Payment destination |
-| Payment instructions | Free-text extra payment guidance |
+| Consultant WhatsApp number      | For chat sessions and client contact                   |
+| Vodafone Cash number            | Payment destination                                    |
+| InstaPay handle                 | Payment destination                                    |
+| Payment instructions            | Free-text extra payment guidance                       |
 
 **Read-only display:** Receipt retention months (system-managed)
 
@@ -524,9 +524,9 @@ All admin pages require **Admin role** (`adminGuard`). Wrapped in `AdminShellCom
 
 ### 6.2 Admin Availability — `/admin/availability`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | Admin |
+| Field       | Detail                                |
+| ----------- | ------------------------------------- |
+| **Access**  | Admin                                 |
 | **Purpose** | Manage when clients can book sessions |
 
 **Contains two management areas:**
@@ -553,9 +553,9 @@ All admin pages require **Admin role** (`adminGuard`). Wrapped in `AdminShellCom
 
 ### 6.3 Admin Bookings — `/admin/bookings`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | Admin |
+| Field       | Detail                                            |
+| ----------- | ------------------------------------------------- |
+| **Access**  | Admin                                             |
 | **Purpose** | Operate all bookings — default admin landing page |
 
 **Contains:**
@@ -584,9 +584,9 @@ All admin pages require **Admin role** (`adminGuard`). Wrapped in `AdminShellCom
 
 ### 6.4 Admin Earnings — `/admin/earnings`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | Admin |
+| Field       | Detail                           |
+| ----------- | -------------------------------- |
+| **Access**  | Admin                            |
 | **Purpose** | Revenue summary for the practice |
 
 **Contains:**
@@ -607,9 +607,9 @@ All admin pages require **Admin role** (`adminGuard`). Wrapped in `AdminShellCom
 
 ### 6.5 Admin Ops Alerts — `/admin/ops`
 
-| Field | Detail |
-|-------|--------|
-| **Access** | Admin |
+| Field       | Detail                                     |
+| ----------- | ------------------------------------------ |
+| **Access**  | Admin                                      |
 | **Purpose** | Operational health monitoring and runbooks |
 
 **Contains:**
@@ -631,22 +631,21 @@ All admin pages require **Admin role** (`adminGuard`). Wrapped in `AdminShellCom
 
 ## 7. Fallback Route
 
-| Route | Behavior |
-|-------|----------|
+| Route                     | Behavior                |
+| ------------------------- | ----------------------- |
 | `**` (any unmatched path) | Redirects to `/` (home) |
 
 ---
 
 ## 8. Route Guards Summary
 
-| Guard | Applied to | Rule |
-|-------|-----------|------|
-| `clientGuard` | `/dashboard`, `/booking/payment/:id` | Must be authenticated client; admin → `/admin`; unauthenticated → login with returnUrl |
-| `adminGuard` | `/admin/*` | Must be authenticated admin |
-| `bookingSlotSelectedGuard` | `/booking/delivery` | Slot selected in session flow |
-| `bookingPhoneGuard` | `/booking/phone` | Voice call delivery selected |
-| `bookingReviewGuard` | `/booking/review` | Slot + delivery method in session flow |
-| `authGuard` | *(defined but not wired to any route)* | — |
+| Guard                      | Applied to                           | Rule                                                                                   |
+| -------------------------- | ------------------------------------ | -------------------------------------------------------------------------------------- |
+| `clientGuard`              | `/dashboard`, `/booking/payment/:id` | Must be authenticated client; admin → `/admin`; unauthenticated → login with returnUrl |
+| `adminGuard`               | `/admin/*`                           | Must be authenticated admin                                                            |
+| `bookingSlotSelectedGuard` | `/booking/delivery`                  | Slot selected in session flow                                                          |
+| `bookingPhoneGuard`        | `/booking/phone`                     | Voice call delivery selected                                                           |
+| `bookingReviewGuard`       | `/booking/review`                    | Slot + delivery method in session flow                                                 |
 
 ---
 
@@ -654,59 +653,59 @@ All admin pages require **Admin role** (`adminGuard`). Wrapped in `AdminShellCom
 
 These appear on multiple pages and are relevant to system design:
 
-| Component | Used on | Purpose |
-|-----------|---------|---------|
-| `BrandLogoComponent` | Shell, Home hero | Brand identity |
-| `BookingCtaComponent` | Home, banners | Link to `/booking/start` |
-| `FeaturedSessionCardComponent` | Home, Services | Price/duration from public settings |
-| `TopicCardComponent` | Home, Services | Consultation topic display |
-| `FooterCtaBannerComponent` | Home, About, Services | Bottom conversion banner |
-| `PageHeaderComponent` | About, Services | Standard page title block |
-| `CounselingSceneComponent` | Home | Hero illustration |
-| `BookingStepIndicatorComponent` | All booking steps | Progress indicator |
-| `PaymentInstructionsPanelComponent` | Payment page, dashboard pending cards | Payment info + receipt upload |
-| `UpcomingBookingCardComponent` | Dashboard | Confirmed booking management |
-| `PendingPaymentCardComponent` | Dashboard | Payment + upload for pending bookings |
-| `PendingApprovalCardComponent` | Dashboard | Awaiting admin review state |
+| Component                           | Used on                               | Purpose                               |
+| ----------------------------------- | ------------------------------------- | ------------------------------------- |
+| `BrandLogoComponent`                | Shell, Home hero                      | Brand identity                        |
+| `BookingCtaComponent`               | Home, banners                         | Link to `/booking/start`              |
+| `FeaturedSessionCardComponent`      | Home, Services                        | Price/duration from public settings   |
+| `TopicCardComponent`                | Home, Services                        | Consultation topic display            |
+| `FooterCtaBannerComponent`          | Home, About, Services                 | Bottom conversion banner              |
+| `PageHeaderComponent`               | About, Services                       | Standard page title block             |
+| `CounselingSceneComponent`          | Home                                  | Hero illustration                     |
+| `BookingStepIndicatorComponent`     | All booking steps                     | Progress indicator                    |
+| `PaymentInstructionsPanelComponent` | Payment page, dashboard pending cards | Payment info + receipt upload         |
+| `UpcomingBookingCardComponent`      | Dashboard                             | Confirmed booking management          |
+| `PendingPaymentCardComponent`       | Dashboard                             | Payment + upload for pending bookings |
+| `PendingApprovalCardComponent`      | Dashboard                             | Awaiting admin review state           |
 
 ---
 
 ## 10. Page Count Summary
 
-| Area | Pages |
-|------|-------|
-| Public marketing | 5 (+ 2 error reference pages) |
-| Authentication | 5 |
-| Booking flow | 5 |
-| Client dashboard | 1 |
-| Admin dashboard | 5 |
+| Area                      | Pages                                       |
+| ------------------------- | ------------------------------------------- |
+| Public marketing          | 5 (+ 2 error reference pages)               |
+| Authentication            | 5                                           |
+| Booking flow              | 5                                           |
+| Client dashboard          | 1                                           |
+| Admin dashboard           | 5                                           |
 | **Total distinct routes** | **23** (+ dynamic `:id` and `:code` params) |
 
 ---
 
 ## 11. Booking Status → Page Relevance
 
-| Status | Client sees on dashboard | Admin action on bookings page |
-|--------|-------------------------|------------------------------|
-| `PendingPayment` | Pending section — upload receipt | View, direct cancel |
-| `PendingApproval` | Pending section — awaiting review | Receipt review (approve/decline) |
-| `Confirmed` | Upcoming section | Direct cancel, cancellation review |
-| `CancellationRequested` | Upcoming — pending cancellation | Cancellation review |
-| `Completed` | Past history | — |
-| `Cancelled` | Past history | Refund actions if applicable |
+| Status                  | Client sees on dashboard          | Admin action on bookings page      |
+| ----------------------- | --------------------------------- | ---------------------------------- |
+| `PendingPayment`        | Pending section — upload receipt  | View, direct cancel                |
+| `PendingApproval`       | Pending section — awaiting review | Receipt review (approve/decline)   |
+| `Confirmed`             | Upcoming section                  | Direct cancel, cancellation review |
+| `CancellationRequested` | Upcoming — pending cancellation   | Cancellation review                |
+| `Completed`             | Past history                      | —                                  |
+| `Cancelled`             | Past history                      | Refund actions if applicable       |
 
 ---
 
 ## 12. External Integrations by Page
 
-| Integration | Pages affected |
-|-------------|----------------|
-| **Google Sign-In** | Login |
-| **Vodafone Cash / InstaPay** (manual, no API) | Payment instructions, dashboard pending cards |
-| **WhatsApp deep links** | Dashboard upcoming cards (chat delivery) |
-| **Azure Blob Storage** (receipt upload) | Payment page, dashboard, admin receipt review |
-| **Brevo email** (backend) | Triggered by auth, booking, payment workflows — no dedicated email pages |
+| Integration                                   | Pages affected                                                           |
+| --------------------------------------------- | ------------------------------------------------------------------------ |
+| **Google Sign-In**                            | Login                                                                    |
+| **Vodafone Cash / InstaPay** (manual, no API) | Payment instructions, dashboard pending cards                            |
+| **WhatsApp deep links**                       | Dashboard upcoming cards (chat delivery)                                 |
+| **Azure Blob Storage** (receipt upload)       | Payment page, dashboard, admin receipt review                            |
+| **Brevo email** (backend)                     | Triggered by auth, booking, payment workflows — no dedicated email pages |
 
 ---
 
-*Generated from frontend route definitions and page components in `src/frontend/src/app/`.*
+_Generated from frontend route definitions and page components in `src/frontend/src/app/`._

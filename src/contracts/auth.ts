@@ -46,10 +46,6 @@ export interface MeResponse {
   email: string;
 }
 
-export interface RolePingResponse {
-  role: string;
-}
-
 export interface AuthUser {
   displayName: string;
   role: string;

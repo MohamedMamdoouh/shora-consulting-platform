@@ -191,6 +191,13 @@ Set secrets via environment variables (double-underscore nesting). Never commit 
 
 Refresh cookies automatically use `Secure=true` and `SameSite=Strict` outside Development ([`RefreshCookieService`](../src/backend/Shora.Infrastructure/Services/RefreshCookieService.cs)).
 
+**Production URL validation (`ValidateOnStart`):** In non-Development environments, [`FrontendOptionsValidator`](../src/backend/Shora.Application/Options/FrontendOptionsValidator.cs) and [`CorsOptionsValidator`](../src/backend/Shora.Application/Options/CorsOptionsValidator.cs) reject startup when:
+
+- `Frontend:BaseUrl` or any `Cors:AllowedOrigins` entry is missing, not a valid absolute HTTPS URL, or contains the placeholder host `YOUR_PRODUCTION_HOST` (see [`ProductionConfigValidation`](../src/backend/Shora.Application/Options/ProductionConfigValidation.cs)).
+- `Cors:AllowedOrigins` is empty.
+
+Set `Frontend__BaseUrl` and `Cors__AllowedOrigins__0` on Railway to the same production HTTPS origin (no trailing slash). `http://localhost:4200` fails validation in Production even if baked into JSON — Railway env vars override JSON and must match the live URL.
+
 **Verify:** App starts with env vars only; CORS accepts the production origin.
 
 ---
@@ -259,7 +266,7 @@ Sequence:
 1. CI should pass on the PR before merge (branch protection recommended); merge to `main` triggers Deploy
 2. Build job produces publish artifact (09.8)
 3. Deploy job builds [`Dockerfile`](../Dockerfile), pushes `ghcr.io/<lowercase-repo>:production` (repository path lowercased — GHCR tags must be lowercase), runs `railway redeploy`
-4. Smoke-test job curls `/api/v1/health`, `/`, `/about` on `PRODUCTION_URL`
+4. Operator verifies manually: `GET /api/v1/health`, `/`, and `/about` on `PRODUCTION_URL` (no automated smoke-test job in `deploy.yml`)
 5. App startup applies EF migrations and idempotent seed (09.10)
 
 **Verify:** After Railway + GitHub secrets are configured, merge to `main` deploys automatically; app reachable over HTTPS with same-site cookies.

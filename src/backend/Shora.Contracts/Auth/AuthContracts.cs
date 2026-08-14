@@ -25,5 +25,3 @@ public sealed record MeResponse(
     string Role,
     bool EmailConfirmed,
     string Email);
-
-public sealed record RolePingResponse(string Role);

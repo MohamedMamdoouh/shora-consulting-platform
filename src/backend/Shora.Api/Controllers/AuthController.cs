@@ -247,24 +247,6 @@ public sealed class AuthController : ApiControllerBase
         return FromResult(result);
     }
 
-    [Authorize(Roles = "Client")]
-    [HttpGet("ping/client")]
-    [EndpointName("Auth.PingClient")]
-    [EndpointSummary("Verify client role authorization")]
-    [ProducesResponseType(typeof(RolePingResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-    public IActionResult PingClient() => Ok(new RolePingResponse("Client"));
-
-    [Authorize(Roles = "Admin")]
-    [HttpGet("ping/admin")]
-    [EndpointName("Auth.PingAdmin")]
-    [EndpointSummary("Verify admin role authorization")]
-    [ProducesResponseType(typeof(RolePingResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-    public IActionResult PingAdmin() => Ok(new RolePingResponse("Admin"));
-
     private void SetRefreshCookie(AuthResult result, DateTime? expiresAtUtc = null)
     {
         var expires = expiresAtUtc ?? result.RefreshTokenExpiresAtUtc;

@@ -139,6 +139,18 @@ Also set `AllowedHosts` to the hostname only (e.g. `<your-app>.up.railway.app` �
 
 If `Cors__AllowedOrigins__0` on Railway is still `http://localhost:4200`, it overrides baked production config and the app fails `ValidateOnStart` with a CORS validation error. Set it to the same HTTPS URL as `Frontend__BaseUrl`.
 
+### Production URL validation (`ValidateOnStart`)
+
+In Production, [`FrontendOptionsValidator`](../src/backend/Shora.Application/Options/FrontendOptionsValidator.cs) and [`CorsOptionsValidator`](../src/backend/Shora.Application/Options/CorsOptionsValidator.cs) run at startup and **fail fast** when:
+
+| Check | Applies to |
+| --- | --- |
+| Must be a valid absolute **HTTPS** URL | `Frontend__BaseUrl`, each `Cors__AllowedOrigins__*` entry |
+| Must not contain `YOUR_PRODUCTION_HOST` | Same (placeholder host in [`ProductionConfigValidation`](../src/backend/Shora.Application/Options/ProductionConfigValidation.cs)) |
+| At least one CORS origin required | `Cors__AllowedOrigins` |
+
+HTTP URLs (including `http://localhost:4200`) are rejected in Production. Railway variables override [`appsettings.Production.json`](../src/backend/Shora.Api/appsettings.Production.json) — ensure both URL settings match your live HTTPS origin.
+
 Refresh cookies use `Secure=true` and `SameSite=Strict` outside Development.
 
 ### Email (required for sending mail)
@@ -261,7 +273,7 @@ Use when the Deploy workflow pushed a new image but Railway is still running an 
 
 1. All required Railway variables saved (no secrets in git).
 2. Merge to `main` — **Deploy** runs automatically ([`deploy.yml`](../.github/workflows/deploy.yml)).
-3. Deploy workflow green (build → push GHCR → `railway redeploy` → smoke test).
+3. Deploy workflow green (build → push GHCR → `railway redeploy`).
 4. Railway deployment status **Success**.
 5. `GET https://<your-production-url>/api/v1/health` → `healthy`.
 6. SPA loads at `/` and `/about`.

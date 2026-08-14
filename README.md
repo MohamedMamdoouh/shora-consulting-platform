@@ -240,8 +240,6 @@ There are **no per-entity repository classes** — Application uses `IApplicatio
 | `adminGuard`                    | Requires `Admin` role                           |
 | `bookingSlotSelectedGuard` etc. | Enforce booking flow order via `sessionStorage` |
 
-**Note:** `authGuard` is defined but **not wired** to any route.
-
 More detail: [`src/frontend/README.md`](src/frontend/README.md).
 
 ---
@@ -1031,7 +1029,6 @@ Documented in code/specs (not a committed roadmap):
 | No online payment gateway                            | By design (`specs/05-payments.md`)                  |
 | No horizontal scaling / Redis                        | MVP topology (`specs/08-cross-cutting-concerns.md`) |
 | `Google:ClientSecret` unused                         | Config present; ID-token flow only                  |
-| `authGuard` defined but unused                       | Frontend code                                       |
 | Base `appsettings.json` LocalDB placeholder          | Misleading default; PostgreSQL is actual engine     |
 | No automated post-deploy smoke tests in `deploy.yml` | Workflow ends at `railway redeploy`                 |
 | SEO files (`robots.txt`, `sitemap.xml`) not shipped  | Documented in deployment guide                      |

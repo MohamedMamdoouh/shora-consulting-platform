@@ -112,14 +112,16 @@ export class ReviewComponent implements OnInit {
       });
     } catch (err) {
       const code = readApiErrorCode(err);
+      const message = readBookingErrorMessage(
+        code,
+        readApiError(err, 'تعذر إتمام الحجز. حاول مرة أخرى.'),
+      );
+      this.errorMessage.set(message);
+      this.slotUnavailable.set(isSlotUnavailableError(code));
       await this.confirmDialog.result({
-        message: readBookingErrorMessage(
-          code,
-          readApiError(err, 'تعذر إتمام الحجز. حاول مرة أخرى.'),
-        ),
+        message,
         variant: 'danger',
       });
-      this.slotUnavailable.set(isSlotUnavailableError(code));
     } finally {
       this.isSubmitting.set(false);
     }

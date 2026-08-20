@@ -8,9 +8,11 @@ import {
   compareAlertsBySeverity,
   countAlertsBySeverity,
   formatAlertKind,
+  formatAlertMessage,
   formatAlertSeverity,
   formatContextEntries,
   getAlertActionRoute,
+  localizeRunbook,
   severityCssModifier,
 } from './admin-ops-labels.util';
 
@@ -36,9 +38,11 @@ export class AdminOpsPageComponent implements OnInit {
   readonly pageState = signal<PageState>({ status: 'loading' });
 
   readonly formatAlertKind = formatAlertKind;
+  readonly formatAlertMessage = formatAlertMessage;
   readonly formatAlertSeverity = formatAlertSeverity;
   readonly formatContextEntries = formatContextEntries;
   readonly getAlertActionRoute = getAlertActionRoute;
+  readonly localizeRunbook = localizeRunbook;
   readonly severityCssModifier = severityCssModifier;
 
   ngOnInit(): void {
@@ -68,7 +72,7 @@ export class AdminOpsPageComponent implements OnInit {
     } catch (error) {
       this.pageState.set({
         status: 'error',
-        message: readApiError(error, 'تعذر تحميل تنبيهات التشغيل. حاول مرة أخرى.'),
+        message: readApiError(error, 'تعذر تحميل تنبيهات النظام. حاول مرة أخرى.'),
       });
     }
   }

@@ -2,14 +2,13 @@
   <header class="admin-ops__header">
     <div class="admin-ops__title-row">
       <div>
-        <h2>تنبيهات التشغيل</h2>
+        <h2>تنبيهات النظام</h2>
         <p class="admin-ops__note">
-          تعرض التنبيهات التي يكتشفها النظام أثناء مراقبته. لكل تنبيه خطوات واضحة لمعرفة المشكلة
-          وكيفية التعامل معها.
+          يعرض التنبيهات التي يكتشفها النظام، مع خطوات واضحة لفهم المشكلة وحلها.
         </p>
       </div>
 
-      <button type="button" class="btn" (click)="loadOpsData()">تحديث</button>
+      <button type="button" class="btn" (click)="loadOpsData()">تحديث الحالة</button>
     </div>
   </header>
 
@@ -22,7 +21,7 @@
     @case ('error') {
       <div class="admin-ops__panel admin-ops__panel--error">
         <p>{{ state.message }}</p>
-        <button type="button" class="btn" (click)="loadOpsData()">إعادة المحاولة</button>
+        <button type="button" class="btn" (click)="loadOpsData()">حاول مرة أخرى</button>
       </div>
     }
 
@@ -31,8 +30,7 @@
         <div class="admin-ops__panel admin-ops__panel--empty">
           <p>لا توجد تنبيهات نشطة حاليًا.</p>
           <p class="admin-ops__note">
-            يتم تحديث حالة التنبيهات تلقائيًا كل 5 دقائق تقريبًا، ويمكنك الضغط على «تحديث» لمعرفة
-            أحدث حالة.
+            يتم تحديث التنبيهات تلقائيًا كل 5 دقائق تقريبًا. اضغط على «تحديث الحالة» لعرض آخر حالة.
           </p>
         </div>
       } @else {
@@ -59,7 +57,7 @@
                 <h3>{{ formatAlertKind(alert.kind) }}</h3>
               </div>
 
-              <p class="admin-ops__message">{{ alert.message }}</p>
+              <p class="admin-ops__message">{{ formatAlertMessage(alert) }}</p>
 
               @if (formatContextEntries(alert.context).length > 0) {
                 <dl class="admin-ops__context">
@@ -73,16 +71,16 @@
               }
 
               @if (getRunbook(alert.runbookId); as runbook) {
+                @let localizedRunbook = localizeRunbook(runbook);
                 <details class="admin-ops__runbook">
-                  <summary>عرض دليل المعالجة</summary>
+                  <summary>عرض خطوات التعامل</summary>
 
                   <div class="admin-ops__runbook-body">
-                    <p><strong>المالك:</strong> {{ runbook.owner }}</p>
-                    <p><strong>مهلة الاستجابة:</strong> {{ runbook.responseSla }}</p>
-                    <p><strong>المحفز:</strong> {{ runbook.trigger }}</p>
+                    <p><strong>الوقت المطلوب للاستجابة:</strong> {{ localizedRunbook.responseSla }}</p>
+                    <p><strong>سبب ظهور التنبيه:</strong> {{ localizedRunbook.trigger }}</p>
 
                     <ol class="admin-ops__steps">
-                      @for (step of runbook.steps; track step) {
+                      @for (step of localizedRunbook.steps; track step) {
                         <li>{{ step }}</li>
                       }
                     </ol>
@@ -90,7 +88,7 @@
                 </details>
               } @else {
                 <p class="admin-ops__runbook-missing">
-                  تعذر تحميل دليل المعالجة لهذا التنبيه ({{ alert.runbookId }}).
+                  تعذر تحميل خطوات التعامل مع هذا التنبيه ({{ alert.runbookId }}).
                 </p>
               }
 

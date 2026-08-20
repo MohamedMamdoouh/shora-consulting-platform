@@ -1,4 +1,5 @@
 import { AdminOpsAlertDto, AdminOpsRunbookDto } from '@contracts/ops';
+import { formatDateTime } from '../../core/i18n/app-locale';
 
 const ALERT_KIND_LABELS: Record<string, string> = {
   PendingApprovalBacklog: 'تراكم الحجوزات التي تنتظر الموافقة',
@@ -38,6 +39,23 @@ const BOOKINGS_LINK_KINDS = new Set([
   'RefundDueAgeing',
 ]);
 
+const UTC_CONTEXT_KEYS = new Set([
+  'pendingSinceUtc',
+  'autoDeclineAtUtc',
+  'cancelledAtUtc',
+  'lastFailureAtUtc',
+]);
+
+const ARABIC_DAY_LABELS = [
+  'الأحد',
+  'الإثنين',
+  'الثلاثاء',
+  'الأربعاء',
+  'الخميس',
+  'الجمعة',
+  'السبت',
+] as const;
+
 type LocalizedRunbook = {
   responseSla: string;
   trigger: string;
@@ -68,11 +86,11 @@ const RUNBOOK_LOCALIZATION: Record<string, LocalizedRunbook> = {
   'refund-due-ageing': {
     responseSla: 'تحذير: خلال يوم عمل واحد · حرج: خلال 4 ساعات',
     trigger:
-      'يظهر التنبيه إذا كان هناك حجز ملغى مع دفعة معتمدة ولم يتم رد المبلغ خلال 24 ساعة (تحذير) أو 72 ساعة (حرج).',
+      'يظهر التنبيه إذا كان هناك حجز ملغى مع عملية دفع مقبولة ولم يتم رد المبلغ خلال 24 ساعة (تحذير) أو 72 ساعة (حرج).',
     steps: [
       'راجع سجلات التحويل اليدوي وتأكد من تفاصيل التحويل.',
       'سجل عملية الاسترداد في النظام بعد اكتمال تحويل المبلغ.',
-      'صعّد الحالة إذا احتجت للتواصل مع العميل أو كان هناك خلاف على المبلغ.',
+      'قم بتصعيد الحالة إذا احتجت للتواصل مع العميل أو كان هناك خلاف على المبلغ.',
     ],
   },
   'job-heartbeat-missing': {
@@ -116,33 +134,22 @@ const RUNBOOK_LOCALIZATION: Record<string, LocalizedRunbook> = {
   },
 };
 
-export function formatAlertMessage(alert: AdminOpsAlertDto): string {
-  const { kind, context } = alert;
-
-  switch (kind) {
-    case 'PendingApprovalBacklog':
-      return `الحجز ${context['bookingId']} ينتظر الموافقة منذ ${context['ageHours']} ساعة.`;
-    case 'CancellationRequestNearAutoDecline':
-      return `طلب الإلغاء ${context['cancellationRequestId']} للحجز ${context['bookingId']} سيُرفض تلقائيًا خلال ${context['minutesRemaining']} دقيقة.`;
-    case 'RefundDueAgeing':
-      return `يوجد مبلغ مستحق للاسترداد لعملية الدفع ${context['paymentId']}، ولم يتم تسجيل الاسترداد بعد مرور ${context['ageHours']} ساعة.`;
-    case 'OutboxDeadLetter':
-      return `تعذر إرسال رسالة البريد ${context['messageId']} (${context['messageType']}).`;
-    case 'OutboxDeadLetterBurst':
-      return `تعذر إرسال ${context['deadLetterCount']} رسالة بريد خلال آخر ${context['windowHours']} ساعة.`;
-    case 'JobFailure':
-      return `سجلت المهمة الخلفية ${context['jobName']} فشلًا في ${context['lastFailureAtUtc']}.`;
-    case 'JobHeartbeatStale': {
-      const stalenessMinutes = context['stalenessMinutes'];
-      if (stalenessMinutes === 'unknown') {
-        return `المهمة الخلفية ${context['jobName']} لم تسجل أي نجاح حتى الآن.`;
-      }
-
-      return `آخر نجاح للمهمة الخلفية ${context['jobName']} كان منذ ${stalenessMinutes} دقيقة، أي أكثر من ${context['intervalMultiplier']} مرة من الفترة المتوقعة.`;
-    }
-    default:
-      return alert.message;
+export function formatOpsUtcDateTime(isoUtc: string): string {
+  const date = new Date(isoUtc);
+  if (Number.isNaN(date.getTime())) {
+    return isoUtc;
   }
+
+  const dayLabel = `${ARABIC_DAY_LABELS[date.getDay()]} ${formatDateTime(date, {
+    day: 'numeric',
+    month: 'long',
+  })}`;
+  const timeLabel = formatDateTime(date, {
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+
+  return `${dayLabel} · ${timeLabel}`;
 }
 
 export function localizeRunbook(runbook: AdminOpsRunbookDto): LocalizedRunbook {
@@ -161,6 +168,10 @@ export function localizeRunbook(runbook: AdminOpsRunbookDto): LocalizedRunbook {
 export function formatContextValue(key: string, value: string): string {
   if (key === 'stalenessMinutes' && value === 'unknown') {
     return 'غير معروف';
+  }
+
+  if (UTC_CONTEXT_KEYS.has(key)) {
+    return formatOpsUtcDateTime(value);
   }
 
   return value;
@@ -218,7 +229,7 @@ export function compareAlertsBySeverity(a: AdminOpsAlertDto, b: AdminOpsAlertDto
     return severityDiff;
   }
 
-  return formatAlertMessage(a).localeCompare(formatAlertMessage(b));
+  return formatAlertKind(a.kind).localeCompare(formatAlertKind(b.kind));
 }
 
 export function countAlertsBySeverity(alerts: AdminOpsAlertDto[]): {

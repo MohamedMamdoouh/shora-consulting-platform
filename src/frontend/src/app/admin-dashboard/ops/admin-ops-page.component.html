@@ -10,6 +10,24 @@
 
       <button type="button" class="btn" (click)="loadOpsData()">تحديث الحالة</button>
     </div>
+
+    <aside class="admin-ops__guide" aria-label="شرح التنبيهات">
+      <h3 class="admin-ops__guide-title">كيف تقرأ التنبيهات؟</h3>
+      <ul class="admin-ops__guide-list">
+        <li>
+          <strong>تحذير / حرج:</strong>
+          درجة إلحاح التنبيه. «حرج» يعني أن المشكلة أكثر استعجالًا وتحتاج متابعة أسرع.
+        </li>
+        <li>
+          <strong>سبب ظهور التنبيه:</strong>
+          الشرط الذي جعل النظام يُظهر التنبيه (مثلًا: مر وقت طويل على حجز معلق).
+        </li>
+        <li>
+          <strong>الوقت المطلوب للاستجابة:</strong>
+          المهلة المتوقعة للتعامل مع التنبيه بعد ظهوره — وليس وقت ظهور التنبيه نفسه.
+        </li>
+      </ul>
+    </aside>
   </header>
 
   @let state = pageState();
@@ -44,7 +62,7 @@
         </div>
 
         <ul class="admin-ops__list">
-          @for (alert of state.alerts; track alert.message + alert.runbookId + alert.severity) {
+          @for (alert of state.alerts; track alert.kind + alert.runbookId + alert.severity) {
             <li class="admin-ops__card admin-ops__card--{{ severityCssModifier(alert.severity) }}">
               <div class="admin-ops__card-header">
                 <span
@@ -56,8 +74,6 @@
                 </span>
                 <h3>{{ formatAlertKind(alert.kind) }}</h3>
               </div>
-
-              <p class="admin-ops__message">{{ formatAlertMessage(alert) }}</p>
 
               @if (formatContextEntries(alert.context).length > 0) {
                 <dl class="admin-ops__context">
@@ -76,7 +92,9 @@
                   <summary>عرض خطوات التعامل</summary>
 
                   <div class="admin-ops__runbook-body">
-                    <p><strong>الوقت المطلوب للاستجابة:</strong> {{ localizedRunbook.responseSla }}</p>
+                    <p>
+                      <strong>الوقت المطلوب للاستجابة:</strong> {{ localizedRunbook.responseSla }}
+                    </p>
                     <p><strong>سبب ظهور التنبيه:</strong> {{ localizedRunbook.trigger }}</p>
 
                     <ol class="admin-ops__steps">

@@ -8,7 +8,6 @@ import {
   compareAlertsBySeverity,
   countAlertsBySeverity,
   formatAlertKind,
-  formatAlertMessage,
   formatAlertSeverity,
   formatContextEntries,
   getAlertActionRoute,
@@ -38,7 +37,6 @@ export class AdminOpsPageComponent implements OnInit {
   readonly pageState = signal<PageState>({ status: 'loading' });
 
   readonly formatAlertKind = formatAlertKind;
-  readonly formatAlertMessage = formatAlertMessage;
   readonly formatAlertSeverity = formatAlertSeverity;
   readonly formatContextEntries = formatContextEntries;
   readonly getAlertActionRoute = getAlertActionRoute;

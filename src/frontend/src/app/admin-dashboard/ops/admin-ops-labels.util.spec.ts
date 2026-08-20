@@ -3,10 +3,10 @@ import {
   compareAlertsBySeverity,
   countAlertsBySeverity,
   formatAlertKind,
-  formatAlertMessage,
   formatAlertSeverity,
   formatContextKey,
   formatContextValue,
+  formatOpsUtcDateTime,
   getAlertActionRoute,
   localizeRunbook,
   severityCssModifier,
@@ -48,22 +48,10 @@ describe('admin ops labels util', () => {
     expect(formatContextValue('bookingId', 'abc')).toBe('abc');
   });
 
-  it('builds Arabic alert messages from kind and context', () => {
-    expect(
-      formatAlertMessage(
-        alert({
-          kind: 'RefundDueAgeing',
-          context: {
-            bookingId: 'booking-1',
-            paymentId: 'payment-1',
-            cancelledAtUtc: '2026-08-14T13:19:16Z',
-            ageHours: '138.9',
-          },
-        }),
-      ),
-    ).toBe(
-      'يوجد مبلغ مستحق للاسترداد لعملية الدفع payment-1، ولم يتم تسجيل الاسترداد بعد مرور 138.9 ساعة.',
-    );
+  it('formats utc context values with local arabic day labels', () => {
+    const formatted = formatContextValue('cancelledAtUtc', '2026-08-14T13:19:16.3955350Z');
+    expect(formatted).toContain('·');
+    expect(formatOpsUtcDateTime('not-a-date')).toBe('not-a-date');
   });
 
   it('localizes runbooks by id', () => {

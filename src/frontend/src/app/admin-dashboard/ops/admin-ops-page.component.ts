@@ -11,6 +11,7 @@ import {
   formatAlertSeverity,
   formatContextEntries,
   getAlertActionRoute,
+  getAlertTrackKey,
   localizeRunbook,
   severityCssModifier,
 } from './admin-ops-labels.util';
@@ -40,6 +41,7 @@ export class AdminOpsPageComponent implements OnInit {
   readonly formatAlertSeverity = formatAlertSeverity;
   readonly formatContextEntries = formatContextEntries;
   readonly getAlertActionRoute = getAlertActionRoute;
+  readonly getAlertTrackKey = getAlertTrackKey;
   readonly localizeRunbook = localizeRunbook;
   readonly severityCssModifier = severityCssModifier;
 

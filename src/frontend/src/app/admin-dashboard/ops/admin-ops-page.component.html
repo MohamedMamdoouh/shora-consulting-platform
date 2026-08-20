@@ -62,7 +62,7 @@
         </div>
 
         <ul class="admin-ops__list">
-          @for (alert of state.alerts; track alert.kind + alert.runbookId + alert.severity) {
+          @for (alert of state.alerts; track getAlertTrackKey(alert)) {
             <li class="admin-ops__card admin-ops__card--{{ severityCssModifier(alert.severity) }}">
               <div class="admin-ops__card-header">
                 <span

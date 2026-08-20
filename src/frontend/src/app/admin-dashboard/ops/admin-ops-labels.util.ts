@@ -193,6 +193,15 @@ export function getAlertActionRoute(alert: AdminOpsAlertDto): string | null {
   return BOOKINGS_LINK_KINDS.has(alert.kind) ? '/admin/bookings' : null;
 }
 
+export function getAlertTrackKey(alert: AdminOpsAlertDto): string {
+  const contextIdentity = Object.keys(alert.context)
+    .sort()
+    .map((key) => `${key}=${alert.context[key]}`)
+    .join('&');
+
+  return `${alert.kind}|${alert.runbookId}|${alert.severity}|${contextIdentity}|${alert.message}`;
+}
+
 export function compareAlertsBySeverity(a: AdminOpsAlertDto, b: AdminOpsAlertDto): number {
   const severityRank = (severity: string) =>
     severity === 'Critical' ? 0 : severity === 'Warning' ? 1 : 2;

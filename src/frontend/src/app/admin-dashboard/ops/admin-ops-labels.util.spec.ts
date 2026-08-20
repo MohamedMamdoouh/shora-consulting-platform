@@ -7,6 +7,7 @@ import {  compareAlertsBySeverity,
   formatContextKey,
   formatContextValue,
   getAlertActionRoute,
+  getAlertTrackKey,
   localizeRunbook,
   severityCssModifier,
 } from './admin-ops-labels.util';
@@ -89,5 +90,30 @@ describe('admin ops labels util', () => {
   it('links booking-related alerts to the bookings page', () => {
     expect(getAlertActionRoute(alert({ kind: 'PendingApprovalBacklog' }))).toBe('/admin/bookings');
     expect(getAlertActionRoute(alert({ kind: 'JobFailure' }))).toBeNull();
+  });
+
+  it('builds unique track keys for same-kind alerts with different context', () => {
+    const first = getAlertTrackKey(
+      alert({
+        context: { bookingId: 'booking-1', ageHours: '8.0' },
+        message: 'Booking booking-1 has been PendingApproval for more than 6 hours.',
+      }),
+    );
+    const second = getAlertTrackKey(
+      alert({
+        context: { bookingId: 'booking-2', ageHours: '9.5' },
+        message: 'Booking booking-2 has been PendingApproval for more than 6 hours.',
+      }),
+    );
+
+    expect(first).not.toBe(second);
+    expect(
+      getAlertTrackKey(
+        alert({
+          context: { bookingId: 'booking-1', ageHours: '8.0' },
+          message: 'Booking booking-1 has been PendingApproval for more than 6 hours.',
+        }),
+      ),
+    ).toBe(first);
   });
 });

@@ -4,6 +4,7 @@ import {
   formatLocalDateTimeWithDay,
   formatLocalDateWithDay,
   formatLocalTime,
+  formatZonedDateKey,
 } from './app-locale';
 
 describe('app locale date formatting', () => {
@@ -25,5 +26,10 @@ describe('app locale date formatting', () => {
 
   it('returns invalid string values unchanged', () => {
     expect(formatLocalDateTimeWithDay('not-a-date')).toBe('not-a-date');
+  });
+
+  it('builds cairo calendar keys around midnight independently of the host timezone', () => {
+    expect(formatZonedDateKey('2026-08-13T20:00:00.000Z')).toBe('2026-08-13');
+    expect(formatZonedDateKey('2026-08-13T21:00:00.000Z')).toBe('2026-08-14');
   });
 });

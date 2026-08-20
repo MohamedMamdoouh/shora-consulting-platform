@@ -40,7 +40,7 @@ export class PaymentInstructionsComponent implements OnInit {
   async onReceiptSubmitted(): Promise<void> {
     await this.confirmDialog.result({
       message: this.copy.booking.receiptSubmitted,
-      redirectTo: ['/dashboard'],
+      redirectTo: ['/dashboard', 'pending'],
     });
   }
 

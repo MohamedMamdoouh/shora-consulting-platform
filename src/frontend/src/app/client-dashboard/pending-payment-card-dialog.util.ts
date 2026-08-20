@@ -6,7 +6,7 @@ export function buildReceiptUploadedResult(
 ): ResultDialogOptions {
   return {
     message,
-    redirectTo: ['/dashboard'],
+    redirectTo: ['/dashboard', 'pending'],
     onComplete: onDashboardRefresh,
   };
 }

@@ -2,51 +2,24 @@ import { AbstractControl, ValidationErrors, ValidatorFn, Validators } from '@ang
 import {
   AvailabilityWindow,
   DAY_OF_WEEK_NAMES,
-  DayOfWeek,
   DayOfWeekName,
 } from '@contracts/availability';
 
-export const CONSULTANT_TIME_ZONE_LABEL = 'Africa/Cairo';
+import { APP_DISPLAY_TIME_ZONE } from '../../core/i18n/app-locale';
+import {
+  dayOfWeekIndex,
+  formatDayOfWeek,
+  parseDayOfWeek,
+} from '../../core/i18n/day-of-week.util';
 
-export const DAY_OF_WEEK_OPTIONS: ReadonlyArray<{ value: DayOfWeekName; label: string }> = [
-  { value: 'Sunday', label: 'الأحد' },
-  { value: 'Monday', label: 'الإثنين' },
-  { value: 'Tuesday', label: 'الثلاثاء' },
-  { value: 'Wednesday', label: 'الأربعاء' },
-  { value: 'Thursday', label: 'الخميس' },
-  { value: 'Friday', label: 'الجمعة' },
-  { value: 'Saturday', label: 'السبت' },
-];
+export { APP_DISPLAY_TIME_ZONE as CONSULTANT_TIME_ZONE_LABEL };
+export { dayOfWeekIndex, formatDayOfWeek, parseDayOfWeek };
 
-const DAY_NAME_BY_INDEX = DAY_OF_WEEK_NAMES;
-
-export function parseDayOfWeek(
-  value: DayOfWeek | string | number | null | undefined,
-): DayOfWeekName {
-  if (typeof value === 'number' && Number.isInteger(value) && value >= 0 && value <= 6) {
-    return DAY_NAME_BY_INDEX[value] ?? 'Monday';
-  }
-
-  if (typeof value === 'string') {
-    const trimmed = value.trim();
-    if (/^[0-6]$/.test(trimmed)) {
-      return DAY_NAME_BY_INDEX[Number(trimmed)] ?? 'Monday';
-    }
-
-    const match = DAY_OF_WEEK_OPTIONS.find(
-      (option) => option.value.toLowerCase() === trimmed.toLowerCase(),
-    );
-    if (match) {
-      return match.value;
-    }
-  }
-
-  return 'Monday';
-}
-
-export function dayOfWeekIndex(value: DayOfWeek | string | number | null | undefined): number {
-  return DAY_NAME_BY_INDEX.indexOf(parseDayOfWeek(value));
-}
+export const DAY_OF_WEEK_OPTIONS: ReadonlyArray<{ value: DayOfWeekName; label: string }> =
+  DAY_OF_WEEK_NAMES.map((value, index) => ({
+    value,
+    label: formatDayOfWeek(index),
+  }));
 
 export function sortWindows(windows: AvailabilityWindow[]): AvailabilityWindow[] {
   return [...windows].sort((left, right) => {
@@ -57,11 +30,6 @@ export function sortWindows(windows: AvailabilityWindow[]): AvailabilityWindow[]
 
     return left.startTime.localeCompare(right.startTime);
   });
-}
-
-export function formatDayOfWeek(dayOfWeek: DayOfWeek | string | number): string {
-  const name = parseDayOfWeek(dayOfWeek);
-  return DAY_OF_WEEK_OPTIONS.find((option) => option.value === name)?.label ?? name;
 }
 
 export function formatLocalTime(time: string): string {

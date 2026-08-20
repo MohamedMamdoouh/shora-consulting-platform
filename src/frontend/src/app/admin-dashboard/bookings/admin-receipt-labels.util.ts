@@ -1,5 +1,5 @@
 import { AdminPaymentReceiptItem, PaymentMethod } from '@contracts/payments';
-import { formatCurrency, formatDateTime } from '../../core/i18n/app-locale';
+import { formatCurrency } from '../../core/i18n/app-locale';
 
 export {
   formatReceiptDeclineReasonCode,
@@ -75,13 +75,6 @@ export function findPendingReceipt(
   receipts: AdminPaymentReceiptItem[],
 ): AdminPaymentReceiptItem | undefined {
   return receipts.find((receipt) => receipt.reviewStatus === 'Pending');
-}
-
-export function formatReceiptUploadedAt(uploadedAtUtc: string): string {
-  return formatDateTime(uploadedAtUtc, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  });
 }
 
 export function formatMoney(amount: number, currency: string): string {

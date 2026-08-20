@@ -1,12 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import {
-  compareAlertsBySeverity,
+import { formatDisplayUtcDateTime } from '../../core/i18n/app-locale';
+import {  compareAlertsBySeverity,
   countAlertsBySeverity,
   formatAlertKind,
   formatAlertSeverity,
   formatContextKey,
   formatContextValue,
-  formatOpsUtcDateTime,
   getAlertActionRoute,
   localizeRunbook,
   severityCssModifier,
@@ -49,9 +48,10 @@ describe('admin ops labels util', () => {
   });
 
   it('formats utc context values with local arabic day labels', () => {
-    const formatted = formatContextValue('cancelledAtUtc', '2026-08-14T13:19:16.3955350Z');
-    expect(formatted).toContain('·');
-    expect(formatOpsUtcDateTime('not-a-date')).toBe('not-a-date');
+    expect(formatContextValue('cancelledAtUtc', '2026-08-13T12:49:00.000Z')).toBe(
+      'الخميس، 13 أغسطس، 2026 · 3:49 م',
+    );
+    expect(formatDisplayUtcDateTime('not-a-date')).toBe('not-a-date');
   });
 
   it('localizes runbooks by id', () => {

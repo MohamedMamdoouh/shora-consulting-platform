@@ -2,9 +2,7 @@ import { AbstractControl, ValidationErrors, ValidatorFn, Validators } from '@ang
 
 import { BlockedDate } from '@contracts/availability';
 
-import { formatDateTime } from '../../core/i18n/app-locale';
-
-import { CONSULTANT_TIME_ZONE_LABEL } from './availability-window.util';
+import { formatDisplayUtcDateTime, APP_DISPLAY_TIME_ZONE } from '../../core/i18n/app-locale';
 
 const MAX_REASON_LENGTH = 500;
 
@@ -73,27 +71,17 @@ export function sortBlockedDates(blockedDates: BlockedDate[]): BlockedDate[] {
 }
 
 export function formatBlockedRangeSummary(blockedDate: BlockedDate): string {
-  const start = formatUtcInstant(blockedDate.startUtc);
+  const start = formatDisplayUtcDateTime(blockedDate.startUtc);
 
-  const end = formatUtcInstant(blockedDate.endUtc);
+  const end = formatDisplayUtcDateTime(blockedDate.endUtc);
 
   const reason = blockedDate.reason ? ` — ${blockedDate.reason}` : '';
 
   return `${start} – ${end}${reason}`;
 }
 
-export function formatUtcInstant(isoUtc: string): string {
-  return formatDateTime(isoUtc, {
-    timeZone: CONSULTANT_TIME_ZONE_LABEL,
-
-    dateStyle: 'medium',
-
-    timeStyle: 'short',
-  });
-}
-
 export function utcIsoToDatetimeLocal(isoUtc: string): string {
-  const parts = getZonedDateTimeParts(new Date(isoUtc), CONSULTANT_TIME_ZONE_LABEL);
+  const parts = getZonedDateTimeParts(new Date(isoUtc), APP_DISPLAY_TIME_ZONE);
 
   return zonedPartsToDatetimeLocal(parts);
 }
@@ -110,7 +98,7 @@ export function datetimeLocalToUtcIso(localValue: string): string {
   let utcMs = Date.UTC(year, month - 1, day, hour, minute);
 
   for (let iteration = 0; iteration < 2; iteration++) {
-    const offsetMs = getTimeZoneOffsetMs(new Date(utcMs), CONSULTANT_TIME_ZONE_LABEL);
+    const offsetMs = getTimeZoneOffsetMs(new Date(utcMs), APP_DISPLAY_TIME_ZONE);
 
     utcMs = Date.UTC(year, month - 1, day, hour, minute) - offsetMs;
   }
@@ -119,7 +107,7 @@ export function datetimeLocalToUtcIso(localValue: string): string {
 }
 
 export function defaultBlockedRangeLocal(): { startUtc: string; endUtc: string } {
-  const cairoNow = getZonedDateTimeParts(new Date(), CONSULTANT_TIME_ZONE_LABEL);
+  const cairoNow = getZonedDateTimeParts(new Date(), APP_DISPLAY_TIME_ZONE);
 
   const year = Number(cairoNow['year']);
 

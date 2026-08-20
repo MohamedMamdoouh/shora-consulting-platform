@@ -1,6 +1,6 @@
 import { AdminBookingListItem, CancellationDecisionReasonCode } from '@contracts/booking';
 import { APP_COPY } from '../../core/i18n/app-copy.constants';
-import { formatDateTime, formatNumber } from '../../core/i18n/app-locale';
+import { formatNumber } from '../../core/i18n/app-locale';
 
 export const CANCELLATION_DECISION_REASON_OPTIONS: ReadonlyArray<{
   value: CancellationDecisionReasonCode;
@@ -27,13 +27,6 @@ export function canDirectCancelBooking(item: AdminBookingListItem, nowMs = Date.
     default:
       return false;
   }
-}
-
-export function formatRequestedAt(requestedAtUtc: string): string {
-  return formatDateTime(requestedAtUtc, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  });
 }
 
 export function formatRemainingTime(deadlineUtc: string, nowMs = Date.now()): string {

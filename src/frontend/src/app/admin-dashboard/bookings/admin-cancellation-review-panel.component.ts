@@ -6,10 +6,10 @@ import { readApiError } from '../../core/api/api-error.util';
 import { AdminBookingsService } from '../../core/admin/admin-bookings.service';
 import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
 import { APP_COPY } from '../../core/i18n/app-copy.constants';
+import { formatDisplayUtcDateTime } from '../../core/i18n/app-locale';
 import {
   CANCELLATION_DECISION_REASON_OPTIONS,
   formatRemainingTime,
-  formatRequestedAt,
 } from './admin-cancellation-labels.util';
 
 @Component({
@@ -35,7 +35,7 @@ export class AdminCancellationReviewPanelComponent {
   readonly showDeclineForm = signal(false);
 
   readonly declineReasonOptions = CANCELLATION_DECISION_REASON_OPTIONS;
-  readonly formatRequestedAt = formatRequestedAt;
+  readonly formatRequestedAt = formatDisplayUtcDateTime;
   readonly formatRemainingTime = formatRemainingTime;
 
   readonly declineForm = this.fb.nonNullable.group({

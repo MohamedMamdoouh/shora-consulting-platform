@@ -1,28 +1,20 @@
 import { MyBookingListItem } from '@contracts/booking';
-import { formatDayOfWeek } from '../admin-dashboard/availability/availability-window.util';
-import { formatDateTime } from '../core/i18n/app-locale';
+import {
+  APP_DISPLAY_TIME_ZONE,
+  formatLocalDateWithDay,
+  formatLocalTime,
+} from '../core/i18n/app-locale';
+
+const DISPLAY_TIME_ZONE = { timeZone: APP_DISPLAY_TIME_ZONE };
 
 export function formatSlotRange(item: Pick<MyBookingListItem, 'slotStartUtc' | 'slotEndUtc'>): string {
-  const start = new Date(item.slotStartUtc);
-  const date = `${formatDayOfWeek(start.getDay())} ${formatDateTime(start, {
-    day: 'numeric',
-    month: 'long',
-  })}`;
-  const startTime = formatDateTime(item.slotStartUtc, {
-    hour: 'numeric',
-    minute: '2-digit',
-  });
-  const endTime = formatDateTime(item.slotEndUtc, {
-    hour: 'numeric',
-    minute: '2-digit',
-  });
+  const date = formatLocalDateWithDay(item.slotStartUtc, DISPLAY_TIME_ZONE);
+  const startTime = formatLocalTime(item.slotStartUtc, DISPLAY_TIME_ZONE);
+  const endTime = formatLocalTime(item.slotEndUtc, DISPLAY_TIME_ZONE);
 
   return `${date} · ${startTime} – ${endTime}`;
 }
 
 export function formatSlotStartTime(slotStartUtc: string): string {
-  return formatDateTime(slotStartUtc, {
-    hour: 'numeric',
-    minute: '2-digit',
-  });
+  return formatLocalTime(slotStartUtc, DISPLAY_TIME_ZONE);
 }

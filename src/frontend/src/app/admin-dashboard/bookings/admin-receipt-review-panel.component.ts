@@ -17,6 +17,7 @@ import { AdminBookingsService } from '../../core/admin/admin-bookings.service';
 import { ConfirmDialogService } from '../../core/ui/confirm-dialog.service';
 
 import { APP_COPY } from '../../core/i18n/app-copy.constants';
+import { formatDisplayUtcDateTime } from '../../core/i18n/app-locale';
 
 import {
   RECEIPT_DECLINE_REASON_OPTIONS,
@@ -27,7 +28,6 @@ import {
   formatPaymentStatus,
   formatReceiptDeclineReasonCode,
   formatReceiptReviewStatus,
-  formatReceiptUploadedAt,
   formatReviewWarning,
 } from './admin-receipt-labels.util';
 
@@ -86,7 +86,7 @@ export class AdminReceiptReviewPanelComponent implements OnInit {
 
   readonly formatReceiptDeclineReasonCode = formatReceiptDeclineReasonCode;
 
-  readonly formatReceiptUploadedAt = formatReceiptUploadedAt;
+  readonly formatReceiptUploadedAt = formatDisplayUtcDateTime;
 
   readonly formatReviewWarning = formatReviewWarning;
 

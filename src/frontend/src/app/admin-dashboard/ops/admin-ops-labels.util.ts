@@ -1,5 +1,5 @@
 import { AdminOpsAlertDto, AdminOpsRunbookDto } from '@contracts/ops';
-import { formatDateTime } from '../../core/i18n/app-locale';
+import { formatDisplayUtcDateTime } from '../../core/i18n/app-locale';
 
 const ALERT_KIND_LABELS: Record<string, string> = {
   PendingApprovalBacklog: 'تراكم الحجوزات التي تنتظر الموافقة',
@@ -45,16 +45,6 @@ const UTC_CONTEXT_KEYS = new Set([
   'cancelledAtUtc',
   'lastFailureAtUtc',
 ]);
-
-const ARABIC_DAY_LABELS = [
-  'الأحد',
-  'الإثنين',
-  'الثلاثاء',
-  'الأربعاء',
-  'الخميس',
-  'الجمعة',
-  'السبت',
-] as const;
 
 type LocalizedRunbook = {
   responseSla: string;
@@ -134,24 +124,6 @@ const RUNBOOK_LOCALIZATION: Record<string, LocalizedRunbook> = {
   },
 };
 
-export function formatOpsUtcDateTime(isoUtc: string): string {
-  const date = new Date(isoUtc);
-  if (Number.isNaN(date.getTime())) {
-    return isoUtc;
-  }
-
-  const dayLabel = `${ARABIC_DAY_LABELS[date.getDay()]} ${formatDateTime(date, {
-    day: 'numeric',
-    month: 'long',
-  })}`;
-  const timeLabel = formatDateTime(date, {
-    hour: 'numeric',
-    minute: '2-digit',
-  });
-
-  return `${dayLabel} · ${timeLabel}`;
-}
-
 export function localizeRunbook(runbook: AdminOpsRunbookDto): LocalizedRunbook {
   const localized = RUNBOOK_LOCALIZATION[runbook.id];
   if (!localized) {
@@ -171,7 +143,7 @@ export function formatContextValue(key: string, value: string): string {
   }
 
   if (UTC_CONTEXT_KEYS.has(key)) {
-    return formatOpsUtcDateTime(value);
+    return formatDisplayUtcDateTime(value);
   }
 
   return value;

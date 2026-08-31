@@ -7,9 +7,9 @@ CI/CD behavior for Shora. For hosting setup and secrets, see [docs/deployment.md
 | Workflow   | File                       | Runs when                   | Deploys?                                                                   |
 | ---------- | -------------------------- | --------------------------- | -------------------------------------------------------------------------- |
 | **CI**     | [`ci.yml`](ci.yml)         | Every push and PR to `main` | No — validates code only                                                   |
-| **Deploy** | [`deploy.yml`](deploy.yml) | Push to `main`              | Yes — builds publish artifact, pushes container to GHCR, redeploys Railway |
+| **Deploy** | [`deploy.yml`](deploy.yml) | Push to `main`              | Yes — builds publish artifact, pushes container to GHCR, triggers Render |
 
-**CI** and **Deploy** serve different jobs. CI keeps `main` healthy; Deploy ships a release after Railway, Neon/Azure Storage, and GitHub secrets exist.
+**CI** and **Deploy** serve different jobs. CI keeps `main` healthy; Deploy ships a release after Render, Neon/Azure Storage, and GitHub secrets exist.
 
 ---
 
@@ -45,14 +45,14 @@ Stop any running `Shora.Api` process before building the backend — a running A
 
 Runs on **every push to `main`**. There is no manual dispatch — merging to `main` is the only deploy trigger.
 
-The deploy job fails if `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`, or `RAILWAY_TOKEN` is missing (no silent skip).
+The deploy job fails if `PRODUCTION_URL` or `RENDER_DEPLOY_HOOK_URL` is missing (no silent skip).
 
-**Concurrency:** only one Deploy run per branch at a time. A newer push to `main` **cancels** the in-progress run (build or Railway redeploy) via `cancel-in-progress: true` in [`deploy.yml`](deploy.yml). The latest commit is the only one that should finish and call `railway redeploy`.
+**Concurrency:** only one Deploy run per branch at a time. A newer push to `main` **cancels** the in-progress run (build or Render deploy hook) via `cancel-in-progress: true` in [`deploy.yml`](deploy.yml). The latest commit is the only one that should finish and trigger Render.
 
 ### What the workflow does
 
 1. **Build job** — `npm ci` + production Angular build → copy into `Shora.Api/wwwroot/` → `dotnet publish` → upload artifact.
-2. **Deploy job** — download artifact → build [`Dockerfile`](../Dockerfile) → push `ghcr.io/<lowercase-repo>:production` (repository path lowercased for GHCR) → `railway redeploy`.
+2. **Deploy job** — download artifact → build [`Dockerfile`](../Dockerfile) → push `ghcr.io/<lowercase-repo>:production` (repository path lowercased for GHCR) → POST Render deploy hook.
 
 After deploy, verify manually: `GET /api/v1/health`, `/`, and `/about` on `PRODUCTION_URL`.
 
@@ -61,10 +61,10 @@ After deploy, verify manually: `GET /api/v1/health`, `/`, and `/about` on `PRODU
 See [docs/deployment.md](../docs/deployment.md) for:
 
 1. Neon PostgreSQL + Azure Blob storage
-2. Railway project, service, domain, and Docker image source
-3. Railway environment variables
-4. GHCR pull access
-5. GitHub `RAILWAY_*` secrets and variables
+2. Render Blueprint (`render.yaml`), service, and domain
+3. Render environment variables
+4. GHCR pull access (registry credential or public package)
+5. GitHub `RENDER_DEPLOY_HOOK_URL` secret and `PRODUCTION_URL` variable
 6. Branch protection on `main`
 
 ---

@@ -123,7 +123,7 @@ public class HealthEndpointTests : IDisposable
     }
 
     [Fact]
-    public async Task Get_health_with_railway_healthcheck_host_returns_ok_when_allowed()
+    public async Task Get_health_with_non_primary_host_returns_ok_when_allowed()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var connectionString = _sqlServer.CreateDatabaseAsync().GetAwaiter().GetResult();
@@ -136,7 +136,7 @@ public class HealthEndpointTests : IDisposable
             AllowAutoRedirect = false
         });
         using var request = new HttpRequestMessage(HttpMethod.Get, "/api/v1/health");
-        request.Headers.Host = "healthcheck.railway.app";
+        request.Headers.Host = "healthcheck.example.com";
 
         var response = await client.SendAsync(request, cancellationToken);
 
@@ -149,7 +149,7 @@ public class HealthEndpointTests : IDisposable
         {
             builder.UseSetting(WebHostDefaults.EnvironmentKey, Environments.Production);
             builder.UseSetting("ConnectionStrings:DefaultConnection", connectionString);
-            builder.UseSetting("AllowedHosts", "mahmoudelbanna.up.railway.app;healthcheck.railway.app");
+            builder.UseSetting("AllowedHosts", "shora.onrender.com;healthcheck.example.com");
             builder.UseSetting("Jwt:SigningKey", "test-signing-key-min-32-characters-long!");
             builder.ConfigureAppConfiguration((_, config) =>
             {
@@ -158,8 +158,8 @@ public class HealthEndpointTests : IDisposable
                     ["Jwt:Issuer"] = "Shora",
                     ["Jwt:Audience"] = "Shora.Web",
                     ["Jwt:SigningKey"] = "test-signing-key-min-32-characters-long!",
-                    ["Frontend:BaseUrl"] = "https://mahmoudelbanna.up.railway.app",
-                    ["Cors:AllowedOrigins:0"] = "https://mahmoudelbanna.up.railway.app",
+                    ["Frontend:BaseUrl"] = "https://shora.onrender.com",
+                    ["Cors:AllowedOrigins:0"] = "https://shora.onrender.com",
                     ["Email:ApiKey"] = "xkeysib-test",
                     ["Email:FromAddress"] = "noreply@example.com",
                     ["Storage:ConnectionString"] = "UseDevelopmentStorage=true",

@@ -56,7 +56,7 @@ jobs:
           retention-days: 7
 
   deploy:
-    name: Deploy to Railway
+    name: Deploy to Render
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -67,7 +67,6 @@ jobs:
     outputs:
       production_url: ${{ steps.deploy-meta.outputs.production_url }}
     env:
-      RAILWAY_SERVICE_ID: ${{ vars.RAILWAY_SERVICE_ID }}
       PRODUCTION_URL: ${{ vars.PRODUCTION_URL }}
     steps:
       - uses: actions/checkout@v4
@@ -75,20 +74,16 @@ jobs:
       - id: deploy-meta
         run: echo "production_url=${PRODUCTION_URL}" >> "$GITHUB_OUTPUT"
 
-      - name: Require Railway configuration
+      - name: Require Render configuration
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: |
-          if [ -z "$RAILWAY_SERVICE_ID" ]; then
-            echo "::error::RAILWAY_SERVICE_ID repository variable is not set. See docs/deployment.md"
-            exit 1
-          fi
           if [ -z "$PRODUCTION_URL" ]; then
-            echo "::error::PRODUCTION_URL repository variable is not set (e.g. https://your-app.up.railway.app)."
+            echo "::error::PRODUCTION_URL repository variable is not set (e.g. https://shora.onrender.com)."
             exit 1
           fi
-          if [ -z "$RAILWAY_TOKEN" ]; then
-            echo "::error::RAILWAY_TOKEN secret is not set on the production environment."
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "::error::RENDER_DEPLOY_HOOK_URL secret is not set on the production environment. See docs/deployment.md"
             exit 1
           fi
 
@@ -118,7 +113,7 @@ jobs:
           push: true
           tags: ${{ steps.image.outputs.tag }}
 
-      - name: Redeploy on Railway
-        run: npx -y @railway/cli@latest redeploy --service "$RAILWAY_SERVICE_ID" --yes
+      - name: Trigger Render deploy
+        run: curl --fail --silent --show-error --request POST "$RENDER_DEPLOY_HOOK_URL"
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}

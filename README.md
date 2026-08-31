@@ -4,7 +4,7 @@
 
 RTL personal practice site for one-to-one relationship consulting sessions. Clients browse availability, reserve a session, pay by manual bank transfer (Vodafone Cash or InstaPay), upload a receipt, and receive the session by voice call or chat. A single **Admin** (the practitioner) manages settings, availability, receipt approval, cancellations, and refunds.
 
-**Status:** MVP feature set is implemented in code (backend, frontend, CI/CD). Production hosting uses Railway + Neon PostgreSQL + Azure Blob Storage — see [Deployment](#23-deployment).
+**Status:** MVP feature set is implemented in code (backend, frontend, CI/CD). Production hosting uses Render + Neon PostgreSQL + Azure Blob Storage — see [Deployment](#23-deployment).
 
 ---
 
@@ -82,7 +82,7 @@ Design specs for maintainers live in [`specs/`](specs/). Operator deployment det
 | **Ops monitoring**         | Background health checks with admin alerts and runbooks at `/admin/ops`               |
 | **Transactional email**    | Auth emails (direct Brevo) + booking/payment emails (outbox with retry)               |
 | **Rate limiting**          | Per-endpoint per-IP limits on auth, availability, booking, receipts, cancellations    |
-| **CI/CD**                  | Path-filtered CI on PRs; deploy to Railway + GHCR on push to `main`                   |
+| **CI/CD**                  | Path-filtered CI on PRs; deploy to Render + GHCR on push to `main`                  |
 
 ---
 
@@ -106,8 +106,8 @@ Design specs for maintainers live in [`specs/`](specs/). Operator deployment det
 | Rate limiting        | ASP.NET Core Rate Limiter                                     | Abuse protection                           |
 | Testing              | xUnit v3, Testcontainers (PostgreSQL, Azurite)                | Unit + integration tests                   |
 | CI/CD                | GitHub Actions                                                | `ci.yml`, `deploy.yml`                     |
-| Container            | Docker (`mcr.microsoft.com/dotnet/aspnet:10.0`)               | Railway runtime image                      |
-| Hosting              | Railway                                                       | Compute; serves API + `wwwroot` SPA        |
+| Container            | Docker (`mcr.microsoft.com/dotnet/aspnet:10.0`)               | Render runtime image                       |
+| Hosting              | Render                                                        | Compute; serves API + `wwwroot` SPA        |
 | Container registry   | GHCR                                                          | `ghcr.io/<owner>/<repo>:production`        |
 
 **Not used:** Stripe or other online payment gateways, Redis, message queues, docker-compose, separate staging environment.
@@ -157,7 +157,7 @@ Shora/
 
 Production runs as **one HTTPS origin**: the browser loads the Angular app and calls `/api/v1/*` on the same host. Refresh-token cookies use `SameSite=Strict`, which requires same-site deployment in MVP.
 
-The Railway container runs **Shora.Api** (HTTP + background jobs) and serves the Angular SPA from **wwwroot**. The API connects to **Neon PostgreSQL**, **Azure Blob Storage** (receipts), and **Brevo** for email.
+The Render container runs **Shora.Api** (HTTP + background jobs) and serves the Angular SPA from **wwwroot**. The API connects to **Neon PostgreSQL**, **Azure Blob Storage** (receipts), and **Brevo** for email.
 
 **Dependency direction (backend):**
 
@@ -559,7 +559,7 @@ Full conventions: [`specs/00-api-conventions.md`](specs/00-api-conventions.md).
 
 ## 17. Configuration
 
-Use `__` (double underscore) for nested env vars on Railway (e.g. `Jwt__SigningKey`).
+Use `__` (double underscore) for nested env vars on Render (e.g. `Jwt__SigningKey`).
 
 ### Required in Production (`ValidateOnStart`)
 
@@ -764,7 +764,7 @@ Tests set `BackgroundJobs:Enabled = false` where needed to avoid background inte
 | ---------------------- | --------------------------------------------------------------------- |
 | **Dockerfile**         | Single-stage runtime image; copies pre-built `./publish`              |
 | **Base image**         | `mcr.microsoft.com/dotnet/aspnet:10.0`                                |
-| **Port**               | `8080` (Railway sets `PORT`)                                          |
+| **Port**               | `8080` (Render sets `PORT`; `ASPNETCORE_HTTP_PORTS=8080` in Blueprint) |
 | **docker-compose**     | **Not present** in repository                                         |
 | **Local Docker usage** | Azurite for dev; Testcontainers for tests; full app image built in CI |
 
@@ -798,12 +798,11 @@ No secrets required. Docs-only changes skip unaffected jobs.
 
 Deploy sequence: push to `main` → build job (npm build, copy to wwwroot, dotnet publish, upload artifact) → deploy job (docker build, push `ghcr.io/<owner>/<repo>:production`, `railway redeploy`).
 
-| Secret / variable    | Location                                      |
-| -------------------- | --------------------------------------------- |
-| `RAILWAY_TOKEN`      | GitHub Environment secret on `production`     |
-| `RAILWAY_SERVICE_ID` | Repository variable                           |
-| `PRODUCTION_URL`     | Repository variable                           |
-| `DEPLOY_ENVIRONMENT` | Optional repo variable (default `production`) |
+| Secret / variable        | Location                                      |
+| ------------------------ | --------------------------------------------- |
+| `RENDER_DEPLOY_HOOK_URL` | GitHub Environment secret on `production`     |
+| `PRODUCTION_URL`         | Repository variable                           |
+| `DEPLOY_ENVIRONMENT`     | Optional repo variable (default `production`) |
 
 Detail: [`.github/workflows/README.md`](.github/workflows/README.md), [`specs/09-ci-cd-pipeline.md`](specs/09-ci-cd-pipeline.md).
 
@@ -813,7 +812,7 @@ Detail: [`.github/workflows/README.md`](.github/workflows/README.md), [`specs/09
 
 | Component       | Provider                       |
 | --------------- | ------------------------------ |
-| Compute + SPA   | Railway (single container)     |
+| Compute + SPA   | Render (single container)      |
 | Database        | Neon PostgreSQL                |
 | Receipt storage | Azure Blob (private container) |
 | Email           | Brevo (HTTPS API)              |
@@ -892,7 +891,7 @@ Always persist and compare business times in **UTC** on the server.
 | **Manual payments**                | No payment gateway fees/complexity for local transfers | Admin must review every receipt                                            |
 | **Outbox for transactional email** | Consistent with DB transactions                        | Delayed delivery (job interval)                                            |
 | **No repository layer**            | EF `DbContext` is the unit of work                     | Less abstraction, simpler codebase                                         |
-| **In-process background jobs**     | Single Railway container, no worker service            | No horizontal scaling of jobs                                              |
+| **In-process background jobs**     | Single Render container, no worker service             | No horizontal scaling of jobs                                              |
 | **Access token in memory**         | Reduces XSS token theft surface                        | Full page reload requires refresh call                                     |
 | **Manual TS contracts**            | No codegen for MVP                                     | Must keep C#/TS in sync manually                                           |
 | **Startup migrations**             | Simpler deploy pipeline                                | Bad migrations affect production immediately; rollback is forward-fix only |
@@ -907,7 +906,7 @@ Always persist and compare business times in **UTC** on the server.
 | Missing Azurite                                         | Receipt upload throws `NotImplementedException`                 |
 | Docker not running                                      | `dotnet test` fails (Testcontainers)                            |
 | `Cors__AllowedOrigins__0` ≠ `Frontend__BaseUrl` in prod | Startup validation fails                                        |
-| Neon URI connection string on Railway                   | Values with `=` may truncate                                    |
+| Neon URI connection string on Render                    | Values with `=` may truncate                                    |
 | Empty `googleClientId`                                  | Google button hidden (expected)                                 |
 | Forgetting to remove `AdminSeed__*`                     | Admin credentials remain in env                                 |
 | Running API during `dotnet build`                       | DLL lock errors                                                 |
@@ -935,17 +934,17 @@ Always persist and compare business times in **UTC** on the server.
 
 **Solution:** Start Azurite on port 10000; confirm `UseDevelopmentStorage=true` in Development config.
 
-### CORS validation error on Railway startup
+### CORS validation error on Render startup
 
-**Cause:** Railway vars still set to `http://localhost:4200`.
+**Cause:** Render vars still set to `http://localhost:4200`.
 
 **Solution:** Set `Frontend__BaseUrl` and `Cors__AllowedOrigins__0` to production HTTPS URL.
 
-### Deploy workflow fails on Railway token
+### Deploy workflow fails on Render deploy hook
 
-**Cause:** Account token used instead of project token, or secret on repo instead of Environment.
+**Cause:** `RENDER_DEPLOY_HOOK_URL` missing or invalid, or Render service not created yet.
 
-**Solution:** Create project token; store as Environment secret on `production`. See [`docs/deployment.md`](docs/deployment.md).
+**Solution:** Apply Blueprint, create deploy hook in Render Settings, store as Environment secret on `production`. See [`docs/deployment.md`](docs/deployment.md).
 
 ### `dotnet test` hangs or fails immediately
 

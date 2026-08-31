@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: shora
+    runtime: image
+    plan: free
+    region: oregon
+    healthCheckPath: /api/v1/health
+    image:
+      url: ghcr.io/mohamedmamdoouh/shora-consulting-platform:production
+    registryCredential:
+      fromRegistryCreds:
+        name: ghcr-shora
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_HTTP_PORTS
+        value: "8080"
+      - key: Storage__ReceiptContainer
+        value: receipts
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: Jwt__SigningKey
+        sync: false
+      - key: Frontend__BaseUrl
+        sync: false
+      - key: Cors__AllowedOrigins__0
+        sync: false
+      - key: AllowedHosts
+        sync: false
+      - key: Storage__ConnectionString
+        sync: false
+      - key: Email__ApiKey
+        sync: false
+      - key: Email__FromAddress
+        sync: false

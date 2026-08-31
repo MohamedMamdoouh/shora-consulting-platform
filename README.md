@@ -568,9 +568,9 @@ Use `__` (double underscore) for nested env vars on Render (e.g. `Jwt__SigningKe
 | `ASPNETCORE_ENVIRONMENT`               | Environment                          | `Production`                             |
 | `ConnectionStrings__DefaultConnection` | Neon PostgreSQL                      | `Host=...;Database=...;Ssl Mode=Require` |
 | `Jwt__SigningKey`                      | HMAC signing key (≥32 chars)         | `YOUR_RANDOM_SECRET_32_CHARS_MIN`        |
-| `Frontend__BaseUrl`                    | Public HTTPS URL (no trailing slash) | `https://your-app.up.railway.app`        |
+| `Frontend__BaseUrl`                    | Public HTTPS URL (no trailing slash) | `https://shora.onrender.com`             |
 | `Cors__AllowedOrigins__0`              | Must match `Frontend__BaseUrl`       | Same as above                            |
-| `AllowedHosts`                         | Hostname only                        | `your-app.up.railway.app`                |
+| `AllowedHosts`                         | Hostname only                        | `shora.onrender.com`                     |
 | `Storage__ConnectionString`            | Azure Blob                           | From Azure Portal / CLI                  |
 | `Storage__ReceiptContainer`            | Private container                    | `receipts`                               |
 | `Email__ApiKey`                        | Brevo API key                        | `xkeysib-...`                            |
@@ -796,7 +796,7 @@ No secrets required. Docs-only changes skip unaffected jobs.
 | Trigger | `push` to `main` only (no manual dispatch) |
 | Concurrency | One deploy per branch; newer push cancels in-progress |
 
-Deploy sequence: push to `main` → build job (npm build, copy to wwwroot, dotnet publish, upload artifact) → deploy job (docker build, push `ghcr.io/<owner>/<repo>:production`, `railway redeploy`).
+Deploy sequence: push to `main` → build job (npm build, copy to wwwroot, dotnet publish, upload artifact) → deploy job (docker build, push `ghcr.io/<owner>/<repo>:production`, Render deploy hook).
 
 | Secret / variable        | Location                                      |
 | ------------------------ | --------------------------------------------- |
@@ -1029,7 +1029,7 @@ Documented in code/specs (not a committed roadmap):
 | No horizontal scaling / Redis                        | MVP topology (`specs/08-cross-cutting-concerns.md`) |
 | `Google:ClientSecret` unused                         | Config present; ID-token flow only                  |
 | Base `appsettings.json` LocalDB placeholder          | Misleading default; PostgreSQL is actual engine     |
-| No automated post-deploy smoke tests in `deploy.yml` | Workflow ends at `railway redeploy`                 |
+| No automated post-deploy smoke tests in `deploy.yml` | Workflow ends at Render deploy hook                 |
 | SEO files (`robots.txt`, `sitemap.xml`) not shipped  | Documented in deployment guide                      |
 
 ---

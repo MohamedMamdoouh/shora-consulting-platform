@@ -11,7 +11,7 @@ public class CorsConfigurationBindingTests
         var config = BuildProductionConfig();
         var cors = BindCorsOptions(config);
 
-        Assert.Equal(["https://mahmoudelbanna.up.railway.app"], cors.AllowedOrigins);
+        Assert.Equal(["https://YOUR_PRODUCTION_HOST.onrender.com"], cors.AllowedOrigins);
     }
 
     [Fact]

@@ -39,6 +39,26 @@ function getLocalDayIndex(date: Date, timeZone?: string): number {
   return WEEKDAY_INDEX_BY_SHORT_LABEL[weekday] ?? date.getDay();
 }
 
+export function formatZonedDateKey(
+  value: Date | string | number,
+  timeZone: string = APP_DISPLAY_TIME_ZONE,
+): string {
+  const date = value instanceof Date ? value : new Date(value);
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-US', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    })
+      .formatToParts(date)
+      .filter((part) => part.type !== 'literal')
+      .map((part) => [part.type, part.value]),
+  );
+
+  return `${parts['year']}-${parts['month']}-${parts['day']}`;
+}
+
 export function formatLocalDateTimeWithDay(
   value: Date | string | number,
   options?: { timeZone?: string },

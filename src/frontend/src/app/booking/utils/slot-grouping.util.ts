@@ -4,6 +4,7 @@ import {
   formatDisplayUtcDateTime,
   formatLocalDateWithDay,
   formatLocalTime,
+  formatZonedDateKey,
 } from '../../core/i18n/app-locale';
 
 export interface SlotDayGroup {
@@ -19,7 +20,7 @@ export function groupSlotsByLocalDay(slots: AvailabilitySlot[]): SlotDayGroup[] 
 
   for (const slot of slots) {
     const start = new Date(slot.startTimeUtc);
-    const dateKey = localDateKey(start);
+    const dateKey = formatZonedDateKey(start, APP_DISPLAY_TIME_ZONE);
 
     const existing = groups.get(dateKey);
     if (existing) {
@@ -51,11 +52,4 @@ export function formatSlotTime(slot: AvailabilitySlot): string {
 
 export function formatSlotSummary(startTimeUtc: string): string {
   return formatDisplayUtcDateTime(startTimeUtc);
-}
-
-function localDateKey(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
 }

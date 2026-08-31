@@ -82,7 +82,7 @@ Design specs for maintainers live in [`specs/`](specs/). Operator deployment det
 | **Ops monitoring**         | Background health checks with admin alerts and runbooks at `/admin/ops`               |
 | **Transactional email**    | Auth emails (direct Brevo) + booking/payment emails (outbox with retry)               |
 | **Rate limiting**          | Per-endpoint per-IP limits on auth, availability, booking, receipts, cancellations    |
-| **CI/CD**                  | Path-filtered CI on PRs; deploy to Render + GHCR on push to `main`                  |
+| **CI/CD**                  | Path-filtered CI on PRs; Render auto-deploy on push to `main`                       |
 
 ---
 
@@ -97,7 +97,6 @@ Design specs for maintainers live in [`specs/`](specs/). Operator deployment det
 | Identity             | ASP.NET Core Identity                                         | Users, roles, password hashing             |
 | Authentication       | JWT Bearer + httpOnly refresh cookie                          | Access token in memory; refresh via cookie |
 | Frontend             | Angular 21 (standalone components)                            | SPA, lazy routes, Vitest                   |
-| Frontend             | Angular 21 (standalone components)                            | SPA, lazy routes, Vitest                   |
 | API contracts        | `Shora.Contracts` (C#) + `src/contracts` (TS)                 | Shared DTO shapes, manual sync             |
 | File storage         | Azure Blob Storage (Azurite locally)                          | Private receipt images                     |
 | Email (dev)          | `DevLoggingEmailSender`                                       | Logs emails to console                     |
@@ -105,10 +104,9 @@ Design specs for maintainers live in [`specs/`](specs/). Operator deployment det
 | Caching              | In-memory cache + ASP.NET Output Cache                        | Public settings & availability             |
 | Rate limiting        | ASP.NET Core Rate Limiter                                     | Abuse protection                           |
 | Testing              | xUnit v3, Testcontainers (PostgreSQL, Azurite)                | Unit + integration tests                   |
-| CI/CD                | GitHub Actions                                                | `ci.yml`, `deploy.yml`                     |
-| Container            | Docker (`mcr.microsoft.com/dotnet/aspnet:10.0`)               | Render runtime image                       |
-| Hosting              | Render                                                        | Compute; serves API + `wwwroot` SPA        |
-| Container registry   | GHCR                                                          | `ghcr.io/<owner>/<repo>:production`        |
+| CI/CD                | GitHub Actions (`ci.yml`)                                     | Tests on PR/push; deploy on Render |
+| Container            | Docker multi-stage ([`Dockerfile`](Dockerfile))               | Built on Render from Git           |
+| Hosting              | Render                                                        | Compute; serves API + `wwwroot` SPA |
 
 **Not used:** Stripe or other online payment gateways, Redis, message queues, docker-compose, separate staging environment.
 
@@ -119,7 +117,7 @@ Design specs for maintainers live in [`specs/`](specs/). Operator deployment det
 ```text
 Shora/
 ├── .github/
-│   ├── workflows/          # CI + Deploy GitHub Actions
+│   ├── workflows/          # CI GitHub Actions
 │   └── dependabot.yml      # Monthly NuGet/npm updates
 ├── docs/
 │   ├── deployment.md       # Production hosting guide
@@ -136,7 +134,7 @@ Shora/
 │   │   └── Shora.Tests/            # xUnit tests
 │   ├── contracts/          # TypeScript mirrors of Shora.Contracts
 │   └── frontend/           # Angular app (shora-web)
-├── Dockerfile              # Runtime image (expects ./publish from CI)
+├── Dockerfile              # Multi-stage production image (Render builds from Git)
 └── README.md
 ```
 
@@ -611,7 +609,7 @@ Use `__` (double underscore) for nested env vars on Render (e.g. `Jwt__SigningKe
 
 | File                                                      | Setting                 | Notes                                             |
 | --------------------------------------------------------- | ----------------------- | ------------------------------------------------- |
-| `src/frontend/src/environments/environment.production.ts` | `googleClientId`        | Commit before merge to `main` for Deploy workflow |
+| `src/frontend/src/environments/environment.production.ts` | `googleClientId`        | Commit before merge to `main` for production builds |
 | Both env files                                            | `apiBaseUrl: '/api/v1'` | Same-origin deploy                                |
 
 Full production reference: [`docs/deployment.md`](docs/deployment.md).
@@ -719,7 +717,7 @@ dotnet ef migrations add YourMigrationName --project Shora.Infrastructure --star
 
 5. Run tests before pushing (see [Testing](#20-testing))
 6. Open PR to `main` — CI runs path-filtered backend/frontend jobs
-7. Merge to `main` triggers production Deploy workflow
+7. Merge to `main` triggers Render auto-deploy (Docker build from Git)
 
 **Formatting:** Prettier is a frontend devDependency; no repo-wide dotnet format config documented.
 
@@ -764,7 +762,7 @@ Tests set `BackgroundJobs:Enabled = false` where needed to avoid background inte
 | ---------------------- | --------------------------------------------------------------------- |
 | **Dockerfile**         | Single-stage runtime image; copies pre-built `./publish`              |
 | **Base image**         | `mcr.microsoft.com/dotnet/aspnet:10.0`                                |
-| **Port**               | `8080` (Render sets `PORT`; `ASPNETCORE_HTTP_PORTS=8080` in Blueprint) |
+| **Port**               | `8080` (`ASPNETCORE_HTTP_PORTS=8080` on Render)                        |
 | **docker-compose**     | **Not present** in repository                                         |
 | **Local Docker usage** | Azurite for dev; Testcontainers for tests; full app image built in CI |
 
@@ -791,20 +789,11 @@ docker run -p 8080:8080 -e ConnectionStrings__DefaultConnection="..." shora:loca
 
 No secrets required. Docs-only changes skip unaffected jobs.
 
-### Deploy (`deploy.yml`)
+Production deploys: push/merge to `main` → Render builds [`Dockerfile`](Dockerfile) and deploys automatically. See [`docs/deployment.md`](docs/deployment.md).
 
-| Trigger | `push` to `main` only (no manual dispatch) |
-| Concurrency | One deploy per branch; newer push cancels in-progress |
+Optional repository variable: `PRODUCTION_URL` (e.g. `https://shora.onrender.com`) for documentation/scripts.
 
-Deploy sequence: push to `main` → build job (npm build, copy to wwwroot, dotnet publish, upload artifact) → deploy job (docker build, push `ghcr.io/<owner>/<repo>:production`, Render deploy hook).
-
-| Secret / variable        | Location                                      |
-| ------------------------ | --------------------------------------------- |
-| `RENDER_DEPLOY_HOOK_URL` | GitHub Environment secret on `production`     |
-| `PRODUCTION_URL`         | Repository variable                           |
-| `DEPLOY_ENVIRONMENT`     | Optional repo variable (default `production`) |
-
-Detail: [`.github/workflows/README.md`](.github/workflows/README.md), [`specs/09-ci-cd-pipeline.md`](specs/09-ci-cd-pipeline.md).
+Detail: [`.github/workflows/README.md`](.github/workflows/README.md).
 
 ---
 
@@ -812,13 +801,12 @@ Detail: [`.github/workflows/README.md`](.github/workflows/README.md), [`specs/09
 
 | Component       | Provider                       |
 | --------------- | ------------------------------ |
-| Compute + SPA   | Render (single container)      |
+| Compute + SPA   | Render (Docker build from Git) |
 | Database        | Neon PostgreSQL                |
 | Receipt storage | Azure Blob (private container) |
 | Email           | Brevo (HTTPS API)              |
-| Images          | GHCR                           |
 
-- Frontend is baked into `Shora.Api/wwwroot` at build time
+- Frontend is baked into `Shora.Api/wwwroot` during the Docker build on Render
 - EF migrations run on container startup (forward-only — no auto rollback)
 - Health check: `/api/v1/health`
 
@@ -940,11 +928,11 @@ Always persist and compare business times in **UTC** on the server.
 
 **Solution:** Set `Frontend__BaseUrl` and `Cors__AllowedOrigins__0` to production HTTPS URL.
 
-### Deploy workflow fails on Render deploy hook
+### Render Docker build fails
 
-**Cause:** `RENDER_DEPLOY_HOOK_URL` missing or invalid, or Render service not created yet.
+**Cause:** Frontend or backend compile error, or missing env vars at runtime.
 
-**Solution:** Apply Blueprint, create deploy hook in Render Settings, store as Environment secret on `production`. See [`docs/deployment.md`](docs/deployment.md).
+**Solution:** Check Render build/deploy logs. Reproduce locally with `docker build -t shora:local .` See [`docs/deployment.md`](docs/deployment.md).
 
 ### `dotnet test` hangs or fails immediately
 
@@ -1029,7 +1017,7 @@ Documented in code/specs (not a committed roadmap):
 | No horizontal scaling / Redis                        | MVP topology (`specs/08-cross-cutting-concerns.md`) |
 | `Google:ClientSecret` unused                         | Config present; ID-token flow only                  |
 | Base `appsettings.json` LocalDB placeholder          | Misleading default; PostgreSQL is actual engine     |
-| No automated post-deploy smoke tests in `deploy.yml` | Workflow ends at Render deploy hook                 |
+| No automated post-deploy smoke tests | Deploy is Render auto-deploy on `main`               |
 | SEO files (`robots.txt`, `sitemap.xml`) not shipped  | Documented in deployment guide                      |
 
 ---

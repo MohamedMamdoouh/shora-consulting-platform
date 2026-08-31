@@ -1,26 +1,24 @@
 # Production deployment
 
-Deploy Shora to **Render** (API + Angular SPA in one container) with **Neon PostgreSQL** (database) and **Azure Blob Storage** (receipt images only). The **Deploy** workflow builds a Docker image, pushes it to GitHub Container Registry (GHCR), and triggers a Render deploy hook on every push to `main`.
+Deploy Shora to **Render** (API + Angular SPA in one container) with **Neon PostgreSQL** (database) and **Azure Blob Storage** (receipt images only). Render builds from the Git repo using the multi-stage [`Dockerfile`](../Dockerfile) on every push to `main` (auto-deploy).
 
 Non-secret config structure lives in [`appsettings.Production.json`](../src/backend/Shora.Api/appsettings.Production.json). **Never commit real credentials** — set values as Render environment variables.
 
 Use double-underscore nesting for nested JSON (e.g. `Jwt__SigningKey` → `Jwt:SigningKey`).
 
-**Related:** [`.github/workflows/README.md`](../.github/workflows/README.md) (CI/CD behavior)
+**Related:** [`.github/workflows/README.md`](../.github/workflows/README.md) (CI behavior)
 
 ## Overview
 
 | Component           | Provider                               |
 | ------------------- | -------------------------------------- |
-| Compute (API + SPA) | Render                                 |
+| Compute (API + SPA) | Render (Docker build from Git)         |
 | Database            | Neon PostgreSQL                        |
 | Receipt blobs       | Azure Blob Storage (private container) |
 | Email               | Brevo (HTTPS API)                      |
-| Container registry  | GitHub Container Registry (GHCR)       |
+| CI (tests only)     | GitHub Actions (`ci.yml`)              |
 
 One process hosts the API, Angular static files (`wwwroot`), in-process background jobs, and in-memory cache. There is no load balancer, horizontal scaling, or distributed cache.
-
-Infrastructure is defined in [`render.yaml`](../render.yaml) (Render Blueprint).
 
 ## 1. Infrastructure prerequisites
 
@@ -57,74 +55,45 @@ az storage account show-connection-string `
 
 Rotate storage keys if they were ever logged.
 
-## 2. Render service (Blueprint)
+## 2. Render web service (Git + Docker)
 
-1. Ensure [`render.yaml`](../render.yaml) is committed on `main`.
-2. Open the Blueprint deeplink (replace repo if needed):
+1. Render Dashboard → **New +** → **Web Service**
+2. Connect repository: `MohamedMamdoouh/shora-consulting-platform`
+3. **Language:** Docker
+4. **Branch:** `main`
+5. **Auto-Deploy:** Yes
+6. **Name:** `shora` (or your preference)
+7. **Health Check Path:** `/api/v1/health`
+8. **Region:** your choice (e.g. Frankfurt)
 
-   ```text
-   https://dashboard.render.com/blueprint/new?repo=https://github.com/MohamedMamdoouh/shora-consulting-platform
-   ```
+Render reads [`Dockerfile`](../Dockerfile) from the repo root. The multi-stage build:
 
-3. Click **Apply** to create the `shora` web service.
-4. Note the assigned URL (e.g. `https://shora.onrender.com`).
-5. Health check path is `/api/v1/health` (configured in `render.yaml`).
+1. Builds the Angular frontend (`npm ci` + `npm run build`)
+2. Publishes the .NET API with static files in `wwwroot`
+3. Runs the final image on `mcr.microsoft.com/dotnet/aspnet:10.0`
 
-The service pulls a prebuilt image:
+**Deploy trigger:** merge/push to `main` → Render builds and deploys automatically. No GitHub deploy workflow or container registry is required.
 
-```text
-ghcr.io/mohamedmamdoouh/shora-consulting-platform:production
-```
+### Build troubleshooting
 
-The **Deploy** workflow builds and pushes this tag on every push to `main`, then calls the Render deploy hook. Render does **not** auto-redeploy when a mutable tag (`:production`) is updated — the hook is required.
+| Symptom | Likely cause |
+| ------- | ------------ |
+| Docker build fails at `npm ci` | Frontend dependency or lockfile issue — check Render build logs |
+| Docker build fails at `dotnet publish` | Backend compile error — run `dotnet build` locally |
+| `COPY` path not found | `dist/shora-web/browser` missing — frontend build stage failed |
+| Health check timeout | App not listening on port 8080 — confirm `ASPNETCORE_HTTP_PORTS=8080` |
+| Startup validation error | `Frontend__BaseUrl` / CORS mismatch — see env vars below |
 
-### Deploy hook
+## 3. Environment variables
 
-After the service exists:
-
-1. Render Dashboard → **shora** → **Settings** → **Deploy Hook**
-2. Copy the hook URL
-3. Add as GitHub Environment secret `RENDER_DEPLOY_HOOK_URL` on `production`
-
-## 3. GHCR image pull
-
-Render must be able to pull from GitHub Container Registry. Run the **Deploy** workflow at least once before expecting Render to succeed.
-
-### Option A — Public package (recommended for MVP)
-
-1. GitHub → **Packages** → your repo package
-2. **Package settings** → **Change visibility** → **Public**
-3. Remove `registryCredential` from `render.yaml` if you use this option
-4. Redeploy on Render
-
-### Option B — Private package
-
-1. GitHub → **Settings → Developer settings** → create a PAT with `read:packages`
-2. Render Dashboard → **Registry Credentials** → create credential named `ghcr-shora`
-3. Username: GitHub username; Password: PAT
-4. `render.yaml` references this via `registryCredential.fromRegistryCreds.name: ghcr-shora`
-5. Redeploy
-
-### Troubleshooting
-
-| Symptom                                 | Likely cause                                  |
-| --------------------------------------- | --------------------------------------------- |
-| `pull access denied` / `unauthorized`   | Package private without Render registry creds |
-| `manifest unknown` / `not found`        | Deploy workflow has not pushed the image yet  |
-| `invalid tag` / uppercase in image name | Use lowercase GHCR path                       |
-| Deployment FAILED, no app logs          | Image pull failed before container start      |
-| Health returns 404                      | No healthy container behind Render edge       |
-
-## 4. Environment variables
-
-Set in Render Dashboard → **shora** → **Environment**, or via Render MCP `update_environment_variables`. Use `__` (double underscore) for nested JSON keys.
+Set in Render Dashboard → **shora** → **Environment**. Use `__` (double underscore) for nested JSON keys.
 
 ### Required (startup fails without these)
 
 | Setting           | Variable name                          | Notes                                                                 |
 | ----------------- | -------------------------------------- | --------------------------------------------------------------------- |
-| Environment       | `ASPNETCORE_ENVIRONMENT`               | `Production` (set in `render.yaml`)                                 |
-| HTTP port         | `ASPNETCORE_HTTP_PORTS`                | `8080` (set in `render.yaml`)                                       |
+| Environment       | `ASPNETCORE_ENVIRONMENT`               | `Production`                                                          |
+| HTTP port         | `ASPNETCORE_HTTP_PORTS`                | `8080`                                                                |
 | Database          | `ConnectionStrings__DefaultConnection` | Neon pooled connection string                                         |
 | JWT signing key   | `Jwt__SigningKey`                      | Min 32 chars; strong random                                           |
 | Production URL    | `Frontend__BaseUrl`                    | e.g. `https://shora.onrender.com` — no trailing slash                 |
@@ -220,62 +189,61 @@ Inherits from base `appsettings.json` unless overridden:
 - `BackgroundJobs`, `OpsMonitoring`, `RateLimiting`, `Cache`, `Booking`, `ReceiptUpload`, `Brand`
 - `Jwt__Issuer`, `Jwt__Audience`, token lifetimes
 
-### Frontend (build-time, not Render)
+### Frontend (build-time)
 
-| File                                                                                      | Purpose                                                                         |
-| ----------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| [`environment.production.ts`](../src/frontend/src/environments/environment.production.ts) | `apiBaseUrl: '/api/v1'` is correct for same-site deploy                         |
-| [`angular.json`](../src/frontend/angular.json)                                            | Production build uses `fileReplacements` to swap in `environment.production.ts` |
+The Angular production build runs inside the Docker build stage. [`environment.production.ts`](../src/frontend/src/environments/environment.production.ts) uses `apiBaseUrl: '/api/v1'` (correct for same-site deploy). No separate frontend deploy step is required.
 
-## 5. GitHub secrets and variables
+## 4. GitHub (CI only)
 
-Configure in your GitHub repo → **Settings**.
+Production deploys are handled by Render auto-deploy on push to `main`. GitHub Actions runs **CI only** ([`ci.yml`](../.github/workflows/ci.yml)) — backend and frontend tests on PRs and pushes.
 
-| Item                     | Where                                  | Value                                                                 |
-| ------------------------ | -------------------------------------- | --------------------------------------------------------------------- |
-| `RENDER_DEPLOY_HOOK_URL` | Environment **secret** on `production` | Deploy hook URL from Render service Settings                          |
-| `PRODUCTION_URL`         | Repository **variable**                | e.g. `https://shora.onrender.com`                                     |
+Optional repository variable for documentation or scripts:
 
-Optional repository variable: `DEPLOY_ENVIRONMENT` (defaults to `production`).
+| Item             | Where               | Value                             |
+| ---------------- | ------------------- | --------------------------------- |
+| `PRODUCTION_URL` | Repository variable | e.g. `https://shora.onrender.com` |
 
-The Deploy job fails explicitly if `PRODUCTION_URL` or `RENDER_DEPLOY_HOOK_URL` is missing.
-
-Remove legacy Railway configuration after cutover: `RAILWAY_SERVICE_ID`, `RAILWAY_TOKEN`.
+No deploy secrets are required on GitHub. Remove legacy secrets if present: `RENDER_DEPLOY_HOOK_URL`, `RAILWAY_TOKEN`, `RAILWAY_SERVICE_ID`.
 
 Enable **branch protection** on `main` so CI passes before merge (recommended).
 
-## 6. Custom domain (optional)
+## 5. Custom domain (optional)
 
 1. Render → **shora** → **Settings → Custom Domains** → add domain → complete DNS.
 2. Update **all** URL-dependent settings to the new HTTPS origin (no trailing slash):
    - `Frontend__BaseUrl`
    - `Cors__AllowedOrigins__0`
    - `AllowedHosts`
+3. Push to `main` to trigger a rebuild if frontend origins are baked at build time.
 
-Rebuild frontend if origins change.
+## 6. Manual redeploy
 
-## 7. Manual redeploy
+- **Render dashboard:** service → **Manual Deploy** → **Deploy latest commit**
+- **Git:** push to `main` (auto-deploy when enabled)
 
-Use when the Deploy workflow pushed a new image but Render is still running an old build, or after fixing GHCR pull access.
-
-- **Render dashboard:** service → **Manual Deploy** → **Deploy latest image**.
-- **GitHub Actions:** Re-run the **Deploy** workflow on `main` after fixing secrets (triggers deploy hook).
-- **Render MCP:** `trigger_deploy(serviceId: "...")`.
-
-## 8. Verify
+## 7. Verify
 
 1. All required Render variables saved (no secrets in git).
-2. Merge to `main` — **Deploy** runs automatically ([`deploy.yml`](../.github/workflows/deploy.yml)).
-3. Deploy workflow green (build → push GHCR → Render deploy hook).
-4. Render deployment status **Live**.
-5. `GET https://<your-production-url>/api/v1/health` → `healthy`.
-6. SPA loads at `/` and `/about`.
-7. Log in as admin at `/auth/login` (AdminSeed account).
-8. **Admin → Settings** — set real WhatsApp, Vodafone Cash, and InstaPay values.
-9. Optional E2E: client signup → verification email → book → receipt upload → admin approve.
-10. **Remove** `AdminSeed__Email` and `AdminSeed__Password` from Render variables.
+2. Merge to `main` — Render build starts automatically.
+3. Render deployment status **Live** (check build logs for Docker stages).
+4. `GET https://<your-production-url>/api/v1/health` → `healthy`.
+5. SPA loads at `/` and `/about`.
+6. Log in as admin at `/auth/login` (AdminSeed account).
+7. **Admin → Settings** — set real WhatsApp, Vodafone Cash, and InstaPay values.
+8. Optional E2E: client signup → verification email → book → receipt upload → admin approve.
+9. **Remove** `AdminSeed__Email` and `AdminSeed__Password` from Render variables.
 
-## 9. Free tier notes
+## 8. Free tier notes
 
 - Render free web services spin down after **15 minutes** of inactivity (cold starts on next request).
+- Docker builds on free tier can be slow (Node + .NET in one image).
 - Ephemeral filesystem — receipt images use Azure Blob (unchanged).
+
+## 9. Local Docker build (optional)
+
+Test the production image locally before pushing:
+
+```powershell
+docker build -t shora:local .
+docker run -p 8080:8080 -e ASPNETCORE_ENVIRONMENT=Production -e ConnectionStrings__DefaultConnection="..." shora:local
+```

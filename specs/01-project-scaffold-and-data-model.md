@@ -63,9 +63,9 @@ Rationale: this keeps external, swappable concerns (payments, email) behind inte
 - **Infrastructure** — concrete implementations:
   - `ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>` implementing `IApplicationDbContext`; fluent entity configurations in `Data/Configurations/`; consolidated PostgreSQL migration `20260811142250_InitialCreate` (see #5).
   - `SystemDateTimeProvider : IDateTimeProvider` — live UTC clock.
-  - `BrevoEmailSender : IEmailSender` — production email via Brevo HTTPS API (spec 08.4); dev falls back to logging.
-  - `AzureBlobFileStorage : IFileStorage` — receipt blob storage (spec 05a); `NotImplementedFileStorage` when `Storage:ConnectionString` is unset.
-  - `PassThroughMalwareScanner : IMalwareScanner` — dev stub; replace in production (spec 05f).
+  - `BrevoEmailSender : IEmailSender` — production email via Brevo HTTPS API (spec 08); dev falls back to logging.
+  - `AzureBlobFileStorage : IFileStorage` — receipt blob storage (spec 05); `NotImplementedFileStorage` when `Storage:ConnectionString` is unset.
+  - `PassThroughMalwareScanner : IMalwareScanner` — dev stub; replace in production (spec 05).
   - `HttpContextCurrentUser : ICurrentUser` — resolves authenticated user id/role (spec 02).
   - `DatabaseSeeder` — idempotent seed for roles, singleton `Settings`, and admin user from config.
 - **Contracts** — `Shora.Contracts` records for all public API DTOs; mirrored manually in `src/contracts/` (spec 00).
@@ -74,7 +74,7 @@ Rationale: this keeps external, swappable concerns (payments, email) behind inte
 ### 2.2 Configuration
 
 - **appsettings.json** structure (secrets via `dotnet user-secrets` / environment variables in real deployments, never committed):
-  - `ConnectionStrings:DefaultConnection` — PostgreSQL connection string (Npgsql; `Host=localhost;Port=5432;Database=Shora;...` in dev; Neon in production)
+  - `ConnectionStrings:DefaultConnection` — PostgreSQL connection string (Npgsql; `Host=localhost;Port=5432;Database=Shora;...` in dev; Supabase in production)
   - `Jwt:Issuer`, `Jwt:Audience`, `Jwt:SigningKey` — JWT auth (see spec 02); issuer/audience default to `Shora` / `Shora.Web`
   - `Storage:ConnectionString`, `Storage:ReceiptContainer` — Azure Blob Storage for receipt images (private container); used in spec 05
   - `Email:*` — Brevo API key and from address for `EmailSender` (password reset + all client/admin notifications). Email is the only notification channel; no SMS.
@@ -360,7 +360,7 @@ Updated by `JobHeartbeatService` after each background job run. `OpsMonitoringSe
   - `BookingStatusAudit`, `CancellationRequest`, `PaymentReceipt`, `RefreshToken`, and `OutboxMessage` tables
   - `JobRunHistory` table
   - No payment-gateway columns (`Payment` has no provider/order/transaction fields)
-- **Database provider:** Npgsql / PostgreSQL 16 (local dev, Neon production, Testcontainers in CI). `UseNpgsql` is configured **without** `EnableRetryOnFailure` because booking and payment flows use manual `BeginTransactionAsync()` with `FOR UPDATE` row locking — EF's retry execution strategy is incompatible with user-initiated transactions.
+- **Database provider:** Npgsql / PostgreSQL 16 (local dev, Supabase production, Testcontainers in CI). `UseNpgsql` is configured **without** `EnableRetryOnFailure` because booking and payment flows use manual `BeginTransactionAsync()` with `FOR UPDATE` row locking — EF's retry execution strategy is incompatible with user-initiated transactions.
 - **Admin FK delete behavior:** PostgreSQL cascade-path constraints require `ON DELETE NO ACTION` (not `SET NULL`) on optional admin-user FKs (`Payment.RefundedByAdminId`, `PaymentReceipt.ReviewedByAdminId`, etc.).
 - **Apply migrations:** `dotnet ef database update --project Shora.Infrastructure --startup-project Shora.Api`. On startup, `InitializeDatabaseAsync()` auto-applies pending migrations and runs seed.
 - **Seed data** (idempotent, via `DatabaseSeeder`):

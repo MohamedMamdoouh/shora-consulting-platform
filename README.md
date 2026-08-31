@@ -4,7 +4,7 @@
 
 RTL personal practice site for one-to-one relationship consulting sessions. Clients browse availability, reserve a session, pay by manual bank transfer (Vodafone Cash or InstaPay), upload a receipt, and receive the session by voice call or chat. A single **Admin** (the practitioner) manages settings, availability, receipt approval, cancellations, and refunds.
 
-**Status:** MVP feature set is implemented in code (backend, frontend, CI/CD). Production hosting uses Render + Neon PostgreSQL + Azure Blob Storage — see [Deployment](#23-deployment).
+**Status:** MVP feature set is implemented in code (backend, frontend, CI/CD). Production hosting uses Render + Supabase PostgreSQL + Azure Blob Storage — see [Deployment](#23-deployment).
 
 ---
 
@@ -80,6 +80,7 @@ Design specs for maintainers live in [`specs/`](specs/). Operator deployment det
 | **Refunds**                | Admin records manual refunds (no payment provider integration)                        |
 | **Earnings**               | Gross / refunded / net revenue summary with date filters                              |
 | **Ops monitoring**         | Background health checks with admin alerts and runbooks at `/admin/ops`               |
+| **Error catalog**          | Public API + pages at `/errors` documenting API error codes and when they occur       |
 | **Transactional email**    | Auth emails (direct Brevo) + booking/payment emails (outbox with retry)               |
 | **Rate limiting**          | Per-endpoint per-IP limits on auth, availability, booking, receipts, cancellations    |
 | **CI/CD**                  | Path-filtered CI on PRs; Render auto-deploy on push to `main`                       |
@@ -93,7 +94,7 @@ Design specs for maintainers live in [`specs/`](specs/). Operator deployment det
 | Backend runtime      | .NET 10                                                       | ASP.NET Core Web API host                  |
 | Backend architecture | Clean Architecture (Domain, Application, Infrastructure, Api) | Separation of concerns, testability        |
 | ORM                  | EF Core 10 + Npgsql                                           | PostgreSQL data access, migrations         |
-| Database             | PostgreSQL 16+ (Neon in production)                           | Primary data store                         |
+| Database             | PostgreSQL 16+ (Supabase in production)                       | Primary data store                         |
 | Identity             | ASP.NET Core Identity                                         | Users, roles, password hashing             |
 | Authentication       | JWT Bearer + httpOnly refresh cookie                          | Access token in memory; refresh via cookie |
 | Frontend             | Angular 21 (standalone components)                            | SPA, lazy routes, Vitest                   |
@@ -122,6 +123,7 @@ Shora/
 ├── docs/
 │   ├── deployment.md       # Production hosting guide
 │   ├── ops-runbooks.md     # Ops runbook pointer
+│   ├── system-design.png   # Architecture diagram
 │   └── README.md           # Operator doc index
 ├── specs/                  # Feature design docs (00–09)
 ├── src/
@@ -155,7 +157,7 @@ Shora/
 
 Production runs as **one HTTPS origin**: the browser loads the Angular app and calls `/api/v1/*` on the same host. Refresh-token cookies use `SameSite=Strict`, which requires same-site deployment in MVP.
 
-The Render container runs **Shora.Api** (HTTP + background jobs) and serves the Angular SPA from **wwwroot**. The API connects to **Neon PostgreSQL**, **Azure Blob Storage** (receipts), and **Brevo** for email.
+The Render container runs **Shora.Api** (HTTP + background jobs) and serves the Angular SPA from **wwwroot**. The API connects to **Supabase PostgreSQL**, **Azure Blob Storage** (receipts), and **Brevo** for email.
 
 **Dependency direction (backend):**
 
@@ -213,7 +215,7 @@ There are **no per-entity repository classes** — Application uses `IApplicatio
 | **Bootstrap**          | `bootstrapApplication(App, appConfig)`                                          |
 | **Routing**            | Lazy-loaded feature routes under `ShellComponent` (header/footer)               |
 | **State**              | Signals + services; booking flow uses `sessionStorage`                          |
-| **HTTP**               | `auth.interceptor.ts` — Bearer token + `withCredentials: true`                  |
+| **HTTP**               | `auth.interceptor.ts` — Bearer token + `withCredentials: true`; `api-timeout.interceptor.ts` — 30s default (120s for receipt upload) |
 | **Auth token storage** | Access JWT **in memory only** (lost on full page reload until refresh succeeds) |
 | **API base URL**       | `environment.apiBaseUrl` = `/api/v1` (relative — same origin in prod)           |
 | **Dev proxy**          | `proxy.conf.json` → `https://localhost:7183`                                    |
@@ -224,10 +226,10 @@ There are **no per-entity repository classes** — Application uses `IApplicatio
 
 | Area    | Paths                                                                                                  |
 | ------- | ------------------------------------------------------------------------------------------------------ |
-| Public  | `/`, `/about`, `/services`, `/privacy`, `/terms`                                                       |
+| Public  | `/`, `/about`, `/services`, `/privacy`, `/terms`, `/errors`, `/errors/:code`                         |
 | Auth    | `/auth/login`, `/auth/signup`, `/auth/verify-email`, `/auth/forgot-password`, `/auth/reset-password`   |
 | Booking | `/booking/start` → `/booking/delivery` → `/booking/phone` → `/booking/review` → `/booking/payment/:id` |
-| Client  | `/dashboard`                                                                                           |
+| Client  | `/dashboard` → `/dashboard/upcoming`, `/dashboard/pending`, `/dashboard/history`                       |
 | Admin   | `/admin/settings`, `/admin/availability`, `/admin/bookings`, `/admin/earnings`, `/admin/ops`           |
 
 ### Guards
@@ -248,7 +250,7 @@ More detail: [`src/frontend/README.md`](src/frontend/README.md).
 
 - `POST /api/v1/auth/signup` — creates `Client` user, returns JWT + sets refresh cookie
 - Email verification required **before booking** (not before login)
-- Google users are auto-verified
+- Email/password only — no social login providers in MVP
 
 ### Login / logout
 
@@ -271,13 +273,6 @@ More detail: [`src/frontend/README.md`](src/frontend/README.md).
 | Production  | `true`  | `Strict` |
 
 Cookie name and path are defined in code (`RefreshCookieOptions`), not in `appsettings`.
-
-### Google Sign-In
-
-- `POST /api/v1/auth/google` with `{ idToken }`
-- Server validates ID token against `Google:ClientId` only
-- `Google:ClientSecret` is in config but **not used** by the server (ID-token flow)
-- Frontend `googleClientId` in `environment.production.ts` must be set at build time; empty = button hidden
 
 ### Roles
 
@@ -521,7 +516,8 @@ Full conventions: [`specs/00-api-conventions.md`](specs/00-api-conventions.md).
 | GET    | `/health`                                         | —      | Health check                      |
 | GET    | `/availability?from=&to=`                         | —      | Available slots (rate limited)    |
 | GET    | `/settings/public`                                | —      | Session price & duration (cached) |
-| POST   | `/auth/signup`, `/auth/login`, `/auth/google`     | —      | Register / login                  |
+| GET    | `/errors`, `/errors/{code}`                       | —      | API error code catalog (cached)   |
+| POST   | `/auth/signup`, `/auth/login`                     | —      | Register / login                  |
 | POST   | `/auth/refresh`, `/auth/logout`                   | —      | Session refresh / logout          |
 | POST   | `/auth/verify-email`, `/auth/resend-verification` | —      | Email verification                |
 | POST   | `/auth/forgot-password`, `/auth/reset-password`   | —      | Password reset                    |
@@ -535,8 +531,9 @@ Full conventions: [`specs/00-api-conventions.md`](specs/00-api-conventions.md).
 | GET    | `/bookings/mine`                       | List own bookings (paginated past) |
 | POST   | `/bookings/{id}/cancel`                | Cancel hold                        |
 | GET    | `/bookings/{id}/payment-instructions`  | Payment details                    |
-| POST   | `/bookings/{id}/cancellation-requests` | Request cancellation               |
-| POST   | `/payments/{bookingId}/receipt`        | Upload receipt (multipart)         |
+| POST   | `/bookings/{id}/cancellation-requests`                | Request cancellation               |
+| POST   | `/bookings/{id}/cancellation-requests/decision-seen` | Acknowledge cancellation decision  |
+| POST   | `/payments/{bookingId}/receipt`                       | Upload receipt (multipart)         |
 
 #### Admin (`Admin` role)
 
@@ -546,6 +543,7 @@ Full conventions: [`specs/00-api-conventions.md`](specs/00-api-conventions.md).
 | CRUD            | `/admin/availability-windows`                                 | Recurring windows      |
 | GET/POST/DELETE | `/admin/blocked-dates`                                        | Blocked ranges         |
 | GET             | `/admin/bookings`                                             | Booking list           |
+| GET             | `/admin/bookings/{id}/receipts`                               | Receipt history for booking |
 | POST            | `/admin/bookings/{id}/receipts/approve\|decline`              | Receipt review         |
 | POST            | `/admin/bookings/{id}/cancel`                                 | Direct cancel          |
 | POST            | `/admin/bookings/{id}/cancellation-requests/approve\|decline` | Cancellation decisions |
@@ -564,7 +562,8 @@ Use `__` (double underscore) for nested env vars on Render (e.g. `Jwt__SigningKe
 | Variable / setting                     | Purpose                              | Example                                  |
 | -------------------------------------- | ------------------------------------ | ---------------------------------------- |
 | `ASPNETCORE_ENVIRONMENT`               | Environment                          | `Production`                             |
-| `ConnectionStrings__DefaultConnection` | Neon PostgreSQL                      | `Host=...;Database=...;Ssl Mode=Require` |
+| `ASPNETCORE_HTTP_PORTS`                | Container listen port                | `8080`                                   |
+| `ConnectionStrings__DefaultConnection` | Supabase PostgreSQL (session pooler) | See [`docs/deployment.md`](docs/deployment.md) |
 | `Jwt__SigningKey`                      | HMAC signing key (≥32 chars)         | `YOUR_RANDOM_SECRET_32_CHARS_MIN`        |
 | `Frontend__BaseUrl`                    | Public HTTPS URL (no trailing slash) | `https://shora.onrender.com`             |
 | `Cors__AllowedOrigins__0`              | Must match `Frontend__BaseUrl`       | Same as above                            |
@@ -584,8 +583,7 @@ Use `__` (double underscore) for nested env vars on Render (e.g. `Jwt__SigningKe
 
 | Variable / setting              | Purpose                                       | Default                 |
 | ------------------------------- | --------------------------------------------- | ----------------------- |
-| `Google__ClientId`              | Google Sign-In                                | Empty = disabled        |
-| `Google__ClientSecret`          | **Unused by server**                          | —                       |
+| `Brand__BrandName`              | Email template branding                       | `دكتور محمود البنا`     |
 | `Seed__*`                       | Payment/contact defaults before first startup | Placeholder test values |
 | `Jwt__AccessTokenMinutes`       | Access token TTL                              | 15                      |
 | `Jwt__RefreshTokenDays`         | Refresh token TTL                             | 7                       |
@@ -607,10 +605,9 @@ Use `__` (double underscore) for nested env vars on Render (e.g. `Jwt__SigningKe
 
 ### Frontend (build-time)
 
-| File                                                      | Setting                 | Notes                                             |
-| --------------------------------------------------------- | ----------------------- | ------------------------------------------------- |
-| `src/frontend/src/environments/environment.production.ts` | `googleClientId`        | Commit before merge to `main` for production builds |
-| Both env files                                            | `apiBaseUrl: '/api/v1'` | Same-origin deploy                                |
+| File                                                      | Setting                 | Notes              |
+| --------------------------------------------------------- | ----------------------- | ------------------ |
+| `src/frontend/src/environments/environment.production.ts` | `apiBaseUrl: '/api/v1'` | Same-origin deploy |
 
 Full production reference: [`docs/deployment.md`](docs/deployment.md).
 
@@ -758,18 +755,18 @@ Tests set `BackgroundJobs:Enabled = false` where needed to avoid background inte
 
 ## 21. Docker
 
-| Item                   | Detail                                                                |
-| ---------------------- | --------------------------------------------------------------------- |
-| **Dockerfile**         | Single-stage runtime image; copies pre-built `./publish`              |
-| **Base image**         | `mcr.microsoft.com/dotnet/aspnet:10.0`                                |
-| **Port**               | `8080` (`ASPNETCORE_HTTP_PORTS=8080` on Render)                        |
-| **docker-compose**     | **Not present** in repository                                         |
-| **Local Docker usage** | Azurite for dev; Testcontainers for tests; full app image built in CI |
+| Item                   | Detail                                                                                      |
+| ---------------------- | ------------------------------------------------------------------------------------------- |
+| **Dockerfile**         | Multi-stage: Node 22 (Angular build) → .NET SDK 10 publish → `aspnet:10.0` runtime          |
+| **SPA embedding**      | Frontend `dist/shora-web/browser/` copied into `Shora.Api/wwwroot/` during the build stage  |
+| **Base image**         | `mcr.microsoft.com/dotnet/aspnet:10.0`                                                      |
+| **Port**               | `8080` (`ASPNETCORE_HTTP_PORTS=8080` on Render)                                              |
+| **docker-compose**     | **Not present** in repository                                                               |
+| **Local Docker usage** | Azurite for dev; Testcontainers for tests; `docker build` compiles frontend + backend in-image |
 
-Build locally (after manual publish):
+Build and run locally (no manual publish step):
 
 ```powershell
-# Build publish folder first (see deploy workflow steps)
 docker build -t shora:local .
 docker run -p 8080:8080 -e ConnectionStrings__DefaultConnection="..." shora:local
 ```
@@ -802,7 +799,7 @@ Detail: [`.github/workflows/README.md`](.github/workflows/README.md).
 | Component       | Provider                       |
 | --------------- | ------------------------------ |
 | Compute + SPA   | Render (Docker build from Git) |
-| Database        | Neon PostgreSQL                |
+| Database        | Supabase PostgreSQL            |
 | Receipt storage | Azure Blob (private container) |
 | Email           | Brevo (HTTPS API)              |
 
@@ -836,7 +833,7 @@ Step-by-step guide: [`docs/deployment.md`](docs/deployment.md).
 - No CSRF tokens (relies on same-site cookies + origin checks)
 - No horizontal scaling / distributed cache in MVP
 - Manual refunds with no automated payout verification
-- `Google:ClientSecret` configured but unused
+- Social login (Google, etc.) not implemented — email/password only
 
 ---
 
@@ -894,8 +891,8 @@ Always persist and compare business times in **UTC** on the server.
 | Missing Azurite                                         | Receipt upload throws `NotImplementedException`                 |
 | Docker not running                                      | `dotnet test` fails (Testcontainers)                            |
 | `Cors__AllowedOrigins__0` ≠ `Frontend__BaseUrl` in prod | Startup validation fails                                        |
-| Neon URI connection string on Render                    | Values with `=` may truncate                                    |
-| Empty `googleClientId`                                  | Google button hidden (expected)                                 |
+| Supabase transaction pooler (port 6543) on Render       | Breaks EF migrations/transactions — use session pooler (5432)   |
+| URI connection string on Render                         | Passwords with `=` may truncate — use key-value Npgsql format     |
 | Forgetting to remove `AdminSeed__*`                     | Admin credentials remain in env                                 |
 | Running API during `dotnet build`                       | DLL lock errors                                                 |
 | Base `appsettings.json` LocalDB string                  | Misleading — use Development config for PostgreSQL              |
@@ -1015,7 +1012,7 @@ Documented in code/specs (not a committed roadmap):
 | No real malware scanner on receipts                  | `PassThroughMalwareScanner`                         |
 | No online payment gateway                            | By design (`specs/05-payments.md`)                  |
 | No horizontal scaling / Redis                        | MVP topology (`specs/08-cross-cutting-concerns.md`) |
-| `Google:ClientSecret` unused                         | Config present; ID-token flow only                  |
+| Social login not implemented                         | Email/password only (`specs/02-authentication.md`)    |
 | Base `appsettings.json` LocalDB placeholder          | Misleading default; PostgreSQL is actual engine     |
 | No automated post-deploy smoke tests | Deploy is Render auto-deploy on `main`               |
 | SEO files (`robots.txt`, `sitemap.xml`) not shipped  | Documented in deployment guide                      |
@@ -1029,5 +1026,6 @@ Documented in code/specs (not a committed roadmap):
 | [`src/frontend/README.md`](src/frontend/README.md)           | Frontend routes and features    |
 | [`src/contracts/README.md`](src/contracts/README.md)         | Keeping TS/C# contracts aligned |
 | [`docs/deployment.md`](docs/deployment.md)                   | Production hosting              |
+| [`docs/system-design.png`](docs/system-design.png)           | Architecture diagram            |
 | [`specs/`](specs/)                                           | Maintainer design reference     |
 | [`.github/workflows/README.md`](.github/workflows/README.md) | CI/CD workflows                 |

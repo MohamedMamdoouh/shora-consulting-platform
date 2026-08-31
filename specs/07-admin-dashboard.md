@@ -1,34 +1,14 @@
 # 07 — Admin / Consultant Dashboard
 
-Status: **Done** (sub-phases 07a–07o). Payment receipt review, approve/decline, manual refund record, and ops alerts API are implemented (specs 05, 08). Admin shell and routing landed in 07a; all admin pages are phased below.
-
-### Implementation status
-
-| Sub-phase | Scope                                                  | Status   |
-| --------- | ------------------------------------------------------ | -------- |
-| 07a       | Admin shell — sub-nav, child routes, placeholder pages | **Done** |
-| 07b       | Settings API                                           | **Done** |
-| 07c       | Settings UI                                            | **Done** |
-| 07d       | Availability windows API                               | **Done** |
-| 07e       | Availability windows UI                                | **Done** |
-| 07f       | Blocked dates API                                      | **Done** |
-| 07g       | Blocked dates UI                                       | **Done** |
-| 07h       | Admin bookings list API                                | **Done** |
-| 07i       | Admin bookings table UI                                | **Done** |
-| 07j       | Receipt review UI                                      | **Done** |
-| 07k       | Admin cancel + cancellation decision API               | **Done** |
-| 07l       | Cancellation queue + direct cancel UI                  | **Done** |
-| 07m       | Refund due UI                                          | **Done** |
-| 07n       | Earnings API + UI                                      | **Done** |
-| 07o       | Ops alerts API + UI (`/admin/ops`)                     | **Done** |
+Status: **Done**. Payment receipt review, approve/decline, manual refund record, and ops alerts API are implemented (specs 05, 08).
 
 **Frontend (`src/frontend/src/app/admin-dashboard/`):**
 
 - `admin-shell.component.*` — page header, sub-nav (Settings, Availability, Bookings, Earnings), `router-outlet`.
 - `admin-dashboard.routes.ts` — `/admin` redirects to `/admin/bookings`; `adminGuard` on shell; child pages: settings, availability, bookings, earnings.
-- `settings/`, `availability/`, `bookings/`, `earnings/` — full UI for each admin area (07b–07n).
+- `settings/`, `availability/`, `bookings/`, `earnings/` — full UI for each admin area.
 
-**Backend (07b):**
+**Settings API (backend):**
 
 - `AdminSettingsController` — `GET/PUT /api/v1/admin/settings` (Admin role).
 - `SettingsService.GetAdminAsync` / `UpdateAsync` — singleton row `Settings.Id = 1`; invalidates public settings cache on update.
@@ -36,13 +16,13 @@ Status: **Done** (sub-phases 07a–07o). Payment receipt review, approve/decline
 - Contracts: `AdminSettingsContracts.cs` + `settings.ts` (`AdminSettings`, `UpdateAdminSettingsRequest`).
 - Tests: `SettingsUpdateValidatorTests`, `AdminSettingsEndpointTests`.
 
-**Frontend (07c):**
+**Settings UI (frontend):**
 
 - `settings/admin-settings-page.component.*` — reactive form at `/admin/settings` with H4 client validation, server field errors, success banner.
 - `settings/admin-settings-validation.util.ts` — Localized field messages.
 - `core/admin/admin-settings.service.ts` — `GET/PUT /admin/settings`; invalidates public settings cache after save.
 
-**Backend (07d):**
+**Availability windows API (backend):**
 
 - `AdminAvailabilityController` — CRUD on `/api/v1/admin/availability-windows`.
 - `AdminAvailabilityService` — persists windows; calls `SlotGenerationService.GenerateHorizonAsync` + invalidates availability cache on every change.
@@ -50,13 +30,13 @@ Status: **Done** (sub-phases 07a–07o). Payment receipt review, approve/decline
 - Contracts: `AdminAvailabilityContracts.cs` + `availability.ts` admin window types.
 - Tests: `AvailabilityWindowValidatorTests`, `AdminAvailabilityEndpointTests`.
 
-**Frontend (07e):**
+**Availability windows UI (frontend):**
 
 - `availability/admin-availability-page.component.*` — recurring windows list + add/edit form at `/admin/availability`.
 - `availability/availability-window.util.ts` — Cairo day labels, time formatting, client validation (start &lt; end).
 - `core/admin/admin-availability.service.ts` — CRUD on `/admin/availability-windows`; invalidates public availability cache after mutations.
 
-**Backend (07f):**
+**Blocked dates API (backend):**
 
 - `AdminBlockedDatesController` — `GET/POST/DELETE /api/v1/admin/blocked-dates`.
 - `AdminBlockedDateService` — transactional overlap check with `UPDLOCK, HOLDLOCK` on overlapping slots; rejects when active bookings conflict; removes open overlapping slots; invalidates availability cache. Delete regenerates horizon via `SlotGenerationService`.
@@ -66,14 +46,14 @@ Status: **Done** (sub-phases 07a–07o). Payment receipt review, approve/decline
 - Conflict responses include `conflictingBookingIds` in problem extensions.
 - Tests: `BlockedDateValidatorTests`, `AdminBlockedDateEndpointTests`.
 
-**Frontend (07g):**
+**Blocked dates UI (frontend):**
 
 - Extended `admin-availability-page.component.*` — blocked dates list + add form on `/admin/availability`.
 - `blocked-date.util.ts` — UTC datetime helpers, Cairo display formatting, client validation.
 - `core/admin/admin-blocked-date.service.ts` — `GET/POST/DELETE /admin/blocked-dates`; invalidates public availability cache after mutations.
 - `readConflictingBookingIds()` in `api-error.util.ts` — surfaces booking IDs from 409 conflict responses.
 
-**Backend (07h):**
+**Admin bookings list API (backend):**
 
 - `GET /api/v1/admin/bookings?status=&from=&to=&page=&pageSize=` — paginated admin booking list (default `pageSize` 20, max 100), ordered most-recent slot first.
 - `AdminBookingListService` — joins client display name, maps cancellation audit labels, exposes `paymentId` / `refundDue` for later admin actions.
@@ -81,41 +61,41 @@ Status: **Done** (sub-phases 07a–07o). Payment receipt review, approve/decline
 - Contracts: `AdminBookingsContracts.cs` + `booking.ts` admin list types.
 - Tests: `AdminBookingsQueryValidatorTests`, `AdminBookingsListEndpointTests`.
 
-**Frontend (07i):**
+**Admin bookings table UI (frontend):**
 
 - `bookings/admin-bookings-page.component.*` — paginated table at `/admin/bookings` with status and date filters.
 - `bookings/admin-bookings-labels.util.ts` — Localized status/delivery labels, slot formatting, cancellation notes.
 - `core/admin/admin-bookings.service.ts` — `GET /admin/bookings` with query params.
 
-**Frontend (07j):**
+**Receipt review UI (frontend):**
 
 - `bookings/admin-receipt-review-panel.component.*` — modal panel for viewing receipt image/history and approve/decline actions on `PendingApproval` rows.
 - `bookings/admin-receipt-labels.util.ts` — Localized payment/receipt labels, decline reason options, formatting helpers.
 - `core/admin/admin-bookings.service.ts` — extended with `GET/POST` receipt review endpoints.
 
-**Backend (07k):**
+**Cancellation API (backend):**
 
 - `AdminBookingCancellationService` — direct cancel, approve/decline cancellation requests with slot release and payment/refund-due semantics.
 - `AdminBookingsController` — `POST /cancel`, `POST /cancellation-requests/approve`, `POST /cancellation-requests/decline`.
 - Contracts: `AdminBookingCancellationContracts.cs` + `booking.ts` admin cancellation types.
 - Tests: `AdminBookingCancellationEndpointTests`.
 
-**Frontend (07l):**
+**Cancellation queue UI (frontend):**
 
 - `bookings/admin-cancellation-review-panel.component.*` — modal for pending cancellation requests with countdown, approve/decline.
 - `bookings/admin-cancellation-labels.util.ts` — queue notes, countdown, direct-cancel guards, decline reason labels.
 - Extended `AdminBookingListItem` with `cancellationRequest` summary (backend + `booking.ts`).
-- `admin-bookings-page.*` — cancellation queue row highlighting, direct cancel button, wired to 07k endpoints.
+- `admin-bookings-page.*` — cancellation queue row highlighting, direct cancel button, wired to cancellation endpoints.
 - `core/admin/admin-bookings.service.ts` — `cancel`, `approveCancellationRequest`, `declineCancellationRequest`.
 
-**Frontend (07m):**
+**Refund due UI (frontend):**
 
 - `bookings/admin-refund-panel.component.*` — record manual refund (reference + note).
 - `bookings/admin-refund-labels.util.ts` — refund-due / refunded row guards and action visibility.
 - `core/admin/admin-payments.service.ts` — `POST /admin/payments/{id}/refunds/record`.
 - `admin-bookings-page.*` — refund-due row highlight, Record refund action.
 
-**Backend (07n):**
+**Earnings API (backend):**
 
 - `GET /api/v1/admin/earnings?from=&to=` — gross/refunded/net revenue and payment counts; optional date filter on booking `SlotStartUtc` (same semantics as admin bookings list).
 - `AdminEarningsService` — aggregates `Payment` rows (`Approved`/`Refunded` for gross; `Refunded` for refunded amount; cancelled + `Approved` payment for refund-due count).
@@ -123,13 +103,13 @@ Status: **Done** (sub-phases 07a–07o). Payment receipt review, approve/decline
 - Contracts: `AdminEarningsContracts.cs` + `earnings.ts`.
 - Tests: `AdminEarningsQueryValidatorTests`, `AdminEarningsEndpointTests`.
 
-**Frontend (07n):**
+**Earnings UI (frontend):**
 
 - `earnings/admin-earnings-page.component.*` — summary cards at `/admin/earnings` with date filters.
 - `earnings/admin-earnings-labels.util.ts` — Localized amount/count formatting.
 - `core/admin/admin-earnings.service.ts` — `GET /admin/earnings`.
 
-**Backend (07o):**
+**Ops alerts API (backend):**
 
 - `AdminOpsController` — `GET /api/v1/admin/ops/alerts` (Admin role).
 - `AdminOpsMonitoringService` — maps `OpsMonitoringService.EvaluateAlertsAsync` to `AdminOpsAlertsResponse`.
@@ -219,4 +199,4 @@ The single practitioner's personal admin panel: manage availability, edit the se
 
 ## 8. Open Items for This Area
 
-- None for MVP ops alerts — `/admin/ops` is wired (spec 08.9).
+- None for MVP ops alerts — `/admin/ops` is wired (spec 08).

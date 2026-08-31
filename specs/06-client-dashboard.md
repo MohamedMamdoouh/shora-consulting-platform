@@ -1,23 +1,8 @@
 # 06 — Client Dashboard
 
-Status: **Implemented** (sub-phases 06a–06j, 2026-08).
+Status: **Implemented**.
 
 The client dashboard at `/dashboard` is fully wired to `GET /api/v1/bookings/mine` and the booking/payment/cancellation client APIs described in specs 04–05. RTL UI; slot times render in the visitor's local browser timezone.
-
-### Implementation status
-
-| Sub-phase | Scope | Status |
-| --------- | ----- | ------ |
-| 06a | Shared TS + C# contracts for `GET /bookings/mine` | **Done** |
-| 06b | `BookingService.ListMineAsync` — owner scoping, status filters, past pagination | **Done** |
-| 06c | L2 cancellation/refund labels, payment summary, receipt SAS thumbnail, consultant WhatsApp | **Done** |
-| 06d | HTTP endpoint + integration tests | **Done** |
-| 06e | Dashboard shell — three sections, parallel load, empty state | **Done** |
-| 06f | Past section — local times, status/reason/refund labels, load-more pagination | **Done** |
-| 06g | `PendingPayment` card — shared payment panel, countdown, upload, cancel hold | **Done** |
-| 06h | `PendingApproval` card — under-review message, receipt thumbnail, cancel hold | **Done** |
-| 06i | Upcoming cards — voice-call copy, pre-filled `wa.me` chat link, local timezone | **Done** |
-| 06j | Cancellation UX — request, pending banner, declined banner, decision-seen, reopen, WhatsApp fallback | **Done** |
 
 **Backend:** `BookingsController` (`GET /mine`, `POST /{id}/cancel`, cancellation-request endpoints), `BookingService.ListMineAsync`, `MyBookingLabelMapper`, unit + integration tests.
 

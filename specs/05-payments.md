@@ -1,19 +1,6 @@
 ﻿# 05 — Manual Payment Verification (Vodafone Cash / InstaPay)
 
-Status: **Done (backend 05a–05h; client UI in spec 06; admin UI in spec 07).** Blob reconciliation (05h) is implemented in [spec 08](08-cross-cutting-concerns.md) as `ReceiptBlobReconciliationService`.
-
-### Implementation status (backend)
-
-| Sub-phase | Scope | Status |
-| --------- | ----- | ------ |
-| 05a | Azure `IFileStorage`, Azurite dev setup, integration tests | **Done** |
-| 05b | `POST /api/v1/payments/{bookingId}/receipt`, validation, state transitions | **Done** |
-| 05c | `GET /api/v1/admin/bookings/{id}/receipts` + on-demand SAS URLs | **Done** |
-| 05d | Admin approve/decline receipts, `RowVersion` guards, outbox emails | **Done** |
-| 05e | SHA-256 duplicate-hash warnings, receipt upload rate limit (5/min/IP) | **Done** |
-| 05f | `IMalwareScanner` stub; admin SAS URLs only when scan `Clean` | **Done** |
-| 05g | `POST …/refunds/record` (idempotent record) | **Done** |
-| 05h | Blob reconciliation job (`BlobFinalizePending`, orphan temps) | **Done** (spec 08.6) |
+Status: **Done** (backend, client UI in spec 06, admin UI in spec 07). Blob reconciliation is implemented in [spec 08](08-cross-cutting-concerns.md) as `ReceiptBlobReconciliationService`.
 
 **Implemented endpoints:** `GET /api/v1/bookings/{id}/payment-instructions`, `POST /api/v1/payments/{bookingId}/receipt`, `GET /api/v1/admin/bookings/{id}/receipts`, `POST /api/v1/admin/bookings/{id}/receipts/approve`, `POST /api/v1/admin/bookings/{id}/receipts/decline`, `POST /api/v1/admin/payments/{id}/refunds/record`.
 

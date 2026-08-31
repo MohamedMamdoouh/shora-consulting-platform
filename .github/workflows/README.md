@@ -42,7 +42,7 @@ Stop any running `Shora.Api` process before building the backend — a running A
 
 See [docs/deployment.md](../docs/deployment.md) for:
 
-1. Neon PostgreSQL + Azure Blob storage
+1. Supabase PostgreSQL + Azure Blob storage
 2. Render web service (Git + Docker, `main` branch, auto-deploy)
 3. Render environment variables
 4. Branch protection on `main`

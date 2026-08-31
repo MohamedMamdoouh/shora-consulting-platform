@@ -1,22 +1,8 @@
 # 08 — Cross-Cutting Concerns (Ops, Security, Deployment)
 
-Status: **Done** (sub-phases 08.1–08.9). Observability, outbox email delivery, all background jobs, full rate-limit matrix, and ops monitoring with runbooks are implemented.
+Status: **Done**. Observability, outbox email delivery, all background jobs, full rate-limit matrix, and ops monitoring with runbooks are implemented.
 
 This spec consolidates operational and cross-cutting requirements referenced by specs 01–07: rate limiting, logging/auditing/monitoring, the background-job execution model, deployment, and data retention.
-
-### Implementation summary
-
-| Sub-phase | Scope                                                                                   | Status   |
-| --------- | --------------------------------------------------------------------------------------- | -------- |
-| 08.1      | Correlation ID, `JobRunHistory`, job heartbeat, `BackgroundJobHost`, payment log scopes | **Done** |
-| 08.2      | Transaction HTML email templates + `IOutboxEmailRenderer`                               | **Done** |
-| 08.3      | Outbox dispatcher (retry/backoff, dead-letter after 8 attempts)                         | **Done** |
-| 08.4      | Production Brevo sender (`BrevoEmailSender`)                                            | **Done** |
-| 08.5      | Cancellation auto-decline + booking auto-complete jobs                                  | **Done** |
-| 08.6      | Refresh-token purge + receipt blob reconciliation (05h)                                 | **Done** |
-| 08.7      | Availability horizon top-up (nightly)                                                   | **Done** |
-| 08.8      | Full rate-limit matrix (auth, availability, booking, receipt, cancellation)             | **Done** |
-| 08.9      | Ops monitoring job, admin alerts API, runbooks                                          | **Done** |
 
 ---
 
@@ -108,7 +94,7 @@ Tunable via `appsettings.json` (see `BackgroundJobOptions`, `OpsMonitoringOption
 | `OpsMonitoring:*`                  | Alert thresholds (pending approval hours, refund-due hours, heartbeat multipliers, dead-letter burst count/window) |
 | `RateLimiting:*`                   | Per-endpoint IP limits                                                                                             |
 | `ReceiptUpload:RateLimitPerMinute` | Receipt upload cap (default 5/min/IP)                                                                              |
-| `Email:*`                          | Brevo API key, from address (spec 08.4)                                                                            |
+| `Email:*`                          | Brevo API key, from address                                                                                        |
 
 ## 4. Deployment
 

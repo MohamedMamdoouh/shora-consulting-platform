@@ -1,8 +1,8 @@
 # 09 — CI/CD Pipeline
 
-Status: **Sub-phases 09.1–09.10 done** in repo. **Deploy target:** Render (Git + Docker) + Neon PostgreSQL + Azure Blob (receipts). Operator guide: [docs/deployment.md](../docs/deployment.md).
+Status: **Done** in repo. **Deploy target:** Render (Git + Docker) + Supabase PostgreSQL + Azure Blob (receipts). Operator guide: [docs/deployment.md](../docs/deployment.md).
 
-This spec defines how Shora is built, validated, and deployed. It complements spec 08 #4 (hosting topology) with GitHub Actions workflows and sub-phases 09.1–09.10. Workflow YAML stays thin; this document is the authoritative design.
+This spec defines how Shora is built, validated, and deployed. It complements spec 08 #4 (hosting topology) with GitHub Actions workflows. Workflow YAML stays thin; this document is the authoritative design.
 
 ### Workflow files
 
@@ -14,28 +14,13 @@ Production releases: push to `main` → Render builds [`Dockerfile`](../Dockerfi
 
 Operator go-live steps: [docs/deployment.md](../docs/deployment.md).
 
-### Implementation summary
-
-| Sub-phase | Scope                                                   | Status                                           |
-| --------- | ------------------------------------------------------- | ------------------------------------------------ |
-| 09.1      | CI path detection (`changes` job)                       | **Done**                                         |
-| 09.2      | Backend CI (restore, build, test)                       | **Done**                                         |
-| 09.3      | Frontend CI (install, build, test)                      | **Done**                                         |
-| 09.4      | CI hygiene (Dependabot, branch protection, CI badge)    | **Done**                                         |
-| 09.5      | Same-site static hosting (`wwwroot`, SPA fallback)      | **Done**                                         |
-| 09.6      | Production config contract (env vars, CORS origin)      | **Done**                                         |
-| 09.7      | Hosting prerequisites (Render + Neon + Azure Blob)      | **Done** (operator checklist)                    |
-| 09.8      | Production Docker image (multi-stage `Dockerfile`)      | **Done** (Render builds on deploy)               |
-| 09.9      | Render auto-deploy on push to `main`                    | **Done** (no GitHub deploy secrets required)     |
-| 09.10     | Startup migrations & rollback policy                    | **Done** (code)                                  |
-
 ---
 
 ## 1. Goals
 
 - **Fast PR feedback** — every change to `main` is buildable and testable before merge.
 - **Reproducible builds** — pinned toolchains (.NET 10, Node 22) and lock files (`package-lock.json`, NuGet restore).
-- **Safe deploy path (09.5–09.9)** — production releases on **Render** (single container, Docker build from Git, same-site SPA + API) with **Neon PostgreSQL** and **Azure Blob** for receipts only; aligned with spec 02 same-site auth (`SameSite=Strict` refresh cookies). Local development uses `Development` / dev tooling only — no separate staging environment.
+- **Safe deploy path** — production releases on **Render** (single container, Docker build from Git, same-site Angular app + API) with **Supabase PostgreSQL** and **Azure Blob** for receipts only; aligned with spec 02 same-site auth (`SameSite=Strict` refresh cookies). Local development uses `Development` / dev tooling only — no separate staging environment.
 
 ## 2. Repository & Triggers
 
@@ -48,7 +33,7 @@ Operator go-live steps: [docs/deployment.md](../docs/deployment.md).
 
 ---
 
-## 09.1 — CI path detection
+## 3. CI path detection
 
 **Purpose:** Decide whether backend or frontend CI jobs should run based on changed paths — saves runner minutes on docs-only edits.
 
@@ -65,7 +50,7 @@ Backend and frontend jobs run only when their paths (or `.github/workflows/**`) 
 
 ---
 
-## 09.2 — Backend CI
+## 4. Backend CI
 
 **Purpose:** Prove every backend change compiles and passes tests before merge.
 
@@ -94,7 +79,7 @@ Stop any running `Shora.Api` process before building — a running API locks out
 
 ---
 
-## 09.3 — Frontend CI
+## 5. Frontend CI
 
 **Purpose:** Prove the Angular app builds for production and unit tests pass headlessly.
 
@@ -121,7 +106,7 @@ $env:CI = "true"; npm test
 
 ---
 
-## 09.4 — CI hygiene
+## 6. CI hygiene
 
 **Purpose:** Keep dependencies current, enforce green CI before merge, and surface pipeline health.
 
@@ -139,9 +124,9 @@ $env:CI = "true"; npm test
 
 ---
 
-## 09.5 — Same-site static hosting
+## 7. Same-site static hosting
 
-**Purpose:** Enable production model where browser hits **one origin** for both SPA and API (required for `SameSite=Strict` refresh cookies, spec 02).
+**Purpose:** Enable production model where browser hits **one origin** for both the Angular app and API (required for `SameSite=Strict` refresh cookies, spec 02).
 
 **Done.** Non-Development environments serve static files from [`wwwroot/`](../src/backend/Shora.Api/wwwroot/) and fall back to `index.html` for client routes. `/api/**` remains handled by controllers.
 
@@ -149,7 +134,7 @@ Changes in [`Program.cs`](../src/backend/Shora.Api/Program.cs):
 
 - `UseDefaultFiles()` + `UseStaticFiles()` when not `Development`
 - `MapFallbackToFile("index.html")` after `MapControllers()` when not `Development`
-- Build output in `wwwroot/` is gitignored (`.gitkeep` only); populated during the Docker build on Render (09.8)
+- Build output in `wwwroot/` is gitignored (`.gitkeep` only); populated during the Docker build on Render
 - Frontend uses relative `apiBaseUrl: '/api/v1'` in [`environment.production.ts`](../src/frontend/src/environments/environment.production.ts)
 
 **Verify locally:**
@@ -163,12 +148,12 @@ Copy-Item -Recurse -Force dist/shora-web/browser/* ../backend/Shora.Api/wwwroot/
 cd ../backend
 $env:ASPNETCORE_ENVIRONMENT = "Production"
 dotnet run --project Shora.Api
-# Browse / for SPA, /api/v1/health for API — same port
+# Browse / for the site, /api/v1/health for API — same port
 ```
 
 ---
 
-## 09.6 — Production config contract
+## 8. Production config contract
 
 **Purpose:** Define the exact environment variables the production host must have — no guessing at deploy time.
 
@@ -178,7 +163,7 @@ Set secrets via environment variables (double-underscore nesting). Never commit 
 
 | Setting                                   | Notes                                                                                                      |
 | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `ConnectionStrings__DefaultConnection`    | Neon PostgreSQL                                                                                            |
+| `ConnectionStrings__DefaultConnection`    | Supabase PostgreSQL (session pooler, port 5432 — see [`docs/deployment.md`](../docs/deployment.md))        |
 | `Jwt__SigningKey`                         | Strong random key, min 32 chars (spec 02)                                                                  |
 | `Storage__ConnectionString`               | Blob account — private Azure Storage container (spec 05)                                                   |
 | `Storage__ReceiptContainer`               | Private container name (`receipts`)                                                                        |
@@ -202,7 +187,7 @@ Set `Frontend__BaseUrl` and `Cors__AllowedOrigins__0` on Render to the same prod
 
 ---
 
-## 09.7 — Hosting prerequisites
+## 9. Hosting prerequisites
 
 **Purpose:** Create the resources CD will target.
 
@@ -211,14 +196,14 @@ Set `Frontend__BaseUrl` and `Cors__AllowedOrigins__0` on Render to the same prod
 | Resource               | Purpose                                              |
 | ---------------------- | ---------------------------------------------------- |
 | **Render**             | Host .NET 10 API + static Angular (Docker from Git)  |
-| **Neon PostgreSQL**    | Production database                                  |
+| **Supabase PostgreSQL** | Production database                                  |
 | **Azure Blob Storage** | Private receipt container (spec 05)                  |
 
 **Verify:** Render env vars configured; push to `main` triggers build; `GET https://<production-url>/api/v1/health` returns OK.
 
 ---
 
-## 09.8 — Production Docker image
+## 10. Production Docker image
 
 **Purpose:** Reproducible production image that bundles frontend + API — built by Render from [`Dockerfile`](../Dockerfile).
 
@@ -232,40 +217,40 @@ Set `Frontend__BaseUrl` and `Cors__AllowedOrigins__0` on Render to the same prod
 
 ---
 
-## 09.9 — Render auto-deploy
+## 11. Render auto-deploy
 
-**Purpose:** Deploy production automatically when `main` is updated, after hosting exists (09.7).
+**Purpose:** Deploy production automatically when `main` is updated, after hosting exists.
 
 **Done.** Render web service connected to GitHub with **Auto-Deploy** on `main`. Setup: [docs/deployment.md](../docs/deployment.md), [`.github/workflows/README.md`](../.github/workflows/README.md).
 
 | Concern          | Design                                                                                        |
 | ---------------- | --------------------------------------------------------------------------------------------- |
 | **Triggers**     | Push to `main` on GitHub → Render Docker build + deploy                                       |
-| **Build**        | Same sequence as 09.8 inside [`Dockerfile`](../Dockerfile)                                    |
+| **Build**        | Multi-stage sequence inside [`Dockerfile`](../Dockerfile)                                     |
 | **Deploy target**| Render web service (Git + Docker)                                                             |
 | **GitHub**       | CI only ([`ci.yml`](../.github/workflows/ci.yml)) — no deploy secrets required on GitHub      |
 
 ### Render setup
 
-1. Neon + Azure Blob + Render web service — [docs/deployment.md](../docs/deployment.md)
+1. Supabase + Azure Blob + Render web service — [docs/deployment.md](../docs/deployment.md)
 2. Connect repo `MohamedMamdoouh/shora-consulting-platform`, branch `main`, language **Docker**
 3. **Dockerfile Path:** `Dockerfile` · **Build context:** `.`
 4. Health check: `/api/v1/health`
-5. Set production env vars on Render (09.6)
+5. Set production env vars on Render (see §8)
 6. Enable branch protection on `main` — CI green before merge, then push auto-deploys on Render
 
 ### Deploy sequence
 
 1. CI should pass on the PR before merge (branch protection recommended); merge to `main` triggers Render
-2. Render builds Docker image (09.8) and deploys
+2. Render builds the Docker image and deploys
 3. Operator verifies manually: `GET /api/v1/health`, `/`, and `/about` on production URL
-4. App startup applies EF migrations and idempotent seed (09.10)
+4. App startup applies EF migrations and idempotent seed (see §12)
 
 **Verify:** After Render is configured, merge to `main` deploys automatically; app reachable over HTTPS with same-site cookies.
 
 ---
 
-## 09.10 — Startup migrations & rollback policy
+## 12. Startup migrations & rollback policy
 
 **Purpose:** Clarify operational behavior for schema changes at deploy time.
 
@@ -281,7 +266,7 @@ Set `Frontend__BaseUrl` and `Cors__AllowedOrigins__0` on Render to the same prod
 
 MVP requires frontend and API on the **same registrable domain** over HTTPS (spec 02 #deployment constraint, spec 08 #4).
 
-- Angular static files served from the API host (`wwwroot`) — see 09.5.
+- Angular static files served from the API host (`wwwroot`) — see §7.
 - API routes remain under `/api/**`.
 - **Not** split across unrelated subdomains with cross-site cookies in MVP.
 - CORS configured for the single app origin with `AllowCredentials` (spec 08 #4).
@@ -313,7 +298,7 @@ npm run build
 CI=true npm test
 ```
 
-**Production Docker image (09.8):** `docker build -t shora:local .` from repo root, or push to `main` and watch Render build logs. See [`Dockerfile`](../Dockerfile) and [docs/deployment.md](../docs/deployment.md).
+**Production Docker image:** `docker build -t shora:local .` from repo root, or push to `main` and watch Render build logs. See [`Dockerfile`](../Dockerfile) and [docs/deployment.md](../docs/deployment.md).
 
 **Note:** stop any running `Shora.Api` process before `dotnet build` locally — a running API locks output DLLs and breaks the build.
 

@@ -3,6 +3,7 @@ WORKDIR /src/frontend
 COPY src/frontend/package.json src/frontend/package-lock.json ./
 RUN npm ci
 COPY src/frontend/ ./
+COPY src/contracts/ ../contracts/
 RUN npm run build
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS backend

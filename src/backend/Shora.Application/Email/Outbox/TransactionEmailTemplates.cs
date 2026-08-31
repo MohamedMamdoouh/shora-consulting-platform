@@ -1,4 +1,5 @@
 using Shora.Application.Availability;
+using Shora.Application.Email;
 using Shora.Domain.Entities;
 using Shora.Domain.Enums;
 
@@ -106,20 +107,18 @@ internal static class TransactionEmailTemplates
             ConsultantTimeZone);
 
         return new EmailTemplateRequest(
-            ContentTemplate: "Transaction/client-booking-confirmed.content.html",
-            PreviewText: "تم تأكيد حجزك بنجاح.",
+            BodyHtml: EmailHtml.Join(
+                EmailHtml.Paragraph("أؤكد حجزك بنجاح."),
+                EmailHtml.DetailsList(
+                    ("موعد الجلسة", slotText),
+                    ("طريقة التسليم", TransactionEmailLabels.FormatDeliveryMethod(booking.DeliveryMethod))),
+                TransactionEmailLabels.FormatDeliveryInstructionsHtml(booking, context.Settings),
+                EmailHtml.ParagraphLast("يمكنك متابعة تفاصيل الحجز من لوحة العميل.")),
             Heading: "تم تأكيد حجزك",
             ActionUrl: links.ClientDashboard(),
             ActionLabel: "عرض حجوزاتي",
             RecipientName: context.Recipient.DisplayName,
-            FooterNote: "أتطلع إلى جلستك. إذا احتجت مساعدة، راسلني عبر لوحة العميل.",
-            AdditionalTokens: BuildDetailTokens(
-                ("SlotTime", TransactionEmailLabels.HtmlEncode(slotText)),
-                ("DeliveryMethod", TransactionEmailLabels.HtmlEncode(
-                    TransactionEmailLabels.FormatDeliveryMethod(booking.DeliveryMethod))),
-                ("DeliveryInstructions", TransactionEmailLabels.FormatDeliveryInstructionsHtml(
-                    booking,
-                    context.Settings))));
+            FooterNote: "أتطلع إلى جلستك. إذا احتجت مساعدة، راسلني عبر لوحة العميل.");
     }
 
     private static EmailTemplateRequest BuildAdminNewBooking(
@@ -137,19 +136,19 @@ internal static class TransactionEmailTemplates
             : booking.ContactPhone;
 
         return new EmailTemplateRequest(
-            ContentTemplate: "Transaction/admin-new-booking.content.html",
-            PreviewText: "تم تأكيد حجز جديد.",
+            BodyHtml: EmailHtml.Join(
+                EmailHtml.Paragraph("تم تأكيد حجز جديد بعد قبول الإيصال."),
+                EmailHtml.DetailsList(
+                    ("العميل", client.DisplayName, false),
+                    ("موعد الجلسة", slotText, false),
+                    ("طريقة التسليم", TransactionEmailLabels.FormatDeliveryMethod(booking.DeliveryMethod), false),
+                    ("رقم التواصل", contactPhone, true)),
+                EmailHtml.ParagraphLast("راجع تفاصيل الحجز في لوحة الإدارة.")),
             Heading: "حجز جديد مؤكد",
             ActionUrl: links.AdminBookings(),
             ActionLabel: "مراجعة الحجوزات",
             RecipientName: context.Recipient.DisplayName,
-            FooterNote: "راجع تفاصيل الحجز في لوحة الإدارة.",
-            AdditionalTokens: BuildDetailTokens(
-                ("ClientName", TransactionEmailLabels.HtmlEncode(client.DisplayName)),
-                ("SlotTime", TransactionEmailLabels.HtmlEncode(slotText)),
-                ("DeliveryMethod", TransactionEmailLabels.HtmlEncode(
-                    TransactionEmailLabels.FormatDeliveryMethod(booking.DeliveryMethod))),
-                ("ContactPhone", TransactionEmailLabels.HtmlEncode(contactPhone))));
+            FooterNote: "راجع تفاصيل الحجز في لوحة الإدارة.");
     }
 
     private static EmailTemplateRequest BuildAdminReceiptUploaded(
@@ -163,16 +162,15 @@ internal static class TransactionEmailTemplates
             ConsultantTimeZone);
 
         return new EmailTemplateRequest(
-            ContentTemplate: "Transaction/admin-receipt-uploaded.content.html",
-            PreviewText: "إيصال دفع جديد بانتظار مراجعتك.",
+            BodyHtml: EmailHtml.Join(
+                EmailHtml.Paragraph($"رفع العميل {booking.Client.DisplayName} إيصال دفع جديد ويحتاج إلى مراجعتك."),
+                EmailHtml.DetailsList(("موعد الجلسة", slotText)),
+                EmailHtml.ParagraphLast("يرجى مراجعة الإيصال واتخاذ قرار القبول أو الرفض.")),
             Heading: "إيصال جديد بانتظار المراجعة",
             ActionUrl: links.AdminBookings(),
             ActionLabel: "مراجعة الإيصال",
             RecipientName: context.Recipient.DisplayName,
-            FooterNote: "يرجى مراجعة الإيصال في أقرب وقت ممكن.",
-            AdditionalTokens: BuildDetailTokens(
-                ("ClientName", TransactionEmailLabels.HtmlEncode(booking.Client.DisplayName)),
-                ("SlotTime", TransactionEmailLabels.HtmlEncode(slotText))));
+            FooterNote: "يرجى مراجعة الإيصال في أقرب وقت ممكن.");
     }
 
     private static EmailTemplateRequest BuildClientReceiptDeclined(
@@ -181,23 +179,24 @@ internal static class TransactionEmailTemplates
     {
         var booking = context.Booking;
         var reason = TransactionEmailLabels.FormatReceiptDeclineReason(context.ReasonCode);
-        var note = TransactionEmailLabels.OptionalNoteParagraph(context.ReasonNote);
+        var note = EmailHtml.OptionalNoteParagraph(context.ReasonNote);
         var deadline = context.ReceiptUploadDeadlineUtc is { } deadlineUtc
             ? TransactionEmailLabels.FormatDateTimeUtc(deadlineUtc, ConsultantTimeZone)
             : "—";
 
         return new EmailTemplateRequest(
-            ContentTemplate: "Transaction/client-receipt-declined.content.html",
-            PreviewText: "يرجى إعادة رفع إيصال الدفع.",
+            BodyHtml: EmailHtml.Join(
+                EmailHtml.Paragraph("لم أتمكن من قبول إيصال الدفع الأخير."),
+                EmailHtml.DetailsList(
+                    ("سبب الرفض", reason),
+                    ("آخر موعد لرفع الإيصال", deadline)),
+                note,
+                EmailHtml.ParagraphLast("يرجى رفع إيصال جديد قبل انتهاء المهلة.")),
             Heading: "يرجى إعادة رفع الإيصال",
             ActionUrl: links.ClientPayment(booking.Id),
             ActionLabel: "رفع إيصال جديد",
             RecipientName: context.Recipient.DisplayName,
-            FooterNote: "إذا كان لديك أي استفسار، راسلني عبر لوحة العميل.",
-            AdditionalTokens: BuildDetailTokens(
-                ("DeclineReason", TransactionEmailLabels.HtmlEncode(reason)),
-                ("ReasonNoteHtml", note),
-                ("UploadDeadline", TransactionEmailLabels.HtmlEncode(deadline))));
+            FooterNote: "إذا كان لديك أي استفسار، راسلني عبر لوحة العميل.");
     }
 
     private static EmailTemplateRequest BuildClientBookingCancelled(
@@ -210,20 +209,27 @@ internal static class TransactionEmailTemplates
             ConsultantTimeZone);
         var cancelledBy = TransactionEmailLabels.FormatCancelledBy(context.CancellationReasonLabel);
         var cancellationDetail = TransactionEmailLabels.FormatCancellationDetail(context.CancellationDetail);
+        var details = new List<(string Label, string Value)>
+        {
+            ("موعد الجلسة", slotText),
+            ("من قام بالإلغاء", cancelledBy)
+        };
+
+        if (!string.IsNullOrWhiteSpace(cancellationDetail))
+        {
+            details.Add(("السبب", cancellationDetail));
+        }
 
         return new EmailTemplateRequest(
-            ContentTemplate: "Transaction/client-booking-cancelled.content.html",
-            PreviewText: "تم إلغاء حجزك.",
+            BodyHtml: EmailHtml.Join(
+                EmailHtml.Paragraph("تم إلغاء حجزك."),
+                EmailHtml.DetailsList(details.ToArray()),
+                EmailHtml.ParagraphLast("إذا كان لديك أي استفسار، يمكنك التواصل معي عبر لوحة العميل.")),
             Heading: "تم إلغاء الحجز",
             ActionUrl: links.ClientDashboard(),
             ActionLabel: "عرض حجوزاتي",
             RecipientName: context.Recipient.DisplayName,
-            FooterNote: "يمكنك حجز موعد جديد في أي وقت.",
-            AdditionalTokens: BuildDetailTokens(
-                ("SlotTime", TransactionEmailLabels.HtmlEncode(slotText)),
-                ("CancelledBy", TransactionEmailLabels.HtmlEncode(cancelledBy)),
-                ("CancellationDetailItemHtml",
-                    TransactionEmailLabels.OptionalListItem("السبب", cancellationDetail))));
+            FooterNote: "يمكنك حجز موعد جديد في أي وقت.");
     }
 
     private static EmailTemplateRequest BuildAdminNewCancellationRequest(
@@ -243,18 +249,18 @@ internal static class TransactionEmailTemplates
             : context.ClientReason;
 
         return new EmailTemplateRequest(
-            ContentTemplate: "Transaction/admin-new-cancellation-request.content.html",
-            PreviewText: "طلب إلغاء جديد بانتظار قرارك.",
+            BodyHtml: EmailHtml.Join(
+                EmailHtml.Paragraph($"قدم العميل {booking.Client.DisplayName} طلب إلغاء جديد."),
+                EmailHtml.DetailsList(
+                    ("موعد الجلسة", slotText),
+                    ("سبب العميل", clientReason),
+                    ("الإغلاق التلقائي", autoDecline)),
+                EmailHtml.ParagraphLast("يرجى مراجعة الطلب واتخاذ قرار قبل موعد الإغلاق التلقائي.")),
             Heading: "طلب إلغاء جديد",
             ActionUrl: links.AdminBookings(),
             ActionLabel: "مراجعة طلب الإلغاء",
             RecipientName: context.Recipient.DisplayName,
-            FooterNote: "يرجى اتخاذ قرار قبل موعد الإغلاق التلقائي.",
-            AdditionalTokens: BuildDetailTokens(
-                ("ClientName", TransactionEmailLabels.HtmlEncode(booking.Client.DisplayName)),
-                ("SlotTime", TransactionEmailLabels.HtmlEncode(slotText)),
-                ("ClientReason", TransactionEmailLabels.HtmlEncode(clientReason)),
-                ("AutoDeclineAt", TransactionEmailLabels.HtmlEncode(autoDecline))));
+            FooterNote: "يرجى اتخاذ قرار قبل موعد الإغلاق التلقائي.");
     }
 
     private static EmailTemplateRequest BuildClientCancellationRequestDeclined(
@@ -263,24 +269,25 @@ internal static class TransactionEmailTemplates
     {
         var booking = context.Booking;
         var reason = TransactionEmailLabels.FormatCancellationDecisionReason(context.ReasonCode);
-        var note = TransactionEmailLabels.OptionalNoteParagraph(context.ReasonNote);
+        var note = EmailHtml.OptionalNoteParagraph(context.ReasonNote);
         var slotText = TransactionEmailLabels.FormatSlotRange(
             booking.SlotStartUtc,
             booking.SlotEndUtc,
             ConsultantTimeZone);
 
         return new EmailTemplateRequest(
-            ContentTemplate: "Transaction/client-cancellation-request-declined.content.html",
-            PreviewText: "تم رفض طلب الإلغاء ويبقى موعدك قائمًا.",
+            BodyHtml: EmailHtml.Join(
+                EmailHtml.Paragraph("تم رفض طلب الإلغاء، وموعدك ما زال مؤكدًا."),
+                EmailHtml.DetailsList(
+                    ("سبب الرفض", reason),
+                    ("موعد الجلسة", slotText)),
+                note,
+                EmailHtml.ParagraphLast("أتطلع إلى جلستك في الموعد المحدد.")),
             Heading: "تم رفض طلب الإلغاء",
             ActionUrl: links.ClientDashboard(),
             ActionLabel: "عرض حجوزاتي",
             RecipientName: context.Recipient.DisplayName,
-            FooterNote: "موعدك ما زال مؤكدًا كما هو.",
-            AdditionalTokens: BuildDetailTokens(
-                ("DeclineReason", TransactionEmailLabels.HtmlEncode(reason)),
-                ("ReasonNoteHtml", note),
-                ("SlotTime", TransactionEmailLabels.HtmlEncode(slotText))));
+            FooterNote: "موعدك ما زال مؤكدًا كما هو.");
     }
 
     private static EmailTemplateRequest BuildClientRefundConfirmation(
@@ -290,32 +297,20 @@ internal static class TransactionEmailTemplates
         var amount = context.RefundAmount ?? context.Payment?.Amount ?? 0m;
         var currency = context.RefundCurrency ?? context.Payment?.Currency ?? "EGP";
         var reference = string.IsNullOrWhiteSpace(context.RefundReference) ? "—" : context.RefundReference;
-        var note = TransactionEmailLabels.OptionalNoteParagraph(context.RefundNote);
+        var note = EmailHtml.OptionalNoteParagraph(context.RefundNote);
 
         return new EmailTemplateRequest(
-            ContentTemplate: "Transaction/client-refund-confirmation.content.html",
-            PreviewText: "تم تسجيل استرداد المبلغ.",
+            BodyHtml: EmailHtml.Join(
+                EmailHtml.Paragraph("تم تسجيل استرداد المبلغ لحجزك الذي تم إلغاؤه."),
+                EmailHtml.DetailsList(
+                    ("المبلغ", TransactionEmailLabels.FormatMoney(amount, currency), false),
+                    ("مرجع التحويل", reference, true)),
+                note,
+                EmailHtml.ParagraphLast("إذا لم تستلم المبلغ بعد، تواصل معي عبر لوحة العميل.")),
             Heading: "تأكيد الاسترداد",
             ActionUrl: links.ClientDashboard(),
             ActionLabel: "عرض حجوزاتي",
             RecipientName: context.Recipient.DisplayName,
-            FooterNote: "إذا لم تستلم المبلغ بعد، تواصل معي عبر لوحة العميل.",
-            AdditionalTokens: BuildDetailTokens(
-                ("RefundAmount", TransactionEmailLabels.HtmlEncode(
-                    TransactionEmailLabels.FormatMoney(amount, currency))),
-                ("RefundReference", TransactionEmailLabels.HtmlEncode(reference)),
-                ("RefundNoteHtml", note)));
-    }
-
-    private static Dictionary<string, string> BuildDetailTokens(
-        params (string Key, string Value)[] tokens)
-    {
-        var dictionary = new Dictionary<string, string>(StringComparer.Ordinal);
-        foreach (var (key, value) in tokens)
-        {
-            dictionary[key] = value;
-        }
-
-        return dictionary;
+            FooterNote: "إذا لم تستلم المبلغ بعد، تواصل معي عبر لوحة العميل.");
     }
 }

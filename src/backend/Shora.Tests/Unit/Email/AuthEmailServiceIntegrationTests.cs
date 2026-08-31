@@ -20,7 +20,8 @@ public class AuthEmailServiceIntegrationTests
         var request = AuthEmailTemplates.BuildRequest(
             AuthEmailKind.VerifyEmail,
             recipientName: "Alex",
-            actionUrl: "http://localhost:4200/auth/verify-email?email=test%40example.com&token=abc");
+            actionUrl: "http://localhost:4200/auth/verify-email?email=test%40example.com&token=abc",
+            brandName: brand.BrandName);
         var subject = AuthEmailTemplates.GetSubject(AuthEmailKind.VerifyEmail, brand.BrandName);
         var htmlBody = service.Render(request);
 

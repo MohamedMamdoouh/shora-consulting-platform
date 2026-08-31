@@ -13,13 +13,16 @@ internal static class AuthEmailTemplates
     public static EmailTemplateRequest BuildRequest(
         AuthEmailKind kind,
         string recipientName,
-        string actionUrl)
+        string actionUrl,
+        string brandName)
     {
         return kind switch
         {
             AuthEmailKind.VerifyEmail => new EmailTemplateRequest(
-                ContentTemplate: "Auth/verify-email.content.html",
-                PreviewText: "أكد بريدك الإلكتروني لتفعيل حسابك.",
+                BodyHtml: EmailHtml.Join(
+                    EmailHtml.Paragraph(
+                        $"شكرًا لتسجيلك لدى {brandName}. لتفعيل حسابك وإتمام الحجز، يرجى تأكيد بريدك الإلكتروني."),
+                    EmailHtml.ParagraphLast("اضغط على الزر أدناه لتأكيد بريدك الإلكتروني.")),
                 Heading: "تأكيد البريد الإلكتروني",
                 ActionUrl: actionUrl,
                 ActionLabel: "تأكيد البريد الإلكتروني",
@@ -27,8 +30,11 @@ internal static class AuthEmailTemplates
                 FooterNote: "إذا لم تنشئ هذا الحساب، يمكنك تجاهل هذه الرسالة."),
 
             AuthEmailKind.ResetPassword => new EmailTemplateRequest(
-                ContentTemplate: "Auth/reset-password.content.html",
-                PreviewText: "أعد تعيين كلمة المرور لحسابك.",
+                BodyHtml: EmailHtml.Join(
+                    EmailHtml.Paragraph(
+                        $"تلقيت طلبًا لإعادة تعيين كلمة المرور لحسابك لدى {brandName}."),
+                    EmailHtml.ParagraphLast(
+                        "اضغط على الزر أدناه لاختيار كلمة مرور جديدة. صلاحية الرابط محدودة.")),
                 Heading: "إعادة تعيين كلمة المرور",
                 ActionUrl: actionUrl,
                 ActionLabel: "تعيين كلمة مرور جديدة",

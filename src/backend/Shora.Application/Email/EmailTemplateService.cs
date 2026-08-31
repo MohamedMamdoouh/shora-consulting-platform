@@ -5,11 +5,18 @@ using Shora.Application.Options;
 
 namespace Shora.Application.Email;
 
+public sealed record EmailTemplateRequest(
+    string BodyHtml,
+    string Heading,
+    string ActionUrl,
+    string ActionLabel,
+    string RecipientName,
+    string FooterNote);
+
 public sealed class EmailTemplateService(IOptions<EmailBrandOptions> brandOptions) : IEmailTemplateService
 {
     private const string ResourcePrefix = "Shora.Application.Email.Templates.";
     private const string LayoutTemplate = "_layout.html";
-    private const string BrandTextColor = "#1a1816";
 
     private static readonly Assembly TemplateAssembly = typeof(EmailTemplateService).Assembly;
 
@@ -18,47 +25,26 @@ public sealed class EmailTemplateService(IOptions<EmailBrandOptions> brandOption
     public string Render(EmailTemplateRequest request)
     {
         var tokens = BuildTokens(request);
-        tokens["Content"] = ReplaceTokens(LoadTemplate(request.ContentTemplate), tokens);
         return ReplaceTokens(LoadTemplate(LayoutTemplate), tokens);
     }
-
-    internal static string RenderFragment(string templatePath, IReadOnlyDictionary<string, string> tokens) =>
-        ReplaceTokens(LoadTemplate(templatePath), tokens);
 
     private Dictionary<string, string> BuildTokens(EmailTemplateRequest request)
     {
         var brandName = HtmlEncode(_brand.BrandName);
 
-        var tokens = new Dictionary<string, string>(StringComparer.Ordinal)
+        return new Dictionary<string, string>(StringComparer.Ordinal)
         {
             ["RecipientName"] = HtmlEncode(request.RecipientName),
             ["BrandName"] = brandName,
             ["Heading"] = HtmlEncode(request.Heading),
-            ["PreviewText"] = HtmlEncode(request.PreviewText),
+            ["BodyHtml"] = request.BodyHtml,
             ["ActionUrl"] = request.ActionUrl,
             ["ActionLabel"] = HtmlEncode(request.ActionLabel),
             ["FooterNote"] = HtmlEncode(request.FooterNote),
-            ["BrandHeader"] = BuildBrandHeader(brandName),
+            ["BrandHeader"] = EmailHtml.BrandHeader(_brand.BrandName),
             ["Year"] = DateTime.UtcNow.Year.ToString()
         };
-
-        if (request.AdditionalTokens is not null)
-        {
-            foreach (var (key, value) in request.AdditionalTokens)
-            {
-                tokens[key] = value;
-            }
-        }
-
-        return tokens;
     }
-
-    private static string BuildBrandHeader(string brandName) =>
-        $"""
-        <p style="margin:0;font-size:22px;line-height:1;font-weight:700;color:{BrandTextColor};font-family:Georgia,'Times New Roman',serif;text-align:center;">
-          {brandName}
-        </p>
-        """;
 
     private static string LoadTemplate(string templatePath)
     {

@@ -16,7 +16,8 @@ public class EmailTemplateTests
         var request = AuthEmailTemplates.BuildRequest(
             AuthEmailKind.VerifyEmail,
             recipientName: "Alex",
-            actionUrl: "https://example.com/auth/verify-email?email=test%40example.com&token=abc");
+            actionUrl: "https://example.com/auth/verify-email?email=test%40example.com&token=abc",
+            brandName: DefaultBrand.BrandName);
         var subject = AuthEmailTemplates.GetSubject(AuthEmailKind.VerifyEmail, DefaultBrand.BrandName);
         var htmlBody = service.Render(request);
 
@@ -35,7 +36,8 @@ public class EmailTemplateTests
         var request = AuthEmailTemplates.BuildRequest(
             AuthEmailKind.ResetPassword,
             recipientName: "Alex",
-            actionUrl: "https://example.com/auth/reset-password?email=test%40example.com&token=abc");
+            actionUrl: "https://example.com/auth/reset-password?email=test%40example.com&token=abc",
+            brandName: DefaultBrand.BrandName);
         var subject = AuthEmailTemplates.GetSubject(AuthEmailKind.ResetPassword, DefaultBrand.BrandName);
         var htmlBody = service.Render(request);
 

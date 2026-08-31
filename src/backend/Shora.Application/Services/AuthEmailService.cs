@@ -38,7 +38,7 @@ public sealed class AuthEmailService(
         CancellationToken cancellationToken)
     {
         var link = BuildLink(_frontendOptions.BaseUrl, route, user.Email!, rawToken);
-        var request = AuthEmailTemplates.BuildRequest(kind, user.DisplayName, link);
+        var request = AuthEmailTemplates.BuildRequest(kind, user.DisplayName, link, _emailBrandOptions.BrandName);
         var subject = AuthEmailTemplates.GetSubject(kind, _emailBrandOptions.BrandName);
         var htmlBody = emailTemplateService.Render(request);
 

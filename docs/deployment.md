@@ -65,6 +65,8 @@ Rotate storage keys if they were ever logged.
 6. **Name:** `shora` (or your preference)
 7. **Health Check Path:** `/api/v1/health`
 8. **Region:** your choice (e.g. Frankfurt)
+9. **Dockerfile Path:** `Dockerfile`
+10. **Docker Build Context Directory:** `.` (repo root)
 
 Render reads [`Dockerfile`](../Dockerfile) from the repo root. The multi-stage build:
 
@@ -78,6 +80,7 @@ Render reads [`Dockerfile`](../Dockerfile) from the repo root. The multi-stage b
 
 | Symptom | Likely cause |
 | ------- | ------------ |
+| `Cannot find module '@contracts/...'` | Frontend build stage missing `src/contracts` — ensure [`Dockerfile`](../Dockerfile) copies `src/contracts/` |
 | Docker build fails at `npm ci` | Frontend dependency or lockfile issue — check Render build logs |
 | Docker build fails at `dotnet publish` | Backend compile error — run `dotnet build` locally |
 | `COPY` path not found | `dist/shora-web/browser` missing — frontend build stage failed |

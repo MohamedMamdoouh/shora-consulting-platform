@@ -1,15 +1,16 @@
 # 09 — CI/CD Pipeline
 
-Status: **Sub-phases 09.1–09.10 done** in repo. **Deploy target:** Railway + GHCR + Neon PostgreSQL + Azure Blob (receipts). Operator guide: [docs/deployment.md](../docs/deployment.md).
+Status: **Sub-phases 09.1–09.10 done** in repo. **Deploy target:** Render (Git + Docker) + Neon PostgreSQL + Azure Blob (receipts). Operator guide: [docs/deployment.md](../docs/deployment.md).
 
 This spec defines how Shora is built, validated, and deployed. It complements spec 08 #4 (hosting topology) with GitHub Actions workflows and sub-phases 09.1–09.10. Workflow YAML stays thin; this document is the authoritative design.
 
 ### Workflow files
 
-| File                                                              | Role                                                       | Trigger             |
-| ----------------------------------------------------------------- | ---------------------------------------------------------- | ------------------- |
-| [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)         | Build + test (backend and frontend separately)             | Push/PR to `main`   |
-| [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) | Production publish artifact + GHCR push + Railway redeploy | Push to `main` only |
+| File                                                      | Role                                           | Trigger           |
+| --------------------------------------------------------- | ---------------------------------------------- | ----------------- |
+| [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) | Build + test (backend and frontend separately) | Push/PR to `main` |
+
+Production releases: push to `main` → Render builds [`Dockerfile`](../Dockerfile) and auto-deploys. No separate GitHub deploy workflow.
 
 Operator go-live steps: [docs/deployment.md](../docs/deployment.md).
 
@@ -23,9 +24,9 @@ Operator go-live steps: [docs/deployment.md](../docs/deployment.md).
 | 09.4      | CI hygiene (Dependabot, branch protection, CI badge)    | **Done**                                         |
 | 09.5      | Same-site static hosting (`wwwroot`, SPA fallback)      | **Done**                                         |
 | 09.6      | Production config contract (env vars, CORS origin)      | **Done**                                         |
-| 09.7      | Hosting prerequisites (Railway + Neon + Azure Blob)     | **Done** (operator checklist)                    |
-| 09.8      | Publish artifact build (npm → wwwroot → dotnet publish) | **Done** (deploy.yml)                            |
-| 09.9      | Deploy workflow (`deploy.yml`, production gate)         | **Done** (needs Railway + GitHub secrets to run) |
+| 09.7      | Hosting prerequisites (Render + Neon + Azure Blob)      | **Done** (operator checklist)                    |
+| 09.8      | Production Docker image (multi-stage `Dockerfile`)      | **Done** (Render builds on deploy)               |
+| 09.9      | Render auto-deploy on push to `main`                    | **Done** (no GitHub deploy secrets required)     |
 | 09.10     | Startup migrations & rollback policy                    | **Done** (code)                                  |
 
 ---
@@ -34,7 +35,7 @@ Operator go-live steps: [docs/deployment.md](../docs/deployment.md).
 
 - **Fast PR feedback** — every change to `main` is buildable and testable before merge.
 - **Reproducible builds** — pinned toolchains (.NET 10, Node 22) and lock files (`package-lock.json`, NuGet restore).
-- **Safe deploy path (09.5–09.9)** — production releases on **Railway** (single container, same-site SPA + API) with **Neon PostgreSQL** and **Azure Blob** for receipts only; aligned with spec 02 same-site auth (`SameSite=Strict` refresh cookies). Local development uses `Development` / dev tooling only — no separate staging environment.
+- **Safe deploy path (09.5–09.9)** — production releases on **Render** (single container, Docker build from Git, same-site SPA + API) with **Neon PostgreSQL** and **Azure Blob** for receipts only; aligned with spec 02 same-site auth (`SameSite=Strict` refresh cookies). Local development uses `Development` / dev tooling only — no separate staging environment.
 
 ## 2. Repository & Triggers
 
@@ -148,7 +149,7 @@ Changes in [`Program.cs`](../src/backend/Shora.Api/Program.cs):
 
 - `UseDefaultFiles()` + `UseStaticFiles()` when not `Development`
 - `MapFallbackToFile("index.html")` after `MapControllers()` when not `Development`
-- Build output in `wwwroot/` is gitignored (`.gitkeep` only); populated at publish time (09.8)
+- Build output in `wwwroot/` is gitignored (`.gitkeep` only); populated during the Docker build on Render (09.8)
 - Frontend uses relative `apiBaseUrl: '/api/v1'` in [`environment.production.ts`](../src/frontend/src/environments/environment.production.ts)
 
 **Verify locally:**
@@ -171,7 +172,7 @@ dotnet run --project Shora.Api
 
 **Purpose:** Define the exact environment variables the production host must have — no guessing at deploy time.
 
-**Done.** Structure template: [`appsettings.Production.json`](../src/backend/Shora.Api/appsettings.Production.json). Operator guide: [`docs/deployment.md`](../docs/deployment.md). Set on **Railway**.
+**Done.** Structure template: [`appsettings.Production.json`](../src/backend/Shora.Api/appsettings.Production.json). Operator guide: [`docs/deployment.md`](../docs/deployment.md). Set on **Render**.
 
 Set secrets via environment variables (double-underscore nesting). Never commit values.
 
@@ -182,10 +183,10 @@ Set secrets via environment variables (double-underscore nesting). Never commit 
 | `Storage__ConnectionString`               | Blob account — private Azure Storage container (spec 05)                                                   |
 | `Storage__ReceiptContainer`               | Private container name (`receipts`)                                                                        |
 | `Email__*`                                | Brevo settings (spec 02, outbox) — `ApiKey` + `FromAddress` required at startup                            |
-| `Frontend__BaseUrl`                       | Production HTTPS URL (e.g. `https://<your-app>.up.railway.app`)                                            |
+| `Frontend__BaseUrl`                       | Production HTTPS URL (e.g. `https://shora.onrender.com`)                                                   |
 | `Cors__AllowedOrigins__0`                 | Same production HTTPS URL (same-site + `AllowCredentials`)                                                 |
-| `AllowedHosts`                            | Hostname only (no `https://`)                                                                              |
-| `AdminSeed__Email`, `AdminSeed__Password` | One-time admin bootstrap — remove from Railway after first login                                           |
+| `AllowedHosts`                            | Hostname only (e.g. `shora.onrender.com` — no `https://`)                                                  |
+| `AdminSeed__Email`, `AdminSeed__Password` | One-time admin bootstrap — remove from Render after first login                                            |
 | `Seed__*`                                 | Optional payment/contact defaults before first startup — see [`docs/deployment.md`](../docs/deployment.md) |
 
 Refresh cookies automatically use `Secure=true` and `SameSite=Strict` outside Development ([`RefreshCookieService`](../src/backend/Shora.Infrastructure/Services/RefreshCookieService.cs)).
@@ -195,7 +196,7 @@ Refresh cookies automatically use `Secure=true` and `SameSite=Strict` outside De
 - `Frontend:BaseUrl` or any `Cors:AllowedOrigins` entry is missing, not a valid absolute HTTPS URL, or contains the placeholder host `YOUR_PRODUCTION_HOST` (see [`ProductionConfigValidation`](../src/backend/Shora.Application/Options/ProductionConfigValidation.cs)).
 - `Cors:AllowedOrigins` is empty.
 
-Set `Frontend__BaseUrl` and `Cors__AllowedOrigins__0` on Railway to the same production HTTPS origin (no trailing slash). `http://localhost:4200` fails validation in Production even if baked into JSON — Railway env vars override JSON and must match the live URL.
+Set `Frontend__BaseUrl` and `Cors__AllowedOrigins__0` on Render to the same production HTTPS origin (no trailing slash). `http://localhost:4200` fails validation in Production even if baked into JSON — Render env vars override JSON and must match the live URL.
 
 **Verify:** App starts with env vars only; CORS accepts the production origin.
 
@@ -209,66 +210,58 @@ Set `Frontend__BaseUrl` and `Cors__AllowedOrigins__0` on Railway to the same pro
 
 | Resource               | Purpose                                              |
 | ---------------------- | ---------------------------------------------------- |
-| **Railway**            | Host .NET 10 API + static Angular (single container) |
+| **Render**             | Host .NET 10 API + static Angular (Docker from Git)  |
 | **Neon PostgreSQL**    | Production database                                  |
 | **Azure Blob Storage** | Private receipt container (spec 05)                  |
-| **GHCR**               | `ghcr.io/<owner>/<repo>:production`                  |
 
-**Verify:** Railway variables configured; GitHub Deploy workflow green; `GET https://<production-url>/api/v1/health` returns OK.
-
----
-
-## 09.8 — Publish artifact build
-
-**Purpose:** Reproducible release folder that bundles frontend + API — the artifact `deploy.yml` uploads.
-
-**Done.** Implemented in [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml) `build` job (no local script — deploy via GitHub Actions only).
-
-Sequence:
-
-1. `npm ci` + `npm run build` in `src/frontend`
-2. Copy `dist/shora-web/browser/*` → `src/backend/Shora.Api/wwwroot/`
-3. `dotnet publish Shora.Api -c Release -o ./publish`
-
-**Verify:** Run the **Deploy** workflow from GitHub Actions after hosting (09.7) and GitHub secrets (09.9) are configured.
+**Verify:** Render env vars configured; push to `main` triggers build; `GET https://<production-url>/api/v1/health` returns OK.
 
 ---
 
-## 09.9 — Deploy workflow
+## 09.8 — Production Docker image
 
-**Purpose:** Automate building the publish artifact, pushing a container to GHCR, and redeploying Railway after 09.5–09.8 are proven and hosting exists (09.7).
+**Purpose:** Reproducible production image that bundles frontend + API — built by Render from [`Dockerfile`](../Dockerfile).
 
-**Done.** Workflow: [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml). Setup: [docs/deployment.md](../docs/deployment.md), [`.github/workflows/README.md`](../.github/workflows/README.md).
+**Done.** Multi-stage Docker build at repo root:
 
-| Concern                    | Design                                                                                                                                          |
-| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Triggers**               | Push to `main` only — no manual dispatch                                                                                                        |
-| **Concurrency**            | One run per branch; `cancel-in-progress: true` cancels an older in-progress Deploy when a newer push to `main` starts                           |
-| **Environments**           | GitHub Environment `production` (optional approval gate)                                                                                        |
-| **Missing Railway config** | Deploy job **Require Railway configuration** step fails if `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`, or `RAILWAY_TOKEN` is unset — no silent skip |
-| **Build**                  | Same sequence as 09.8 in the `build` job                                                                                                        |
-| **Deploy target**          | Railway service (Docker image from GHCR)                                                                                                        |
-| **Auth**                   | GitHub secret `RAILWAY_TOKEN` (Railway **project token** for `production`); GHCR push via `GITHUB_TOKEN`                                        |
+1. **frontend** — `npm ci` + `npm run build` in `src/frontend` (includes `src/contracts` for `@contracts/*` imports)
+2. **backend** — copy Angular output to `Shora.Api/wwwroot`, `dotnet publish`
+3. **runtime** — `mcr.microsoft.com/dotnet/aspnet:10.0`, port 8080
 
-### GitHub setup (Railway path)
+**Verify:** `docker build -t shora:local .` locally (requires Docker), or push to `main` and watch Render build logs.
 
-1. Neon + Azure Blob + Railway — [docs/deployment.md](../docs/deployment.md)
-2. GitHub Environment `production` (optional reviewers)
-3. Repository variables: `RAILWAY_SERVICE_ID`, `PRODUCTION_URL`
-4. Optional repository variable `DEPLOY_ENVIRONMENT` (defaults to `production`)
-5. Environment secret `RAILWAY_TOKEN` (Railway **project token** for `production`; not an account token from [railway.app/account/tokens](https://railway.app/account/tokens))
-6. GHCR package public or Railway registry credentials for image pull
-7. Enable branch protection on `main` — CI green before merge, then push auto-deploys
+---
+
+## 09.9 — Render auto-deploy
+
+**Purpose:** Deploy production automatically when `main` is updated, after hosting exists (09.7).
+
+**Done.** Render web service connected to GitHub with **Auto-Deploy** on `main`. Setup: [docs/deployment.md](../docs/deployment.md), [`.github/workflows/README.md`](../.github/workflows/README.md).
+
+| Concern          | Design                                                                                        |
+| ---------------- | --------------------------------------------------------------------------------------------- |
+| **Triggers**     | Push to `main` on GitHub → Render Docker build + deploy                                       |
+| **Build**        | Same sequence as 09.8 inside [`Dockerfile`](../Dockerfile)                                    |
+| **Deploy target**| Render web service (Git + Docker)                                                             |
+| **GitHub**       | CI only ([`ci.yml`](../.github/workflows/ci.yml)) — no deploy secrets required on GitHub      |
+
+### Render setup
+
+1. Neon + Azure Blob + Render web service — [docs/deployment.md](../docs/deployment.md)
+2. Connect repo `MohamedMamdoouh/shora-consulting-platform`, branch `main`, language **Docker**
+3. **Dockerfile Path:** `Dockerfile` · **Build context:** `.`
+4. Health check: `/api/v1/health`
+5. Set production env vars on Render (09.6)
+6. Enable branch protection on `main` — CI green before merge, then push auto-deploys on Render
 
 ### Deploy sequence
 
-1. CI should pass on the PR before merge (branch protection recommended); merge to `main` triggers Deploy
-2. Build job produces publish artifact (09.8)
-3. Deploy job builds [`Dockerfile`](../Dockerfile), pushes `ghcr.io/<lowercase-repo>:production` (repository path lowercased — GHCR tags must be lowercase), runs `railway redeploy`
-4. Operator verifies manually: `GET /api/v1/health`, `/`, and `/about` on `PRODUCTION_URL` (no automated smoke-test job in `deploy.yml`)
-5. App startup applies EF migrations and idempotent seed (09.10)
+1. CI should pass on the PR before merge (branch protection recommended); merge to `main` triggers Render
+2. Render builds Docker image (09.8) and deploys
+3. Operator verifies manually: `GET /api/v1/health`, `/`, and `/about` on production URL
+4. App startup applies EF migrations and idempotent seed (09.10)
 
-**Verify:** After Railway + GitHub secrets are configured, merge to `main` deploys automatically; app reachable over HTTPS with same-site cookies.
+**Verify:** After Render is configured, merge to `main` deploys automatically; app reachable over HTTPS with same-site cookies.
 
 ---
 
@@ -299,7 +292,7 @@ MVP requires frontend and API on the **same registrable domain** over HTTPS (spe
 
 - Multi-region or blue/green deploy
 - Full APM / deployment smoke-test suite (add incrementally post-MVP)
-- Deploy gated on CI workflow completion (CI runs on PR; Deploy runs on push to `main` — use branch protection so only green PRs merge)
+- Deploy gated on CI workflow completion (CI runs on PR; Render deploys on push to `main` — use branch protection so only green PRs merge)
 
 ---
 
@@ -320,7 +313,7 @@ npm run build
 CI=true npm test
 ```
 
-**Full publish artifact (09.8):** use the **Deploy** workflow in GitHub Actions — see [`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml).
+**Production Docker image (09.8):** `docker build -t shora:local .` from repo root, or push to `main` and watch Render build logs. See [`Dockerfile`](../Dockerfile) and [docs/deployment.md](../docs/deployment.md).
 
 **Note:** stop any running `Shora.Api` process before `dotnet build` locally — a running API locks output DLLs and breaks the build.
 

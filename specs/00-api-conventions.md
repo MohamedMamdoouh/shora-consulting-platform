@@ -21,7 +21,7 @@ Status: **Implemented** — applies to all specs (01–09) and every new endpoin
 - Browser navigation to `/errors/{code}` (same origin as the SPA) opens the Angular public error detail page.
 - JSON metadata: `GET /api/v1/errors` (list) and `GET /api/v1/errors/{code}` (single entry, includes computed `type` URI).
 - Catalog entries live in `Shora.Application.Common.ErrorCatalog` — add an entry whenever a new `ErrorCodes` constant is introduced.
-- Canonical `type` host is `shora.dev`; point that custom domain at the Railway service so production URIs match (see deployment docs).
+- Canonical `type` host is `shora.dev`; point that custom domain at the Render service so production URIs match (see deployment docs).
 
 ## 3. API versioning & routes
 

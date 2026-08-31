@@ -112,7 +112,7 @@ Tunable via `appsettings.json` (see `BackgroundJobOptions`, `OpsMonitoringOption
 
 ## 4. Deployment
 
-- **CI/CD:** see [spec 09](09-ci-cd-pipeline.md) — CI on push/PR; production **Deploy** on push to `main` after hosting setup ([docs/deployment.md](../docs/deployment.md)).
+- **CI/CD:** see [spec 09](09-ci-cd-pipeline.md) — CI on push/PR via GitHub Actions; production deploy on push to `main` via Render (Git + Docker). Operator guide: [docs/deployment.md](../docs/deployment.md).
 - **Receipt storage:** private Azure Blob container (`Storage:ReceiptContainer`); short-lived SAS read URLs for admin.
 - **Email:** configure `Email:ApiKey` and `Email:FromAddress` for production Brevo; dev uses log sender.
 - **Migrations + seed:** applied on startup, idempotent.

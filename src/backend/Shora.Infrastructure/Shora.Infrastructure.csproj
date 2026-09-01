@@ -27,6 +27,7 @@
       <PrivateAssets>all</PrivateAssets>
 
     </PackageReference>
+    <PackageReference Include="Npgsql" />
 
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
 

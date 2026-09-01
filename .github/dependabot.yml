@@ -10,7 +10,7 @@ updates:
         patterns: ["*"]
     ignore:
       - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]
 
   - package-ecosystem: npm
     directory: /src/frontend
@@ -21,7 +21,5 @@ updates:
       frontend-dependencies:
         patterns: ["*"]
     ignore:
-      - dependency-name: "@angular/*"
-        update-types: ["version-update:semver-major", "version-update:semver-minor"]
       - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
+        update-types: ["version-update:semver-minor", "version-update:semver-patch"]

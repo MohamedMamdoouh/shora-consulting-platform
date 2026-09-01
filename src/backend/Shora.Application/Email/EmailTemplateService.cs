@@ -41,7 +41,7 @@ public sealed class EmailTemplateService(IOptions<EmailBrandOptions> brandOption
             ["ActionUrl"] = request.ActionUrl,
             ["ActionLabel"] = HtmlEncode(request.ActionLabel),
             ["FooterNote"] = HtmlEncode(request.FooterNote),
-            ["BrandHeader"] = EmailHtml.BrandHeader(_brand.BrandName),
+            ["BrandHeader"] = EmailHtml.BrandHeader(_brand.BrandName, request.Heading),
             ["Year"] = DateTime.UtcNow.Year.ToString()
         };
     }

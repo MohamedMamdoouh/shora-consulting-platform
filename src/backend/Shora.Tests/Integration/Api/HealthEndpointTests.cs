@@ -61,7 +61,40 @@ public class HealthEndpointTests : IDisposable
         var body = await response.Content.ReadAsStringAsync(cancellationToken);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.Contains("healthy", body, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("\"status\":\"healthy\"", body, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task Get_health_returns_service_unavailable_when_database_is_unreachable()
+    {
+        var cancellationToken = TestContext.Current.CancellationToken;
+        var connectionString = await _sqlServer.CreateDatabaseAsync();
+        var databaseName = new NpgsqlConnectionStringBuilder(connectionString).Database
+            ?? throw new InvalidOperationException("Test database name is missing from the connection string.");
+
+        await using var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        {
+            builder.UseSetting("ConnectionStrings:DefaultConnection", connectionString);
+            builder.ConfigureAppConfiguration((_, config) =>
+            {
+                config.AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["Jwt:Issuer"] = "Shora",
+                    ["Jwt:Audience"] = "Shora.Web",
+                    ["Jwt:SigningKey"] = "test-signing-key-min-32-characters-long!",
+                    ["Cors:AllowedOrigins:0"] = "http://localhost:4200"
+                });
+            });
+        });
+        var client = factory.CreateClient();
+
+        await _sqlServer.DropDatabaseAsync(databaseName);
+
+        var response = await client.GetAsync("/api/v1/health", cancellationToken);
+        var body = await response.Content.ReadAsStringAsync(cancellationToken);
+
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+        Assert.Contains("\"status\":\"unhealthy\"", body, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]

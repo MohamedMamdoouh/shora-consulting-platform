@@ -98,12 +98,32 @@ Render → **shora** → **Environment**.
 ## 4. Verify
 
 1. Render deploy status **Live**
-2. `GET https://<your-host>/api/v1/health` → healthy
+2. `GET https://<your-host>/api/v1/health` → `200` with `"status":"healthy"` (includes a Supabase connectivity check)
 3. Site loads at `/`
 4. Log in at `/auth/login`
 5. Remove `AdminSeed__*` env vars after first admin login
 
-## 5. Operations
+## 5. Free tier keep-alive
+
+On free tiers, **Render** spins down after 15 minutes without HTTP traffic and **Supabase** pauses after ~7 days without database activity. A scheduled GitHub Actions workflow ([`keep-alive.yml`](../.github/workflows/keep-alive.yml)) pings production every 14 minutes to prevent both.
+
+### One-time GitHub setup
+
+1. GitHub repo → **Settings** → **Secrets and variables** → **Actions** → **Variables**
+2. Add repository variable `PRODUCTION_HOST` = your Render hostname only (e.g. `shora.onrender.com` — no `https://` prefix)
+3. Actions → **Keep alive** → **Run workflow** to verify it succeeds
+
+The workflow calls `GET /api/v1/health`, which verifies API and database connectivity. Render deploy health checks use the same endpoint.
+
+### Optional backup
+
+GitHub `schedule` is best-effort. If you still see cold starts, add a free [UptimeRobot](https://uptimerobot.com) monitor on `https://<your-host>/api/v1/health` (5-minute interval).
+
+### When to upgrade
+
+For a production site with real users, consider Render Starter (~$7/mo, always on) and Supabase Pro (~$25/mo, no auto-pause) instead of relying on keep-alive pings.
+
+## 6. Operations
 
 | Task | How |
 | ---- | --- |
@@ -112,4 +132,4 @@ Render → **shora** → **Environment**.
 | Local Docker test | `docker build -t shora:local .` then run on port 8080 with prod env vars |
 | GitHub | CI only — no deploy secrets needed. Remove legacy `RAILWAY_*` / `RENDER_DEPLOY_HOOK_URL` if present |
 
-**Free tier:** Render web services spin down after 15 minutes of inactivity; builds can be slow. Receipt images use Azure Blob (not local disk).
+**Free tier:** Render web services spin down after 15 minutes of inactivity; builds can be slow. Receipt images use Azure Blob (not local disk). See [§5 Free tier keep-alive](#5-free-tier-keep-alive) to prevent spin-down and Supabase pause.

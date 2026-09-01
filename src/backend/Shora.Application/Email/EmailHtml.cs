@@ -18,10 +18,13 @@ public static class EmailHtml
     public static string Join(params string?[] parts) =>
         string.Concat(parts.Where(static part => !string.IsNullOrEmpty(part)));
 
-    public static string BrandHeader(string brandName) =>
+    public static string BrandHeader(string brandName, string heading) =>
         $"""
-        <p dir="rtl" style="margin:0;font-size:20px;line-height:1.3;font-weight:700;color:{Ink};font-family:{FontDisplay};{Rtl}">
+        <p dir="rtl" style="margin:0 0 4px;font-size:20px;line-height:1.3;font-weight:700;color:{Ink};font-family:{FontDisplay};direction:rtl;text-align:center">
           {HtmlEncode(brandName)}
+        </p>
+        <p dir="rtl" style="margin:0;font-size:22px;line-height:1.35;font-weight:700;color:{Ink};font-family:{FontDisplay};direction:rtl;text-align:center">
+          {HtmlEncode(heading)}
         </p>
         """;
 

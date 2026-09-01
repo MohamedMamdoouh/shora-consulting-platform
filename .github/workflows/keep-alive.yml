@@ -1,0 +1,15 @@
+name: Keep alive
+
+on:
+  schedule:
+    - cron: "*/14 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping production health
+        run: |
+          curl --fail --retry 3 --retry-delay 10 --max-time 60 \
+            "https://${{ vars.PRODUCTION_HOST }}/api/v1/health"

@@ -4,9 +4,10 @@ CI behavior for Shora. Production deploys are handled by **Render auto-deploy** 
 
 ## Overview
 
-| Workflow | File               | Runs when                   | Deploys?                 |
-| -------- | ------------------ | --------------------------- | ------------------------ |
-| **CI**   | [`ci.yml`](ci.yml) | Every push and PR to `main` | No — validates code only |
+| Workflow      | File                         | Runs when                              | Deploys?                 |
+| ------------- | ---------------------------- | -------------------------------------- | ------------------------ |
+| **CI**        | [`ci.yml`](ci.yml)           | Every push and PR to `main`            | No — validates code only |
+| **Keep alive**| [`keep-alive.yml`](keep-alive.yml) | Every 14 min (UTC) + manual dispatch | No — pings production health |
 
 Production releases: push/merge to `main` → Render builds from [`Dockerfile`](../Dockerfile) and deploys automatically.
 
@@ -64,3 +65,13 @@ Configure once in GitHub after CI has passed at least once on `main`:
 3. **Require branches to be up to date before merging** (recommended)
 
 This is a repository setting only — it cannot be committed to the repo.
+
+---
+
+## Keep alive (`keep-alive.yml`)
+
+| Job    | When it runs                         | Steps                                      |
+| ------ | ------------------------------------ | ------------------------------------------ |
+| **Ping** | Every 14 minutes (UTC) + manual run | `curl` → `https://$PRODUCTION_HOST/api/v1/health` |
+
+Requires repository variable `PRODUCTION_HOST` (hostname only, e.g. `shora.onrender.com`). See [docs/deployment.md §5](../docs/deployment.md#5-free-tier-keep-alive).

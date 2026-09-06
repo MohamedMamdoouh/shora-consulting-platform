@@ -41,10 +41,6 @@ public sealed class R2FileStorage : IFileStorage, IDisposable
             throw new InvalidOperationException("Storage:ReceiptBucket is not configured.");
         }
 
-        // R2 rejects SigV2 presigned URLs. See
-        // https://developers.cloudflare.com/r2/examples/aws/aws-sdk-net/
-        AWSConfigsS3.UseSignatureVersion4 = true;
-
         _protocol = storageOptions.Endpoint.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
             ? Protocol.HTTPS
             : Protocol.HTTP;
@@ -54,7 +50,6 @@ public sealed class R2FileStorage : IFileStorage, IDisposable
             ServiceURL = storageOptions.Endpoint,
             ForcePathStyle = true,
             AuthenticationRegion = "auto",
-            SignatureVersion = "4",
             UseHttp = _protocol == Protocol.HTTP
         };
 
@@ -103,13 +98,7 @@ public sealed class R2FileStorage : IFileStorage, IDisposable
         }
 
         await _s3Client.CopyObjectAsync(
-            new CopyObjectRequest
-            {
-                SourceBucket = _bucketName,
-                SourceKey = tempPath,
-                DestinationBucket = _bucketName,
-                DestinationKey = finalPath
-            },
+            CreateCopyObjectRequest(_bucketName, tempPath, _bucketName, finalPath),
             cancellationToken);
 
         await _s3Client.DeleteObjectAsync(_bucketName, tempPath, cancellationToken);
@@ -193,7 +182,7 @@ public sealed class R2FileStorage : IFileStorage, IDisposable
                 },
                 cancellationToken);
 
-            foreach (var s3Object in listResponse.S3Objects)
+            foreach (var s3Object in listResponse.S3Objects ?? [])
             {
                 if (s3Object.LastModified > cutoff)
                 {
@@ -204,7 +193,7 @@ public sealed class R2FileStorage : IFileStorage, IDisposable
                 deletedCount++;
             }
 
-            continuationToken = listResponse.IsTruncated ? listResponse.NextContinuationToken : null;
+            continuationToken = listResponse.IsTruncated == true ? listResponse.NextContinuationToken : null;
         }
         while (continuationToken is not null);
 
@@ -216,8 +205,6 @@ public sealed class R2FileStorage : IFileStorage, IDisposable
         _s3Client.Dispose();
     }
 
-    // R2 does not support AWSSDK.S3 Streaming SigV4. See
-    // https://developers.cloudflare.com/r2/examples/aws/aws-sdk-net/
     internal static PutObjectRequest CreateUploadRequest(
         string bucketName,
         string key,
@@ -241,6 +228,21 @@ public sealed class R2FileStorage : IFileStorage, IDisposable
         }
 
         return request;
+    }
+
+    internal static CopyObjectRequest CreateCopyObjectRequest(
+        string sourceBucket,
+        string sourceKey,
+        string destinationBucket,
+        string destinationKey)
+    {
+        return new CopyObjectRequest
+        {
+            SourceBucket = sourceBucket,
+            SourceKey = sourceKey,
+            DestinationBucket = destinationBucket,
+            DestinationKey = destinationKey
+        };
     }
 
     private static AmazonS3Exception CreateNotFoundException(string message)

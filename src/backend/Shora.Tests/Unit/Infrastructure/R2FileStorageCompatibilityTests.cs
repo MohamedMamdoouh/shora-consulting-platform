@@ -1,6 +1,4 @@
 using System.Text;
-using Amazon;
-using Amazon.S3;
 using Microsoft.Extensions.Options;
 using Shora.Application.Options;
 using Shora.Infrastructure.Services;
@@ -31,10 +29,24 @@ public sealed class R2FileStorageCompatibilityTests
     }
 
     [Fact]
-    public void Constructor_enables_sigv4_for_r2_presigned_urls()
+    public void CreateCopyObjectRequest_omits_tagging_directive_required_by_r2()
     {
-        AWSConfigsS3.UseSignatureVersion4 = false;
+        var request = R2FileStorage.CreateCopyObjectRequest(
+            "shora-receipts",
+            "temp/abc",
+            "shora-receipts",
+            "receipts/xyz.png");
 
+        Assert.Null(request.TaggingDirective);
+        Assert.Equal("shora-receipts", request.SourceBucket);
+        Assert.Equal("temp/abc", request.SourceKey);
+        Assert.Equal("shora-receipts", request.DestinationBucket);
+        Assert.Equal("receipts/xyz.png", request.DestinationKey);
+    }
+
+    [Fact]
+    public void Constructor_accepts_r2_endpoint_configuration()
+    {
         using var storage = new R2FileStorage(Options.Create(new StorageOptions
         {
             Endpoint = "https://example.r2.cloudflarestorage.com",
@@ -42,7 +54,5 @@ public sealed class R2FileStorageCompatibilityTests
             SecretAccessKey = "secret",
             ReceiptBucket = "shora-receipts"
         }));
-
-        Assert.True(AWSConfigsS3.UseSignatureVersion4);
     }
 }

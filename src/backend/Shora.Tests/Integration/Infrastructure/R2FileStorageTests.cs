@@ -24,7 +24,7 @@ public sealed class R2FileStorageTests
     public async Task UploadTempAsync_stores_blob_under_temp_prefix()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
-        var fileStorage = CreateFileStorage();
+        var fileStorage = await CreateFileStorageAsync(cancellationToken);
         await using var content = new MemoryStream(Encoding.UTF8.GetBytes("receipt-bytes"));
 
         var tempPath = await fileStorage.UploadTempAsync(content, "image/png", cancellationToken);
@@ -36,7 +36,7 @@ public sealed class R2FileStorageTests
     public async Task Full_lifecycle_upload_finalize_read_and_delete()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
-        var fileStorage = CreateFileStorage();
+        var fileStorage = await CreateFileStorageAsync(cancellationToken);
         const string payload = "receipt-image-bytes";
         var finalPath = $"receipts/{Guid.NewGuid():N}.png";
 
@@ -65,7 +65,7 @@ public sealed class R2FileStorageTests
     public async Task FinalizeAsync_throws_when_temp_blob_is_missing()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
-        var fileStorage = CreateFileStorage();
+        var fileStorage = await CreateFileStorageAsync(cancellationToken);
 
         var act = () => fileStorage.FinalizeAsync(
             $"temp/{Guid.NewGuid():N}",
@@ -76,18 +76,30 @@ public sealed class R2FileStorageTests
         Assert.Equal(HttpStatusCode.NotFound, exception.StatusCode);
     }
 
-    private R2FileStorage CreateFileStorage()
+    private async Task<R2FileStorage> CreateFileStorageAsync(CancellationToken cancellationToken)
     {
+        var bucketName = $"shora-receipts-{Guid.NewGuid():N}";
         var services = new ServiceCollection();
         services.AddOptions<StorageOptions>().Configure(options =>
         {
             options.Endpoint = _minio.Endpoint;
             options.AccessKeyId = _minio.AccessKeyId;
             options.SecretAccessKey = _minio.SecretAccessKey;
-            options.ReceiptBucket = $"shora-receipts-{Guid.NewGuid():N}";
+            options.ReceiptBucket = bucketName;
         });
 
         var serviceProvider = services.BuildServiceProvider();
+        using var adminClient = new AmazonS3Client(
+            _minio.AccessKeyId,
+            _minio.SecretAccessKey,
+            new AmazonS3Config
+            {
+                ServiceURL = _minio.Endpoint,
+                ForcePathStyle = true,
+                UseHttp = true
+            });
+        await adminClient.PutBucketAsync(bucketName, cancellationToken);
+
         return new R2FileStorage(serviceProvider.GetRequiredService<IOptions<StorageOptions>>());
     }
 }

@@ -151,7 +151,7 @@ The single practitioner's personal admin panel: manage availability, edit the se
 - Each row shows: client display name, **client contact phone** (only present for Voice Call bookings; visible only to the admin and the owning client per spec 01 #4 — never to other clients), delivery method, slot time (read from the booking's snapshotted `SlotStartUtc`, spec 01; converted from UTC to the admin's local browser timezone per spec 01 #4), status, and — for cancelled rows — the reason from the audit trail (spec 06).
 - **Pagination (M5):** `GET /api/admin/bookings?status=&from=&to=&page=&pageSize=` returns `{ items, page, pageSize, totalCount }` (default `pageSize` 20, max 100), most-recent-first. The list never loads unbounded.
 - **Receipt review (`PendingApproval`):** rows awaiting review expose **View receipt / Approve / Decline** actions.
-  - `GET /api/admin/bookings/{id}/receipts` returns the `PaymentReceipt` attempt history with short-lived SAS image URLs (spec 05 #4).
+  - `GET /api/admin/bookings/{id}/receipts` returns the `PaymentReceipt` attempt history with short-lived presigned image URLs (spec 05 #4).
   - `POST /api/admin/bookings/{id}/receipts/approve` → booking `Confirmed`, confirmation emails enqueued.
   - `POST /api/admin/bookings/{id}/receipts/decline` (body `{ reasonCode, reasonNote? }`) → booking back to `PendingPayment` with a fresh upload window; a "please re-upload" email carries the typed reason + optional note.
 - Bookings **auto-complete**: `BookingAutoCompleteService` (spec 08, ~every 5 min) transitions `Confirmed` bookings to `Completed` once `SlotEndUtc` passes. The client past section (spec 06) displays `Completed` rows after this job runs. There is no manual "mark completed" action.
@@ -193,7 +193,7 @@ The single practitioner's personal admin panel: manage availability, edit the se
 ## 7. Auditing, Monitoring & Background Jobs (H6, M6)
 
 - **Status-change audit trail:** every booking transition is recorded in `BookingStatusAudit` (spec 01) with actor (Client/Admin/System), reason, and UTC timestamp. This backs the cancelled-reason labels (spec 06) and gives the admin an authoritative history, including cancellation-request decisions.
-- **Payment/refund logging:** every payment action (receipt upload, admin approve/decline, manual `refunds/record`) is logged with a correlation id tied to the booking/payment (details in spec 08). Receipt image access (SAS URL minting) is logged too.
+- **Payment/refund logging:** every payment action (receipt upload, admin approve/decline, manual `refunds/record`) is logged with a correlation id tied to the booking/payment (details in spec 08). Receipt image access (presigned URL minting) is logged too.
 - **Alerts:** `OpsMonitoringService` (spec 08) evaluates operational alerts every ~5 min and logs warnings/criticals. `GET /api/v1/admin/ops/alerts` exposes active alerts for the admin dashboard; `/admin/ops` shows runbook steps from [`runbooks.json`](../src/backend/Shora.Application/Ops/runbooks.json). Thresholds: `PendingApproval > 6 h` warning / `> 24 h` critical; cancellation request within `< 30 min` of auto-decline; refund-due > 24 h warning / > 72 h critical; job heartbeat stale; outbox dead-letters.
 - **Background-job intervals (M6):** the receipt-upload-deadline cleanup job runs ~**every 1 minute**, the cancellation-request auto-decline job ~**every 1 minute**, the auto-complete job ~**every 5 minutes**, and the availability top-up job **nightly**. All jobs run as in-process `BackgroundService` workers on the single app instance (spec 08).
 

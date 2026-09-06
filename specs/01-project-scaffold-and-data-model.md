@@ -15,7 +15,7 @@ The backend follows **Clean Architecture** with four layers, applied pragmatical
 
 - **Domain** depends on nothing (no EF, no ASP.NET, no external services).
 - **Application** depends only on Domain. It defines interfaces (e.g. `IFileStorage`, `IEmailSender`, `IApplicationDbContext`) that outer layers implement.
-- **Infrastructure** implements those interfaces (EF Core, Azure Blob storage, email) and depends on Application + Domain.
+- **Infrastructure** implements those interfaces (EF Core, Cloudflare R2 storage, email) and depends on Application + Domain.
 - **Api** is the entry point: controllers call Application use-cases; it wires up (DI) the Infrastructure implementations at startup. Api never contains business logic.
 
 ### 1.2 Repository Layout (Monorepo)
@@ -33,7 +33,7 @@ Shora/
 │       ├── Shora.Domain/           # Entities, enums, domain rules. No external dependencies.
 │       ├── Shora.Application/      # Use-case services, abstraction interfaces, options, email templates
 │       ├── Shora.Contracts/        # Shared request/response records (no dependencies)
-│       ├── Shora.Infrastructure/   # EF Core DbContext + migrations, seed, Azure Blob, Brevo email
+│       ├── Shora.Infrastructure/   # EF Core DbContext + migrations, seed, Cloudflare R2, Brevo email
 │       ├── Shora.Api/              # ASP.NET Core Web API: controllers, jobs, rate limiting, middleware
 │       └── Shora.Tests/            # xUnit integration + unit tests
 ├── .github/workflows/              # CI + Deploy workflows (spec 09)
@@ -64,7 +64,7 @@ Rationale: this keeps external, swappable concerns (payments, email) behind inte
   - `ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>` implementing `IApplicationDbContext`; fluent entity configurations in `Data/Configurations/`; consolidated PostgreSQL migration `20260811142250_InitialCreate` (see #5).
   - `SystemDateTimeProvider : IDateTimeProvider` — live UTC clock.
   - `BrevoEmailSender : IEmailSender` — production email via Brevo HTTPS API (spec 08); dev falls back to logging.
-  - `AzureBlobFileStorage : IFileStorage` — receipt blob storage (spec 05); `NotImplementedFileStorage` when `Storage:ConnectionString` is unset.
+  - `R2FileStorage : IFileStorage` — receipt blob storage via S3-compatible API (spec 05); `NotImplementedFileStorage` when `Storage:Endpoint` is unset.
   - `PassThroughMalwareScanner : IMalwareScanner` — dev stub; replace in production (spec 05).
   - `HttpContextCurrentUser : ICurrentUser` — resolves authenticated user id/role (spec 02).
   - `DatabaseSeeder` — idempotent seed for roles, singleton `Settings`, and admin user from config.
@@ -76,7 +76,7 @@ Rationale: this keeps external, swappable concerns (payments, email) behind inte
 - **appsettings.json** structure (secrets via `dotnet user-secrets` / environment variables in real deployments, never committed):
   - `ConnectionStrings:DefaultConnection` — PostgreSQL connection string (Npgsql; `Host=localhost;Port=5432;Database=Shora;...` in dev; Supabase in production)
   - `Jwt:Issuer`, `Jwt:Audience`, `Jwt:SigningKey` — JWT auth (see spec 02); issuer/audience default to `Shora` / `Shora.Web`
-  - `Storage:ConnectionString`, `Storage:ReceiptContainer` — Azure Blob Storage for receipt images (private container); used in spec 05
+  - `Storage:Endpoint`, `Storage:AccessKeyId`, `Storage:SecretAccessKey`, `Storage:ReceiptBucket` — Cloudflare R2 for receipt images (private bucket); used in spec 05
   - `Email:*` — Brevo API key and from address for `EmailSender` (password reset + all client/admin notifications). Email is the only notification channel; no SMS.
   - `AdminSeed:Email`, `AdminSeed:Password` — seeded admin user (dev via `appsettings.Development.json`; production via secrets)
   - `Seed:ConsultantWhatsAppNumber`, `Seed:VodafoneCashNumber`, `Seed:InstaPayHandle`, `Seed:PaymentInstructions` — defaults for the singleton `Settings` row on first run
@@ -255,7 +255,7 @@ Receipt image attempts are tracked in the separate `PaymentReceipt` table (one r
 | ----------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
 | Id                | `Guid`                                                           |                                                                                                                      |
 | PaymentId         | `Guid`                                                           | FK to `Payment`                                                                                                      |
-| BlobPath          | `string`                                                         | Path/key of the stored image in the **private** Azure Blob container (random name; never a public URL — see spec 05) |
+| BlobPath          | `string`                                                         | Path/key of the stored image in the **private** R2 bucket (random name; never a public URL — see spec 05) |
 | OriginalFileName  | `string`                                                         | As uploaded (for admin display only; never used as the stored name)                                                  |
 | ContentType       | `string`                                                         | Validated against the allowlist (jpeg/png/webp/pdf)                                                                  |
 | ContentHashSha256 | `string`                                                         | Strong file fingerprint for duplicate/replay detection                                                               |

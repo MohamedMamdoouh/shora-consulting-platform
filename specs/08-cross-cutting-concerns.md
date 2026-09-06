@@ -34,7 +34,7 @@ Uses ASP.NET Core's built-in rate limiting middleware. Limits are **per-IP** per
 ### Structured logging
 
 - Structured logs with a **correlation id** per request; payment flows additionally carry `bookingId`/`paymentId`.
-- **Never log** secrets, JWTs, refresh tokens, or storage connection strings/SAS tokens. Receipt images are never logged.
+- **Never log** secrets, JWTs, refresh tokens, or storage credentials/presigned URLs. Receipt images are never logged.
 
 ### Audit trail
 
@@ -99,7 +99,7 @@ Tunable via `appsettings.json` (see `BackgroundJobOptions`, `OpsMonitoringOption
 ## 4. Deployment
 
 - **CI/CD:** see [spec 09](09-ci-cd-pipeline.md) — CI on push/PR via GitHub Actions; production deploy on push to `main` via Render (Git + Docker). Operator guide: [docs/deployment.md](../docs/deployment.md).
-- **Receipt storage:** private Azure Blob container (`Storage:ReceiptContainer`); short-lived SAS read URLs for admin.
+- **Receipt storage:** private Cloudflare R2 bucket (`Storage:ReceiptBucket`); short-lived presigned read URLs for admin.
 - **Email:** configure `Email:ApiKey` and `Email:FromAddress` for production Brevo; dev uses log sender.
 - **Migrations + seed:** applied on startup, idempotent.
 - **Secrets:** environment variables / user-secrets — never committed.

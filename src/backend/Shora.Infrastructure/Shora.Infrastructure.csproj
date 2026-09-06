@@ -16,7 +16,7 @@
 
   <ItemGroup>
 
-    <PackageReference Include="Azure.Storage.Blobs" />
+    <PackageReference Include="AWSSDK.S3" />
 
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />

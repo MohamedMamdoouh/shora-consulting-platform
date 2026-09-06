@@ -1,6 +1,6 @@
 # 09 — CI/CD Pipeline
 
-Status: **Done** in repo. **Deploy target:** Render (Git + Docker) + Supabase PostgreSQL + Azure Blob (receipts). Operator guide: [docs/deployment.md](../docs/deployment.md).
+Status: **Done** in repo. **Deploy target:** Render (Git + Docker) + Supabase PostgreSQL + Cloudflare R2 (receipts). Operator guide: [docs/deployment.md](../docs/deployment.md).
 
 This spec defines how Shora is built, validated, and deployed. It complements spec 08 #4 (hosting topology) with GitHub Actions workflows. Workflow YAML stays thin; this document is the authoritative design.
 
@@ -20,7 +20,7 @@ Operator go-live steps: [docs/deployment.md](../docs/deployment.md).
 
 - **Fast PR feedback** — every change to `main` is buildable and testable before merge.
 - **Reproducible builds** — pinned toolchains (.NET 10, Node 22) and lock files (`package-lock.json`, NuGet restore).
-- **Safe deploy path** — production releases on **Render** (single container, Docker build from Git, same-site Angular app + API) with **Supabase PostgreSQL** and **Azure Blob** for receipts only; aligned with spec 02 same-site auth (`SameSite=Strict` refresh cookies). Local development uses `Development` / dev tooling only — no separate staging environment.
+- **Safe deploy path** — production releases on **Render** (single container, Docker build from Git, same-site Angular app + API) with **Supabase PostgreSQL** and **Cloudflare R2** for receipts only; aligned with spec 02 same-site auth (`SameSite=Strict` refresh cookies). Local development uses `Development` / dev tooling only — no separate staging environment.
 
 ## 2. Repository & Triggers
 
@@ -165,8 +165,10 @@ Set secrets via environment variables (double-underscore nesting). Never commit 
 | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | `ConnectionStrings__DefaultConnection`    | Supabase PostgreSQL (session pooler, port 5432 — see [`docs/deployment.md`](../docs/deployment.md))        |
 | `Jwt__SigningKey`                         | Strong random key, min 32 chars (spec 02)                                                                  |
-| `Storage__ConnectionString`               | Blob account — private Azure Storage container (spec 05)                                                   |
-| `Storage__ReceiptContainer`               | Private container name (`receipts`)                                                                        |
+| `Storage__Endpoint`                       | R2 S3 endpoint — private bucket (spec 05)                                                                  |
+| `Storage__AccessKeyId`                    | R2 access key ID                                                                                           |
+| `Storage__SecretAccessKey`                | R2 secret access key                                                                                       |
+| `Storage__ReceiptBucket`                  | Private bucket name (`receipts`)                                                                           |
 | `Email__*`                                | Brevo settings (spec 02, outbox) — `ApiKey` + `FromAddress` required at startup                            |
 | `Frontend__BaseUrl`                       | Production HTTPS URL (e.g. `https://shora.onrender.com`)                                                   |
 | `Cors__AllowedOrigins__0`                 | Same production HTTPS URL (same-site + `AllowCredentials`)                                                 |
@@ -197,7 +199,7 @@ Set `Frontend__BaseUrl` and `Cors__AllowedOrigins__0` on Render to the same prod
 | ---------------------- | ---------------------------------------------------- |
 | **Render**             | Host .NET 10 API + static Angular (Docker from Git)  |
 | **Supabase PostgreSQL** | Production database                                  |
-| **Azure Blob Storage** | Private receipt container (spec 05)                  |
+| **Cloudflare R2** | Private receipt bucket (spec 05)                     |
 
 **Verify:** Render env vars configured; push to `main` triggers build; `GET https://<production-url>/api/v1/health` returns OK.
 
@@ -232,7 +234,7 @@ Set `Frontend__BaseUrl` and `Cors__AllowedOrigins__0` on Render to the same prod
 
 ### Render setup
 
-1. Supabase + Azure Blob + Render web service — [docs/deployment.md](../docs/deployment.md)
+1. Supabase + Cloudflare R2 + Render web service — [docs/deployment.md](../docs/deployment.md)
 2. Connect repo `MohamedMamdoouh/shora-consulting-platform`, branch `main`, language **Docker**
 3. **Dockerfile Path:** `Dockerfile` · **Build context:** `.`
 4. Health check: `/api/v1/health`

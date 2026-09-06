@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text;
+using Amazon.S3;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Shora.Application.Abstractions;
@@ -9,14 +10,14 @@ using Shora.Tests.Common;
 
 namespace Shora.Tests.Integration.Infrastructure;
 
-[Collection("Azurite")]
-public sealed class AzureBlobFileStorageTests
+[Collection("Minio")]
+public sealed class R2FileStorageTests
 {
-    private readonly AzuriteFixture _azurite;
+    private readonly MinioFixture _minio;
 
-    public AzureBlobFileStorageTests(AzuriteFixture azurite)
+    public R2FileStorageTests(MinioFixture minio)
     {
-        _azurite = azurite;
+        _minio = minio;
     }
 
     [Fact]
@@ -56,8 +57,8 @@ public sealed class AzureBlobFileStorageTests
         var getAfterDelete = async () =>
             await fileStorage.GetReadUrlAsync(finalPath, TimeSpan.FromMinutes(5), cancellationToken);
 
-        var exception = await Assert.ThrowsAsync<Azure.RequestFailedException>(getAfterDelete);
-        Assert.Equal((int)HttpStatusCode.NotFound, exception.Status);
+        var exception = await Assert.ThrowsAsync<AmazonS3Exception>(getAfterDelete);
+        Assert.Equal(HttpStatusCode.NotFound, exception.StatusCode);
     }
 
     [Fact]
@@ -71,20 +72,22 @@ public sealed class AzureBlobFileStorageTests
             $"receipts/{Guid.NewGuid():N}.png",
             cancellationToken);
 
-        var exception = await Assert.ThrowsAsync<Azure.RequestFailedException>(act);
-        Assert.Equal((int)HttpStatusCode.NotFound, exception.Status);
+        var exception = await Assert.ThrowsAsync<AmazonS3Exception>(act);
+        Assert.Equal(HttpStatusCode.NotFound, exception.StatusCode);
     }
 
-    private AzureBlobFileStorage CreateFileStorage()
+    private R2FileStorage CreateFileStorage()
     {
         var services = new ServiceCollection();
         services.AddOptions<StorageOptions>().Configure(options =>
         {
-            options.ConnectionString = _azurite.BlobConnectionString;
-            options.ReceiptContainer = $"receipts-{Guid.NewGuid():N}";
+            options.Endpoint = _minio.Endpoint;
+            options.AccessKeyId = _minio.AccessKeyId;
+            options.SecretAccessKey = _minio.SecretAccessKey;
+            options.ReceiptBucket = $"receipts-{Guid.NewGuid():N}";
         });
 
         var serviceProvider = services.BuildServiceProvider();
-        return new AzureBlobFileStorage(serviceProvider.GetRequiredService<IOptions<StorageOptions>>());
+        return new R2FileStorage(serviceProvider.GetRequiredService<IOptions<StorageOptions>>());
     }
 }

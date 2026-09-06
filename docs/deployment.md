@@ -1,6 +1,6 @@
 # Production deployment
 
-Shora runs on **Render** (API + Angular app in one container), **Supabase PostgreSQL**, **Azure Blob** (receipts), and **Brevo** (email).
+Shora runs on **Render** (API + Angular app in one container), **Supabase PostgreSQL**, **Cloudflare R2** (receipts), and **Brevo** (email).
 
 Push to `main` → Render builds [`Dockerfile`](../Dockerfile) and auto-deploys. GitHub Actions ([`ci.yml`](../.github/workflows/ci.yml)) runs tests only.
 
@@ -8,13 +8,13 @@ Set secrets as **Render environment variables** (`Jwt__SigningKey` → `Jwt:Sign
 
 ## Stack
 
-| Component | Provider |
-| --------- | -------- |
-| Compute | Render (Docker from Git) |
-| Database | Supabase PostgreSQL |
-| Receipts | Azure Blob (private container) |
-| Email | Brevo HTTPS API |
-| CI | GitHub Actions |
+| Component | Provider                       |
+| --------- | ------------------------------ |
+| Compute   | Render (Docker from Git)       |
+| Database  | Supabase PostgreSQL            |
+| Receipts  | Cloudflare R2 (private bucket) |
+| Email     | Brevo HTTPS API                |
+| CI        | GitHub Actions                 |
 
 ## 1. Prerequisites
 
@@ -22,11 +22,11 @@ Set secrets as **Render environment variables** (`Jwt__SigningKey` → `Jwt:Sign
 
 Shora uses EF migrations on startup, manual transactions, and `FOR UPDATE` row locks. Use the **session pooler** (port **5432**), not the transaction pooler (port **6543**).
 
-| Connection type | Port | Use for Shora? |
-| --------------- | ---- | -------------- |
-| Session pooler (Supavisor) | 5432 | **Recommended on Render** — IPv4-friendly |
-| Direct | 5432 | OK if Render can reach it (may need IPv4 add-on) |
-| Transaction pooler | 6543 | **Avoid** — breaks session-scoped EF transactions |
+| Connection type            | Port | Use for Shora?                                    |
+| -------------------------- | ---- | ------------------------------------------------- |
+| Session pooler (Supavisor) | 5432 | **Recommended on Render** — IPv4-friendly         |
+| Direct                     | 5432 | OK if Render can reach it (may need IPv4 add-on)  |
+| Transaction pooler         | 6543 | **Avoid** — breaks session-scoped EF transactions |
 
 In Supabase → **Connect** → **Session pooler**, then convert to **key-value Npgsql format** for Render (avoids `=` truncation in URI strings):
 
@@ -36,7 +36,7 @@ Host=aws-0-<region>.pooler.supabase.com;Port=5432;Database=postgres;Username=pos
 
 Session pooler username is `postgres.<project-ref>`, not plain `postgres`.
 
-**Azure Blob** — create a storage account and private container (e.g. `receipts`). Get the connection string via Azure Portal or `az storage account show-connection-string`.
+**Cloudflare R2** — create a private bucket (e.g. `receipts`) in the [Cloudflare dashboard](https://dash.cloudflare.com/). Create an R2 API token with **Object Read & Write** scoped to that bucket. Note your **Account ID**, **Access Key ID**, and **Secret Access Key**. The S3 endpoint is `https://<accountId>.r2.cloudflarestorage.com`.
 
 Migrations run automatically on first startup.
 
@@ -46,14 +46,14 @@ Migrations run automatically on first startup.
 
 Render Dashboard → **New +** → **Web Service** → connect `MohamedMamdoouh/shora-consulting-platform`:
 
-| Setting | Value |
-| ------- | ----- |
-| Language | Docker |
-| Branch | `main` |
-| Auto-Deploy | Yes |
-| Health Check Path | `/api/v1/health` |
-| Dockerfile Path | `Dockerfile` |
-| Docker Build Context | `.` |
+| Setting              | Value            |
+| -------------------- | ---------------- |
+| Language             | Docker           |
+| Branch               | `main`           |
+| Auto-Deploy          | Yes              |
+| Health Check Path    | `/api/v1/health` |
+| Dockerfile Path      | `Dockerfile`     |
+| Docker Build Context | `.`              |
 
 Push to `main` deploys automatically. No GitHub deploy workflow or container registry.
 
@@ -63,25 +63,27 @@ Render → **shora** → **Environment**.
 
 ### Required
 
-| Variable | Value |
-| -------- | ----- |
-| `ASPNETCORE_ENVIRONMENT` | `Production` |
-| `ASPNETCORE_HTTP_PORTS` | `8080` |
-| `ConnectionStrings__DefaultConnection` | Supabase session-pooler key-value string (see §1) |
-| `Jwt__SigningKey` | Random string, 32+ chars |
-| `Frontend__BaseUrl` | `https://<your-host>.onrender.com` (no trailing slash) |
-| `Cors__AllowedOrigins__0` | Same as `Frontend__BaseUrl` |
-| `AllowedHosts` | Hostname only, e.g. `<your-host>.onrender.com` |
-| `Storage__ConnectionString` | Azure connection string |
-| `Storage__ReceiptContainer` | `receipts` |
-| `Email__ApiKey` | Brevo API key |
-| `Email__FromAddress` | Verified Brevo sender |
+| Variable                               | Value                                                  |
+| -------------------------------------- | ------------------------------------------------------ |
+| `ASPNETCORE_ENVIRONMENT`               | `Production`                                           |
+| `ASPNETCORE_HTTP_PORTS`                | `8080`                                                 |
+| `ConnectionStrings__DefaultConnection` | Supabase session-pooler key-value string (see §1)      |
+| `Jwt__SigningKey`                      | Random string, 32+ chars                               |
+| `Frontend__BaseUrl`                    | `https://<your-host>.onrender.com` (no trailing slash) |
+| `Cors__AllowedOrigins__0`              | Same as `Frontend__BaseUrl`                            |
+| `AllowedHosts`                         | Hostname only, e.g. `<your-host>.onrender.com`         |
+| `Storage__Endpoint`                    | `https://<accountId>.r2.cloudflarestorage.com`         |
+| `Storage__AccessKeyId`                 | R2 access key ID                                       |
+| `Storage__SecretAccessKey`             | R2 secret access key                                   |
+| `Storage__ReceiptBucket`               | `receipts`                                             |
+| `Email__ApiKey`                        | Brevo API key                                          |
+| `Email__FromAddress`                   | Verified Brevo sender                                  |
 
 ### First-time only
 
-| Variable | Purpose |
-| -------- | ------- |
-| `AdminSeed__Email` / `AdminSeed__Password` | Create first admin — **remove after login** |
+| Variable                                                                             | Purpose                                                                   |
+| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
+| `AdminSeed__Email` / `AdminSeed__Password`                                           | Create first admin — **remove after login**                               |
 | `Seed__ConsultantWhatsAppNumber`, `Seed__VodafoneCashNumber`, `Seed__InstaPayHandle` | Payment defaults before first startup (or set in `/admin/settings` later) |
 
 ### Optional
@@ -125,11 +127,11 @@ For a production site with real users, consider Render Starter (~$7/mo, always o
 
 ## 6. Operations
 
-| Task | How |
-| ---- | --- |
-| Redeploy | Push to `main`, or Render → **Manual Deploy** |
-| Custom domain | Render → Custom Domains, then update `Frontend__BaseUrl`, `Cors__AllowedOrigins__0`, `AllowedHosts` |
-| Local Docker test | `docker build -t shora:local .` then run on port 8080 with prod env vars |
-| GitHub | CI only — no deploy secrets needed. Remove legacy `RAILWAY_*` / `RENDER_DEPLOY_HOOK_URL` if present |
+| Task              | How                                                                                                 |
+| ----------------- | --------------------------------------------------------------------------------------------------- |
+| Redeploy          | Push to `main`, or Render → **Manual Deploy**                                                       |
+| Custom domain     | Render → Custom Domains, then update `Frontend__BaseUrl`, `Cors__AllowedOrigins__0`, `AllowedHosts` |
+| Local Docker test | `docker build -t shora:local .` then run on port 8080 with prod env vars                            |
+| GitHub            | CI only — no deploy secrets needed. Remove legacy `RAILWAY_*` / `RENDER_DEPLOY_HOOK_URL` if present |
 
-**Free tier:** Render web services spin down after 15 minutes of inactivity; builds can be slow. Receipt images use Azure Blob (not local disk). See [§5 Free tier keep-alive](#5-free-tier-keep-alive) to prevent spin-down and Supabase pause.
+**Free tier:** Render web services spin down after 15 minutes of inactivity; builds can be slow. Receipt images use Cloudflare R2 (not local disk). See [§5 Free tier keep-alive](#5-free-tier-keep-alive) to prevent spin-down and Supabase pause.

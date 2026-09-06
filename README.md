@@ -4,7 +4,7 @@
 
 RTL personal practice site for one-to-one relationship consulting sessions. Clients browse availability, reserve a session, pay by manual bank transfer (Vodafone Cash or InstaPay), upload a receipt, and receive the session by voice call or chat. A single **Admin** (the practitioner) manages settings, availability, receipt approval, cancellations, and refunds.
 
-**Status:** MVP feature set is implemented in code (backend, frontend, CI/CD). Production hosting uses Render + Supabase PostgreSQL + Azure Blob Storage — see [Deployment](#23-deployment).
+**Status:** MVP feature set is implemented in code (backend, frontend, CI/CD). Production hosting uses Render + Supabase PostgreSQL + Cloudflare R2 — see [Deployment](#23-deployment).
 
 ---
 
@@ -99,12 +99,12 @@ Design specs for maintainers live in [`specs/`](specs/). Operator deployment det
 | Authentication       | JWT Bearer + httpOnly refresh cookie                          | Access token in memory; refresh via cookie |
 | Frontend             | Angular 21 (standalone components)                            | SPA, lazy routes, Vitest                   |
 | API contracts        | `Shora.Contracts` (C#) + `src/contracts` (TS)                 | Shared DTO shapes, manual sync             |
-| File storage         | Azure Blob Storage (Azurite locally)                          | Private receipt images                     |
+| File storage         | Cloudflare R2 (MinIO locally)                                 | Private receipt images                     |
 | Email (dev)          | `DevLoggingEmailSender`                                       | Logs emails to console                     |
 | Email (prod)         | Brevo HTTPS API                                               | Auth + transactional mail                  |
 | Caching              | In-memory cache + ASP.NET Output Cache                        | Public settings & availability             |
 | Rate limiting        | ASP.NET Core Rate Limiter                                     | Abuse protection                           |
-| Testing              | xUnit v3, Testcontainers (PostgreSQL, Azurite)                | Unit + integration tests                   |
+| Testing              | xUnit v3, Testcontainers (PostgreSQL, MinIO)                  | Unit + integration tests                   |
 | CI/CD                | GitHub Actions (`ci.yml`)                                     | Tests on PR/push; deploy on Render |
 | Container            | Docker multi-stage ([`Dockerfile`](Dockerfile))               | Built on Render from Git           |
 | Hosting              | Render                                                        | Compute; serves API + `wwwroot` SPA |
@@ -145,7 +145,7 @@ Shora/
 | `src/backend/Shora.Api`            | Entry point, DI wiring, background job hosts, `Program.cs`        |
 | `src/backend/Shora.Application`    | Use-case services, outbox, ops monitoring, options classes        |
 | `src/backend/Shora.Domain`         | Pure domain model — no EF or ASP.NET references                   |
-| `src/backend/Shora.Infrastructure` | PostgreSQL, Identity stores, JWT/refresh, Azure Blob, Brevo email |
+| `src/backend/Shora.Infrastructure` | PostgreSQL, Identity stores, JWT/refresh, Cloudflare R2, Brevo email |
 | `src/backend/Shora.Contracts`      | API DTO records consumed by Api and mirrored in TS                |
 | `src/frontend`                     | Angular SPA; `@contracts/*` alias points to `src/contracts`       |
 | `specs/`                           | Maintainer-facing design documentation                            |
@@ -157,7 +157,7 @@ Shora/
 
 Production runs as **one HTTPS origin**: the browser loads the Angular app and calls `/api/v1/*` on the same host. Refresh-token cookies use `SameSite=Strict`, which requires same-site deployment in MVP.
 
-The Render container runs **Shora.Api** (HTTP + background jobs) and serves the Angular SPA from **wwwroot**. The API connects to **Supabase PostgreSQL**, **Azure Blob Storage** (receipts), and **Brevo** for email.
+The Render container runs **Shora.Api** (HTTP + background jobs) and serves the Angular SPA from **wwwroot**. The API connects to **Supabase PostgreSQL**, **Cloudflare R2** (receipts), and **Brevo** for email.
 
 **Dependency direction (backend):**
 
@@ -177,7 +177,7 @@ The Render container runs **Shora.Api** (HTTP + background jobs) and serves the 
 | ------------------ | ---------------------------------------------------------------------------- |
 | **Domain**         | Entities, enums, invariants                                                  |
 | **Application**    | Services, validators, `Result` pattern, `IApplicationDbContext`, outbox, ops |
-| **Infrastructure** | EF Core, Identity, JWT, refresh tokens, Brevo email, Azure Blob, seeder      |
+| **Infrastructure** | EF Core, Identity, JWT, refresh tokens, Brevo email, Cloudflare R2, seeder   |
 | **Api**            | Controllers, middleware, rate limits, background job hosts                   |
 | **Contracts**      | Shared DTO records (no business logic)                                       |
 
@@ -437,15 +437,15 @@ Shora does **not** integrate with Stripe, PayPal, or other payment providers.
 
 | Item             | Detail                                                                                                   |
 | ---------------- | -------------------------------------------------------------------------------------------------------- |
-| **Provider**     | Azure Blob Storage (`IFileStorage` → `AzureBlobFileStorage`)                                             |
-| **Dev**          | Azurite via `Storage:ConnectionString=UseDevelopmentStorage=true`                                        |
-| **Container**    | Private `Storage:ReceiptContainer` (default `receipts`)                                                  |
+| **Provider**     | Cloudflare R2 (`IFileStorage` → `R2FileStorage`)                                                         |
+| **Dev**          | MinIO via `Storage:Endpoint=http://localhost:9000` (see §18)                                             |
+| **Bucket**       | Private `Storage:ReceiptBucket` (default `receipts`)                                                     |
 | **Upload flow**  | Multipart → validate type/size → `temp/{guid}` → DB row → finalize to `receipts/{paymentId}/{receiptId}` |
-| **Admin read**   | Short-lived SAS URLs (`Storage:ReceiptReadUrlMinutes`, default 5) only when malware scan = `Clean`       |
+| **Admin read**   | Short-lived presigned URLs (`Storage:ReceiptReadUrlMinutes`, default 5) only when malware scan = `Clean` |
 | **Malware scan** | `PassThroughMalwareScanner` — always marks `Clean` (no external AV)                                      |
 | **Cleanup**      | Jobs delete orphan temp blobs and purge old receipts per retention settings                              |
 
-If `Storage:ConnectionString` is unset, `NotImplementedFileStorage` throws on upload.
+If `Storage:Endpoint` is unset, `NotImplementedFileStorage` throws on upload.
 
 ---
 
@@ -568,8 +568,10 @@ Use `__` (double underscore) for nested env vars on Render (e.g. `Jwt__SigningKe
 | `Frontend__BaseUrl`                    | Public HTTPS URL (no trailing slash) | `https://shora.onrender.com`             |
 | `Cors__AllowedOrigins__0`              | Must match `Frontend__BaseUrl`       | Same as above                            |
 | `AllowedHosts`                         | Hostname only                        | `shora.onrender.com`                     |
-| `Storage__ConnectionString`            | Azure Blob                           | From Azure Portal / CLI                  |
-| `Storage__ReceiptContainer`            | Private container                    | `receipts`                               |
+| `Storage__Endpoint`                    | Cloudflare R2 S3 endpoint            | `https://<accountId>.r2.cloudflarestorage.com` |
+| `Storage__AccessKeyId`                 | R2 access key ID                     | From Cloudflare dashboard                |
+| `Storage__SecretAccessKey`             | R2 secret access key                 | From Cloudflare dashboard                |
+| `Storage__ReceiptBucket`               | Private bucket name                  | `receipts`                               |
 | `Email__ApiKey`                        | Brevo API key                        | `xkeysib-...`                            |
 | `Email__FromAddress`                   | Verified sender                      | `noreply@yourdomain.com`                 |
 
@@ -600,7 +602,7 @@ Use `__` (double underscore) for nested env vars on Render (e.g. `Jwt__SigningKe
 | PostgreSQL connection | `appsettings.Development.json` or user-secrets        | Replace `YOUR_PG_USER` / `YOUR_PG_PASSWORD`   |
 | `AdminSeed`           | `appsettings.Development.json`                        | Default `admin@localhost.dev`                 |
 | `Jwt:SigningKey`      | `appsettings.Development.json`                        | Dev-only key included                         |
-| Azurite               | `Storage:ConnectionString=UseDevelopmentStorage=true` | Requires Azurite on port 10000                |
+| MinIO                 | `Storage:Endpoint=http://localhost:9000` in Development | Requires MinIO on port 9000                   |
 | Email                 | Unconfigured                                          | Logged to console via `DevLoggingEmailSender` |
 
 ### Frontend (build-time)
@@ -624,7 +626,7 @@ Full production reference: [`docs/deployment.md`](docs/deployment.md).
 | npm            | **10.x** (project uses 10.9.4) | Frontend dependencies          |
 | PostgreSQL     | **16+**                        | Local database                 |
 | Docker Desktop | Latest                         | Backend tests (Testcontainers) |
-| Azurite        | Docker image or local          | Receipt upload in dev          |
+| MinIO          | Docker image                   | Receipt upload in dev          |
 
 Angular CLI is invoked via `npx ng` / `npm run ng` (local devDependency).
 
@@ -655,11 +657,13 @@ dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Po
 
 Or edit [`src/backend/Shora.Api/appsettings.Development.json`](src/backend/Shora.Api/appsettings.Development.json).
 
-### 3. Azurite (receipt uploads)
+### 3. MinIO (receipt uploads)
 
 ```powershell
-docker run --rm -p 10000:10000 mcr.microsoft.com/azure-storage/azurite:3.35.0 azurite-blob --blobHost 0.0.0.0 --blobPort 10000 --skipApiVersionCheck
+docker run --rm -p 9000:9000 -p 9001:9001 minio/minio server /data --console-address ":9001"
 ```
+
+Create the `receipts` bucket once via the MinIO console at `http://localhost:9001` (default credentials: `minioadmin` / `minioadmin`). Development config in [`appsettings.Development.json`](src/backend/Shora.Api/appsettings.Development.json) already points at MinIO.
 
 ### 4. Database migrations
 
@@ -731,7 +735,7 @@ dotnet ef migrations add YourMigrationName --project Shora.Infrastructure --star
 | **Unit tests**        | `Unit/` — validators, mappers, retry logic                             |
 | **Integration tests** | `Integration/Api/`, `Integration/Infrastructure/`, `Integration/Auth/` |
 | **Test DB**           | Testcontainers PostgreSQL — **Docker must be running**                 |
-| **Blob tests**        | Testcontainers Azurite or `InMemoryFileStorage`                        |
+| **Blob tests**        | Testcontainers MinIO or `InMemoryFileStorage`                          |
 | **Frontend tests**    | Vitest via `ng test`                                                   |
 
 ### Commands
@@ -762,7 +766,7 @@ Tests set `BackgroundJobs:Enabled = false` where needed to avoid background inte
 | **Base image**         | `mcr.microsoft.com/dotnet/aspnet:10.0`                                                      |
 | **Port**               | `8080` (`ASPNETCORE_HTTP_PORTS=8080` on Render)                                              |
 | **docker-compose**     | **Not present** in repository                                                               |
-| **Local Docker usage** | Azurite for dev; Testcontainers for tests; `docker build` compiles frontend + backend in-image |
+| **Local Docker usage** | MinIO for dev; Testcontainers for tests; `docker build` compiles frontend + backend in-image |
 
 Build and run locally (no manual publish step):
 
@@ -800,7 +804,7 @@ Detail: [`.github/workflows/README.md`](.github/workflows/README.md).
 | --------------- | ------------------------------ |
 | Compute + SPA   | Render (Docker build from Git) |
 | Database        | Supabase PostgreSQL            |
-| Receipt storage | Azure Blob (private container) |
+| Receipt storage | Cloudflare R2 (private bucket) |
 | Email           | Brevo (HTTPS API)              |
 
 - Frontend is baked into `Shora.Api/wwwroot` during the Docker build on Render
@@ -888,7 +892,7 @@ Always persist and compare business times in **UTC** on the server.
 | Pitfall                                                 | Why it breaks things                                            |
 | ------------------------------------------------------- | --------------------------------------------------------------- |
 | Using `https://localhost:7183` directly in browser      | Refresh cookies won't work cross-origin with Angular dev server |
-| Missing Azurite                                         | Receipt upload throws `NotImplementedException`                 |
+| Missing MinIO                                           | Receipt upload throws `NotImplementedException`                 |
 | Docker not running                                      | `dotnet test` fails (Testcontainers)                            |
 | `Cors__AllowedOrigins__0` ≠ `Frontend__BaseUrl` in prod | Startup validation fails                                        |
 | Supabase transaction pooler (port 6543) on Render       | Breaks EF migrations/transactions — use session pooler (5432)   |
@@ -915,9 +919,9 @@ Always persist and compare business times in **UTC** on the server.
 
 ### Receipt upload fails in dev
 
-**Cause:** Azurite not running or wrong `Storage:ConnectionString`.
+**Cause:** MinIO not running or wrong `Storage:Endpoint` / credentials.
 
-**Solution:** Start Azurite on port 10000; confirm `UseDevelopmentStorage=true` in Development config.
+**Solution:** Start MinIO on port 9000; confirm `appsettings.Development.json` storage settings and create the `receipts` bucket.
 
 ### CORS validation error on Render startup
 
@@ -961,8 +965,8 @@ npm start
 npm run build
 npm test
 
-# Azurite
-docker run --rm -p 10000:10000 mcr.microsoft.com/azure-storage/azurite:3.35.0 azurite-blob --blobHost 0.0.0.0 --blobPort 10000 --skipApiVersionCheck
+# MinIO
+docker run --rm -p 9000:9000 -p 9001:9001 minio/minio server /data --console-address ":9001"
 ```
 
 ---
@@ -996,7 +1000,7 @@ Contract sync: [`src/contracts/README.md`](src/contracts/README.md).
 | **Slot**             | Concrete UTC appointment time generated from availability windows                  |
 | **Delivery method**  | Voice call or chat (WhatsApp) for the session                                      |
 | **AdminSeed**        | One-time env-based admin account bootstrap                                         |
-| **SAS URL**          | Time-limited Azure Blob read URL for admin receipt viewing                         |
+| **Presigned URL**    | Time-limited R2/S3 read URL for admin receipt viewing                              |
 | **Same-site deploy** | SPA and API served from one HTTPS origin                                           |
 | **Ops alert**        | Automated warning from background monitoring (stale jobs, pending approvals, etc.) |
 

@@ -27,7 +27,7 @@
 
     <PackageReference Include="Testcontainers.PostgreSql" />
 
-    <PackageReference Include="Testcontainers.Azurite" />
+    <PackageReference Include="Testcontainers.Minio" />
 
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
 

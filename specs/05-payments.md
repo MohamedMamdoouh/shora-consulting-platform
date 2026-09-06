@@ -28,7 +28,7 @@ This replaces the previous automated gateway entirely: there are no webhooks, no
      3. Commit DB; move/rename blob to final key (or mark final in metadata).
      4. If any post-commit blob step fails, mark the receipt row `BlobFinalizePending` and let the **receipt blob reconciliation job ([spec 08](08-cross-cutting-concerns.md) §3)** reconcile.
    - This prevents silent divergence between blob and DB state.
-5. **Admin reviews (`GET /api/admin/bookings/{id}/receipts`)**: returns the attempt history plus **short-lived SAS read URLs** for the private blob images.
+5. **Admin reviews (`GET /api/admin/bookings/{id}/receipts`)**: returns the attempt history plus **short-lived presigned read URLs** for the private blob images.
 6. **Approve (`POST /api/admin/bookings/{id}/receipts/approve`)**: in one DB transaction set the latest `PaymentReceipt.ReviewStatus = Approved`, `Payment.Status = Approved`, `Booking.Status = Confirmed` (writing a `BookingStatusAudit` row), and enqueue the client confirmation + admin new-booking emails to the outbox.
 7. **Decline (`POST /api/admin/bookings/{id}/receipts/decline`, body `{ reasonCode, reasonNote? }`)**: set the latest `PaymentReceipt.ReviewStatus = Declined` with typed reason + optional note, `Payment.Status = AwaitingReceipt`, `Booking.Status = PendingPayment`, and a **fresh** `ReceiptUploadDeadlineUtc = now + Settings.ReceiptUploadWindowMinutes`; enqueue a "please re-upload" email carrying the reason. The client may re-upload (the slot stays held).
 
@@ -40,15 +40,15 @@ All state changes are guarded by `Booking.RowVersion` (spec 01), so concurrent a
 | ------------------------------------------------ | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `GET /api/bookings/{id}/payment-instructions`    | Client (owner) | Returns Vodafone Cash number, InstaPay handle, amount, optional instructions, and the upload deadline for a `PendingPayment` booking.                                                                                           |
 | `POST /api/payments/{bookingId}/receipt`         | Client (owner) | Multipart: `image` file + `method` (`VodafoneCash`\|`InstaPay`) + optional `senderReference`. Allowed only while the booking is `PendingPayment` and before `ReceiptUploadDeadlineUtc`. Moves the booking to `PendingApproval`. |
-| `GET /api/admin/bookings/{id}/receipts`          | Admin          | Returns `PaymentReceipt` attempt history + short-lived SAS URLs to view images.                                                                                                                                                 |
+| `GET /api/admin/bookings/{id}/receipts`          | Admin          | Returns `PaymentReceipt` attempt history + short-lived presigned URLs to view images.                                                                                                                                                 |
 | `POST /api/admin/bookings/{id}/receipts/approve` | Admin          | Approves the pending receipt → booking `Confirmed`.                                                                                                                                                                             |
 | `POST /api/admin/bookings/{id}/receipts/decline` | Admin          | Body `{ reasonCode, reasonNote? }`. Declines pending receipt → booking back to `PendingPayment` with a new upload window.                                                                                                       |
 | `POST /api/admin/payments/{id}/refunds/record`   | Admin          | Body `{ reference, note }`. Records a manual out-of-band refund on a cancelled booking's payment (#6).                                                                                                                          |
 
 ## 4. File Upload & Storage (security)
 
-- **Storage**: receipt images are stored in a **private Azure Blob Storage container** (`Storage:ReceiptContainer`). Blobs are given **random, unguessable names**; the original filename is kept only as display metadata on `PaymentReceipt`. Blobs are **never public**.
-- **Admin access**: the admin views a receipt only via a **short-lived SAS read URL** minted on demand by `GET /api/admin/bookings/{id}/receipts`. URLs expire quickly (e.g. a few minutes) and are not persisted.
+- **Storage**: receipt images are stored in a **private Cloudflare R2 bucket** (`Storage:ReceiptBucket`). Blobs are given **random, unguessable names**; the original filename is kept only as display metadata on `PaymentReceipt`. Blobs are **never public**.
+- **Admin access**: the admin views a receipt only via a **short-lived presigned read URL** minted on demand by `GET /api/admin/bookings/{id}/receipts`. URLs expire quickly (e.g. a few minutes) and are not persisted.
 - **Validation** on upload:
   - Content-type allowlist: `image/jpeg`, `image/png`, `image/webp`, `application/pdf`.
   - Max size (e.g. **5 MB**), enforced before storing; `413`/`400` on violation.
@@ -81,7 +81,7 @@ Refunds are **only** triggered by a cancellation and are handled **entirely out-
 
 ## 7. Configuration
 
-- `Storage:ConnectionString`, `Storage:ReceiptContainer` — Azure Blob Storage (private container) for receipt images. Stored via `dotnet user-secrets` locally and environment variables / secret store in production; never committed.
+- `Storage:Endpoint`, `Storage:AccessKeyId`, `Storage:SecretAccessKey`, `Storage:ReceiptBucket` — Cloudflare R2 (S3-compatible API) for receipt images. Stored via `dotnet user-secrets` locally and environment variables / secret store in production; never committed.
 - The Vodafone Cash number and InstaPay handle are **operational data** in `Settings` (admin-editable), not secrets.
 
 ## 8. Failure & Edge Cases
@@ -101,4 +101,4 @@ Refunds are **only** triggered by a cancellation and are handled **entirely out-
 ## 10. Open Items for This Area
 
 - The consultant's Vodafone Cash number and InstaPay handle must be provided (configured in `Settings`) before this can be used — a provisioning input, not a design decision.
-- An Azure Blob Storage account + private container must be provisioned; connection string supplied via secrets.
+- A Cloudflare R2 bucket + API token must be provisioned; credentials supplied via secrets.

@@ -195,8 +195,10 @@ public class HealthEndpointTests : IDisposable
                     ["Cors:AllowedOrigins:0"] = "https://shora.onrender.com",
                     ["Email:ApiKey"] = "xkeysib-test",
                     ["Email:FromAddress"] = "noreply@example.com",
-                    ["Storage:ConnectionString"] = "UseDevelopmentStorage=true",
-                    ["Storage:ReceiptContainer"] = "receipts",
+                    ["Storage:Endpoint"] = "http://localhost:9000",
+                    ["Storage:AccessKeyId"] = "minioadmin",
+                    ["Storage:SecretAccessKey"] = "minioadmin",
+                    ["Storage:ReceiptBucket"] = "receipts",
                     ["BackgroundJobs:Enabled"] = "false"
                 });
             });

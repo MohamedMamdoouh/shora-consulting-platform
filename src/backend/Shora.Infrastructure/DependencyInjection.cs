@@ -52,9 +52,9 @@ public static class DependencyInjection
         services.Configure<ReceiptUploadOptions>(configuration.GetSection(ReceiptUploadOptions.SectionName));
 
         var storageOptions = configuration.GetSection(StorageOptions.SectionName).Get<StorageOptions>() ?? new StorageOptions();
-        if (!string.IsNullOrWhiteSpace(storageOptions.ConnectionString))
+        if (!string.IsNullOrWhiteSpace(storageOptions.Endpoint))
         {
-            services.AddSingleton<IFileStorage, AzureBlobFileStorage>();
+            services.AddSingleton<IFileStorage, R2FileStorage>();
         }
         else
         {

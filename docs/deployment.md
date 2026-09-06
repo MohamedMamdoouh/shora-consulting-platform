@@ -36,7 +36,7 @@ Host=aws-0-<region>.pooler.supabase.com;Port=5432;Database=postgres;Username=pos
 
 Session pooler username is `postgres.<project-ref>`, not plain `postgres`.
 
-**Cloudflare R2** — create a private bucket (e.g. `receipts`) in the [Cloudflare dashboard](https://dash.cloudflare.com/). Create an R2 API token with **Object Read & Write** scoped to that bucket. Note your **Account ID**, **Access Key ID**, and **Secret Access Key**. The S3 endpoint is `https://<accountId>.r2.cloudflarestorage.com`.
+**Cloudflare R2** — create a private bucket (e.g. `shora-receipts`) in the [Cloudflare dashboard](https://dash.cloudflare.com/). Create an R2 API token with **Object Read & Write** scoped to that bucket. Note your **Account ID**, **Access Key ID**, and **Secret Access Key**. The S3 endpoint is `https://<accountId>.r2.cloudflarestorage.com`.
 
 Migrations run automatically on first startup.
 
@@ -75,7 +75,7 @@ Render → **shora** → **Environment**.
 | `Storage__Endpoint`                    | `https://<accountId>.r2.cloudflarestorage.com`         |
 | `Storage__AccessKeyId`                 | R2 access key ID                                       |
 | `Storage__SecretAccessKey`             | R2 secret access key                                   |
-| `Storage__ReceiptBucket`               | `receipts`                                             |
+| `Storage__ReceiptBucket`               | `shora-receipts`                                       |
 | `Email__ApiKey`                        | Brevo API key                                          |
 | `Email__FromAddress`                   | Verified Brevo sender                                  |
 

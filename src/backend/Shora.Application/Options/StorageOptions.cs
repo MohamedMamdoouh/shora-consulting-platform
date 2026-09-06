@@ -10,7 +10,7 @@ public sealed class StorageOptions
 
     public string SecretAccessKey { get; set; } = string.Empty;
 
-    public string ReceiptBucket { get; set; } = "receipts";
+    public string ReceiptBucket { get; set; } = "shora-receipts";
 
     public int ReceiptReadUrlMinutes { get; set; } = 5;
 }

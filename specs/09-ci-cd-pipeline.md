@@ -168,7 +168,7 @@ Set secrets via environment variables (double-underscore nesting). Never commit 
 | `Storage__Endpoint`                       | R2 S3 endpoint — private bucket (spec 05)                                                                  |
 | `Storage__AccessKeyId`                    | R2 access key ID                                                                                           |
 | `Storage__SecretAccessKey`                | R2 secret access key                                                                                       |
-| `Storage__ReceiptBucket`                  | Private bucket name (`receipts`)                                                                           |
+| `Storage__ReceiptBucket`                  | Private bucket name (`shora-receipts`)                                                                   |
 | `Email__*`                                | Brevo settings (spec 02, outbox) — `ApiKey` + `FromAddress` required at startup                            |
 | `Frontend__BaseUrl`                       | Production HTTPS URL (e.g. `https://shora.onrender.com`)                                                   |
 | `Cors__AllowedOrigins__0`                 | Same production HTTPS URL (same-site + `AllowCredentials`)                                                 |

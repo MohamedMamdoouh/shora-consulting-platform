@@ -439,7 +439,7 @@ Shora does **not** integrate with Stripe, PayPal, or other payment providers.
 | ---------------- | -------------------------------------------------------------------------------------------------------- |
 | **Provider**     | Cloudflare R2 (`IFileStorage` → `R2FileStorage`)                                                         |
 | **Dev**          | MinIO via `Storage:Endpoint=http://localhost:9000` (see §18)                                             |
-| **Bucket**       | Private `Storage:ReceiptBucket` (default `receipts`)                                                     |
+| **Bucket**       | Private `Storage:ReceiptBucket` (default `shora-receipts`)                                               |
 | **Upload flow**  | Multipart → validate type/size → `temp/{guid}` → DB row → finalize to `receipts/{paymentId}/{receiptId}` |
 | **Admin read**   | Short-lived presigned URLs (`Storage:ReceiptReadUrlMinutes`, default 5) only when malware scan = `Clean` |
 | **Malware scan** | `PassThroughMalwareScanner` — always marks `Clean` (no external AV)                                      |
@@ -571,7 +571,7 @@ Use `__` (double underscore) for nested env vars on Render (e.g. `Jwt__SigningKe
 | `Storage__Endpoint`                    | Cloudflare R2 S3 endpoint            | `https://<accountId>.r2.cloudflarestorage.com` |
 | `Storage__AccessKeyId`                 | R2 access key ID                     | From Cloudflare dashboard                |
 | `Storage__SecretAccessKey`             | R2 secret access key                 | From Cloudflare dashboard                |
-| `Storage__ReceiptBucket`               | Private bucket name                  | `receipts`                               |
+| `Storage__ReceiptBucket`               | Private bucket name                  | `shora-receipts`                         |
 | `Email__ApiKey`                        | Brevo API key                        | `xkeysib-...`                            |
 | `Email__FromAddress`                   | Verified sender                      | `noreply@yourdomain.com`                 |
 
@@ -663,7 +663,7 @@ Or edit [`src/backend/Shora.Api/appsettings.Development.json`](src/backend/Shora
 docker run --rm -p 9000:9000 -p 9001:9001 minio/minio server /data --console-address ":9001"
 ```
 
-Create the `receipts` bucket once via the MinIO console at `http://localhost:9001` (default credentials: `minioadmin` / `minioadmin`). Development config in [`appsettings.Development.json`](src/backend/Shora.Api/appsettings.Development.json) already points at MinIO.
+Create the `shora-receipts` bucket once via the MinIO console at `http://localhost:9001` (default credentials: `minioadmin` / `minioadmin`). Development config in [`appsettings.Development.json`](src/backend/Shora.Api/appsettings.Development.json) already points at MinIO.
 
 ### 4. Database migrations
 
@@ -921,7 +921,7 @@ Always persist and compare business times in **UTC** on the server.
 
 **Cause:** MinIO not running or wrong `Storage:Endpoint` / credentials.
 
-**Solution:** Start MinIO on port 9000; confirm `appsettings.Development.json` storage settings and create the `receipts` bucket.
+**Solution:** Start MinIO on port 9000; confirm `appsettings.Development.json` storage settings and create the `shora-receipts` bucket.
 
 ### CORS validation error on Render startup
 

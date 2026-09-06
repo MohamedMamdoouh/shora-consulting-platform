@@ -84,7 +84,7 @@ public sealed class R2FileStorageTests
             options.Endpoint = _minio.Endpoint;
             options.AccessKeyId = _minio.AccessKeyId;
             options.SecretAccessKey = _minio.SecretAccessKey;
-            options.ReceiptBucket = $"receipts-{Guid.NewGuid():N}";
+            options.ReceiptBucket = $"shora-receipts-{Guid.NewGuid():N}";
         });
 
         var serviceProvider = services.BuildServiceProvider();

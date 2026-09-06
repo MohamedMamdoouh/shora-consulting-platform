@@ -198,7 +198,7 @@ public class HealthEndpointTests : IDisposable
                     ["Storage:Endpoint"] = "http://localhost:9000",
                     ["Storage:AccessKeyId"] = "minioadmin",
                     ["Storage:SecretAccessKey"] = "minioadmin",
-                    ["Storage:ReceiptBucket"] = "receipts",
+                    ["Storage:ReceiptBucket"] = "shora-receipts",
                     ["BackgroundJobs:Enabled"] = "false"
                 });
             });

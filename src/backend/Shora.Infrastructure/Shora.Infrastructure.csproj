@@ -34,5 +34,8 @@
 
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Shora.Tests" />
+  </ItemGroup>
 
 </Project>

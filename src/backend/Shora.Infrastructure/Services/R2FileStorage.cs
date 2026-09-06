@@ -41,6 +41,10 @@ public sealed class R2FileStorage : IFileStorage, IDisposable
             throw new InvalidOperationException("Storage:ReceiptBucket is not configured.");
         }
 
+        // R2 rejects SigV2 presigned URLs. See
+        // https://developers.cloudflare.com/r2/examples/aws/aws-sdk-net/
+        AWSConfigsS3.UseSignatureVersion4 = true;
+
         _protocol = storageOptions.Endpoint.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
             ? Protocol.HTTPS
             : Protocol.HTTP;
@@ -50,6 +54,7 @@ public sealed class R2FileStorage : IFileStorage, IDisposable
             ServiceURL = storageOptions.Endpoint,
             ForcePathStyle = true,
             AuthenticationRegion = "auto",
+            SignatureVersion = "4",
             UseHttp = _protocol == Protocol.HTTP
         };
 
@@ -72,17 +77,8 @@ public sealed class R2FileStorage : IFileStorage, IDisposable
             throw new ArgumentException("Content type is required.", nameof(contentType));
         }
 
-        await EnsureBucketExistsAsync(cancellationToken);
-
         var tempPath = $"{TempPrefix}{Guid.NewGuid():N}";
-        var request = new PutObjectRequest
-        {
-            BucketName = _bucketName,
-            Key = tempPath,
-            InputStream = content,
-            ContentType = contentType,
-            AutoCloseStream = false
-        };
+        var request = CreateUploadRequest(_bucketName, tempPath, content, contentType);
 
         await _s3Client.PutObjectAsync(request, cancellationToken);
         return tempPath;
@@ -95,8 +91,6 @@ public sealed class R2FileStorage : IFileStorage, IDisposable
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(tempPath);
         ArgumentException.ThrowIfNullOrWhiteSpace(finalPath);
-
-        await EnsureBucketExistsAsync(cancellationToken);
 
         if (!await ExistsAsync(tempPath, cancellationToken))
         {
@@ -217,16 +211,24 @@ public sealed class R2FileStorage : IFileStorage, IDisposable
         _s3Client.Dispose();
     }
 
-    private async Task EnsureBucketExistsAsync(CancellationToken cancellationToken)
+    // R2 does not support AWSSDK.S3 Streaming SigV4. See
+    // https://developers.cloudflare.com/r2/examples/aws/aws-sdk-net/
+    internal static PutObjectRequest CreateUploadRequest(
+        string bucketName,
+        string key,
+        Stream content,
+        string contentType)
     {
-        try
+        return new PutObjectRequest
         {
-            await _s3Client.GetBucketLocationAsync(_bucketName, cancellationToken);
-        }
-        catch (AmazonS3Exception ex) when (IsNotFound(ex))
-        {
-            await _s3Client.PutBucketAsync(new PutBucketRequest { BucketName = _bucketName }, cancellationToken);
-        }
+            BucketName = bucketName,
+            Key = key,
+            InputStream = content,
+            ContentType = contentType,
+            AutoCloseStream = false,
+            DisablePayloadSigning = true,
+            DisableDefaultChecksumValidation = true
+        };
     }
 
     private static AmazonS3Exception CreateNotFoundException(string message)

@@ -1,6 +1,6 @@
 # 09 — CI/CD Pipeline
 
-Status: **Done** in repo. **Deploy target:** Render (Git + Docker) + Supabase PostgreSQL + Cloudflare R2 (receipts). Operator guide: [docs/deployment.md](../docs/deployment.md).
+Status: **Done** in repo. **Deploy target:** Render (Git + Docker) + Supabase PostgreSQL + Cloudflare R2 (`shora-receipts` bucket). Operator guide: [docs/deployment.md](../docs/deployment.md).
 
 This spec defines how Shora is built, validated, and deployed. It complements spec 08 #4 (hosting topology) with GitHub Actions workflows. Workflow YAML stays thin; this document is the authoritative design.
 
@@ -64,7 +64,7 @@ Backend and frontend jobs run only when their paths (or `.github/workflows/**`) 
 | Build      | `dotnet build --no-restore`                            |
 | Test       | `dotnet test --no-build --verbosity normal`            |
 
-- **xUnit tests** in `Shora.Tests` (PostgreSQL via Testcontainers — Docker required on the runner).
+- **xUnit tests** in `Shora.Tests` (PostgreSQL and MinIO via Testcontainers — Docker required on the runner).
 - **Cache:** NuGet packages via `setup-dotnet` cache.
 
 **Verify locally:**
@@ -199,7 +199,7 @@ Set `Frontend__BaseUrl` and `Cors__AllowedOrigins__0` on Render to the same prod
 | ---------------------- | ---------------------------------------------------- |
 | **Render**             | Host .NET 10 API + static Angular (Docker from Git)  |
 | **Supabase PostgreSQL** | Production database                                  |
-| **Cloudflare R2** | Private receipt bucket (spec 05)                     |
+| **Cloudflare R2**        | Private receipt bucket `shora-receipts` (spec 05)    |
 
 **Verify:** Render env vars configured; push to `main` triggers build; `GET https://<production-url>/api/v1/health` returns OK.
 
@@ -258,7 +258,7 @@ Set `Frontend__BaseUrl` and `Cors__AllowedOrigins__0` on Render to the same prod
 
 **Done in code** — [`Program.cs`](../src/backend/Shora.Api/Program.cs) calls `InitializeDatabaseAsync()` → `MigrateAsync` + idempotent seed ([`DependencyInjection.cs`](../src/backend/Shora.Infrastructure/DependencyInjection.cs)).
 
-- **CI:** backend tests spin up PostgreSQL via Testcontainers (Docker on `ubuntu-latest`).
+- **CI:** backend tests spin up PostgreSQL and MinIO via Testcontainers (Docker on `ubuntu-latest`).
 - **CD (MVP):** no separate `dotnet ef database update` step in the pipeline — deploy relies on startup migration (spec 01 #5, spec 08 #4).
 - **Rollback:** redeploying an older app binary does **not** revert the database schema. Migrations are forward-only. If a bad migration ships, restore from backup and ship a fix migration — not automated in MVP.
 

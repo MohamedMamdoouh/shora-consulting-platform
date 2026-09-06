@@ -804,7 +804,7 @@ Detail: [`.github/workflows/README.md`](.github/workflows/README.md).
 | --------------- | ------------------------------ |
 | Compute + SPA   | Render (Docker build from Git) |
 | Database        | Supabase PostgreSQL            |
-| Receipt storage | Cloudflare R2 (private bucket) |
+| Receipt storage | Cloudflare R2 (private bucket `shora-receipts`) |
 | Email           | Brevo (HTTPS API)              |
 
 - Frontend is baked into `Shora.Api/wwwroot` during the Docker build on Render

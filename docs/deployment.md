@@ -12,7 +12,7 @@ Set secrets as **Render environment variables** (`Jwt__SigningKey` → `Jwt:Sign
 | --------- | ------------------------------ |
 | Compute   | Render (Docker from Git)       |
 | Database  | Supabase PostgreSQL            |
-| Receipts  | Cloudflare R2 (private bucket) |
+| Receipts  | Cloudflare R2 (private bucket `shora-receipts`) |
 | Email     | Brevo HTTPS API                |
 | CI        | GitHub Actions                 |
 
@@ -96,6 +96,8 @@ Render → **shora** → **Environment**.
 - **Wrong pooler mode:** port `6543` causes migration/transaction failures — use session pooler port `5432`.
 - **URI on Render:** passwords containing `=` get truncated — use key-value format, not a `postgresql://` URI.
 - **Wrong username:** session pooler requires `postgres.<project-ref>`, not `postgres`.
+- **Legacy Azure storage vars:** remove `Storage__ConnectionString` and `Storage__ReceiptContainer` if still present; use the four `Storage__*` R2 variables from the table above.
+- **Wrong bucket name:** `Storage__ReceiptBucket` must match your R2 bucket (default `shora-receipts`).
 
 ## 4. Verify
 

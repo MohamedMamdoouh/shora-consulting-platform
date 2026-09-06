@@ -21,7 +21,7 @@ Production releases: push/merge to `main` → Render builds from [`Dockerfile`](
 | **Backend**  | `src/backend/**` or `.github/workflows/**` changed  | `src/backend`     | `dotnet restore` → `build` → `test`                   |
 | **Frontend** | `src/frontend/**` or `.github/workflows/**` changed | `src/frontend`    | `npm ci` → `npm run build` → `npm test` (`CI=true`)   |
 
-- Backend tests use Testcontainers PostgreSQL (Docker required on the runner).
+- Backend tests use Testcontainers PostgreSQL and MinIO (Docker required on the runner).
 - Docs/spec-only changes skip the jobs that did not touch backend or frontend code.
 
 ### Reproduce locally

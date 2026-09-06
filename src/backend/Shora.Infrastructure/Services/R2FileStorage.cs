@@ -97,15 +97,18 @@ public sealed class R2FileStorage : IFileStorage, IDisposable
             throw CreateNotFoundException($"Temporary blob '{tempPath}' was not found.");
         }
 
-        await _s3Client.CopyObjectAsync(
-            new CopyObjectRequest
-            {
-                SourceBucket = _bucketName,
-                SourceKey = tempPath,
-                DestinationBucket = _bucketName,
-                DestinationKey = finalPath
-            },
-            cancellationToken);
+        // AWSSDK.S3 3.7 CopyObject always sends x-amz-tagging-directive.
+        // R2 does not implement that header and returns 501, so finalize
+        // must Get + Put instead. See
+        // https://developers.cloudflare.com/r2/api/s3/api/
+        using (var source = await _s3Client.GetObjectAsync(_bucketName, tempPath, cancellationToken))
+        {
+            var contentType = string.IsNullOrWhiteSpace(source.Headers.ContentType)
+                ? "application/octet-stream"
+                : source.Headers.ContentType;
+            var request = CreateUploadRequest(_bucketName, finalPath, source.ResponseStream, contentType);
+            await _s3Client.PutObjectAsync(request, cancellationToken);
+        }
 
         await _s3Client.DeleteObjectAsync(_bucketName, tempPath, cancellationToken);
     }

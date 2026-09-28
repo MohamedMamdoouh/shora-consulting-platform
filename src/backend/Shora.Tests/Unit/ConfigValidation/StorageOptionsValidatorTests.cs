@@ -19,7 +19,7 @@ public class StorageOptionsValidatorTests
     {
         var result = _validator.Validate(null, new StorageOptions
         {
-            Endpoint = "http://localhost:9000"
+            Endpoint = "https://example.r2.cloudflarestorage.com"
         });
 
         Assert.False(result.Succeeded);
@@ -30,8 +30,8 @@ public class StorageOptionsValidatorTests
     {
         var result = _validator.Validate(null, new StorageOptions
         {
-            Endpoint = "http://localhost:9000",
-            AccessKeyId = "minioadmin"
+            Endpoint = "https://example.r2.cloudflarestorage.com",
+            AccessKeyId = "test-access-key-id"
         });
 
         Assert.False(result.Succeeded);
@@ -42,9 +42,9 @@ public class StorageOptionsValidatorTests
     {
         var result = _validator.Validate(null, new StorageOptions
         {
-            Endpoint = "http://localhost:9000",
-            AccessKeyId = "minioadmin",
-            SecretAccessKey = "minioadmin"
+            Endpoint = "https://example.r2.cloudflarestorage.com",
+            AccessKeyId = "test-access-key-id",
+            SecretAccessKey = "test-secret-access-key"
         });
 
         Assert.True(result.Succeeded);

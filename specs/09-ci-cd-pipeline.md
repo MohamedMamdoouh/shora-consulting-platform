@@ -64,7 +64,7 @@ Backend and frontend jobs run only when their paths (or `.github/workflows/**`) 
 | Build      | `dotnet build --no-restore`                            |
 | Test       | `dotnet test --no-build --verbosity normal`            |
 
-- **xUnit tests** in `Shora.Tests` (PostgreSQL and MinIO via Testcontainers — Docker required on the runner).
+- **xUnit tests** in `Shora.Tests` (PostgreSQL via Testcontainers — Docker required on the runner; file storage uses in-memory fakes).
 - **Cache:** NuGet packages via `setup-dotnet` cache.
 
 **Verify locally:**
@@ -258,7 +258,7 @@ Set `Frontend__BaseUrl` and `Cors__AllowedOrigins__0` on Render to the same prod
 
 **Done in code** — [`Program.cs`](../src/backend/Shora.Api/Program.cs) calls `InitializeDatabaseAsync()` → `MigrateAsync` + idempotent seed ([`DependencyInjection.cs`](../src/backend/Shora.Infrastructure/DependencyInjection.cs)).
 
-- **CI:** backend tests spin up PostgreSQL and MinIO via Testcontainers (Docker on `ubuntu-latest`).
+- **CI:** backend tests spin up PostgreSQL via Testcontainers (Docker on `ubuntu-latest`).
 - **CD (MVP):** no separate `dotnet ef database update` step in the pipeline — deploy relies on startup migration (spec 01 #5, spec 08 #4).
 - **Rollback:** redeploying an older app binary does **not** revert the database schema. Migrations are forward-only. If a bad migration ships, restore from backup and ship a fix migration — not automated in MVP.
 

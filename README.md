@@ -102,12 +102,12 @@ Design specs for maintainers live in [`specs/`](specs/). Operator deployment det
 | Authentication       | JWT Bearer + httpOnly refresh cookie                          | Access token in memory; refresh via cookie |
 | Frontend             | Angular 21 (standalone components)                            | SPA, lazy routes, Vitest                   |
 | API contracts        | `Shora.Contracts` (C#) + `src/contracts` (TS)                 | Shared DTO shapes, manual sync             |
-| File storage         | Cloudflare R2 (MinIO locally)                                 | Private receipt images                     |
+| File storage         | Cloudflare R2 (S3-compatible API)                             | Private receipt images                     |
 | Email (dev)          | `DevLoggingEmailSender`                                       | Logs emails to console                     |
 | Email (prod)         | Brevo HTTPS API                                               | Auth + transactional mail                  |
 | Caching              | In-memory cache + ASP.NET Output Cache                        | Public settings & availability             |
 | Rate limiting        | ASP.NET Core Rate Limiter                                     | Abuse protection                           |
-| Testing              | xUnit v3, Testcontainers (PostgreSQL, MinIO)                  | Unit + integration tests                   |
+| Testing              | xUnit v3, Testcontainers (PostgreSQL)                         | Unit + integration tests                   |
 | CI/CD                | GitHub Actions (`ci.yml`)                                     | Tests on PR/push; deploy on Render |
 | Container            | Docker multi-stage ([`Dockerfile`](Dockerfile))               | Built on Render from Git           |
 | Hosting              | Render                                                        | Compute; serves API + `wwwroot` SPA |
@@ -441,7 +441,7 @@ Shora does **not** integrate with Stripe, PayPal, or other payment providers.
 | Item             | Detail                                                                                                   |
 | ---------------- | -------------------------------------------------------------------------------------------------------- |
 | **Provider**     | Cloudflare R2 (`IFileStorage` → `R2FileStorage`)                                                         |
-| **Dev**          | MinIO via `Storage:Endpoint=http://localhost:9000` (see §18)                                             |
+| **Dev**          | Optional: Cloudflare R2 via user-secrets / env (see §18); unset `Storage:Endpoint` disables uploads   |
 | **Bucket**       | Private `Storage:ReceiptBucket` (default `shora-receipts`)                                               |
 | **Upload flow**  | Multipart → validate type/size → `temp/{guid}` → DB row → finalize to `receipts/{paymentId}/{receiptId}` |
 | **Admin read**   | Short-lived presigned URLs (`Storage:ReceiptReadUrlMinutes`, default 5) only when malware scan = `Clean` |
@@ -605,7 +605,7 @@ Use `__` (double underscore) for nested env vars on Render (e.g. `Jwt__SigningKe
 | PostgreSQL connection | `appsettings.Development.json` or user-secrets        | Replace `YOUR_PG_USER` / `YOUR_PG_PASSWORD`   |
 | `AdminSeed`           | `appsettings.Development.json`                        | Default `admin@localhost.dev`                 |
 | `Jwt:SigningKey`      | `appsettings.Development.json`                        | Dev-only key included                         |
-| MinIO                 | `Storage:Endpoint=http://localhost:9000` in Development | Requires MinIO on port 9000                   |
+| `Storage:*`           | User-secrets or env (not in committed Development JSON) | Optional; needed only for local receipt upload |
 | Email                 | Unconfigured                                          | Logged to console via `DevLoggingEmailSender` |
 
 ### Frontend (build-time)
@@ -628,8 +628,7 @@ Full production reference: [`docs/deployment.md`](docs/deployment.md).
 | Node.js        | **22.x**                       | Frontend (Angular 21)          |
 | npm            | **10.x** (project uses 10.9.4) | Frontend dependencies          |
 | PostgreSQL     | **16+**                        | Local database                 |
-| Docker Desktop | Latest                         | Backend tests (Testcontainers) |
-| MinIO          | Docker image                   | Receipt upload in dev          |
+| Docker Desktop | Latest                         | Backend integration tests (Testcontainers PostgreSQL) |
 
 Angular CLI is invoked via `npx ng` / `npm run ng` (local devDependency).
 
@@ -660,13 +659,20 @@ dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Po
 
 Or edit [`src/backend/Shora.Api/appsettings.Development.json`](src/backend/Shora.Api/appsettings.Development.json).
 
-### 3. MinIO (receipt uploads)
+### 3. Receipt uploads (optional)
+
+Committed [`appsettings.Development.json`](src/backend/Shora.Api/appsettings.Development.json) does **not** include `Storage` settings. Without them, the API uses `NotImplementedFileStorage` and receipt upload endpoints fail until you configure Cloudflare R2 (or any S3-compatible endpoint).
+
+Use user-secrets (recommended) or environment variables:
 
 ```powershell
-docker run --rm -p 9000:9000 -p 9001:9001 quay.io/minio/minio:RELEASE.2024-12-18T13-15-44Z server /data --console-address ":9001"
+dotnet user-secrets set "Storage:Endpoint" "https://<accountId>.r2.cloudflarestorage.com" --project src/backend/Shora.Api
+dotnet user-secrets set "Storage:AccessKeyId" "<r2-access-key-id>" --project src/backend/Shora.Api
+dotnet user-secrets set "Storage:SecretAccessKey" "<r2-secret-access-key>" --project src/backend/Shora.Api
+dotnet user-secrets set "Storage:ReceiptBucket" "shora-receipts" --project src/backend/Shora.Api
 ```
 
-Create the `shora-receipts` bucket once via the MinIO console at `http://localhost:9001` (default credentials: `minioadmin` / `minioadmin`). Development config in [`appsettings.Development.json`](src/backend/Shora.Api/appsettings.Development.json) already points at MinIO.
+Create the private bucket in the Cloudflare dashboard before testing uploads. Integration tests use `InMemoryFileStorage` and do not require R2.
 
 ### 4. Database migrations
 
@@ -738,7 +744,7 @@ dotnet ef migrations add YourMigrationName --project Shora.Infrastructure --star
 | **Unit tests**        | `Unit/` — validators, mappers, retry logic                             |
 | **Integration tests** | `Integration/Api/`, `Integration/Infrastructure/`, `Integration/Auth/` |
 | **Test DB**           | Testcontainers PostgreSQL — **Docker must be running**                 |
-| **Blob tests**        | Testcontainers MinIO or `InMemoryFileStorage`                          |
+| **Blob / file storage** | `InMemoryFileStorage` in tests; `R2FileStorageCompatibilityTests` for R2 adapter details |
 | **Frontend tests**    | Vitest via `ng test`                                                   |
 
 ### Commands
@@ -769,7 +775,7 @@ Tests set `BackgroundJobs:Enabled = false` where needed to avoid background inte
 | **Base image**         | `mcr.microsoft.com/dotnet/aspnet:10.0`                                                      |
 | **Port**               | `8080` (`ASPNETCORE_HTTP_PORTS=8080` on Render)                                              |
 | **docker-compose**     | **Not present** in repository                                                               |
-| **Local Docker usage** | MinIO for dev; Testcontainers for tests; `docker build` compiles frontend + backend in-image |
+| **Local Docker usage** | Testcontainers PostgreSQL for backend tests; `docker build` compiles frontend + backend in-image |
 
 Build and run locally (no manual publish step):
 
@@ -895,7 +901,7 @@ Always persist and compare business times in **UTC** on the server.
 | Pitfall                                                 | Why it breaks things                                            |
 | ------------------------------------------------------- | --------------------------------------------------------------- |
 | Using `https://localhost:7183` directly in browser      | Refresh cookies won't work cross-origin with Angular dev server |
-| Missing MinIO                                           | Receipt upload throws `NotImplementedException`                 |
+| Storage not configured in dev                           | Receipt upload throws `NotImplementedException`                 |
 | Docker not running                                      | `dotnet test` fails (Testcontainers)                            |
 | `Cors__AllowedOrigins__0` ≠ `Frontend__BaseUrl` in prod | Startup validation fails                                        |
 | Supabase transaction pooler (port 6543) on Render       | Breaks EF migrations/transactions — use session pooler (5432)   |
@@ -922,9 +928,9 @@ Always persist and compare business times in **UTC** on the server.
 
 ### Receipt upload fails in dev
 
-**Cause:** MinIO not running or wrong `Storage:Endpoint` / credentials.
+**Cause:** `Storage:Endpoint` (and related keys) are unset, or R2 credentials / bucket are wrong.
 
-**Solution:** Start MinIO on port 9000; confirm `appsettings.Development.json` storage settings and create the `shora-receipts` bucket.
+**Solution:** Set `Storage:*` via user-secrets or environment variables (see [§18](#18-local-development-setup)). Confirm the R2 bucket exists and the API token has object read/write on that bucket.
 
 ### CORS validation error on Render startup
 
@@ -968,8 +974,8 @@ npm start
 npm run build
 npm test
 
-# MinIO
-docker run --rm -p 9000:9000 -p 9001:9001 quay.io/minio/minio:RELEASE.2024-12-18T13-15-44Z server /data --console-address ":9001"
+# Storage (optional local receipt uploads — user-secrets example)
+dotnet user-secrets set "Storage:Endpoint" "https://<accountId>.r2.cloudflarestorage.com" --project src/backend/Shora.Api
 ```
 
 ---

@@ -195,9 +195,9 @@ public class HealthEndpointTests : IDisposable
                     ["Cors:AllowedOrigins:0"] = "https://shora.onrender.com",
                     ["Email:ApiKey"] = "xkeysib-test",
                     ["Email:FromAddress"] = "noreply@example.com",
-                    ["Storage:Endpoint"] = "http://localhost:9000",
-                    ["Storage:AccessKeyId"] = "minioadmin",
-                    ["Storage:SecretAccessKey"] = "minioadmin",
+                    ["Storage:Endpoint"] = "https://example.r2.cloudflarestorage.com",
+                    ["Storage:AccessKeyId"] = "test-access-key-id",
+                    ["Storage:SecretAccessKey"] = "test-secret-access-key",
                     ["Storage:ReceiptBucket"] = "shora-receipts",
                     ["BackgroundJobs:Enabled"] = "false"
                 });

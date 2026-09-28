@@ -4,7 +4,8 @@ namespace Shora.Tests.Common;
 
 public sealed class MinioFixture : IAsyncLifetime
 {
-    private readonly MinioContainer _container = new MinioBuilder("minio/minio:RELEASE.2024-12-18T13-15-44Z")
+    // Docker Hub removed the minio/minio repository. The same release is still published on Quay.
+    private readonly MinioContainer _container = new MinioBuilder("quay.io/minio/minio:RELEASE.2024-12-18T13-15-44Z")
         .Build();
 
     public string Endpoint =>

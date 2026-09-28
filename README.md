@@ -663,7 +663,7 @@ Or edit [`src/backend/Shora.Api/appsettings.Development.json`](src/backend/Shora
 ### 3. MinIO (receipt uploads)
 
 ```powershell
-docker run --rm -p 9000:9000 -p 9001:9001 minio/minio server /data --console-address ":9001"
+docker run --rm -p 9000:9000 -p 9001:9001 quay.io/minio/minio:RELEASE.2024-12-18T13-15-44Z server /data --console-address ":9001"
 ```
 
 Create the `shora-receipts` bucket once via the MinIO console at `http://localhost:9001` (default credentials: `minioadmin` / `minioadmin`). Development config in [`appsettings.Development.json`](src/backend/Shora.Api/appsettings.Development.json) already points at MinIO.
@@ -969,7 +969,7 @@ npm run build
 npm test
 
 # MinIO
-docker run --rm -p 9000:9000 -p 9001:9001 minio/minio server /data --console-address ":9001"
+docker run --rm -p 9000:9000 -p 9001:9001 quay.io/minio/minio:RELEASE.2024-12-18T13-15-44Z server /data --console-address ":9001"
 ```
 
 ---

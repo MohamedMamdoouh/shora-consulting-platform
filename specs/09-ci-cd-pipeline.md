@@ -64,7 +64,8 @@ Backend and frontend jobs run only when their paths (or `.github/workflows/**`) 
 | Build      | `dotnet build --no-restore`                            |
 | Test       | `dotnet test --no-build --verbosity normal`            |
 
-- **xUnit tests** in `Shora.Tests` (PostgreSQL via Testcontainers — Docker required on the runner; file storage uses in-memory fakes).
+- **xUnit unit tests** in `Shora.Tests.Unit` (fast, no Docker).
+- **xUnit integration tests** in `Shora.Tests.Integration` (PostgreSQL via Testcontainers — Docker required on the runner; shared helpers in `Shora.Tests.Common`; file storage uses in-memory fakes).
 - **Cache:** NuGet packages via `setup-dotnet` cache.
 
 **Verify locally:**

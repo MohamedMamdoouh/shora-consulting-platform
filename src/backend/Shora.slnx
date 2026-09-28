@@ -4,5 +4,7 @@
   <Project Path="Shora.Contracts/Shora.Contracts.csproj" />
   <Project Path="Shora.Domain/Shora.Domain.csproj" />
   <Project Path="Shora.Infrastructure/Shora.Infrastructure.csproj" />
-  <Project Path="Shora.Tests/Shora.Tests.csproj" />
+  <Project Path="Shora.Tests.Common/Shora.Tests.Common.csproj" />
+  <Project Path="Shora.Tests.Unit/Shora.Tests.Unit.csproj" />
+  <Project Path="Shora.Tests.Integration/Shora.Tests.Integration.csproj" />
 </Solution>

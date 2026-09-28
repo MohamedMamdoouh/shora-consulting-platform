@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>Shora.Tests.Common</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
+    <PackageReference Include="Microsoft.OpenApi" />
+    <PackageReference Include="Npgsql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Shora.Api\Shora.Api.csproj" />
+    <ProjectReference Include="..\Shora.Application\Shora.Application.csproj" />
+    <ProjectReference Include="..\Shora.Contracts\Shora.Contracts.csproj" />
+    <ProjectReference Include="..\Shora.Infrastructure\Shora.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

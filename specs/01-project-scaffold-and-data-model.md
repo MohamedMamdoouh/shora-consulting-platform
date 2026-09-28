@@ -35,7 +35,9 @@ Shora/
 │       ├── Shora.Contracts/        # Shared request/response records (no dependencies)
 │       ├── Shora.Infrastructure/   # EF Core DbContext + migrations, seed, Cloudflare R2, Brevo email
 │       ├── Shora.Api/              # ASP.NET Core Web API: controllers, jobs, rate limiting, middleware
-│       └── Shora.Tests/            # xUnit integration + unit tests
+│       ├── Shora.Tests.Common/     # Shared test helpers (factories, fixtures)
+│       ├── Shora.Tests.Unit/       # xUnit unit tests
+│       └── Shora.Tests.Integration/ # xUnit integration tests (Testcontainers)
 ├── .github/workflows/              # CI + Deploy workflows (spec 09)
 ├── .gitignore
 └── README.md

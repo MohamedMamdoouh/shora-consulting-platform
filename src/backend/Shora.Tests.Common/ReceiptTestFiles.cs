@@ -1,6 +1,6 @@
 namespace Shora.Tests.Common;
 
-internal static class ReceiptTestFiles
+public static class ReceiptTestFiles
 {
     public static readonly byte[] MinimalJpeg =
     [

@@ -20,7 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Shora.Tests" />
+    <InternalsVisibleTo Include="Shora.Tests.Unit" />
+    <InternalsVisibleTo Include="Shora.Tests.Integration" />
+    <InternalsVisibleTo Include="Shora.Tests.Common" />
   </ItemGroup>
 
 </Project>

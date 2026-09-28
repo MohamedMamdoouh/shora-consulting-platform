@@ -136,7 +136,9 @@ Shora/
 │   │   ├── Shora.Domain/           # Entities, enums
 │   │   ├── Shora.Contracts/        # Shared request/response DTOs
 │   │   ├── Shora.Infrastructure/   # EF Core, Identity, Brevo email, Blob, seed
-│   │   └── Shora.Tests/            # xUnit tests
+│   │   ├── Shora.Tests.Common/     # Shared test helpers
+│   │   ├── Shora.Tests.Unit/       # xUnit unit tests
+│   │   └── Shora.Tests.Integration/ # xUnit integration tests
 │   ├── contracts/          # TypeScript mirrors of Shora.Contracts
 │   └── frontend/           # Angular app (shora-web)
 ├── Dockerfile              # Multi-stage production image (Render builds from Git)
@@ -740,7 +742,8 @@ dotnet ef migrations add YourMigrationName --project Shora.Infrastructure --star
 | Item                  | Detail                                                                 |
 | --------------------- | ---------------------------------------------------------------------- |
 | **Framework**         | xUnit v3                                                               |
-| **Project**           | `src/backend/Shora.Tests`                                              |
+| **Unit tests**        | `src/backend/Shora.Tests.Unit`                                         |
+| **Integration tests** | `src/backend/Shora.Tests.Integration` (requires Docker for Postgres)   |
 | **Unit tests**        | `Unit/` — validators, mappers, retry logic                             |
 | **Integration tests** | `Integration/Api/`, `Integration/Infrastructure/`, `Integration/Auth/` |
 | **Test DB**           | Testcontainers PostgreSQL — **Docker must be running**                 |
@@ -750,10 +753,12 @@ dotnet ef migrations add YourMigrationName --project Shora.Infrastructure --star
 ### Commands
 
 ```powershell
-# Backend (requires Docker)
+# Backend (integration tests require Docker)
 cd src/backend
 dotnet build
-dotnet test
+dotnet test Shora.Tests.Unit/Shora.Tests.Unit.csproj
+dotnet test Shora.Tests.Integration/Shora.Tests.Integration.csproj
+# Or: dotnet test  (runs unit + integration)
 
 # Frontend
 cd src/frontend

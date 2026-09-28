@@ -113,29 +113,6 @@
   color: var(--color-primary);
 }
 
-.hero__visual {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 0;
-  @include fade-in-up(200ms);
-}
-
-.hero__photo {
-  display: block;
-  width: 100%;
-  max-width: 14rem;
-  height: auto;
-  border-radius: 50% 50% var(--radius-xl) var(--radius-xl);
-  object-fit: cover;
-  object-position: center 18%;
-  aspect-ratio: 3 / 4;
-  box-shadow: var(--shadow-md);
-  border: 2px solid var(--color-surface);
-  outline: 1px solid var(--color-border);
-}
-
 /* Process steps */
 .steps {
   display: grid;
@@ -268,17 +245,6 @@
   gap: var(--space-md);
 }
 
-@media (min-width: 768px) {
-  .hero__inner {
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-lg);
-  }
-
-  .hero__photo {
-    max-width: 15rem;
-  }
-}
-
 @media (max-width: 640px) {
   .section--card {
     padding: var(--space-md);
@@ -286,11 +252,6 @@
 
   .hero {
     padding: 0 0 var(--space-md);
-  }
-
-  .hero__photo {
-    max-width: 11rem;
-    margin-inline: auto;
   }
 
   .step {

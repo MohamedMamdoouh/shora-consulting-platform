@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/MohamedMamdoouh/shora-consulting-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/MohamedMamdoouh/shora-consulting-platform/actions/workflows/ci.yml)
 
+**Live site:** [https://shora-asde.onrender.com/](https://shora-asde.onrender.com/)
+
 RTL personal practice site for one-to-one relationship consulting sessions. Clients browse availability, reserve a session, pay by manual bank transfer (Vodafone Cash or InstaPay), upload a receipt, and receive the session by voice call or chat. A single **Admin** (the practitioner) manages settings, availability, receipt approval, cancellations, and refunds.
 
 **Status:** MVP feature set is implemented in code (backend, frontend, CI/CD). Production hosting uses Render + Supabase PostgreSQL + Cloudflare R2 — see [Deployment](#23-deployment).
@@ -51,6 +53,7 @@ RTL personal practice site for one-to-one relationship consulting sessions. Clie
 | Item                 | Description                                                                                                                  |
 | -------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | **Name**             | Shora                                                                                                                        |
+| **Live site**        | [https://shora-asde.onrender.com/](https://shora-asde.onrender.com/)                                                         |
 | **Purpose**          | Personal practice booking site for one-to-one relationship consulting sessions                                               |
 | **Problem**          | Lets a single practitioner offer bookable sessions with manual local payment verification, without an online payment gateway |
 | **Target users**     | **Clients** — people booking sessions; **Admin** — the practitioner operating their personal practice                        |
@@ -565,9 +568,9 @@ Use `__` (double underscore) for nested env vars on Render (e.g. `Jwt__SigningKe
 | `ASPNETCORE_HTTP_PORTS`                | Container listen port                | `8080`                                   |
 | `ConnectionStrings__DefaultConnection` | Supabase PostgreSQL (session pooler) | See [`docs/deployment.md`](docs/deployment.md) |
 | `Jwt__SigningKey`                      | HMAC signing key (≥32 chars)         | `YOUR_RANDOM_SECRET_32_CHARS_MIN`        |
-| `Frontend__BaseUrl`                    | Public HTTPS URL (no trailing slash) | `https://shora.onrender.com`             |
+| `Frontend__BaseUrl`                    | Public HTTPS URL (no trailing slash) | `https://shora-asde.onrender.com`        |
 | `Cors__AllowedOrigins__0`              | Must match `Frontend__BaseUrl`       | Same as above                            |
-| `AllowedHosts`                         | Hostname only                        | `shora.onrender.com`                     |
+| `AllowedHosts`                         | Hostname only                        | `shora-asde.onrender.com`                |
 | `Storage__Endpoint`                    | Cloudflare R2 S3 endpoint            | `https://<accountId>.r2.cloudflarestorage.com` |
 | `Storage__AccessKeyId`                 | R2 access key ID                     | From Cloudflare dashboard                |
 | `Storage__SecretAccessKey`             | R2 secret access key                 | From Cloudflare dashboard                |
@@ -585,7 +588,7 @@ Use `__` (double underscore) for nested env vars on Render (e.g. `Jwt__SigningKe
 
 | Variable / setting              | Purpose                                       | Default                 |
 | ------------------------------- | --------------------------------------------- | ----------------------- |
-| `Brand__BrandName`              | Email template branding                       | `دكتور محمود البنا`     |
+| `Brand__BrandName`              | Email template branding                       | `منصة شورى`     |
 | `Seed__*`                       | Payment/contact defaults before first startup | Placeholder test values |
 | `Jwt__AccessTokenMinutes`       | Access token TTL                              | 15                      |
 | `Jwt__RefreshTokenDays`         | Refresh token TTL                             | 7                       |
@@ -792,7 +795,7 @@ No secrets required. Docs-only changes skip unaffected jobs.
 
 Production deploys: push/merge to `main` → Render builds [`Dockerfile`](Dockerfile) and deploys automatically. See [`docs/deployment.md`](docs/deployment.md).
 
-Optional repository variable: `PRODUCTION_URL` (e.g. `https://shora.onrender.com`) for documentation/scripts.
+Optional repository variable: `PRODUCTION_URL` (e.g. `https://shora-asde.onrender.com`) for documentation/scripts.
 
 Detail: [`.github/workflows/README.md`](.github/workflows/README.md).
 

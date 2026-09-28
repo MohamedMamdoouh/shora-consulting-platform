@@ -45,7 +45,7 @@ Admin HTTP services live under `src/app/core/admin/`.
 
 ## Static assets (`public/`)
 
-Ships `logo.svg` for the favicon and home page hero only. **`robots.txt` and `sitemap.xml` are not used** — traffic is expected from direct/social links, not search indexing. Add them under `public/` later if you want SEO.
+Ships `shora-logo.png` for the favicon and header brand mark. **`robots.txt` and `sitemap.xml` are not used** — traffic is expected from direct/social links, not search indexing. Add them under `public/` later if you want SEO.
 
 ## Build & test
 

@@ -224,7 +224,7 @@ internal static class TransactionEmailTemplates
             BodyHtml: EmailHtml.Join(
                 EmailHtml.Paragraph("تم إلغاء حجزك."),
                 EmailHtml.DetailsList(details.ToArray()),
-                EmailHtml.ParagraphLast("إذا كان لديك أي استفسار، يمكنك التواصل معي عبر لوحة العميل.")),
+                EmailHtml.ParagraphLast("إذا كان لديك أي استفسار، يمكنك التواصل عبر لوحة العميل.")),
             Heading: "تم إلغاء الحجز",
             ActionUrl: links.ClientDashboard(),
             ActionLabel: "عرض حجوزاتي",
@@ -306,11 +306,11 @@ internal static class TransactionEmailTemplates
                     ("المبلغ", TransactionEmailLabels.FormatMoney(amount, currency), false),
                     ("مرجع التحويل", reference, true)),
                 note,
-                EmailHtml.ParagraphLast("إذا لم تستلم المبلغ بعد، تواصل معي عبر لوحة العميل.")),
+                EmailHtml.ParagraphLast("إذا لم تستلم المبلغ بعد، تواصل عبر لوحة العميل.")),
             Heading: "تأكيد الاسترداد",
             ActionUrl: links.ClientDashboard(),
             ActionLabel: "عرض حجوزاتي",
             RecipientName: context.Recipient.DisplayName,
-            FooterNote: "إذا لم تستلم المبلغ بعد، تواصل معي عبر لوحة العميل.");
+            FooterNote: "إذا لم تستلم المبلغ بعد، تواصل عبر لوحة العميل.");
     }
 }

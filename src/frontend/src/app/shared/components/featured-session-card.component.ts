@@ -109,17 +109,6 @@ import { BookingCtaComponent } from '../../public/shared/booking-cta.component';
           {{ copy.session.privacyNote }}
         </p>
       </div>
-
-      <div class="featured-session__visual">
-        <img
-          class="featured-session__photo"
-          src="/hero-counselor.png"
-          [attr.alt]="copy.instructor.photoAlt"
-          width="320"
-          height="400"
-          decoding="async"
-        />
-      </div>
     </article>
   `,
   styles: `
@@ -230,31 +219,9 @@ import { BookingCtaComponent } from '../../public/shared/booking-cta.component';
       color: var(--color-text-muted);
     }
 
-    .featured-session__visual {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .featured-session__photo {
-      display: block;
-      width: 100%;
-      max-width: 14rem;
-      height: auto;
-      border-radius: 50% 50% var(--radius-xl) var(--radius-xl);
-      object-fit: cover;
-      aspect-ratio: 4 / 5;
-      box-shadow: var(--shadow-card);
-      border: 3px solid var(--color-surface);
-      outline: 1px solid var(--color-border);
-    }
-
     @media (min-width: 768px) {
       .featured-session {
-        grid-template-columns: 1.1fr 0.9fr;
-        align-items: center;
         padding: var(--space-md) var(--space-lg);
-        gap: var(--space-md);
       }
 
       .featured-session__meta-item {

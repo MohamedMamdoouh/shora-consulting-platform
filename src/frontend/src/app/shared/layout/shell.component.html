@@ -152,50 +152,6 @@
           <a routerLink="/terms">{{ copy.nav.terms }}</a>
           <a routerLink="/about">{{ copy.footer.aboutLink }}</a>
         </nav>
-
-        <div class="shell__footer-divider" aria-hidden="true"></div>
-
-        <ul class="shell__footer-social" [attr.aria-label]="copy.footer.socialNavLabel">
-          @for (social of copy.footer.social; track social.id) {
-            <li>
-              <a
-                [href]="social.href"
-                target="_blank"
-                rel="noopener noreferrer"
-                [attr.aria-label]="social.label"
-              >
-                @switch (social.id) {
-                  @case ('facebook') {
-                    <svg
-                      viewBox="0 0 24 24"
-                      width="20"
-                      height="20"
-                      fill="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M13.5 9.5H16l-.75 3H13.5V20h-3v-7.5H8V9.5h2.5V7.8c0-2 1.2-3.3 3.2-3.3H16v2.7h-1.5c-.7 0-1 .4-1 1v1.3z"
-                      />
-                    </svg>
-                  }
-                  @case ('tiktok') {
-                    <svg
-                      viewBox="0 0 24 24"
-                      width="20"
-                      height="20"
-                      fill="currentColor"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M15.75 5.25a4.5 4.5 0 003 1.12V9.9a6.9 6.9 0 01-3-.64v6.74a4.86 4.86 0 11-4.86-4.86c.17 0 .34.01.5.03v2.98a1.88 1.88 0 102.64 1.72V2.25h2.72v3z"
-                      />
-                    </svg>
-                  }
-                }
-              </a>
-            </li>
-          }
-        </ul>
       </div>
     </div>
   </footer>

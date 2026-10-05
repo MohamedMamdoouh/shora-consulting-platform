@@ -7,10 +7,12 @@ import { FooterCtaBannerComponent } from '../../shared/components/footer-cta-ban
 import { TopicCardComponent } from '../../shared/components/topic-card.component';
 import { CONSULTATION_TOPICS, HOW_IT_WORKS_STEPS } from '../shared/topic.constants';
 import { BookingCtaComponent } from '../shared/booking-cta.component';
+import { BrandLogoComponent } from '../../shared/components/brand-logo.component';
 
 @Component({
   selector: 'app-home-page',
   imports: [
+    BrandLogoComponent,
     BookingCtaComponent,
     FeaturedSessionCardComponent,
     TopicCardComponent,

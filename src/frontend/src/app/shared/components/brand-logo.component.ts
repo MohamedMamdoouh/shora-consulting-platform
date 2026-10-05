@@ -5,6 +5,7 @@ import { Component, input } from '@angular/core';
   host: {
     class: 'brand-logo',
     '[class.brand-logo--compact]': 'compact()',
+    '[class.brand-logo--hero]': 'hero()',
   },
   template: `
     <img
@@ -32,10 +33,21 @@ import { Component, input } from '@angular/core';
     :host(.brand-logo--compact) img {
       height: 2rem;
     }
+
+    :host(.brand-logo--hero) {
+      flex-shrink: 0;
+    }
+
+    :host(.brand-logo--hero) img {
+      width: auto;
+      max-width: 100%;
+      height: clamp(12rem, 52vmin, 32rem);
+    }
   `,
 })
 export class BrandLogoComponent {
   readonly compact = input(false);
+  readonly hero = input(false);
   readonly decorative = input(false);
   readonly ariaLabel = input('منصة شورى');
 }

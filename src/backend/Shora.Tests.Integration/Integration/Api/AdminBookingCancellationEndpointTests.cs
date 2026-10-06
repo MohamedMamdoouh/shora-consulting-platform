@@ -160,6 +160,7 @@ public class AdminBookingCancellationEndpointTests : IDisposable
     {
         var cancellationToken = TestContext.Current.CancellationToken;
         var (client, bookingId, slotId) = await CreateConfirmedBookingAsync("admin-approve-cancel-too-late@example.com", cancellationToken);
+        await SetBookingSlotStartAsync(bookingId, DateTime.UtcNow.AddDays(1), cancellationToken);
 
         var requestResponse = await client.PostApiJsonAsync(
             $"/api/v1/bookings/{bookingId}/cancellation-requests",
